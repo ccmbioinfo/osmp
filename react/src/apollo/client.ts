@@ -1,4 +1,4 @@
-import { ApolloClient, createHttpLink, from, InMemoryCache } from '@apollo/client';
+import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { QueryHookOptions, useQuery } from '@apollo/react-hooks';
 import { DocumentNode } from 'graphql';
@@ -36,6 +36,17 @@ export const useApolloQuery = <T, V>(query: DocumentNode, options: QueryHookOpti
     return useQuery<T, V>(query, {
         client,
         fetchPolicy: 'cache-first',
+        ...options,
+    });
+};
+
+export const useLazyApolloQuery = <T, V>(
+    query: DocumentNode,
+    options: QueryHookOptions<T, V> = {}
+) => {
+    return useLazyQuery<T, V>(query, {
+        client,
+        //fetchPolicy: 'standby', // does not requery when underlying values change....
         ...options,
     });
 };

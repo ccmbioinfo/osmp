@@ -58,6 +58,7 @@ const getEnsemblQuery = async (
       transformVariantQueryInputToEnsembl(args)
     );
   } catch (e: unknown) {
+    console.log(e);
     const error = e as AxiosError<EnsemblQueryError>;
     ensemblQueryError = { code: +(error.code || 500), message: error.message };
   }
@@ -79,7 +80,7 @@ export const transformEnsemblQueryResponse: ResultTransformer<{
     return [];
   } else {
     return response.data.variants.map(r => ({
-      af: r.info.AF[0] ? +r.info.AF[0] : null,
+      af: r.info.AF[0] ? +r.info.AF[0] || null : null,
       alt: r.alternateBases[0],
       chromosome: r.referenceName,
       dp: r.info.DP[0] ? +r.info.DP[0] : null,

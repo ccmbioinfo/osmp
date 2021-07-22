@@ -92,8 +92,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 };
 
 const Cell = styled.td`
-    color: ${props => props.theme.colors.primary};
-    outline: thin solid ${props => props.theme.colors.primary};
+    color: ${props => props.theme.palette.primary};
+    outline: thin solid ${props => props.theme.palette.primary};
     padding: 2px;
 `;
 

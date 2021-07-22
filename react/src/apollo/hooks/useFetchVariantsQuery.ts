@@ -1,6 +1,6 @@
 import { gql } from '@apollo/react-hooks';
 import { VariantQueryInput, VariantQueryResponse } from '../../types';
-import { useApolloQuery } from '../client';
+import { useLazyApolloQuery } from '../client';
 
 const fetchVariantsQuery = gql`
     query GetVariants($input: VariantQueryInput) {
@@ -26,12 +26,9 @@ const fetchVariantsQuery = gql`
     }
 `;
 
-const useFetchVariantsQuery = (variables: VariantQueryInput) => {
-    return useApolloQuery<{ getVariants: VariantQueryResponse }, VariantQueryInput>(
-        fetchVariantsQuery,
-        {
-            variables,
-        }
+const useFetchVariantsQuery = () => {
+    return useLazyApolloQuery<{ getVariants: VariantQueryResponse }, VariantQueryInput>(
+        fetchVariantsQuery
     );
 };
 

@@ -33,7 +33,14 @@ const getLocalQuery = async (
   let localQueryError: LocalQueryError | null = null;
   try {
     localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
-      return resolve([{ alternative: 'A', reference: 'T', chromosome: '1', extraneous: 'extr' }]);
+      return resolve([
+        {
+          alternative: 'A',
+          reference: 'T',
+          chromosome: args.input.chromosome || '1',
+          extraneous: 'extr',
+        },
+      ]);
     });
   } catch (e) {
     localQueryError = e;

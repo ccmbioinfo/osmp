@@ -2,6 +2,7 @@ import React from 'react';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { VariantQueryPage } from '.';
+import { Typography } from '../components';
 import theme from '../constants/theme';
 
 const App: React.FC<{}> = () => {
@@ -9,7 +10,7 @@ const App: React.FC<{}> = () => {
         <ThemeProvider theme={theme}>
             <div>
                 <header>
-                    <h2>Hello World</h2>
+                    <Typography variant="h3">This is the main page heading</Typography>
                 </header>
                 <Router>
                     <Switch>
