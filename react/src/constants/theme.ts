@@ -11,17 +11,17 @@ const theme: DefaultTheme = {
 
     typography: {
         h3: {
-            fontFamily: 'TBD, sans-serif',
+            fontFamily: 'Roboto, sans-serif',
             fontSize: '24px',
             fontWeight: 600,
         },
         h4: {
-            fontFamily: 'TBD, sans-serif',
+            fontFamily: 'Roboto, sans-serif',
             fontSize: '24px',
             fontWeight: 600,
         },
         p: {
-            fontFamily: 'TBD, sans-serif',
+            fontFamily: 'Roboto, sans-serif',
             fontSize: '14px',
             fontWeight: 'normal',
         },

@@ -1,4 +1,5 @@
-import Table from './Table';
+import Table from './Table/Table';
 import Typography from './Typography';
+import Dropdown from './Filters/Dropdown';
 
-export { Table, Typography };
+export { Table, Typography, Dropdown };
