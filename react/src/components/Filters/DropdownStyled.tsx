@@ -38,6 +38,8 @@ export const List = styled.div`
 
     li {
         list-style-type: none;
+        max-height: 100px;
+        overflow: scroll;
 
         &:first-of-type {
             > button {
