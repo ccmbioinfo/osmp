@@ -18,6 +18,8 @@ const Component = styled.p<TypographyProps>`
     font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
     font-size: ${props => {
         switch (props.variant) {
+            case 'subtitle':
+                return props.theme.fontSizes.xs;
             case 'p':
                 return props.theme.fontSizes.s;
             case 'h4':

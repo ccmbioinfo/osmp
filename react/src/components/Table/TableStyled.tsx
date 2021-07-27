@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-// To-do: Add theming and parametrize color variables
-
 export const TableStyled = styled.table`
     margin-top: 5px;
     border-collapse: collapse;
@@ -42,5 +40,5 @@ export const Row = styled.tr`
     }
 `;
 export const Cell = styled.td`
-    color: ${props => props.theme.palette.typography.main};
+    color: ${props => props.theme.colors.text};
 `;

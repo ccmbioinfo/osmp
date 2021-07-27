@@ -1,51 +1,53 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
-    display: flex;
+const Flex = styled.div`
+  display: flex;
+`
+
+export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
 `;
 
-export const Header = styled.div`
-    background-color: white;
-    border-color: #ccc;
-    color: #ccc;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-    display: flex;
+export const Header = styled(Flex)`
+    background-color: ${props => props.theme.background};
+    border-color: ${props => props.theme.colors.muted};
+    color: ${props => props.theme.colors.muted};
+    border-radius: ${props => props.theme.radii.base};
+    border: ${props => props.theme.borders.thin};
+    box-shadow: ${props => props.theme.boxShadow};
+    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
     width: 100%;
-    padding: 0 20px;
 `;
 
 export const Title = styled.p`
-    font-size: 14px;
-    margin-inline-end: 5px;
+    font-size: ${props => props.theme.fontSizes.s};
+    color: ${props => props.theme.colors.text};
+    margin-inline-end: ${props => props.theme.space[1]};
 `;
 
 export const List = styled.div`
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+    box-shadow: ${props => props.theme.boxShadow}
     padding: 0;
     margin: 0;
     width: 100%;
     margin-top: 20px;
+    max-height: 100px;
+    overflow: auto;
 
     /* Dropdown List Styling */
 
-    li {
+    > li {
         list-style-type: none;
-        max-height: 100px;
-        overflow: scroll;
 
         &:first-of-type {
             > button {
-                border-top: 1px solid #ccc;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
+                border-top: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
+                border-top-left-radius: ${props => props.theme.radii.base};
+                border-top-right-radius: ${props => props.theme.radii.base};
             }
         }
 

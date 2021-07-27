@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
-import { Button, Dropdown, Table, Typography } from '../components';
+import { Button, Dropdown, Input, Table, Typography } from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
@@ -147,7 +147,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column>
                         <Typography variant="p">Start Range</Typography>
                         <Input
-                            type="text"
                             value={queryOptionsForm.start.value}
                             onChange={e => updateQueryOptionsForm('start')(e.currentTarget.value)}
                         />
@@ -156,7 +155,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column>
                         <Typography variant="p">End Range</Typography>
                         <Input
-                            type="text"
                             value={queryOptionsForm.end.value}
                             onChange={e => updateQueryOptionsForm('end')(e.currentTarget.value)}
                         />
@@ -219,7 +217,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <div>
                             <label>Start</label>
                             <Input
-                                type="text"
                                 value={queryOptionsForm.start.value}
                                 onChange={e =>
                                     updateQueryOptionsForm('start')(e.currentTarget.value)
@@ -230,7 +227,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <div>
                             <label>End</label>
                             <Input
-                                type="text"
                                 value={queryOptionsForm.end.value}
                                 onChange={e => updateQueryOptionsForm('end')(e.currentTarget.value)}
                             />
@@ -299,16 +295,4 @@ const Column = styled.div`
     flex-direction: column;
     margin-right: 10px;
     margin-bottom: 0px;
-`;
-
-const Input = styled.input`
-    background-color: white;
-    border-color: #ccc;
-    color: #ccc;
-    border-radius: 4px;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
-    padding: 0 20px;
-    height: 100%;
 `;

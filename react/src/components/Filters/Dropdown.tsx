@@ -48,7 +48,9 @@ const Dropdown: React.FC<DropdownProps> = ({ items, multiSelect, title, reset, o
     return (
         <Wrapper>
             <Header tabIndex={0} role="button" onClick={toggle}>
-                <Title>{selection.length > 0 ? `${selection.length} Selected` : title}</Title>
+                <Title>
+                    {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}
+                </Title>
                 {open ? <ExpandLess /> : <ExpandMore />}
             </Header>
             {open && (

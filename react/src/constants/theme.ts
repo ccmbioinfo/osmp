@@ -2,6 +2,7 @@ import { DefaultTheme } from 'styled-components';
 
 const theme: DefaultTheme = {
     background: 'white',
+    boxShadow: '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important',
     colors: {
         text: '#333',
         background: '#fff',
@@ -57,6 +58,10 @@ const theme: DefaultTheme = {
             fontWeight: 600,
         },
         p: {
+            fontSize: '12px',
+            fontWeight: 'normal',
+        },
+        subtitle: {
             fontSize: '12px',
             fontWeight: 'normal',
         },

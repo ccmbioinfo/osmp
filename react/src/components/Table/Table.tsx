@@ -48,7 +48,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
-    /* todo: replace table elements with styled components */
     return (
         <TableStyled {...getTableProps()}>
             <thead>
