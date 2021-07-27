@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import { DropdownItem } from '../../types';
-import { Header, List, Title, Wrapper } from './DropdownStyled';
+import { Header, List, Title, Wrapper } from './Dropdown.styles';
 
 interface DropdownProps {
     title: string;

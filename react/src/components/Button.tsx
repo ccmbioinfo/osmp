@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ButtonProps {
-    onClick: () => void;
     variant: string;
+    onClick?: () => void;
     disabled?: boolean;
 }
 
@@ -11,6 +11,7 @@ const Component = styled.button<ButtonProps>`
     box-sizing: border-box;
     display: inline-block;
     text-align: center;
+    font-family: ${props => props.theme.fontFamily.heading};
     padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
     margin: ${props => props.theme.space[3]} ${props => props.theme.space[2]};
     color: ${props =>

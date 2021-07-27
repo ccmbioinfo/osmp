@@ -3,7 +3,7 @@ import { DefaultTheme } from 'styled-components';
 const theme: DefaultTheme = {
     background: {
         main: '#fff',
-        success: '#effbef'
+        success: '#effbef',
     },
     boxShadow: '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important',
     colors: {
@@ -14,7 +14,7 @@ const theme: DefaultTheme = {
         accent: '#d396c3',
         muted: '#efefef',
         error: '#d0453e',
-        success: '#78d380' 
+        success: '#78d380',
     },
     space: [
         '0rem',
@@ -27,9 +27,13 @@ const theme: DefaultTheme = {
         '8rem', // 128px
         '16rem', // 256px
     ],
+    fontFamily: {
+        heading: 'DM Sans',
+        body: 'Roboto',
+    },
     fontSizes: {
-        xl: '3rem',
-        l: '2rem',
+        xl: '2rem',
+        l: '1.5rem',
         m: '1rem',
         s: '0.9rem',
         xs: '0.75rem',

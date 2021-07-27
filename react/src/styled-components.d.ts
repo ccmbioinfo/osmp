@@ -18,6 +18,10 @@ declare module 'styled-components' {
             success: string;
         };
         space: string[];
+        fontFamily: {
+            heading: string;
+            body: string;
+        }
         fontSizes: {
             xl: string;
             l: string;

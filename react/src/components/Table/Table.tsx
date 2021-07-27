@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Row, TableStyled } from './TableStyled';
+import { Row, TableStyled } from './Table.styles';
 
 interface TableProps {
     variantData: VariantQueryResponseSchemaTableRow[];

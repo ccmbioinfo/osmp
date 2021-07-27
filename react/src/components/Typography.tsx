@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Theme from '../constants/theme';
+import { printIntrospectionSchema } from 'graphql';
 
 interface TypographyOverrides {
     bold?: boolean;
@@ -26,6 +27,14 @@ const Component = styled.p<TypographyProps>`
                 return props.theme.fontSizes.m;
             case 'h3':
                 return props.theme.fontSizes.l;
+        }
+    }};
+    font-family: ${props => {
+        switch (props.variant) {
+            case 'subtitle' || 'p':
+                return props.theme.fontFamily.body;
+            case 'h4' || 'h3':
+                return props.theme.fontFamily.heading;
         }
     }};
 `;
