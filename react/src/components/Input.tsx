@@ -9,7 +9,7 @@ interface InputProps {
 }
 
 const Component = styled.input<InputProps>`
-    background-color: ${props => props.theme.background};
+    background-color: ${props => props.theme.background.main};
     border-color: ${props =>
         props.error ? props.theme.colors.error : props.theme.colors.muted} !important;
     color: ${props => props.theme.colors.text};

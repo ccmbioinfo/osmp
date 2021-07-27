@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Cell, Row, TableStyled } from './TableStyled';
+import { Row, TableStyled } from './TableStyled';
 
 interface TableProps {
     variantData: VariantQueryResponseSchemaTableRow[];
@@ -77,9 +77,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             {row.cells.map(cell => {
                                 const { key, ...restCellProps } = cell.getCellProps();
                                 return (
-                                    <Cell key={key} {...restCellProps}>
+                                    <td key={key} {...restCellProps}>
                                         {cell.render('Cell')}
-                                    </Cell>
+                                    </td>
                                 );
                             })}
                         </Row>

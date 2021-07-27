@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
-import { Button, Dropdown, Input, Table, Typography } from '../components';
+import { Button, Dropdown, Input, Spinner, Table, Typography } from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
@@ -180,8 +180,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                     >
                         Clear
                     </Button>
+                    <Column>{loading ? <Spinner /> : null}</Column>
                 </FlexRow>
-                <form>
+                {/* <form>
                     <fieldset>
                         <legend>
                             <Typography variant="h4" bold>
@@ -206,8 +207,8 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </label>
                         <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </fieldset>
-                </form>
-                <form>
+                </form> */}
+                {/* <form>
                     <fieldset>
                         <legend>
                             <Typography variant="h4" bold>
@@ -262,14 +263,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Clear
                         </button>
                     </fieldset>
-                </form>
+                </form> */}
             </div>
-            <hr />
-            {data ? (
-                <Table variantData={prepareData(data.getVariants)} />
-            ) : loading ? (
-                <Typography variant="h3">Loading...</Typography>
-            ) : null}
+            {/* <hr /> */}
+            {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
         </div>
     );
 };

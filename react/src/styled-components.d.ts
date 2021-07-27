@@ -2,7 +2,10 @@ import 'styled-components';
 
 declare module 'styled-components' {
     export interface DefaultTheme {
-        background: string;
+        background: {
+            main: string;
+            success:string;
+        };
         boxShadow: string; 
         colors: {
             text: string;
@@ -12,6 +15,7 @@ declare module 'styled-components' {
             accent: string;
             muted: string;
             error: string;
+            success: string;
         };
         space: string[];
         fontSizes: {
