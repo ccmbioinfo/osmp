@@ -10,11 +10,11 @@ const spin = keyframes`
 `;
 
 export const Loader = styled.div`
-    border: 0.2em solid rgba(0, 0, 0, 0.1);
-    border-top: 0.2em solid #767676;
+    border: ${props => props.theme.borders.thin} rgba(0, 0, 0, 0.1);
+    border-top: ${props => props.theme.borders.thin} #767676;
     border-radius: 50%;
-    width: 2.1rem;
-    height: 2.1rem;
+    width: ${props => props.theme.space[5]};
+    height: ${props => props.theme.space[5]};
     margin: auto;
     animation: ${spin} 0.6s linear infinite;
 `;
