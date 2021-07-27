@@ -1,5 +1,11 @@
 import { Maybe } from 'graphql/jsutils/Maybe';
 
+export interface DropdownItem {
+    id: number;
+    value: string;
+    label: string;
+}
+
 export interface VariantQueryResponseSchema {
     af: Maybe<number>;
     alt: string;

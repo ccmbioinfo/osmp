@@ -13,28 +13,37 @@ interface TypographyProps extends TypographyOverrides {
     variant: TagType;
 }
 
-/* todo: reduce duplication... */
-const styledTypographyMap = {
-    p: styled.p`
-        color: ${props =>
-            props.error
-                ? props.theme.palette.typography.error
-                : props.theme.palette.typography.main};
-        font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
-    `,
-    h3: styled.h3`
-        color: ${props => props.theme.palette.typography.main};
-        font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
-    `,
-    h4: styled.h4`
-        color: ${props => props.theme.palette.typography.main};
-        font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
-    `,
-};
+const Component = styled.p<TypographyProps>`
+    color: ${props => (props.error ? props.theme.colors.error : props.theme.colors.text)};
+    font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
+    font-size: ${props => {
+        switch (props.variant) {
+            case 'subtitle':
+                return props.theme.fontSizes.xs;
+            case 'p':
+                return props.theme.fontSizes.s;
+            case 'h4':
+                return props.theme.fontSizes.m;
+            case 'h3':
+                return props.theme.fontSizes.l;
+        }
+    }};
+    font-family: ${props => {
+        switch (props.variant) {
+            case 'subtitle' || 'p':
+                return props.theme.fontFamily.body;
+            case 'h4' || 'h3':
+                return props.theme.fontFamily.heading;
+        }
+    }};
+`;
 
 const Typography: React.FC<TypographyProps> = ({ variant, children, ...userStyles }) => {
-    const Component = styledTypographyMap[variant];
-    return <Component {...userStyles}>{children}</Component>;
+    return (
+        <Component variant={variant} {...userStyles}>
+            {children}
+        </Component>
+    );
 };
 
 export default Typography;

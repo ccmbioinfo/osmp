@@ -5,6 +5,7 @@
   "proxy": "http://ssmp-server:5862",
   "dependencies": {
     "@apollo/react-hooks": "^4.0.0",
+    "@material-ui/icons": "^4.11.2",
     "apollo-client": "^2.6.10",
     "gql-tag": "^1.0.1",
     "graphql": "^15.5.1",

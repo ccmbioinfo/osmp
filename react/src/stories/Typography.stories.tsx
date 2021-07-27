@@ -8,10 +8,10 @@ export default {
     component: Typography,
     argTypes: {
         variant: {
-          options: ['h3', 'p'],
-          control: { type: 'radio' }
-        }
-      }
+            options: ['h3', 'p'],
+            control: { type: 'radio' },
+        },
+    },
 } as Meta;
 
 const Template: Story<{ bold: boolean; variant: 'h3' | 'p' }> = args => (

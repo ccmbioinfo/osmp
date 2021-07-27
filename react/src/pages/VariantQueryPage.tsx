@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
-import { Table, Typography } from '../components';
+import {
+    Body,
+    Button,
+    Column,
+    Dropdown,
+    Flex,
+    Input,
+    Spinner,
+    Table,
+    Typography,
+} from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
-import { VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
+import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
 
 const queryOptionsFormValidator = {
     sources: {
@@ -74,8 +84,10 @@ const VariantQueryPage: React.FC<{}> = () => {
     });
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
+    const [reset, setReset] = useState<Boolean>(false);
 
-    const toggleSource = (source: 'ensembl' | 'local') => {
+    // Todo: Enable typings for only 'emsembl' | 'local'
+    const toggleSource = (source: string) => {
         const update = updateQueryOptionsForm('sources');
 
         queryOptionsForm.sources.value.includes(source)
@@ -83,10 +95,102 @@ const VariantQueryPage: React.FC<{}> = () => {
             : update(queryOptionsForm.sources.value.concat(source));
     };
 
+    const sources: DropdownItem[] = [
+        {
+            id: 1,
+            value: 'local',
+            label: 'Local',
+        },
+        {
+            id: 2,
+            value: 'ensembl',
+            label: 'Ensembl',
+        },
+    ];
+
+    const chromosomes: DropdownItem[] = Array.from(Array(22))
+        .map((v, i) => ({
+            id: i,
+            value: (i + 1).toString(),
+            label: (i + 1).toString(),
+        }))
+        .concat(
+            ['X', 'Y'].map((v, i) => ({
+                id: 22 + i,
+                value: v,
+                label: v,
+            }))
+        );
+
     return (
-        <div>
+        <Body>
             <div>
-                <form>
+                <Flex>
+                    <Column>
+                        <Typography variant="p">Sources</Typography>
+                        <Dropdown
+                            title="Select Sources"
+                            items={sources}
+                            multiSelect
+                            onChange={item => {
+                                toggleSource(item.value);
+                                setReset(false);
+                            }}
+                            reset={reset}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.sources.error} />
+                    </Column>
+                    <Column>
+                        <Typography variant="p">Chromosomes</Typography>
+                        <Dropdown
+                            title="Select Chromosome"
+                            items={chromosomes}
+                            onChange={e => {
+                                setReset(false);
+                                updateQueryOptionsForm('chromosome')(e.value);
+                            }}
+                            reset={reset}
+                        />
+                    </Column>
+                    <Column>
+                        <Typography variant="p">Start Range</Typography>
+                        <Input
+                            value={queryOptionsForm.start.value}
+                            onChange={e => updateQueryOptionsForm('start')(e.currentTarget.value)}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.start.error} />
+                    </Column>
+                    <Column>
+                        <Typography variant="p">End Range</Typography>
+                        <Input
+                            value={queryOptionsForm.end.value}
+                            onChange={e => updateQueryOptionsForm('end')(e.currentTarget.value)}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.end.error} />
+                    </Column>
+                </Flex>
+                <Flex>
+                    <Button
+                        disabled={
+                            loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                        }
+                        onClick={() => fetchVariants({ variables: getArgs() })}
+                        variant="primary"
+                    >
+                        Fetch
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setReset(true);
+                            resetQueryOptionsForm();
+                        }}
+                        variant="primary"
+                    >
+                        Clear
+                    </Button>
+                    <Column>{loading ? <Spinner /> : null}</Column>
+                </Flex>
+                {/* <form>
                     <fieldset>
                         <legend>
                             <Typography variant="h4" bold>
@@ -121,8 +225,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </legend>
                         <div>
                             <label>Start</label>
-                            <input
-                                type="text"
+                            <Input
                                 value={queryOptionsForm.start.value}
                                 onChange={e =>
                                     updateQueryOptionsForm('start')(e.currentTarget.value)
@@ -132,8 +235,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </div>
                         <div>
                             <label>End</label>
-                            <input
-                                type="text"
+                            <Input
                                 value={queryOptionsForm.end.value}
                                 onChange={e => updateQueryOptionsForm('end')(e.currentTarget.value)}
                             />
@@ -169,15 +271,11 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Clear
                         </button>
                     </fieldset>
-                </form>
+                </form> */}
             </div>
-            <hr />
-            {data ? (
-                <Table variantData={prepareData(data.getVariants)} />
-            ) : loading ? (
-                <Typography variant="h3">Loading...</Typography>
-            ) : null}
-        </div>
+            {/* <hr /> */}
+            {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
+        </Body>
     );
 };
 

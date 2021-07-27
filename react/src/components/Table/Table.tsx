@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTable } from 'react-table';
-import styled from 'styled-components';
-import { VariantQueryResponseSchemaTableRow } from '../types';
+import { VariantQueryResponseSchemaTableRow } from '../../types';
+import { Row, TableStyled } from './Table.styles';
 
 interface TableProps {
     variantData: VariantQueryResponseSchemaTableRow[];
@@ -48,15 +48,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
-    /* todo: replace table elements with styled components */
     return (
-        <table {...getTableProps()}>
+        <TableStyled {...getTableProps()}>
             <thead>
                 {headerGroups.map(headerGroup => {
                     // https://github.com/tannerlinsley/react-table/discussions/2647
                     const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
                     return (
-                        <tr key={key} {...restHeaderGroupProps}>
+                        <Row key={key} {...restHeaderGroupProps}>
                             {headerGroup.headers.map(column => {
                                 const { key, ...restHeaderProps } = column.getHeaderProps();
                                 return (
@@ -65,7 +64,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     </th>
                                 );
                             })}
-                        </tr>
+                        </Row>
                     );
                 })}
             </thead>
@@ -74,27 +73,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     prepareRow(row);
                     const { key, ...restRowProps } = row.getRowProps();
                     return (
-                        <tr key={key} {...restRowProps}>
+                        <Row key={key} {...restRowProps}>
                             {row.cells.map(cell => {
                                 const { key, ...restCellProps } = cell.getCellProps();
                                 return (
-                                    <Cell key={key} {...restCellProps}>
+                                    <td key={key} {...restCellProps}>
                                         {cell.render('Cell')}
-                                    </Cell>
+                                    </td>
                                 );
                             })}
-                        </tr>
+                        </Row>
                     );
                 })}
             </tbody>
-        </table>
+        </TableStyled>
     );
 };
-
-const Cell = styled.td`
-    color: ${props => props.theme.palette.primary};
-    outline: thin solid ${props => props.theme.palette.primary};
-    padding: 2px;
-`;
-
 export default Table;
