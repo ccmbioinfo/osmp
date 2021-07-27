@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
-import { Button, Dropdown, Input, Spinner, Table, Typography } from '../components';
+import { Button, Column, Dropdown, Flex, Input, Spinner, Table, Typography } from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
@@ -118,7 +117,7 @@ const VariantQueryPage: React.FC<{}> = () => {
     return (
         <div>
             <div>
-                <FlexRow>
+                <Flex>
                     <Column>
                         <Typography variant="p">Sources</Typography>
                         <Dropdown
@@ -131,6 +130,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                             reset={reset}
                         />
+                        <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </Column>
                     <Column>
                         <Typography variant="p">Chromosomes</Typography>
@@ -160,8 +160,8 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                         <ErrorIndicator error={queryOptionsForm.end.error} />
                     </Column>
-                </FlexRow>
-                <FlexRow>
+                </Flex>
+                <Flex>
                     <Button
                         disabled={
                             loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
@@ -181,7 +181,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         Clear
                     </Button>
                     <Column>{loading ? <Spinner /> : null}</Column>
-                </FlexRow>
+                </Flex>
                 {/* <form>
                     <fieldset>
                         <legend>
@@ -207,8 +207,8 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </label>
                         <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </fieldset>
-                </form> */}
-                {/* <form>
+                </form>
+                <form>
                     <fieldset>
                         <legend>
                             <Typography variant="h4" bold>
@@ -278,18 +278,3 @@ const prepareData = (queryResponse: VariantQueryResponse) =>
     );
 
 export default VariantQueryPage;
-
-/*
-    FLEXBOX SYSTEM
-*/
-
-const FlexRow = styled.div`
-    display: flex;
-`;
-
-const Column = styled.div`
-    display: flex;
-    flex-direction: column;
-    margin-right: 10px;
-    margin-bottom: 0px;
-`;
