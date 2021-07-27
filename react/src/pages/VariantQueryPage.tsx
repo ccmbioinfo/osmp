@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
-import { Body, Button, Column, Dropdown, Flex, Input, Spinner, Table, Typography } from '../components';
+import {
+    Body,
+    Button,
+    Column,
+    Dropdown,
+    Flex,
+    Input,
+    Spinner,
+    Table,
+    Typography,
+} from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
@@ -64,8 +74,6 @@ const VariantQueryPage: React.FC<{}> = () => {
             queryOptionsFormValidator
         );
 
-    console.log(queryOptionsForm);
-    console.log(updateQueryOptionsForm);
     const getArgs = () => ({
         input: {
             chromosome: queryOptionsForm.chromosome.value,
