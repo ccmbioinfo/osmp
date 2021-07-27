@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Theme from '../constants/theme';
-import { printIntrospectionSchema } from 'graphql';
 
 interface TypographyOverrides {
     bold?: boolean;
