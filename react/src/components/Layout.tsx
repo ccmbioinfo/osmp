@@ -2,8 +2,12 @@ import styled from 'styled-components';
 
 export const Flex = styled.div`
     display: flex;
-    margin: ${props => props.theme.space[3]};
+    margin: ${props => props.theme.space[3]} 0;
 `;
+
+export const Body = styled.div`
+    padding: ${props => props.theme.space[4]}
+`
 
 export const Column = styled(Flex)`
     flex-direction: column;

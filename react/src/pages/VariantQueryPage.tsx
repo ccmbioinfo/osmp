@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
-import { Button, Column, Dropdown, Flex, Input, Spinner, Table, Typography } from '../components';
+import { Body, Button, Column, Dropdown, Flex, Input, Spinner, Table, Typography } from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
@@ -115,7 +115,7 @@ const VariantQueryPage: React.FC<{}> = () => {
         );
 
     return (
-        <div>
+        <Body>
             <div>
                 <Flex>
                     <Column>
@@ -267,7 +267,7 @@ const VariantQueryPage: React.FC<{}> = () => {
             </div>
             {/* <hr /> */}
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
-        </div>
+        </Body>
     );
 };
 
