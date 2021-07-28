@@ -6,6 +6,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import logger from './logger/index';
 
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
@@ -51,5 +52,6 @@ const startServer = async () => {
 startServer();
 
 httpServer.listen({ port: process.env.SERVER_PORT }, () => {
-  console.log(`Our server is punning on port ${process.env.SERVER_PORT}`);
+  logger.info(`Our server is punning on port ${process.env.SERVER_PORT}`);
+  console.log('hello')
 });
