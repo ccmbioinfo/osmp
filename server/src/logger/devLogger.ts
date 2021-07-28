@@ -15,6 +15,18 @@ const buildDevLogger = () => {
       logFormat
     ),
     transports: [new transports.Console()],
+    /* One can customize the error files outputted by using the configuration below
+    transports: [
+        transports.File({
+          filename: 'combined.log',
+          level: 'info'
+        }),
+        transports.File({
+          filename: 'errors.log',
+          level: 'error'
+        })
+      ]
+    */
   });
 };
 

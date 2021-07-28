@@ -53,5 +53,4 @@ startServer();
 
 httpServer.listen({ port: process.env.SERVER_PORT }, () => {
   logger.info(`Our server is punning on port ${process.env.SERVER_PORT}`);
-  console.log('hello')
 });
