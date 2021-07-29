@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
+import styled from 'styled-components';
+import { Flex, Input, Typography } from '../index';
 
 interface GlobalFilterProps {
     filter: any;
     setFilter: (filterValue: any) => void;
 }
+
+const SearchInput = styled(Input)`
+    margin: ${props => props.theme.space[3]};
+    min-height: 30px;
+`;
 
 export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter }) => {
     const [value, setValue] = useState(filter);
@@ -12,15 +19,15 @@ export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter })
         setFilter(value || undefined);
     }, 1000);
     return (
-        <span>
-            Search:{' '}
-            <input
+        <Flex>
+            <Typography variant="p">Search</Typography>
+            <SearchInput
                 value={value || ''}
                 onChange={e => {
                     setValue(e.target.value);
                     onChange(e.target.value);
                 }}
             />
-        </span>
+        </Flex>
     );
 };

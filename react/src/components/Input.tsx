@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface InputProps {
-    value: number;
+    value: any;
     onChange: (e: any) => void;
     error?: boolean;
     disabled?: boolean;
