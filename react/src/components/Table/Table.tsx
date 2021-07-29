@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
-import { usePagination, useSortBy, useTable } from 'react-table';
+import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
 import { Typography } from '../index';
+import { GlobalFilter } from './GlobalFilters';
 import { Footer, Row, SkipToBeginning, SkipToEnd, TableStyled } from './Table.styles';
 
 interface TableProps {
@@ -60,6 +61,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 sortBy: sortByArray,
             },
         },
+        useGlobalFilter,
         useSortBy,
         usePagination
     );
@@ -78,13 +80,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         pageCount,
         setPageSize,
         state,
+        setGlobalFilter,
         prepareRow,
     } = tableInstance;
 
-    const { pageIndex, pageSize } = state;
+    const { globalFilter, pageIndex, pageSize } = state;
 
     return (
         <>
+            <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
             <TableStyled {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => {
