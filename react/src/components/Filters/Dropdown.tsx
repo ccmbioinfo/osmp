@@ -7,7 +7,7 @@ interface DropdownProps {
     title: string;
     items: DropdownItem[];
     onChange: (item: DropdownItem) => void;
-    reset: Boolean;
+    reset?: Boolean;
     multiSelect?: boolean;
 }
 

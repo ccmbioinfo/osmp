@@ -1,3 +1,4 @@
+import { SkipNext, SkipPrevious } from '@material-ui/icons';
 import styled from 'styled-components';
 
 export const TableStyled = styled.table`
@@ -46,4 +47,53 @@ export const Row = styled.tr`
         margin-left: ${props => props.theme.space[3]};
         margin-right: ${props => props.theme.space[3]};
     }
+`;
+
+export const Footer = styled.div`
+    display: flex; 
+    align-items: center;
+
+    * {
+        padding: ${props => props.theme.space[2]};
+        margin: ${props => props.theme.space[3]} ${props => props.theme.space[1]};
+        font-size: ${props => props.theme.fontSizes.xs}
+    }
+
+    span {
+        display: flex;
+        margin-right: ${props => props.theme.space[4]}
+    }
+    
+    select {
+        border: none;
+        border-radius: ${props => props.theme.radii.base};
+        box-shadow: ${props => props.theme.boxShadow};
+    }
+
+    button {
+        background-color: ${props => props.theme.background.main};
+        color: ${props => props.theme.colors.text};
+        border: none;
+        padding: ${props => props.theme.space[3]};
+        border-radius: ${props => props.theme.radii.round};
+        &:hover:not(:disabled) {
+            cursor: pointer;
+            background-color: whitesmoke;
+        }
+        &:disabled {
+            color:lightgrey;
+        }
+`;
+
+const Icon = `
+    padding: 0;
+    margin: 0;
+`;
+
+export const SkipToEnd = styled(SkipNext)`
+    ${Icon}
+`;
+
+export const SkipToBeginning = styled(SkipPrevious)`
+    ${Icon}
 `;

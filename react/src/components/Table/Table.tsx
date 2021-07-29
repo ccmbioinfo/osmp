@@ -2,7 +2,8 @@ import React, { useMemo } from 'react';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
 import { usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Row, TableStyled } from './Table.styles';
+import { Typography } from '../index';
+import { Footer, Row, SkipToBeginning, SkipToEnd, TableStyled } from './Table.styles';
 
 interface TableProps {
     variantData: VariantQueryResponseSchemaTableRow[];
@@ -135,22 +136,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     })}
                 </tbody>
             </TableStyled>
-            <div>
+            <Footer>
                 <span>
-                    Page{' '}
+                    <Typography variant="subtitle">Rows per page:</Typography>
+                    <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}>
+                        {[10, 25, 50].map(pageSize => (
+                            <option key={pageSize} value={pageSize}>
+                                {pageSize}
+                            </option>
+                        ))}
+                    </select>
+                </span>
+                <Typography variant="subtitle">
+                    Page
                     <strong>
                         {pageIndex + 1} of {pageOptions.length}
-                    </strong>{' '}
-                </span>
-                <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}>
-                    {[10, 25, 50].map(pageSize => (
-                        <option key={pageSize} value={pageSize}>
-                            Show {pageSize}
-                        </option>
-                    ))}
-                </select>
+                    </strong>
+                </Typography>
                 <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-                    {'<<'}
+                    <SkipToBeginning fontSize="small" />
                 </button>
                 <button onClick={() => previousPage()} disabled={!canPreviousPage}>
                     Previous
@@ -159,9 +163,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     Next
                 </button>
                 <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-                    {'>>'}
+                    <SkipToEnd fontSize="small" />
                 </button>
-            </div>
+            </Footer>
         </>
     );
 };
