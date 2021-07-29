@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
 import styled from 'styled-components';
-import { Flex, Input, Typography } from '../index';
+import { Flex, Input } from '../index';
 
 interface GlobalFilterProps {
     filter: any;
@@ -10,7 +10,7 @@ interface GlobalFilterProps {
 
 const SearchInput = styled(Input)`
     margin: ${props => props.theme.space[3]};
-    min-height: 30px;
+    height: 100%;
 `;
 
 export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter }) => {
@@ -20,9 +20,9 @@ export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter })
     }, 1000);
     return (
         <Flex>
-            <Typography variant="p">Search</Typography>
             <SearchInput
                 value={value || ''}
+                placeholder="Search All Columns..."
                 onChange={e => {
                     setValue(e.target.value);
                     onChange(e.target.value);

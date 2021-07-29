@@ -1,5 +1,10 @@
 import { SkipNext, SkipPrevious } from '@material-ui/icons';
 import styled from 'styled-components';
+import { Flex } from '../index';
+
+export const TableFilters = styled(Flex)`
+    align-items: center;
+`;
 
 export const TableStyled = styled.table`
     margin-top: ${props => props.theme.space[2]};

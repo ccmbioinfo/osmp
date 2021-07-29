@@ -23,9 +23,7 @@ const Component = styled.button<ButtonProps>`
     border-radius: ${props => props.theme.radii.base};
     font-size: ${props => props.theme.fontSizes.s};
     text-decoration: none;
-    &:hover:not(:disabled),
-    &:active:not(:disabled),
-    &:focus {
+    &:hover:not(:disabled) {
         outline: 0;
         color: ${props => props.theme.colors.background};
         border-color: ${props => props.theme.colors.accent};

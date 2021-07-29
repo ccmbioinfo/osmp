@@ -1,16 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
-import { useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
+import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Typography } from '../index';
+import { Button, Column, Typography } from '../index';
+import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
-import { Footer, Row, SkipToBeginning, SkipToEnd, TableStyled } from './Table.styles';
+import { Footer, Row, SkipToBeginning, SkipToEnd, TableFilters, TableStyled } from './Table.styles';
 
 interface TableProps {
     variantData: VariantQueryResponseSchemaTableRow[];
 }
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
+    const [open, setOpen] = useState<Boolean>(false);
     const tableData = useMemo(() => variantData, [variantData]);
     const sortByArray = useMemo(
         () => [
@@ -61,6 +63,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 sortBy: sortByArray,
             },
         },
+        useFilters,
         useGlobalFilter,
         useSortBy,
         usePagination
@@ -80,6 +83,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         pageCount,
         setPageSize,
         state,
+        setFilter,
         setGlobalFilter,
         prepareRow,
     } = tableInstance;
@@ -88,7 +92,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     return (
         <>
-            <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+            <TableFilters>
+                <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
+                    Advanced Filters
+                </Button>
+            </TableFilters>
+
+            {open && (
+                <TableFilters>
+                    {columns.map((v, i) => (
+                        <Column key={i}>
+                            <Typography variant="subtitle" bold>
+                                {v.Header}
+                            </Typography>
+                            <ColumnFilter setFilter={setFilter} columnId={v.id} />
+                        </Column>
+                    ))}
+                </TableFilters>
+            )}
             <TableStyled {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => {
@@ -122,22 +144,28 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     })}
                 </thead>
                 <tbody {...getTableBodyProps()}>
-                    {page.map(row => {
-                        prepareRow(row);
-                        const { key, ...restRowProps } = row.getRowProps();
-                        return (
-                            <Row key={key} {...restRowProps}>
-                                {row.cells.map(cell => {
-                                    const { key, ...restCellProps } = cell.getCellProps();
-                                    return (
-                                        <td key={key} {...restCellProps}>
-                                            {cell.render('Cell')}
-                                        </td>
-                                    );
-                                })}
-                            </Row>
-                        );
-                    })}
+                    {page.length > 0 ? (
+                        page.map(row => {
+                            prepareRow(row);
+                            const { key, ...restRowProps } = row.getRowProps();
+                            return (
+                                <Row key={key} {...restRowProps}>
+                                    {row.cells.map(cell => {
+                                        const { key, ...restCellProps } = cell.getCellProps();
+                                        return (
+                                            <td key={key} {...restCellProps}>
+                                                {cell.render('Cell')}
+                                            </td>
+                                        );
+                                    })}
+                                </Row>
+                            );
+                        })
+                    ) : (
+                        <Typography variant="p" error>
+                            There are no records to display.
+                        </Typography>
+                    )}
                 </tbody>
             </TableStyled>
             <Footer>

@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 export const Flex = styled.div`
     display: flex;
+    flex-wrap: wrap;
     margin: ${props => props.theme.space[3]} 0;
 `;
 

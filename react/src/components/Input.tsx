@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface InputProps {
     value: any;
     onChange: (e: any) => void;
+    placeholder?: string;
     error?: boolean;
     disabled?: boolean;
 }
