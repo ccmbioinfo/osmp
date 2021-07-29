@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const TableStyled = styled.table`
     margin-top: ${props => props.theme.space[2]};
     border-collapse: collapse;
+    width: 100%;
 `;
 export const Row = styled.tr`
     thead > & {

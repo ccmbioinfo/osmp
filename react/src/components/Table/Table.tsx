@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
-import { useSortBy, useTable } from 'react-table';
+import { usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
 import { Row, TableStyled } from './Table.styles';
 
@@ -59,63 +59,110 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 sortBy: sortByArray,
             },
         },
-        useSortBy
+        useSortBy,
+        usePagination
     );
 
-    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        page,
+        nextPage,
+        previousPage,
+        canNextPage,
+        canPreviousPage,
+        pageOptions,
+        gotoPage,
+        pageCount,
+        setPageSize,
+        state,
+        prepareRow,
+    } = tableInstance;
+
+    const { pageIndex, pageSize } = state;
 
     return (
-        <TableStyled {...getTableProps()}>
-            <thead>
-                {headerGroups.map(headerGroup => {
-                    // https://github.com/tannerlinsley/react-table/discussions/2647
-                    const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
-                    return (
-                        <Row key={key} {...restHeaderGroupProps}>
-                            {headerGroup.headers.map(column => {
-                                const { key, ...restHeaderProps } = column.getHeaderProps(
-                                    column.getSortByToggleProps()
-                                );
-                                return (
-                                    <th key={key} {...restHeaderProps}>
-                                        {column.render('Header')}
-                                        <span>
-                                            {column.isSorted ? (
-                                                column.isSortedDesc ? (
-                                                    <ArrowDropUp color="action" />
+        <>
+            <TableStyled {...getTableProps()}>
+                <thead>
+                    {headerGroups.map(headerGroup => {
+                        // https://github.com/tannerlinsley/react-table/discussions/2647
+                        const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
+                        return (
+                            <Row key={key} {...restHeaderGroupProps}>
+                                {headerGroup.headers.map(column => {
+                                    const { key, ...restHeaderProps } = column.getHeaderProps(
+                                        column.getSortByToggleProps()
+                                    );
+                                    return (
+                                        <th key={key} {...restHeaderProps}>
+                                            {column.render('Header')}
+                                            <span>
+                                                {column.isSorted ? (
+                                                    column.isSortedDesc ? (
+                                                        <ArrowDropUp color="action" />
+                                                    ) : (
+                                                        <ArrowDropDown color="action" />
+                                                    )
                                                 ) : (
-                                                    <ArrowDropDown color="action" />
-                                                )
-                                            ) : (
-                                                ''
-                                            )}
-                                        </span>
-                                    </th>
-                                );
-                            })}
-                        </Row>
-                    );
-                })}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
-                    prepareRow(row);
-                    const { key, ...restRowProps } = row.getRowProps();
-                    return (
-                        <Row key={key} {...restRowProps}>
-                            {row.cells.map(cell => {
-                                const { key, ...restCellProps } = cell.getCellProps();
-                                return (
-                                    <td key={key} {...restCellProps}>
-                                        {cell.render('Cell')}
-                                    </td>
-                                );
-                            })}
-                        </Row>
-                    );
-                })}
-            </tbody>
-        </TableStyled>
+                                                    ''
+                                                )}
+                                            </span>
+                                        </th>
+                                    );
+                                })}
+                            </Row>
+                        );
+                    })}
+                </thead>
+                <tbody {...getTableBodyProps()}>
+                    {page.map(row => {
+                        prepareRow(row);
+                        const { key, ...restRowProps } = row.getRowProps();
+                        return (
+                            <Row key={key} {...restRowProps}>
+                                {row.cells.map(cell => {
+                                    const { key, ...restCellProps } = cell.getCellProps();
+                                    return (
+                                        <td key={key} {...restCellProps}>
+                                            {cell.render('Cell')}
+                                        </td>
+                                    );
+                                })}
+                            </Row>
+                        );
+                    })}
+                </tbody>
+            </TableStyled>
+            <div>
+                <span>
+                    Page{' '}
+                    <strong>
+                        {pageIndex + 1} of {pageOptions.length}
+                    </strong>{' '}
+                </span>
+                <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}>
+                    {[10, 25, 50].map(pageSize => (
+                        <option key={pageSize} value={pageSize}>
+                            Show {pageSize}
+                        </option>
+                    ))}
+                </select>
+                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+                    {'<<'}
+                </button>
+                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+                    Previous
+                </button>
+                <button onClick={() => nextPage()} disabled={!canNextPage}>
+                    Next
+                </button>
+                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+                    {'>>'}
+                </button>
+            </div>
+        </>
     );
 };
 export default Table;
