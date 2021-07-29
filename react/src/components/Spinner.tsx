@@ -15,7 +15,6 @@ export const Loader = styled.div`
     border-radius: 50%;
     width: ${props => props.theme.space[5]};
     height: ${props => props.theme.space[5]};
-    margin: auto;
     animation: ${spin} 0.6s linear infinite;
 `;
 

@@ -20,10 +20,17 @@ export const Row = styled.tr`
         color: ${props => props.theme.colors.text};
         font-size: ${props => props.theme.fontSizes.s};
         font-weight: ${props => props.theme.fontWeights.bold};
-        padding: ${props => props.theme.space[3]};
+        padding: ${props => props.theme.space[4]};
         text-align: center;
         height: 30px;
         border: none;
+    }
+
+    th > * {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
     }
 
     & > td {

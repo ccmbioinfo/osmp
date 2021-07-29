@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
-import { useTable } from 'react-table';
+import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
+import { useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
 import { Row, TableStyled } from './Table.styles';
 
@@ -9,6 +10,15 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const tableData = useMemo(() => variantData, [variantData]);
+    const sortByArray = useMemo(
+        () => [
+            {
+                id: 'ref',
+                desc: false,
+            },
+        ],
+        []
+    );
 
     const columns = React.useMemo(
         () => [
@@ -41,10 +51,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    const tableInstance = useTable<VariantQueryResponseSchemaTableRow>({
-        columns,
-        data: tableData,
-    });
+    const tableInstance = useTable<VariantQueryResponseSchemaTableRow>(
+        {
+            columns,
+            data: tableData,
+            initialState: {
+                sortBy: sortByArray,
+            },
+        },
+        useSortBy
+    );
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
 
@@ -57,10 +73,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     return (
                         <Row key={key} {...restHeaderGroupProps}>
                             {headerGroup.headers.map(column => {
-                                const { key, ...restHeaderProps } = column.getHeaderProps();
+                                const { key, ...restHeaderProps } = column.getHeaderProps(
+                                    column.getSortByToggleProps()
+                                );
                                 return (
                                     <th key={key} {...restHeaderProps}>
                                         {column.render('Header')}
+                                        <span>
+                                            {column.isSorted ? (
+                                                column.isSortedDesc ? (
+                                                    <ArrowDropUp color="action" />
+                                                ) : (
+                                                    <ArrowDropDown color="action" />
+                                                )
+                                            ) : (
+                                                ''
+                                            )}
+                                        </span>
                                     </th>
                                 );
                             })}
