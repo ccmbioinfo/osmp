@@ -1,11 +1,19 @@
 import React, { useMemo, useState } from 'react';
-import { ArrowDropDown, ArrowDropUp } from '@material-ui/icons';
+import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
 import { Button, Column, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
-import { Footer, Row, SkipToBeginning, SkipToEnd, TableFilters, TableStyled } from './Table.styles';
+import {
+    FilterIcon,
+    Footer,
+    Row,
+    SkipToBeginning,
+    SkipToEnd,
+    TableFilters,
+    TableStyled,
+} from './Table.styles';
 
 interface TableProps {
     variantData: VariantQueryResponseSchemaTableRow[];
@@ -95,7 +103,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             <TableFilters>
                 <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                 <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
-                    Advanced Filters
+                    Advanced Filters <FilterIcon />
                 </Button>
             </TableFilters>
 
@@ -128,9 +136,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             <span>
                                                 {column.isSorted ? (
                                                     column.isSortedDesc ? (
-                                                        <ArrowDropUp color="action" />
+                                                        <BsFillCaretUpFill />
                                                     ) : (
-                                                        <ArrowDropDown color="action" />
+                                                        <BsFillCaretDownFill />
                                                     )
                                                 ) : (
                                                     ''

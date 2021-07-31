@@ -1,4 +1,4 @@
-import { SkipNext, SkipPrevious } from '@material-ui/icons';
+import { BsFillSkipEndFill, BsFillSkipStartFill, BsFilter } from 'react-icons/bs';
 import styled from 'styled-components';
 import { Flex } from '../index';
 
@@ -95,10 +95,14 @@ const Icon = `
     margin: 0;
 `;
 
-export const SkipToEnd = styled(SkipNext)`
+export const SkipToEnd = styled(BsFillSkipEndFill)`
     ${Icon}
 `;
 
-export const SkipToBeginning = styled(SkipPrevious)`
+export const SkipToBeginning = styled(BsFillSkipStartFill)`
     ${Icon}
+`;
+
+export const FilterIcon = styled(BsFilter)`
+    margin-inline-start: inherit;
 `;

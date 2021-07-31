@@ -127,7 +127,9 @@ const VariantQueryPage: React.FC<{}> = () => {
             <div>
                 <Flex>
                     <Column>
-                        <Typography variant="subtitle" bold>Sources</Typography>
+                        <Typography variant="subtitle" bold>
+                            Sources
+                        </Typography>
                         <Dropdown
                             title="Select Sources"
                             items={sources}
@@ -141,7 +143,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </Column>
                     <Column>
-                        <Typography variant="subtitle" bold>Chromosomes</Typography>
+                        <Typography variant="subtitle" bold>
+                            Chromosomes
+                        </Typography>
                         <Dropdown
                             title="Select Chromosome"
                             items={chromosomes}
@@ -153,7 +157,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                     </Column>
                     <Column>
-                        <Typography variant="subtitle" bold>Start Range</Typography>
+                        <Typography variant="subtitle" bold>
+                            Start Range
+                        </Typography>
                         <Input
                             value={queryOptionsForm.start.value}
                             onChange={e => updateQueryOptionsForm('start')(e.currentTarget.value)}
@@ -161,7 +167,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <ErrorIndicator error={queryOptionsForm.start.error} />
                     </Column>
                     <Column>
-                        <Typography variant="subtitle" bold>End Range</Typography>
+                        <Typography variant="subtitle" bold>
+                            End Range
+                        </Typography>
                         <Input
                             value={queryOptionsForm.end.value}
                             onChange={e => updateQueryOptionsForm('end')(e.currentTarget.value)}
