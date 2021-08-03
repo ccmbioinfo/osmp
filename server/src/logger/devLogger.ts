@@ -1,4 +1,4 @@
-import { format, createLogger, transports } from 'Winston';
+import { format, createLogger, transports } from 'winston';
 
 const { timestamp, combine, printf, errors } = format;
 
