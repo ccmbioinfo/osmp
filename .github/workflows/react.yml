@@ -1,0 +1,33 @@
+name: "React: Typescript, eslint, prettier"
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/react.yml
+      - react/src/**/*
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: react
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: install dependencies
+        run: |
+          yarn install
+      - name: run eslint
+        run: |
+          node_modules/.bin/eslint --max-warnings=0 src/
+      - name: run prettier
+        run: |
+          node_modules/.bin/prettier --check src/
+      - name: compile typescript
+        run: |
+          node_modules/.bin/tsc
