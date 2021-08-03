@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface InputProps {
-    value: number | string;
     onChange: (e: any) => void;
+    value?: number | string;
     placeholder?: string;
     error?: boolean;
     disabled?: boolean;

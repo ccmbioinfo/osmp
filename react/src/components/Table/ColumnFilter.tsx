@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Flex, Input } from '../index';
 
@@ -12,15 +11,12 @@ const SearchInput = styled(Input)`
 `;
 
 export const ColumnFilter: React.FC<ColumnFilterProps> = ({ setFilter, columnId }) => {
-    const [value, setValue] = useState('');
     return (
         <Flex>
             <SearchInput
-                value={value}
                 placeholder={columnId}
                 onChange={e => {
                     setFilter(columnId, e.target.value);
-                    setValue(e.target.value);
                 }}
             />
         </Flex>
