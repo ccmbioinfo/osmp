@@ -7,4 +7,16 @@ import Spinner from './Spinner';
 import Table from './Table/Table';
 import Typography from './Typography';
 
-export { Button, Body, Column, Container, Dropdown, Flex, Input, Navbar, Spinner, Table, Typography };
+export {
+    Button,
+    Body,
+    Column,
+    Container,
+    Dropdown,
+    Flex,
+    Input,
+    Navbar,
+    Spinner,
+    Table,
+    Typography,
+};

@@ -2,13 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "commonjs",
-    "lib": [
-      "ES6",
-      "ES2017",
-      "ES2018",
-      "ES2019",
-      "ES2020"
-    ],
+    "lib": ["ES6", "ES2017", "ES2018", "ES2019", "ES2020"],
     "sourceMap": false,
     "outDir": "./dist",
     "rootDir": "src",
@@ -27,10 +21,6 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true
   },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "./src/**/*.ts",
-  ]
+  "exclude": ["node_modules"],
+  "include": ["./src/**/*.ts"]
 }

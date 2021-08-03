@@ -4,9 +4,9 @@ declare module 'styled-components' {
     export interface DefaultTheme {
         background: {
             main: string;
-            success:string;
+            success: string;
         };
-        boxShadow: string; 
+        boxShadow: string;
         colors: {
             text: string;
             background: string;
@@ -21,7 +21,7 @@ declare module 'styled-components' {
         fontFamily: {
             heading: string;
             body: string;
-        }
+        };
         fontSizes: {
             xl: string;
             l: string;
@@ -39,12 +39,12 @@ declare module 'styled-components' {
             heading: number;
         };
         borders: {
-            none: string; 
+            none: string;
             thin: string;
         };
         radii: {
             none: number;
-            base: string; 
+            base: string;
             round: string;
         };
         typography: {
