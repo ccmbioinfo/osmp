@@ -90,7 +90,7 @@ export const transformEnsemblQueryResponse: ResultTransformer<{
 };
 
 /* Return variants from 1000 genomes phase 3 https://www.internationalgenome.org/category/phase-3/
-*/
+ */
 export const transformVariantQueryInputToEnsembl = (args: VariantQueryInput) => ({
   variantSetId: 1,
   datasetId: '6e340c4d1e333c7a676b1710d2e3953c',
