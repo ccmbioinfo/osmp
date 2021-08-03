@@ -1,29 +1,24 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "types": [
-            "jest",
-            "node"
-        ],
-        "module": "commonjs",
-        "sourceMap": false,
-        "rootDir": "../",
-        "moduleResolution": "node",
-        "removeComments": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "strictFunctionTypes": true,
-        "noImplicitThis": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": false,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
-    },
-    "include": [
-        "./**/*.ts",
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "types": ["jest", "node"],
+    "module": "commonjs",
+    "sourceMap": false,
+    "rootDir": "../",
+    "moduleResolution": "node",
+    "removeComments": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+  "include": ["./**/*.ts"]
 }

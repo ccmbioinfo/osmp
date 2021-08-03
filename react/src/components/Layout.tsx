@@ -6,8 +6,8 @@ export const Flex = styled.div`
 `;
 
 export const Body = styled.div`
-    padding: ${props => props.theme.space[4]}
-`
+    padding: ${props => props.theme.space[4]};
+`;
 
 export const Column = styled(Flex)`
     flex-direction: column;
