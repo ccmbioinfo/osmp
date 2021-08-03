@@ -96,8 +96,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         prepareRow,
     } = tableInstance;
 
-    const { filters, globalFilter, pageIndex, pageSize } = state;
-    console.log(filters);
+    const { globalFilter, pageIndex, pageSize } = state;
 
     return (
         <>
