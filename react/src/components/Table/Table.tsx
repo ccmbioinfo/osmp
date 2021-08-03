@@ -92,11 +92,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setPageSize,
         state,
         setFilter,
+        setAllFilters,
         setGlobalFilter,
         prepareRow,
     } = tableInstance;
 
-    const { globalFilter, pageIndex, pageSize } = state;
+    const { filters, globalFilter, pageIndex, pageSize } = state;
 
     return (
         <>
@@ -104,6 +105,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                 <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
                     Advanced Filters <FilterIcon />
+                </Button>
+                <Button
+                    disabled={filters.length > 0 ? false : true}
+                    variant="secondary"
+                    onClick={() => setAllFilters([])}
+                >
+                    Clear all filters
                 </Button>
             </TableFilters>
 
@@ -114,7 +122,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             <Typography variant="subtitle" bold>
                                 {v.Header}
                             </Typography>
-                            <ColumnFilter setFilter={setFilter} columnId={v.id} />
+                            <ColumnFilter filters={filters} setFilter={setFilter} columnId={v.id} />
                         </Column>
                     ))}
                 </TableFilters>
