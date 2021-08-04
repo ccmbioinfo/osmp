@@ -16,6 +16,12 @@ export const Column = styled(Flex)`
     margin-bottom: 0px;
 `;
 
+export const ButtonWrapper = styled(Flex)`
+    flex-direction: row;
+    align-items: flex-end;
+    margin: 0;
+`;
+
 export const Container = styled.div`
     margin: 0 auto;
     padding: 0 ${props => props.theme.space[6]};

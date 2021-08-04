@@ -36,11 +36,13 @@ export const List = styled.div`
     box-shadow: ${props => props.theme.boxShadow}
     padding: 0;
     margin: 0;
-    width: 100%;
+    width: inherit;
     margin-top: ${props => props.theme.space[4]};
     max-height: 100px;
     overflow: auto;
-
+    position: absolute;
+    top: 200px;
+    z-index: 1;
     /* Dropdown List Styling */
 
     > li {

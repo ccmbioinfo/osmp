@@ -3,6 +3,7 @@ import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Body,
     Button,
+    ButtonWrapper,
     Column,
     Dropdown,
     Flex,
@@ -176,27 +177,27 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                         <ErrorIndicator error={queryOptionsForm.end.error} />
                     </Column>
-                </Flex>
-                <Flex>
-                    <Button
-                        disabled={
-                            loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
-                        }
-                        onClick={() => fetchVariants({ variables: getArgs() })}
-                        variant="primary"
-                    >
-                        Fetch
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            setReset(true);
-                            resetQueryOptionsForm();
-                        }}
-                        variant="primary"
-                    >
-                        Clear
-                    </Button>
-                    <Column>{loading ? <Spinner /> : null}</Column>
+                    <ButtonWrapper>
+                        <Button
+                            disabled={
+                                loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                            }
+                            onClick={() => fetchVariants({ variables: getArgs() })}
+                            variant="primary"
+                        >
+                            Fetch
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setReset(true);
+                                resetQueryOptionsForm();
+                            }}
+                            variant="primary"
+                        >
+                            Clear
+                        </Button>
+                        {loading ? <Spinner /> : null}
+                    </ButtonWrapper>
                 </Flex>
             </div>
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
