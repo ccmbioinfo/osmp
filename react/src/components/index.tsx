@@ -1,5 +1,5 @@
 import Button from './Button';
-import Dropdown from './Filters/Dropdown';
+import Dropdown from './Dropdown/Dropdown';
 import Input from './Input';
 import { Body, Column, Container, Flex } from './Layout';
 import Navbar from './Navbar/Navbar';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import { DropdownItem } from '../../types';
 import { Header, List, Title, Wrapper } from './Dropdown.styles';
 
@@ -7,7 +7,7 @@ interface DropdownProps {
     title: string;
     items: DropdownItem[];
     onChange: (item: DropdownItem) => void;
-    reset: Boolean;
+    reset?: Boolean;
     multiSelect?: boolean;
 }
 
@@ -51,7 +51,7 @@ const Dropdown: React.FC<DropdownProps> = ({ items, multiSelect, title, reset, o
                 <Title>
                     {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}
                 </Title>
-                {open ? <ExpandLess /> : <ExpandMore />}
+                {open ? <BsChevronUp /> : <BsChevronDown />}
             </Header>
             {open && (
                 <List>
