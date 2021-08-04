@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import { useClickAway } from '../../hooks';
 import { DropdownItem } from '../../types';
@@ -10,13 +10,34 @@ interface DropdownProps {
     onChange: (item: DropdownItem) => void;
     reset?: Boolean;
     multiSelect?: boolean;
+    searchable?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ items, multiSelect, title, reset, onChange }) => {
+const Dropdown: React.FC<DropdownProps> = ({
+    items,
+    multiSelect,
+    title,
+    reset,
+    searchable,
+    onChange,
+}) => {
     const [open, setOpen] = useState<Boolean>(false);
     const [selection, setSelection] = useState<DropdownItem[]>([]);
+    const [suggestions, setSuggestions] = useState<DropdownItem[]>(items);
+    console.log(suggestions);
 
     const toggle = () => setOpen(!open);
+
+    const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (value.length > 0) {
+            const regex = new RegExp(`^${value}`, 'i');
+            const autocomplete = items.sort().filter((v: DropdownItem) => regex.test(v.label));
+            setSuggestions(autocomplete);
+        } else {
+            setSuggestions(items);
+        }
+    };
 
     function handleOnClick(item: DropdownItem) {
         onChange(item);
@@ -53,14 +74,18 @@ const Dropdown: React.FC<DropdownProps> = ({ items, multiSelect, title, reset, o
         <div ref={fragmentRef}>
             <Wrapper>
                 <Header tabIndex={0} role="button" onClick={toggle}>
-                    <Title>
-                        {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}
-                    </Title>
+                    {searchable && !multiSelect ? (
+                        <input placeholder="Find chromosome..." onChange={getSuggestions} />
+                    ) : (
+                        <Title>
+                            {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}
+                        </Title>
+                    )}
                     {open ? <BsChevronUp /> : <BsChevronDown />}
                 </Header>
                 {open && (
                     <List>
-                        {items.map(item => (
+                        {suggestions.map(item => (
                             <li key={item.id}>
                                 <button type="button" onClick={() => handleOnClick(item)}>
                                     <span>{item.label}</span>

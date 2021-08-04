@@ -75,6 +75,8 @@ const VariantQueryPage: React.FC<{}> = () => {
             queryOptionsFormValidator
         );
 
+    console.log(queryOptionsForm);
+
     const getArgs = () => ({
         input: {
             chromosome: queryOptionsForm.chromosome.value,
@@ -155,6 +157,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 updateQueryOptionsForm('chromosome')(e.value);
                             }}
                             reset={reset}
+                            searchable
                         />
                     </Column>
                     <Column>
