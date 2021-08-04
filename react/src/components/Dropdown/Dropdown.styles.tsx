@@ -7,6 +7,8 @@ const Flex = styled.div`
 export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
+    flex-grow: 0;
+    width: 200px;
 `;
 
 export const Header = styled(Flex)`
