@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import { useClickAway } from '../../hooks';
 import { DropdownItem } from '../../types';
-import { Header, List, Title, Wrapper } from './Dropdown.styles';
+import { Input, Header, List, Title, Wrapper } from './Dropdown.styles';
 
 interface DropdownProps {
     title: string;
@@ -11,6 +11,7 @@ interface DropdownProps {
     reset?: Boolean;
     multiSelect?: boolean;
     searchable?: boolean;
+    value?: string | number;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -19,17 +20,25 @@ const Dropdown: React.FC<DropdownProps> = ({
     title,
     reset,
     searchable,
+    value,
     onChange,
 }) => {
+    const [text, setText] = useState(value);
     const [open, setOpen] = useState<Boolean>(false);
     const [selection, setSelection] = useState<DropdownItem[]>([]);
     const [suggestions, setSuggestions] = useState<DropdownItem[]>(items);
-    console.log(suggestions);
 
     const toggle = () => setOpen(!open);
 
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
+        setText(value);
+        setOpen(true);
+        onChange({
+            id: 1,
+            value: value,
+            label: value,
+        });
         if (value.length > 0) {
             const regex = new RegExp(`^${value}`, 'i');
             const autocomplete = items.sort().filter((v: DropdownItem) => regex.test(v.label));
@@ -67,6 +76,16 @@ const Dropdown: React.FC<DropdownProps> = ({
         }
     }, [reset]);
 
+    useEffect(() => {
+        if (searchable && selection.length > 0) {
+            setText(selection[0].value);
+        }
+    }, [selection]);
+
+    useEffect(() => {
+        setText(value);
+    }, [value]);
+
     const fragmentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
     useClickAway(fragmentRef, () => setOpen(false));
 
@@ -75,7 +94,11 @@ const Dropdown: React.FC<DropdownProps> = ({
             <Wrapper>
                 <Header tabIndex={0} role="button" onClick={toggle}>
                     {searchable && !multiSelect ? (
-                        <input placeholder="Find chromosome..." onChange={getSuggestions} />
+                        <Input
+                            value={text}
+                            placeholder="Find chromosome..."
+                            onChange={getSuggestions}
+                        />
                     ) : (
                         <Title>
                             {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}

@@ -4,6 +4,12 @@ const Flex = styled.div`
     display: flex;
 `;
 
+export const Input = styled.input`
+    min-height: 45px;
+    border: none;
+    outline: none;
+    font-size: ${props => props.theme.fontSizes.s};
+`;
 export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
@@ -44,10 +50,8 @@ export const List = styled.div`
     top: 200px;
     z-index: 1;
     /* Dropdown List Styling */
-
     > li {
         list-style-type: none;
-
         &:first-of-type {
             > button {
                 border-top: ${props => props.theme.borders.thin} ${props =>
@@ -56,12 +60,10 @@ export const List = styled.div`
                 border-top-right-radius: ${props => props.theme.radii.base};
             }
         }
-
         &:last-of-type > button {
           border-bottom-left-radius: ${props => props.theme.radii.base};
           border-bottom-right-radius: ${props => props.theme.radii.base};
         }
-
         button {
             display: flex;
             justify-content: space-between;
@@ -75,7 +77,6 @@ export const List = styled.div`
             text-align: left;
             border-left: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
             border-right: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
-
             &:hover {
                 cursor: pointer;
                 font-weight: bold;

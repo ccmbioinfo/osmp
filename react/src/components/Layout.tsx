@@ -17,9 +17,8 @@ export const Column = styled(Flex)`
 `;
 
 export const ButtonWrapper = styled(Flex)`
-    flex-direction: row;
-    align-items: flex-end;
-    margin: 0;
+    display: inline-flex;
+    margin-top: 1.5rem;
 `;
 
 export const Container = styled.div`

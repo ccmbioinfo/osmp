@@ -16,6 +16,33 @@ import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
 
+const sources: DropdownItem[] = [
+    {
+        id: 1,
+        value: 'local',
+        label: 'Local',
+    },
+    {
+        id: 2,
+        value: 'ensembl',
+        label: 'Ensembl',
+    },
+];
+
+const chromosomes: DropdownItem[] = Array.from(Array(22))
+    .map((v, i) => ({
+        id: i,
+        value: (i + 1).toString(),
+        label: (i + 1).toString(),
+    }))
+    .concat(
+        ['X', 'Y'].map((v, i) => ({
+            id: 22 + i,
+            value: v,
+            label: v,
+        }))
+    );
+
 const queryOptionsFormValidator = {
     sources: {
         required: true,
@@ -23,7 +50,7 @@ const queryOptionsFormValidator = {
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     !!state.sources.value.filter(s => ['local', 'ensembl'].includes(s)).length,
-                error: 'Invalid source!',
+                error: 'Please specify a source.',
             },
         ],
     },
@@ -44,6 +71,16 @@ const queryOptionsFormValidator = {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     +state.start.value < +state.end.value,
                 error: 'End must be greater than start!',
+            },
+        ],
+    },
+    chromosome: {
+        required: true,
+        rules: [
+            {
+                valid: (state: FormState<QueryOptionsFormState>) =>
+                    !!chromosomes.map(c => c.value).includes(state.chromosome.value),
+                error: 'Chromosome is invalid.',
             },
         ],
     },
@@ -98,33 +135,6 @@ const VariantQueryPage: React.FC<{}> = () => {
             : update(queryOptionsForm.sources.value.concat(source));
     };
 
-    const sources: DropdownItem[] = [
-        {
-            id: 1,
-            value: 'local',
-            label: 'Local',
-        },
-        {
-            id: 2,
-            value: 'ensembl',
-            label: 'Ensembl',
-        },
-    ];
-
-    const chromosomes: DropdownItem[] = Array.from(Array(22))
-        .map((v, i) => ({
-            id: i,
-            value: (i + 1).toString(),
-            label: (i + 1).toString(),
-        }))
-        .concat(
-            ['X', 'Y'].map((v, i) => ({
-                id: 22 + i,
-                value: v,
-                label: v,
-            }))
-        );
-
     return (
         <Body>
             <div>
@@ -150,6 +160,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Chromosomes
                         </Typography>
                         <Dropdown
+                            value={queryOptionsForm.chromosome.value}
                             title="Select Chromosome"
                             items={chromosomes}
                             onChange={e => {
@@ -159,6 +170,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             reset={reset}
                             searchable
                         />
+                        <ErrorIndicator error={queryOptionsForm.chromosome.error} />
                     </Column>
                     <Column>
                         <Typography variant="subtitle" bold>
