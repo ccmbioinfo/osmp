@@ -57,6 +57,8 @@ export const Row = styled.tr`
 export const Footer = styled.div`
     display: flex; 
     align-items: center;
+    justify-content: flex-end;
+    margin-right: ${props => props.theme.space[3]};
 
     * {
         padding: ${props => props.theme.space[2]};
@@ -66,6 +68,7 @@ export const Footer = styled.div`
 
     span {
         display: flex;
+        align-items: center; 
         margin-right: ${props => props.theme.space[4]}
     }
     
