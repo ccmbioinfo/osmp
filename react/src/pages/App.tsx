@@ -1,4 +1,5 @@
-import React from 'react';
+import { useEffect } from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { VariantQueryPage } from '.';
@@ -6,13 +7,22 @@ import { Navbar } from '../components';
 import theme from '../constants/theme';
 
 const App: React.FC<{}> = () => {
-    return (
+    const {
+        keycloak: { authenticated, login },
+        initialized,
+    } = useKeycloak();
+
+    useEffect(() => {
+        if (initialized && !authenticated) {
+            login();
+        }
+    }, [initialized, authenticated, login]);
+
+    return !initialized ? (
+        <span>Loading...</span>
+    ) : authenticated ? (
         <ThemeProvider theme={theme}>
             <div>
-                {/* <header>
-                    <Typography variant="h3">This is the main page heading</Typography>
-                </header> */}
-
                 <Router>
                     <Navbar />
                     <Switch>
@@ -23,7 +33,7 @@ const App: React.FC<{}> = () => {
                 </Router>
             </div>
         </ThemeProvider>
-    );
+    ) : null;
 };
 
 export default App;

@@ -1,17 +1,20 @@
 import React from 'react';
+import { useKeycloak } from '@react-keycloak/web';
 import { Button } from '../index';
 import {
     Menu,
     MenuItem,
     MenuItemBtn,
     MenuLink,
-    MenuLinkBtn,
     Nav,
     NavbarContainer,
     NavLogo,
 } from './Navbar.styles';
 
 const Navbar: React.FC = () => {
+    const {
+        keycloak: { logout },
+    } = useKeycloak();
     return (
         <div>
             <Nav>
@@ -29,9 +32,9 @@ const Navbar: React.FC = () => {
                             <MenuLink to="/about">About</MenuLink>
                         </MenuItem>
                         <MenuItemBtn>
-                            <MenuLinkBtn to="/logout">
-                                <Button variant="primary">Log Out</Button>
-                            </MenuLinkBtn>
+                            <Button variant="primary" onClick={() => logout()}>
+                                Log Out
+                            </Button>
                         </MenuItemBtn>
                     </Menu>
                 </NavbarContainer>
