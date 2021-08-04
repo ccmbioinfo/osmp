@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Body,
@@ -12,10 +12,10 @@ import {
     Typography,
 } from '../components';
 import { useFormReducer } from '../hooks';
-import { formIsValid, FormState } from '../hooks/useFormReducer';
+import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
 
-const queryOptionsFormValidator = {
+const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     sources: {
         required: true,
         rules: [
@@ -46,11 +46,16 @@ const queryOptionsFormValidator = {
             },
         ],
     },
+    gene: {
+        required: false,
+    },
 };
 
 interface QueryOptionsFormState {
     chromosome: string;
     end: number;
+    ensemblId: string;
+    gene: string;
     sources: string[];
     start: number;
 }
@@ -68,6 +73,8 @@ const VariantQueryPage: React.FC<{}> = () => {
             {
                 chromosome: '19',
                 end: 44909393,
+                ensemblId: '',
+                gene: '',
                 sources: [],
                 start: 44905791,
             },
@@ -176,6 +183,26 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                         <ErrorIndicator error={queryOptionsForm.end.error} />
                     </Column>
+                    <Column>
+                        <Typography variant="subtitle" bold>
+                            Gene
+                        </Typography>
+                        <GeneSearch
+                            onSearch={term => {
+                                updateQueryOptionsForm('gene')(term);
+                                updateQueryOptionsForm('ensemblId')('');
+                            }}
+                            onSelect={({ ensemblId, name }: GeneModel) => {
+                                updateQueryOptionsForm('gene')(name);
+                                updateQueryOptionsForm('ensemblId')(ensemblId);
+                            }}
+                            value={{
+                                name: queryOptionsForm.gene.value,
+                                ensemblId: queryOptionsForm.ensemblId.value,
+                            }}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.end.error} />
+                    </Column>
                 </Flex>
                 <Flex>
                     <Button
@@ -211,3 +238,74 @@ const prepareData = (queryResponse: VariantQueryResponse) =>
     );
 
 export default VariantQueryPage;
+
+interface GeneModel {
+    ensemblId: string;
+    name: string;
+}
+
+interface GeneSearchProps {
+    value: GeneModel;
+    onSelect: (gene: GeneModel) => void;
+    onSearch: (name: string) => void;
+}
+
+const GeneSearch: React.FC<GeneSearchProps> = ({ onSearch, onSelect, value: { name } }) => {
+    const [options, setOptions] = useState<DropdownItem[]>([]);
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            setLoading(true);
+            if (name.length > 2) {
+                const res = await fetch(
+                    `https://www.ebi.ac.uk/ebisearch/ws/rest/ensembl/autocomplete?term=${name}`,
+                    {
+                        headers: { accept: 'application/json' },
+                    }
+                );
+                const body = await res.json();
+
+                setOptions(
+                    body.suggestions.map((s: { suggestion: string }, i: number) => ({
+                        value: s.suggestion.toUpperCase(),
+                        id: i,
+                        label: s.suggestion.toUpperCase(),
+                    }))
+                );
+                setOpen(true);
+                setLoading(false);
+            }
+        })();
+    }, [name]);
+
+    return (
+        <Flex>
+            <Column>
+                <Input value={name} onChange={e => onSearch(e.currentTarget.value)} />
+                {open && (
+                    <Dropdown
+                        title="my title"
+                        items={options}
+                        onChange={async item => {
+                            setLoading(true);
+                            const res = await fetch(
+                                `https://www.ebi.ac.uk/ebisearch/ws/rest/ensembl_gene?query=${item.value}&size=1`,
+                                {
+                                    headers: { accept: 'application/json' },
+                                }
+                            );
+                            const body = await res.json();
+                            onSelect({
+                                ensemblId: body.entries[0]['id'],
+                                name: item.value,
+                            });
+                            setLoading(false);
+                        }}
+                    />
+                )}
+            </Column>
+        </Flex>
+    );
+};
