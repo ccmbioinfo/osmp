@@ -64,9 +64,17 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
       af: undefined,
       alt: r.alternative,
       chromosome: r.chromosome,
+      datasetId: undefined,
       dp: undefined,
+      end: undefined,
+      ethnicity: undefined,
+      phenotypes: undefined,
       ref: r.reference,
+      start: undefined,
+      sex: undefined,
+      someFakeScore: undefined,
       rsId: undefined,
+      zygosity: undefined,
     }));
   }
 };
