@@ -24,6 +24,7 @@ export const Header = styled(Flex)`
 `;
 
 export const Title = styled.p`
+    font-family: ${props => props.theme.fontFamily.body};
     font-size: ${props => props.theme.fontSizes.s};
     color: ${props => props.theme.colors.text};
     margin-inline-end: ${props => props.theme.space[1]};
