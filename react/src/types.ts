@@ -10,9 +10,17 @@ export interface VariantQueryResponseSchema {
     af: Maybe<number>;
     alt: string;
     chromosome: string;
+    datasetId: Maybe<string>;
     dp: Maybe<number>;
+    end: Maybe<number>;
+    ethnicity: Maybe<string>;
+    phenotypes: Maybe<string>;
     ref: string;
     rsId: Maybe<string>;
+    sex: Maybe<string>;
+    someFakeScore: Maybe<number>;
+    start: Maybe<number>;
+    zygosity: Maybe<string>;
 }
 
 export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponseSchema {

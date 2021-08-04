@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ExpandLess, ExpandMore } from '@material-ui/icons';
+//import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import { DropdownItem } from '../../types';
 import { Header, List, Title, Wrapper } from './Dropdown.styles';
 
@@ -51,7 +51,7 @@ const Dropdown: React.FC<DropdownProps> = ({ items, multiSelect, title, reset, o
                 <Title>
                     {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}
                 </Title>
-                {open ? <ExpandLess /> : <ExpandMore />}
+                {open ? 'lss' : 'mrrr'}
             </Header>
             {open && (
                 <List>

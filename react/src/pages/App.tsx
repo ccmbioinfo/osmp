@@ -9,10 +9,6 @@ const App: React.FC<{}> = () => {
     return (
         <ThemeProvider theme={theme}>
             <div>
-                {/* <header>
-                    <Typography variant="h3">This is the main page heading</Typography>
-                </header> */}
-
                 <Router>
                     <Navbar />
                     <Switch>
