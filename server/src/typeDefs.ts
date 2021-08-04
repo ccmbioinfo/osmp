@@ -11,9 +11,17 @@ export default gql`
     af: Float
     alt: String
     chromosome: String
+    datasetId: String
     dp: Int
+    end: Int
+    ethnicity: String
+    phenotypes: String
     ref: String
-    rsID: Int
+    rsId: String
+    sex: String
+    someFakeScore: Float
+    start: Int
+    zygosity: String
   }
 
   type VariantQueryDataResult {

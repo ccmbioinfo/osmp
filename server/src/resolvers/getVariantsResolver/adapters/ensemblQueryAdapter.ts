@@ -1,5 +1,6 @@
 import { PubSub } from 'graphql-subscriptions';
 import axios, { AxiosError } from 'axios';
+import Faker from 'faker';
 import { QUERY_RESOLVED } from '../..';
 import { ResolvedVariantQueryResult, ResultTransformer, VariantQueryInput } from '../../../types';
 
@@ -82,9 +83,17 @@ export const transformEnsemblQueryResponse: ResultTransformer<{
       af: r.info.AF[0] ? +r.info.AF[0] || null : null,
       alt: r.alternateBases[0],
       chromosome: r.referenceName,
+      datasetId: Faker.random.alphaNumeric(25),
+      end: +r.end,
+      ethnicity: ['eth1', 'eth2', 'eth3'][Faker.datatype.number({ min: 0, max: 2 })],
       dp: r.info.DP[0] ? +r.info.DP[0] : null,
+      phenotypes: Faker.lorem.words(Faker.datatype.number({ min: 10, max: 20 })),
       ref: r.referenceBases[0],
-      rsId: r.id,
+      rsId: r.names[0],
+      someFakeScore: Faker.datatype.float(),
+      sex: ['male', 'female'][Faker.datatype.number({ min: 0, max: 1 })],
+      start: +r.start,
+      zygosity: ['het', 'het', 'het', 'hom'][Faker.datatype.number({ min: 0, max: 3 })],
     }));
   }
 };

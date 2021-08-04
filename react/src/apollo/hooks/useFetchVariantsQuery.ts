@@ -9,13 +9,22 @@ const fetchVariantsQuery = gql`
                 data {
                     af
                     alt
-                    ref
                     chromosome
+                    datasetId
+                    dp
+                    end
+                    ethnicity
+                    phenotypes
+                    ref
+                    rsId
+                    sex
+                    someFakeScore
+                    start
+                    zygosity
                 }
                 source
             }
             errors {
-                source
                 error {
                     code
                     message
