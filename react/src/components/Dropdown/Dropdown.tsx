@@ -51,11 +51,7 @@ const Dropdown: React.FC<DropdownProps> = ({ items, multiSelect, title, reset, o
                 <Title>
                     {selection.length > 0 ? selection.map(v => v.label).join(', ') : title}
                 </Title>
-<<<<<<< HEAD:react/src/components/Filters/Dropdown.tsx
-                {open ? 'lss' : 'mrrr'}
-=======
                 {open ? <BsChevronUp /> : <BsChevronDown />}
->>>>>>> develop:react/src/components/Dropdown/Dropdown.tsx
             </Header>
             {open && (
                 <List>
