@@ -6,7 +6,7 @@ const useClickAway = <T extends HTMLElement>(
 ) => {
     return useEffect(() => {
         const listener = (e: Event) => {
-            if (!containerRef.current.contains(e.target as Node)) {
+            if (!containerRef.current?.contains(e.target as Node)) {
                 onAwayClick();
             }
         };

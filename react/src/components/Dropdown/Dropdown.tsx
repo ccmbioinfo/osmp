@@ -2,28 +2,28 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsChevronDown, BsChevronUp } from 'react-icons/bs';
 import { useClickAway } from '../../hooks';
 import { DropdownItem } from '../../types';
-import { Input, Header, List, Title, Wrapper } from './Dropdown.styles';
+import { Header, Input, List, Title, Wrapper } from './Dropdown.styles';
 
 interface DropdownProps {
     title: string;
     items: DropdownItem[];
-    onChange: (item: DropdownItem) => void;
-    reset?: Boolean;
+    onChange: (item: { value: string }) => void;
     multiSelect?: boolean;
     searchable?: boolean;
-    value?: string | number;
+    value?: string | string[];
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
     items,
     multiSelect,
     title,
-    reset,
     searchable,
     value,
     onChange,
 }) => {
+    // Note: Currently, text is only usable for single-select autocomplete. More work needs to be done for multiSelect autocomplete....
     const [text, setText] = useState(value);
+    console.log(text, value);
     const [open, setOpen] = useState<Boolean>(false);
     const [selection, setSelection] = useState<DropdownItem[]>([]);
     const [suggestions, setSuggestions] = useState<DropdownItem[]>(items);
@@ -35,9 +35,7 @@ const Dropdown: React.FC<DropdownProps> = ({
         setText(value);
         setOpen(true);
         onChange({
-            id: 1,
             value: value,
-            label: value,
         });
         if (value.length > 0) {
             const regex = new RegExp(`^${value}`, 'i');
@@ -49,7 +47,7 @@ const Dropdown: React.FC<DropdownProps> = ({
     };
 
     function handleOnClick(item: DropdownItem) {
-        onChange(item);
+        onChange({ value: item.value });
         if (!selection.some(current => current.id === item.id)) {
             if (!multiSelect) {
                 setSelection([item]);
@@ -71,20 +69,18 @@ const Dropdown: React.FC<DropdownProps> = ({
     }
 
     useEffect(() => {
-        if (reset) {
-            setSelection([]);
-        }
-    }, [reset]);
-
-    useEffect(() => {
         if (searchable && selection.length > 0) {
+            // Autocomplete text based on the selection
             setText(selection[0].value);
         }
-    }, [selection]);
+    }, [selection, searchable]);
 
     useEffect(() => {
         setText(value);
-    }, [value]);
+        if (value === '' || value?.length === 0) {
+            setSelection([]);
+        }
+    }, [items, value]);
 
     const fragmentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
     useClickAway(fragmentRef, () => setOpen(false));

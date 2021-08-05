@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Body,
@@ -124,7 +124,6 @@ const VariantQueryPage: React.FC<{}> = () => {
     });
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
-    const [reset, setReset] = useState<Boolean>(false);
 
     // Todo: Enable typings for only 'emsembl' | 'local'
     const toggleSource = (source: string) => {
@@ -145,13 +144,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Dropdown
                             title="Select Sources"
+                            value={queryOptionsForm.sources.value}
                             items={sources}
                             multiSelect
-                            onChange={item => {
-                                toggleSource(item.value);
-                                setReset(false);
-                            }}
-                            reset={reset}
+                            onChange={item => toggleSource(item.value)}
                         />
                         <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </Column>
@@ -163,11 +159,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             value={queryOptionsForm.chromosome.value}
                             title="Select Chromosome"
                             items={chromosomes}
-                            onChange={e => {
-                                setReset(false);
-                                updateQueryOptionsForm('chromosome')(e.value);
-                            }}
-                            reset={reset}
+                            onChange={e => updateQueryOptionsForm('chromosome')(e.value)}
                             searchable
                         />
                         <ErrorIndicator error={queryOptionsForm.chromosome.error} />
@@ -204,15 +196,14 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Button>
                         <Button
                             onClick={() => {
-                                setReset(true);
                                 resetQueryOptionsForm();
                             }}
                             variant="primary"
                         >
                             Clear
                         </Button>
-                        {loading ? <Spinner /> : null}
                     </ButtonWrapper>
+                    {loading ? <Spinner /> : null}
                 </Flex>
             </div>
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
