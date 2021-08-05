@@ -140,8 +140,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     );
                                     return (
                                         <th key={key} {...restHeaderProps}>
-                                            {column.render('Header')}
                                             <span>
+                                                {column.render('Header')}
                                                 {column.isSorted ? (
                                                     column.isSortedDesc ? (
                                                         <BsFillCaretUpFill />

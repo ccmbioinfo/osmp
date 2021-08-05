@@ -5,9 +5,11 @@
     "proxy": "http://ssmp-server:5862",
     "dependencies": {
         "@apollo/react-hooks": "^4.0.0",
+        "@react-keycloak/web": "^3.4.0",
         "apollo-client": "^2.6.10",
         "gql-tag": "^1.0.1",
         "graphql": "^15.5.1",
+        "keycloak-js": "^15.0.0",
         "react": "^17.0.2",
         "react-dom": "^17.0.2",
         "react-icons": "^4.2.0",
@@ -50,7 +52,10 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "storybook": "start-storybook -p 6001 -s public",
-        "build-storybook": "build-storybook -s public"
+        "build-storybook": "build-storybook -s public",
+        "format": "prettier --check src/",
+        "lint": "eslint --max-warnings=0 src/",
+        "tsc": "tsc"
     },
     "eslintConfig": {
         "extends": "eslint-config-react-app",

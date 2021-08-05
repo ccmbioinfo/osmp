@@ -1,3 +1,4 @@
+import useClickAway from './useClickAway';
 import useFormReducer from './useFormReducer';
 
-export { useFormReducer };
+export { useClickAway, useFormReducer };

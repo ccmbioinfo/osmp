@@ -16,6 +16,11 @@ export const Column = styled(Flex)`
     margin-bottom: 0px;
 `;
 
+export const ButtonWrapper = styled(Flex)`
+    display: inline-flex;
+    margin-top: 1.5rem;
+`;
+
 export const Container = styled.div`
     margin: 0 auto;
     padding: 0 ${props => props.theme.space[6]};
