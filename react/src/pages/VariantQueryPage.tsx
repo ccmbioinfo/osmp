@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Body,
     Button,
+    ButtonWrapper,
     Column,
     Dropdown,
     Flex,
@@ -15,6 +16,33 @@ import { useFormReducer } from '../hooks';
 import { formIsValid, FormState } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
 
+const sources: DropdownItem[] = [
+    {
+        id: 1,
+        value: 'local',
+        label: 'Local',
+    },
+    {
+        id: 2,
+        value: 'ensembl',
+        label: 'Ensembl',
+    },
+];
+
+const chromosomes: DropdownItem[] = Array.from(Array(22))
+    .map((v, i) => ({
+        id: i,
+        value: (i + 1).toString(),
+        label: (i + 1).toString(),
+    }))
+    .concat(
+        ['X', 'Y'].map((v, i) => ({
+            id: 22 + i,
+            value: v,
+            label: v,
+        }))
+    );
+
 const queryOptionsFormValidator = {
     sources: {
         required: true,
@@ -22,7 +50,7 @@ const queryOptionsFormValidator = {
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     !!state.sources.value.filter(s => ['local', 'ensembl'].includes(s)).length,
-                error: 'Invalid source!',
+                error: 'Please specify a source.',
             },
         ],
     },
@@ -43,6 +71,16 @@ const queryOptionsFormValidator = {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     +state.start.value < +state.end.value,
                 error: 'End must be greater than start!',
+            },
+        ],
+    },
+    chromosome: {
+        required: true,
+        rules: [
+            {
+                valid: (state: FormState<QueryOptionsFormState>) =>
+                    !!chromosomes.map(c => c.value).includes(state.chromosome.value),
+                error: 'Chromosome is invalid.',
             },
         ],
     },
@@ -74,6 +112,8 @@ const VariantQueryPage: React.FC<{}> = () => {
             queryOptionsFormValidator
         );
 
+    console.log(queryOptionsForm);
+
     const getArgs = () => ({
         input: {
             chromosome: queryOptionsForm.chromosome.value,
@@ -84,7 +124,6 @@ const VariantQueryPage: React.FC<{}> = () => {
     });
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
-    const [reset, setReset] = useState<Boolean>(false);
 
     // Todo: Enable typings for only 'emsembl' | 'local'
     const toggleSource = (source: string) => {
@@ -94,33 +133,6 @@ const VariantQueryPage: React.FC<{}> = () => {
             ? update(queryOptionsForm.sources.value.filter(s => s !== source))
             : update(queryOptionsForm.sources.value.concat(source));
     };
-
-    const sources: DropdownItem[] = [
-        {
-            id: 1,
-            value: 'local',
-            label: 'Local',
-        },
-        {
-            id: 2,
-            value: 'ensembl',
-            label: 'Ensembl',
-        },
-    ];
-
-    const chromosomes: DropdownItem[] = Array.from(Array(22))
-        .map((v, i) => ({
-            id: i,
-            value: (i + 1).toString(),
-            label: (i + 1).toString(),
-        }))
-        .concat(
-            ['X', 'Y'].map((v, i) => ({
-                id: 22 + i,
-                value: v,
-                label: v,
-            }))
-        );
 
     return (
         <Body>
@@ -132,13 +144,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Dropdown
                             title="Select Sources"
+                            value={queryOptionsForm.sources.value}
                             items={sources}
                             multiSelect
-                            onChange={item => {
-                                toggleSource(item.value);
-                                setReset(false);
-                            }}
-                            reset={reset}
+                            onChange={item => toggleSource(item.value)}
                         />
                         <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </Column>
@@ -147,14 +156,13 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Chromosomes
                         </Typography>
                         <Dropdown
+                            value={queryOptionsForm.chromosome.value}
                             title="Select Chromosome"
                             items={chromosomes}
-                            onChange={e => {
-                                setReset(false);
-                                updateQueryOptionsForm('chromosome')(e.value);
-                            }}
-                            reset={reset}
+                            onChange={e => updateQueryOptionsForm('chromosome')(e.value)}
+                            searchable
                         />
+                        <ErrorIndicator error={queryOptionsForm.chromosome.error} />
                     </Column>
                     <Column>
                         <Typography variant="subtitle" bold>
@@ -176,27 +184,26 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                         <ErrorIndicator error={queryOptionsForm.end.error} />
                     </Column>
-                </Flex>
-                <Flex>
-                    <Button
-                        disabled={
-                            loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
-                        }
-                        onClick={() => fetchVariants({ variables: getArgs() })}
-                        variant="primary"
-                    >
-                        Fetch
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            setReset(true);
-                            resetQueryOptionsForm();
-                        }}
-                        variant="primary"
-                    >
-                        Clear
-                    </Button>
-                    <Column>{loading ? <Spinner /> : null}</Column>
+                    <ButtonWrapper>
+                        <Button
+                            disabled={
+                                loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                            }
+                            onClick={() => fetchVariants({ variables: getArgs() })}
+                            variant="primary"
+                        >
+                            Fetch
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                resetQueryOptionsForm();
+                            }}
+                            variant="primary"
+                        >
+                            Clear
+                        </Button>
+                    </ButtonWrapper>
+                    {loading ? <Spinner /> : null}
                 </Flex>
             </div>
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}

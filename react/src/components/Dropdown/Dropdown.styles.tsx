@@ -4,9 +4,18 @@ const Flex = styled.div`
     display: flex;
 `;
 
+export const Input = styled.input`
+    min-height: 45px;
+    border: none;
+    outline: none;
+    font-size: ${props => props.theme.fontSizes.s};
+    width: 70%;
+`;
 export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
+    flex-grow: 0;
+    width: 200px;
 `;
 
 export const Header = styled(Flex)`
@@ -20,7 +29,7 @@ export const Header = styled(Flex)`
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    width: 100%;
+    width: inherit;
 `;
 
 export const Title = styled.p`
@@ -34,16 +43,16 @@ export const List = styled.div`
     box-shadow: ${props => props.theme.boxShadow}
     padding: 0;
     margin: 0;
-    width: 100%;
+    width: inherit;
     margin-top: ${props => props.theme.space[4]};
     max-height: 100px;
     overflow: auto;
-
+    position: absolute;
+    top: 200px;
+    z-index: 1;
     /* Dropdown List Styling */
-
     > li {
         list-style-type: none;
-
         &:first-of-type {
             > button {
                 border-top: ${props => props.theme.borders.thin} ${props =>
@@ -52,12 +61,10 @@ export const List = styled.div`
                 border-top-right-radius: ${props => props.theme.radii.base};
             }
         }
-
         &:last-of-type > button {
           border-bottom-left-radius: ${props => props.theme.radii.base};
           border-bottom-right-radius: ${props => props.theme.radii.base};
         }
-
         button {
             display: flex;
             justify-content: space-between;
@@ -71,7 +78,6 @@ export const List = styled.div`
             text-align: left;
             border-left: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
             border-right: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
-
             &:hover {
                 cursor: pointer;
                 font-weight: bold;

@@ -11,6 +11,7 @@ const Component = styled.button<ButtonProps>`
     box-sizing: border-box;
     display: flex;
     align-items: center;
+    height: 40px;
     text-align: center;
     font-family: ${props => props.theme.fontFamily.heading};
     padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
