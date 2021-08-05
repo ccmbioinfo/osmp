@@ -9,6 +9,7 @@ export const Input = styled.input`
     border: none;
     outline: none;
     font-size: ${props => props.theme.fontSizes.s};
+    width: 70%;
 `;
 export const Wrapper = styled(Flex)`
     min-height: 38px;
@@ -28,7 +29,7 @@ export const Header = styled(Flex)`
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    width: 100%;
+    width: inherit;
 `;
 
 export const Title = styled.p`
