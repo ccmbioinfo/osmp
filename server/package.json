@@ -7,7 +7,10 @@
   "scripts": {
     "test": "jest",
     "start-dev-old": "ts-node-dev --transpile-only --inspect --debug --files --respawn src/server.ts",
-    "start-dev": "ts-node-dev src/server.ts"
+    "start-dev": "ts-node-dev src/server.ts",
+    "format": "prettier --check src/",
+    "lint": "eslint --max-warnings=0 src/",
+    "tsc": "tsc"
   },
   "devDependencies": {
     "@graphql-eslint/eslint-plugin": "^1.1.2",

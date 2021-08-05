@@ -52,7 +52,10 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "storybook": "start-storybook -p 6001 -s public",
-        "build-storybook": "build-storybook -s public"
+        "build-storybook": "build-storybook -s public",
+        "format": "prettier --check src/",
+        "lint": "eslint --max-warnings=0 src/",
+        "tsc": "tsc"
     },
     "eslintConfig": {
         "extends": "eslint-config-react-app",
