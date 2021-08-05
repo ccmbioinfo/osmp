@@ -59,6 +59,51 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'source',
                 Header: 'Source',
             },
+            {
+                accessor: 'datasetId',
+                id: 'datasetId',
+                Header: 'Dataset ID',
+            },
+            {
+                accessor: 'dp',
+                id: 'dp',
+                Header: 'DP',
+            },
+            {
+                accessor: 'end',
+                id: 'end',
+                Header: 'End',
+            },
+            {
+                accessor: 'ethnicity',
+                id: 'ethnicity',
+                Header: 'Ethnicity',
+            },
+            {
+                accessor: 'phenotypes',
+                id: 'phenotypes',
+                Header: 'Phenotypes',
+            },
+            {
+                accessor: 'rsId',
+                id: 'rsId',
+                Header: 'RSID',
+            },
+            {
+                accessor: 'sex',
+                id: 'sex',
+                Header: 'Sex',
+            },
+            {
+                accessor: 'someFakeScore',
+                id: 'someFakeScore',
+                Header: 'Some Fake Score',
+            },
+            {
+                accessor: 'zygosity',
+                id: 'zygosity',
+                Header: 'Zygosity',
+            },
         ],
         []
     );
@@ -95,12 +140,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setAllFilters,
         setGlobalFilter,
         prepareRow,
+        allColumns,
+        getToggleHideAllColumnsProps,
+
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
     return (
         <>
+            <div>
+                {allColumns.map(column => (
+                    <div key={column.id}>
+                        <label>
+                        <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
+                        {column.id}
+                        </label>
+                    </div>
+                ))}
+            </div>
             <TableFilters>
                 <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                 <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
