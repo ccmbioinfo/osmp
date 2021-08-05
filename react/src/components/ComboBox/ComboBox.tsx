@@ -45,21 +45,21 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     const fragmentRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
     useClickAway(fragmentRef, () => {
-        if (onClose) {
+        if (open && onClose) {
             onClose();
         }
         setOpen(false);
     });
 
     return (
-        <div ref={fragmentRef}>
+        <div>
             <Wrapper>
                 <Header tabIndex={0} role="button">
                     <Input value={searchTerm} placeholder={placeholder} onChange={getSuggestions} />
                     {loading ? <Spinner size={5} /> : <BsSearch />}
                 </Header>
                 {open && (
-                    <List>
+                    <List ref={fragmentRef}>
                         {items
                             .filter(i => i.label.toLowerCase().includes(searchTerm.toLowerCase()))
                             .map(item => (
