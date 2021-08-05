@@ -1,5 +1,6 @@
 import Button from './Button';
 import ComboBox from './ComboBox/ComboBox';
+import GeneSearch from './GeneSearch';
 import Input from './Input';
 import { Body, ButtonWrapper, Column, Container, Flex } from './Layout';
 import Navbar from './Navbar/Navbar';
@@ -15,6 +16,7 @@ export {
     Column,
     Container,
     Flex,
+    GeneSearch,
     Input,
     Navbar,
     Spinner,

@@ -27,8 +27,6 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     const [searchTerm, setSearchTerm] = useState(value);
     const [open, setOpen] = useState<Boolean>(false);
 
-    const toggle = () => setOpen(!open);
-
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchTerm(value);
@@ -56,7 +54,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     return (
         <div ref={fragmentRef}>
             <Wrapper>
-                <Header tabIndex={0} role="button" onClick={toggle}>
+                <Header tabIndex={0} role="button">
                     <Input value={searchTerm} placeholder={placeholder} onChange={getSuggestions} />
                     {loading ? <Spinner size={5} /> : <BsSearch />}
                 </Header>
