@@ -1,8 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
+import React, { useMemo, useState } from 'react';
+import {
+    BsFillCaretDownFill,
+    BsFillCaretUpFill,
+    BsFillEyeFill,
+    BsFillEyeSlashFill,
+} from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Button, Column, Typography } from '../index';
+import { Button, Column, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
@@ -21,46 +26,24 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [open, setOpen] = useState<Boolean>(false);
+    const [showModal, setShowModal] = useState<Boolean>(false);
     const [group, setGroup] = useState([
         {
-            name: 'core',
+            name: 'Core',
             visible: true,
-            columns: [
-                'alt',
-                'chromosome',
-                'end',
-                'ref',
-                'start',
-                'source'
-            ]
+            columns: ['alt', 'chromosome', 'end', 'ref', 'start', 'source'],
         },
         {
-            name: 'variation_details',
+            name: 'Variation Details',
             visible: true,
-            columns: [
-                'af',
-                'rsId',
-                'someFakeScore'
-            ]
+            columns: ['af', 'rsId', 'someFakeScore'],
         },
         {
-            name: 'case_details',
+            name: 'Case Details',
             visible: true,
-            columns: [
-                'datasetId',
-                'dp',
-                'ethnicity',
-                'phenotypes',
-                'sex',
-                'zygosity'
-            ]
+            columns: ['datasetId', 'dp', 'ethnicity', 'phenotypes', 'sex', 'zygosity'],
         },
     ]);
-
-    const isColumnVisible = useCallback(
-        (id: string) => group.filter(g => g.columns.includes(id))[0].visible,
-        [group]
-    )
 
     const tableData = useMemo(() => variantData, [variantData]);
     const sortByArray = useMemo(
@@ -149,7 +132,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    console.log('COLUMNS', columns)
+    console.log('COLUMNS', columns);
 
     const tableInstance = useTable<VariantQueryResponseSchemaTableRow>(
         {
@@ -157,7 +140,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: ['chromosome']
+                hiddenColumns: ['chromosome'],
             },
         },
         useFilters,
@@ -184,47 +167,47 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setAllFilters,
         setGlobalFilter,
         prepareRow,
-        allColumns,
         toggleHideColumn,
-        setHiddenColumns,
-        getToggleHideAllColumnsProps,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const handleGroupChange = (g: {name: string, visible: boolean, columns:string[]}) => {
-        setGroup(prev => prev.map(e => {
-            if (e.name === g.name) {
-                e.columns.map(c => toggleHideColumn(c, g.visible))
-                return {
-                    name: e.name,
-                    visible: !g.visible,
-                    columns: e.columns
+    const handleGroupChange = (g: { name: string; visible: boolean; columns: string[] }) => {
+        setGroup(prev =>
+            prev.map(e => {
+                if (e.name === g.name) {
+                    e.columns.map(c => toggleHideColumn(c, g.visible));
+                    return {
+                        name: e.name,
+                        visible: !g.visible,
+                        columns: e.columns,
+                    };
+                } else {
+                    return e;
                 }
-            }
-            else {
-                return e;
-            }
-        }))
-    }
+            })
+        );
+    };
 
     return (
         <>
-            <div>
-                {group.map((g, id) => (
-                    <div key={id}>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={g.visible}
-                                onChange={() => handleGroupChange(g)}
-                            />
-                            {g.name}
-                        </label>
-                    </div>
+            <Modal active={showModal} hideModal={() => setShowModal(false)}>
+                <div>
+                    {group.map((g, id) => (
+                        <div key={id}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={g.visible}
+                                    onChange={() => handleGroupChange(g)}
+                                />
+                                {g.name}
+                            </label>
+                        </div>
+                    ))}
+                </div>
+            </Modal>
 
-                ))}
-            </div>
             <TableFilters>
                 <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                 <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
@@ -236,6 +219,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     onClick={() => setAllFilters([])}
                 >
                     Clear all filters
+                </Button>
+                <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
+                    {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
                 </Button>
             </TableFilters>
 
