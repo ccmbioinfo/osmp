@@ -59,74 +59,100 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const columns = React.useMemo(
         () => [
             {
-                accessor: 'chromosome',
-                id: 'chromosome',
-                Header: 'Chromosome',
+                Header: 'Core',
+                id: 'core',
+                columns: [
+                    {
+                        accessor: 'chromosome',
+                        id: 'chromosome',
+                        Header: 'Chromosome',
+                    },
+                    {
+                        accessor: 'alt',
+                        id: 'alt',
+                        Header: 'Alt',
+                    },
+                    {
+                        accessor: 'ref' as any, // strange typing issue here that should be looked into as things settle down
+                        id: 'ref',
+                        Header: 'Ref',
+                    },
+                    {
+                        accessor: 'start',
+                        id: 'start',
+                        Header: 'Start',
+                    },
+                    {
+                        accessor: 'end',
+                        id: 'end',
+                        Header: 'End',
+                    },
+                    {
+                        accessor: 'source',
+                        id: 'source',
+                        Header: 'Source',
+                    },
+                ],
             },
             {
-                accessor: 'af',
-                id: 'af',
-                Header: 'AF',
+                Header: 'Variation Details',
+                id: 'variation_details',
+                columns: [
+                    {
+                        accessor: 'af',
+                        id: 'af',
+                        Header: 'AF',
+                    },
+                    {
+                        accessor: 'rsId',
+                        id: 'rsId',
+                        Header: 'RSID',
+                    },
+                    {
+                        accessor: 'someFakeScore',
+                        id: 'someFakeScore',
+                        Header: 'Some Fake Score',
+                    },
+                ],
             },
             {
-                accessor: 'alt',
-                id: 'alt',
-                Header: 'Alt',
-            },
-            {
-                accessor: 'ref' as any, // strange typing issue here that should be looked into as things settle down
-                id: 'ref',
-                Header: 'Ref',
-            },
-            {
-                accessor: 'source',
-                id: 'source',
-                Header: 'Source',
-            },
-            {
-                accessor: 'datasetId',
-                id: 'datasetId',
-                Header: 'Dataset ID',
-            },
-            {
-                accessor: 'dp',
-                id: 'dp',
-                Header: 'DP',
-            },
-            {
-                accessor: 'end',
-                id: 'end',
-                Header: 'End',
-            },
-            {
-                accessor: 'ethnicity',
-                id: 'ethnicity',
-                Header: 'Ethnicity',
-            },
-            {
-                accessor: 'phenotypes',
-                id: 'phenotypes',
-                Header: 'Phenotypes',
-            },
-            {
-                accessor: 'rsId',
-                id: 'rsId',
-                Header: 'RSID',
-            },
-            {
-                accessor: 'sex',
-                id: 'sex',
-                Header: 'Sex',
-            },
-            {
-                accessor: 'someFakeScore',
-                id: 'someFakeScore',
-                Header: 'Some Fake Score',
-            },
-            {
-                accessor: 'zygosity',
-                id: 'zygosity',
-                Header: 'Zygosity',
+                Header: 'Case Details',
+                id: 'case_details',
+                columns: [
+                    {
+                        accessor: 'datasetId',
+                        id: 'datasetId',
+                        Header: 'Dataset ID',
+                    },
+                    {
+                        accessor: 'dp',
+                        id: 'dp',
+                        Header: 'DP',
+                    },
+
+                    {
+                        accessor: 'ethnicity',
+                        id: 'ethnicity',
+                        Header: 'Ethnicity',
+                    },
+                    {
+                        accessor: 'phenotypes',
+                        id: 'phenotypes',
+                        Header: 'Phenotypes',
+                    },
+
+                    {
+                        accessor: 'sex',
+                        id: 'sex',
+                        Header: 'Sex',
+                    },
+
+                    {
+                        accessor: 'zygosity',
+                        id: 'zygosity',
+                        Header: 'Zygosity',
+                    },
+                ],
             },
         ],
         []
