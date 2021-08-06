@@ -3,6 +3,7 @@ import styled from 'styled-components';
 interface FlexProps {
     alignItems?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
     justifyContent?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
+    variant?: 'success' | 'main' | 'light';
 }
 
 export const Flex = styled.div<FlexProps>`
@@ -10,7 +11,18 @@ export const Flex = styled.div<FlexProps>`
     display: flex;
     flex-wrap: wrap;
     justify-content: ${props => props.justifyContent ?? 'inherit'};
+    background: ${props => {
+        switch (props.variant) {
+            case 'success':
+                return props.theme.background.success;
+            case 'light':
+                return props.theme.background.light;
+            default:
+                return 'inherit';
+        }
+    }};
     margin: ${props => props.theme.space[3]} 0;
+    padding: ${props => props.theme.space[3]};
 `;
 
 export const InlineFlex = styled.div`
