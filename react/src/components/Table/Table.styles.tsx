@@ -4,23 +4,24 @@ import { Flex } from '../index';
 
 export const TableFilters = styled(Flex)`
     align-items: center;
+    justify-content: space-between;
 `;
 
 export const TableStyled = styled.table`
     margin-top: ${props => props.theme.space[2]};
-    border-collapse: collapse;
+    border-collapse: separate;
     width: 100%;
 `;
 export const Row = styled.tr`
     thead > & {
         background: #f7f7f7;
         height: 30px;
-        margin-bottom: ${props => props.theme.space[1]};
+        margin-bottom: ${props => props.theme.space[2]};
     }
 
     tbody > & {
         background: #fcfcfc;
-        margin-bottom: ${props => props.theme.space[1]};
+        margin-bottom: ${props => props.theme.space[2]};
     }
 
     & > th {

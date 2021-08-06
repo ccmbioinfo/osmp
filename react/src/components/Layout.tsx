@@ -13,6 +13,11 @@ export const Flex = styled.div<FlexProps>`
     margin: ${props => props.theme.space[3]} 0;
 `;
 
+export const InlineFlex = styled.div`
+    display: inline-flex;
+    align-items: center;
+`;
+
 export const Body = styled.div`
     padding: ${props => props.theme.space[4]};
 `;

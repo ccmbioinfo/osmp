@@ -1,8 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
+import {
+    BsFillCaretDownFill,
+    BsFillCaretUpFill,
+    BsFillEyeFill,
+    BsFillEyeSlashFill,
+} from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Button, Column, Typography } from '../index';
+import { Button, Column, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
@@ -21,6 +26,25 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [open, setOpen] = useState<Boolean>(false);
+    const [showModal, setShowModal] = useState<Boolean>(false);
+    const [group, setGroup] = useState([
+        {
+            name: 'Core',
+            visible: true,
+            columns: ['alt', 'chromosome', 'end', 'ref', 'start', 'source'],
+        },
+        {
+            name: 'Variation Details',
+            visible: true,
+            columns: ['af', 'rsId', 'someFakeScore'],
+        },
+        {
+            name: 'Case Details',
+            visible: true,
+            columns: ['datasetId', 'dp', 'ethnicity', 'phenotypes', 'sex', 'zygosity'],
+        },
+    ]);
+
     const tableData = useMemo(() => variantData, [variantData]);
     const sortByArray = useMemo(
         () => [
@@ -35,29 +59,100 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const columns = React.useMemo(
         () => [
             {
-                accessor: 'chromosome',
-                id: 'chromosome',
-                Header: 'Chromosome',
+                Header: 'Core',
+                id: 'core',
+                columns: [
+                    {
+                        accessor: 'chromosome',
+                        id: 'chromosome',
+                        Header: 'Chromosome',
+                    },
+                    {
+                        accessor: 'alt',
+                        id: 'alt',
+                        Header: 'Alt',
+                    },
+                    {
+                        accessor: 'ref' as any, // strange typing issue here that should be looked into as things settle down
+                        id: 'ref',
+                        Header: 'Ref',
+                    },
+                    {
+                        accessor: 'start',
+                        id: 'start',
+                        Header: 'Start',
+                    },
+                    {
+                        accessor: 'end',
+                        id: 'end',
+                        Header: 'End',
+                    },
+                    {
+                        accessor: 'source',
+                        id: 'source',
+                        Header: 'Source',
+                    },
+                ],
             },
             {
-                accessor: 'af',
-                id: 'af',
-                Header: 'AF',
+                Header: 'Variation Details',
+                id: 'variation_details',
+                columns: [
+                    {
+                        accessor: 'af',
+                        id: 'af',
+                        Header: 'AF',
+                    },
+                    {
+                        accessor: 'rsId',
+                        id: 'rsId',
+                        Header: 'RSID',
+                    },
+                    {
+                        accessor: 'someFakeScore',
+                        id: 'someFakeScore',
+                        Header: 'Some Fake Score',
+                    },
+                ],
             },
             {
-                accessor: 'alt',
-                id: 'alt',
-                Header: 'Alt',
-            },
-            {
-                accessor: 'ref' as any, // strange typing issue here that should be looked into as things settle down
-                id: 'ref',
-                Header: 'Ref',
-            },
-            {
-                accessor: 'source',
-                id: 'source',
-                Header: 'Source',
+                Header: 'Case Details',
+                id: 'case_details',
+                columns: [
+                    {
+                        accessor: 'datasetId',
+                        id: 'datasetId',
+                        Header: 'Dataset ID',
+                    },
+                    {
+                        accessor: 'dp',
+                        id: 'dp',
+                        Header: 'DP',
+                    },
+
+                    {
+                        accessor: 'ethnicity',
+                        id: 'ethnicity',
+                        Header: 'Ethnicity',
+                    },
+                    {
+                        accessor: 'phenotypes',
+                        id: 'phenotypes',
+                        Header: 'Phenotypes',
+                    },
+
+                    {
+                        accessor: 'sex',
+                        id: 'sex',
+                        Header: 'Sex',
+                    },
+
+                    {
+                        accessor: 'zygosity',
+                        id: 'zygosity',
+                        Header: 'Zygosity',
+                    },
+                ],
             },
         ],
         []
@@ -69,6 +164,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
+                hiddenColumns: ['chromosome'],
             },
         },
         useFilters,
@@ -95,24 +191,69 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setAllFilters,
         setGlobalFilter,
         prepareRow,
+        toggleHideColumn,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
+    const handleGroupChange = (g: { name: string; visible: boolean; columns: string[] }) => {
+        setGroup(prev =>
+            prev.map(e => {
+                if (e.name === g.name) {
+                    e.columns.map(c => toggleHideColumn(c, g.visible));
+                    return {
+                        name: e.name,
+                        visible: !g.visible,
+                        columns: e.columns,
+                    };
+                } else {
+                    return e;
+                }
+            })
+        );
+    };
+
     return (
         <>
             <TableFilters>
-                <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-                <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
-                    Advanced Filters <FilterIcon />
-                </Button>
-                <Button
-                    disabled={filters.length > 0 ? false : true}
-                    variant="secondary"
-                    onClick={() => setAllFilters([])}
-                >
-                    Clear all filters
-                </Button>
+                <InlineFlex>
+                    <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                    <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
+                        Advanced Filters <FilterIcon />
+                    </Button>
+                    <Button
+                        disabled={filters.length > 0 ? false : true}
+                        variant="secondary"
+                        onClick={() => setAllFilters([])}
+                    >
+                        Clear all filters
+                    </Button>
+                </InlineFlex>
+                <InlineFlex>
+                    <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
+                        {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
+                    </Button>
+                    <Modal
+                        active={showModal}
+                        hideModal={() => setShowModal(false)}
+                        title="Hide/Unhide Columns"
+                    >
+                        <div>
+                            {group.map((g, id) => (
+                                <div key={id}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={g.visible}
+                                            onChange={() => handleGroupChange(g)}
+                                        />
+                                        {g.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </Modal>
+                </InlineFlex>
             </TableFilters>
 
             {open && (
