@@ -132,8 +132,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    console.log('COLUMNS', columns);
-
     const tableInstance = useTable<VariantQueryResponseSchemaTableRow>(
         {
             columns,
