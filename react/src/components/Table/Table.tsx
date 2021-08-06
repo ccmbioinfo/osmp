@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
@@ -21,6 +21,47 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [open, setOpen] = useState<Boolean>(false);
+    const [group, setGroup] = useState([
+        {
+            name: 'core',
+            visible: true,
+            columns: [
+                'alt',
+                'chromosome',
+                'end',
+                'ref',
+                'start',
+                'source'
+            ]
+        },
+        {
+            name: 'variation_details',
+            visible: true,
+            columns: [
+                'af',
+                'rsId',
+                'someFakeScore'
+            ]
+        },
+        {
+            name: 'case_details',
+            visible: true,
+            columns: [
+                'datasetId',
+                'dp',
+                'ethnicity',
+                'phenotypes',
+                'sex',
+                'zygosity'
+            ]
+        },
+    ]);
+
+    const isColumnVisible = useCallback(
+        (id: string) => group.filter(g => g.columns.includes(id))[0].visible,
+        [group]
+    )
+
     const tableData = useMemo(() => variantData, [variantData]);
     const sortByArray = useMemo(
         () => [
@@ -108,12 +149,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
+    console.log('COLUMNS', columns)
+
     const tableInstance = useTable<VariantQueryResponseSchemaTableRow>(
         {
             columns,
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
+                hiddenColumns: ['chromosome']
             },
         },
         useFilters,
@@ -141,22 +185,44 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setGlobalFilter,
         prepareRow,
         allColumns,
+        toggleHideColumn,
+        setHiddenColumns,
         getToggleHideAllColumnsProps,
-
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
+    const handleGroupChange = (g: {name: string, visible: boolean, columns:string[]}) => {
+        setGroup(prev => prev.map(e => {
+            if (e.name === g.name) {
+                e.columns.map(c => toggleHideColumn(c, g.visible))
+                return {
+                    name: e.name,
+                    visible: !g.visible,
+                    columns: e.columns
+                }
+            }
+            else {
+                return e;
+            }
+        }))
+    }
+
     return (
         <>
             <div>
-                {allColumns.map(column => (
-                    <div key={column.id}>
+                {group.map((g, id) => (
+                    <div key={id}>
                         <label>
-                        <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
-                        {column.id}
+                            <input
+                                type="checkbox"
+                                checked={g.visible}
+                                onChange={() => handleGroupChange(g)}
+                            />
+                            {g.name}
                         </label>
                     </div>
+
                 ))}
             </div>
             <TableFilters>
