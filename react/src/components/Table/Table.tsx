@@ -7,7 +7,7 @@ import {
 } from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Button, Column, Modal, Typography } from '../index';
+import { Button, Column, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
@@ -191,38 +191,45 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     return (
         <>
-            <Modal active={showModal} hideModal={() => setShowModal(false)}>
-                <div>
-                    {group.map((g, id) => (
-                        <div key={id}>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={g.visible}
-                                    onChange={() => handleGroupChange(g)}
-                                />
-                                {g.name}
-                            </label>
-                        </div>
-                    ))}
-                </div>
-            </Modal>
-
             <TableFilters>
-                <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-                <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
-                    Advanced Filters <FilterIcon />
-                </Button>
-                <Button
-                    disabled={filters.length > 0 ? false : true}
-                    variant="secondary"
-                    onClick={() => setAllFilters([])}
-                >
-                    Clear all filters
-                </Button>
-                <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
-                    {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
-                </Button>
+                <InlineFlex>
+                    <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
+                    <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
+                        Advanced Filters <FilterIcon />
+                    </Button>
+                    <Button
+                        disabled={filters.length > 0 ? false : true}
+                        variant="secondary"
+                        onClick={() => setAllFilters([])}
+                    >
+                        Clear all filters
+                    </Button>
+                </InlineFlex>
+                <InlineFlex>
+                    <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
+                        {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
+                    </Button>
+                    <Modal
+                        active={showModal}
+                        hideModal={() => setShowModal(false)}
+                        title="Hide/Unhide Columns"
+                    >
+                        <div>
+                            {group.map((g, id) => (
+                                <div key={id}>
+                                    <label>
+                                        <input
+                                            type="checkbox"
+                                            checked={g.visible}
+                                            onChange={() => handleGroupChange(g)}
+                                        />
+                                        {g.name}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    </Modal>
+                </InlineFlex>
             </TableFilters>
 
             {open && (

@@ -16,6 +16,7 @@ export const ModalBlock = styled.div`
 `;
 
 export const ModalOverlay = styled.a`
+    background: rgba(247, 248, 249, 0.5);
     bottom: 0;
     cursor: default;
     display: block;
@@ -60,8 +61,9 @@ export const ModalHeader = styled.div`
 `;
 
 export const ModalTitle = styled.span`
-    font-size: 30px;
+    font-size: ${props => props.theme.fontSizes.m};
     font-weight: 500;
+    margin-inline-end: ${props => props.theme.space[4]};
 `;
 
 export const ModalFooter = styled.div`

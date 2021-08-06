@@ -4,6 +4,7 @@ import { Flex } from '../index';
 
 export const TableFilters = styled(Flex)`
     align-items: center;
+    justify-content: space-between;
 `;
 
 export const TableStyled = styled.table`

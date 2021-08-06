@@ -2,7 +2,7 @@ import Button from './Button';
 import ComboBox from './ComboBox/ComboBox';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
-import { Body, ButtonWrapper, Column, Container, Flex } from './Layout';
+import { Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Spinner from './Spinner';
@@ -18,6 +18,7 @@ export {
     Container,
     Flex,
     GeneSearch,
+    InlineFlex,
     Input,
     Modal,
     Navbar,
