@@ -56,7 +56,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
             <Wrapper>
                 <Header tabIndex={0} role="button">
                     <Input value={searchTerm} placeholder={placeholder} onChange={getSuggestions} />
-                    {loading ? <Spinner size={5} /> : <BsSearch />}
+                    {loading ? <Spinner size={10} /> : <BsSearch />}
                 </Header>
                 {open && (
                     <List ref={fragmentRef}>

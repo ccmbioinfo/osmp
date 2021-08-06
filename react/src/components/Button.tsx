@@ -16,10 +16,12 @@ const Component = styled.button<ButtonProps>`
     font-family: ${props => props.theme.fontFamily.heading};
     padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
     margin: ${props => props.theme.space[3]} ${props => props.theme.space[2]};
+    // Todo: Add more button color combos ...
     color: ${props =>
         props.variant === 'primary' ? props.theme.colors.background : props.theme.colors.primary};
     background-color: ${props =>
         props.variant === 'primary' ? props.theme.colors.primary : props.theme.colors.background};
+
     border: ${props => props.theme.borders.thin};
     border-color: ${props => props.theme.colors.primary};
     border-radius: ${props => props.theme.radii.base};
