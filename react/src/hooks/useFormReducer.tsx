@@ -10,7 +10,7 @@ interface Rule<S> {
 export type Validator<S> = {
     [K in keyof S]?: {
         required?: boolean;
-        rules: Rule<S>[];
+        rules?: Rule<S>[];
     };
 };
 
@@ -59,7 +59,7 @@ const validateField = <S,>(
     if (!validator || !validator[field]) return '';
     if (!value && validator[field]?.required) return `${field} is required!`;
     let error = '';
-    validator[field]?.rules.forEach(rule => {
+    validator[field]?.rules?.forEach(rule => {
         if (!rule.valid(state, value)) {
             error = rule.error;
             return;

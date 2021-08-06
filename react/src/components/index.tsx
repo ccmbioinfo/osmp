@@ -1,5 +1,6 @@
 import Button from './Button';
-import Dropdown from './Dropdown/Dropdown';
+import ComboBox from './ComboBox/ComboBox';
+import GeneSearch from './GeneSearch';
 import Input from './Input';
 import { Body, ButtonWrapper, Column, Container, Flex } from './Layout';
 import Navbar from './Navbar/Navbar';
@@ -8,13 +9,14 @@ import Table from './Table/Table';
 import Typography from './Typography';
 
 export {
+    ComboBox,
     Button,
     ButtonWrapper,
     Body,
     Column,
     Container,
-    Dropdown,
     Flex,
+    GeneSearch,
     Input,
     Navbar,
     Spinner,

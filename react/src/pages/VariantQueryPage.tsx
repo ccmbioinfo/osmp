@@ -5,15 +5,17 @@ import {
     Button,
     ButtonWrapper,
     Column,
-    Dropdown,
+    ComboBox,
     Flex,
+    GeneSearch,
     Input,
     Spinner,
     Table,
     Typography,
 } from '../components';
+import { GeneOption } from '../components/GeneSearch';
 import { useFormReducer } from '../hooks';
-import { formIsValid, FormState } from '../hooks/useFormReducer';
+import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
 
 const sources: DropdownItem[] = [
@@ -43,7 +45,7 @@ const chromosomes: DropdownItem[] = Array.from(Array(22))
         }))
     );
 
-const queryOptionsFormValidator = {
+const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     sources: {
         required: true,
         rules: [
@@ -89,6 +91,8 @@ const queryOptionsFormValidator = {
 interface QueryOptionsFormState {
     chromosome: string;
     end: number;
+    ensemblId: string;
+    gene: string;
     sources: string[];
     start: number;
 }
@@ -106,13 +110,13 @@ const VariantQueryPage: React.FC<{}> = () => {
             {
                 chromosome: '19',
                 end: 44909393,
+                ensemblId: '',
+                gene: '',
                 sources: [],
                 start: 44905791,
             },
             queryOptionsFormValidator
         );
-
-    console.log(queryOptionsForm);
 
     const getArgs = () => ({
         input: {
@@ -142,25 +146,23 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="subtitle" bold>
                             Sources
                         </Typography>
-                        <Dropdown
-                            title="Select Sources"
-                            value={queryOptionsForm.sources.value}
+                        <ComboBox
+                            placeholder="Find a source"
+                            value=""
                             items={sources}
-                            multiSelect
-                            onChange={item => toggleSource(item.value)}
+                            onSelect={item => toggleSource(item.value)}
                         />
                         <ErrorIndicator error={queryOptionsForm.sources.error} />
                     </Column>
                     <Column>
                         <Typography variant="subtitle" bold>
-                            Chromosomes
+                            Chromosome
                         </Typography>
-                        <Dropdown
+                        <ComboBox
                             value={queryOptionsForm.chromosome.value}
-                            title="Select Chromosome"
+                            placeholder="Select Chromosome"
                             items={chromosomes}
-                            onChange={e => updateQueryOptionsForm('chromosome')(e.value)}
-                            searchable
+                            onSelect={e => updateQueryOptionsForm('chromosome')(e.value)}
                         />
                         <ErrorIndicator error={queryOptionsForm.chromosome.error} />
                     </Column>
@@ -184,6 +186,26 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                         <ErrorIndicator error={queryOptionsForm.end.error} />
                     </Column>
+                    <Column>
+                        <Typography variant="subtitle" bold>
+                            Gene
+                        </Typography>
+                        <GeneSearch
+                            onSearch={term => {
+                                updateQueryOptionsForm('gene')(term);
+                                updateQueryOptionsForm('ensemblId')('');
+                            }}
+                            onSelect={({ ensemblId, name }: GeneOption) => {
+                                updateQueryOptionsForm('gene')(name);
+                                updateQueryOptionsForm('ensemblId')(ensemblId);
+                            }}
+                            value={{
+                                name: queryOptionsForm.gene.value,
+                                ensemblId: queryOptionsForm.ensemblId.value,
+                            }}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.end.error} />
+                    </Column>
                     <ButtonWrapper>
                         <Button
                             disabled={
@@ -203,7 +225,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Clear
                         </Button>
                     </ButtonWrapper>
-                    {loading ? <Spinner /> : null}
+                    <Column justifyContent="center">{loading && <Spinner />}</Column>
                 </Flex>
             </div>
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}

@@ -28,15 +28,7 @@ export const Header = styled(Flex)`
     padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     justify-content: space-between;
     align-items: center;
-    cursor: pointer;
     width: inherit;
-`;
-
-export const Title = styled.p`
-    font-family: ${props => props.theme.fontFamily.body};
-    font-size: ${props => props.theme.fontSizes.s};
-    color: ${props => props.theme.colors.text};
-    margin-inline-end: ${props => props.theme.space[1]};
 `;
 
 export const List = styled.div`

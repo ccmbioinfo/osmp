@@ -1,6 +1,7 @@
 import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { QueryHookOptions, useQuery } from '@apollo/react-hooks';
+import { RestLink } from 'apollo-link-rest';
 import { DocumentNode } from 'graphql';
 
 const port = process.env.REACT_APP_API_PORT,
@@ -27,8 +28,10 @@ const httpLink = createHttpLink({
     headers: { Authorization: 'placeholder', accept: 'application/json' },
 });
 
+const restLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
+
 export const client = new ApolloClient<any>({
-    link: from([errorLink, httpLink]),
+    link: from([restLink, errorLink, httpLink]),
     cache: new InMemoryCache(),
 });
 
@@ -46,7 +49,7 @@ export const useLazyApolloQuery = <T, V>(
 ) => {
     return useLazyQuery<T, V>(query, {
         client,
-        //fetchPolicy: 'standby', // does not requery when underlying values change....
+        fetchPolicy: 'cache-first',
         ...options,
     });
 };

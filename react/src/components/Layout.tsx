@@ -1,8 +1,15 @@
 import styled from 'styled-components';
 
-export const Flex = styled.div`
+interface FlexProps {
+    alignItems?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
+    justifyContent?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
+}
+
+export const Flex = styled.div<FlexProps>`
+    align-items: ${props => props.alignItems ?? 'inherit'};
     display: flex;
     flex-wrap: wrap;
+    justify-content: ${props => props.justifyContent ?? 'inherit'};
     margin: ${props => props.theme.space[3]} 0;
 `;
 
@@ -10,7 +17,7 @@ export const Body = styled.div`
     padding: ${props => props.theme.space[4]};
 `;
 
-export const Column = styled(Flex)`
+export const Column = styled(Flex)<FlexProps>`
     flex-direction: column;
     margin-right: ${props => props.theme.space[3]};
     margin-bottom: 0px;
