@@ -1,16 +1,16 @@
 import styled from 'styled-components';
 
+interface BackgroundProps {
+    variant?: 'success' | 'main' | 'light';
+}
+
 interface FlexProps {
     alignItems?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
     justifyContent?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
     variant?: 'success' | 'main' | 'light';
 }
 
-export const Flex = styled.div<FlexProps>`
-    align-items: ${props => props.alignItems ?? 'inherit'};
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: ${props => props.justifyContent ?? 'inherit'};
+export const Background = styled.div<BackgroundProps>`
     background: ${props => {
         switch (props.variant) {
             case 'success':
@@ -21,6 +21,13 @@ export const Flex = styled.div<FlexProps>`
                 return 'inherit';
         }
     }};
+`;
+
+export const Flex = styled.div<FlexProps>`
+    align-items: ${props => props.alignItems ?? 'inherit'};
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: ${props => props.justifyContent ?? 'inherit'};
     margin: ${props => props.theme.space[3]} 0;
     padding: ${props => props.theme.space[3]};
 `;
