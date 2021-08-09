@@ -47,7 +47,7 @@ export const Column = styled(Flex)<FlexProps>`
 
 export const ButtonWrapper = styled(Flex)`
     display: inline-flex;
-    margin-top: 1.5rem;
+    align-items: center;
 `;
 
 export const Container = styled.div`
