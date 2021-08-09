@@ -1,37 +1,49 @@
 import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import { QueryHookOptions, useQuery } from '@apollo/react-hooks';
+import { ApolloLink, QueryHookOptions, useQuery } from '@apollo/react-hooks';
 import { RestLink } from 'apollo-link-rest';
 import { DocumentNode } from 'graphql';
 
 const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
-const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
-    if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, locations, path }) =>
-            console.error(
-                `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-            )
-        );
-    }
+export const buildLink = (token?: string) => {
+    const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
+    const httpLink = createHttpLink({
+        uri: `http://${host}:${port}/graphql`,
+        headers: { accept: 'application/json' },
+    });
+    const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
+        if (graphQLErrors) {
+            graphQLErrors.forEach(({ message, locations, path }) =>
+                console.error(
+                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+                )
+            );
+        }
 
-    if (networkError) {
-        console.error(`[Network error]: ${networkError}`);
-    }
+        if (networkError) {
+            console.error(`[Network error]: ${networkError}`);
+        }
 
-    return forward(operation);
-});
+        return forward(operation);
+    });
 
-const httpLink = createHttpLink({
-    uri: `http://${host}:${port}/graphql`,
-    headers: { Authorization: 'placeholder', accept: 'application/json' },
-});
+    const authLink = new ApolloLink((operation, forward) => {
+        operation.setContext(({ headers = {} }) => ({
+            headers: {
+                ...headers,
+                authorization: `Bearer ${token}`,
+            },
+        }));
+        return forward(operation);
+    });
 
-const restLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
+    return from([ebiRestLink, authLink, errorLink, httpLink]);
+};
 
 export const client = new ApolloClient<any>({
-    link: from([restLink, errorLink, httpLink]),
+    link: buildLink(),
     cache: new InMemoryCache(),
 });
 
