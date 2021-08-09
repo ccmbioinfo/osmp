@@ -35,9 +35,10 @@ const fetchVariantsQuery = gql`
     }
 `;
 
-const useFetchVariantsQuery = () =>
-    useLazyApolloQuery<{ getVariants: VariantQueryResponse }, VariantQueryInput>(
+const useFetchVariantsQuery = () => {
+    return useLazyApolloQuery<{ getVariants: VariantQueryResponse }, VariantQueryInput>(
         fetchVariantsQuery
     );
+};
 
 export default useFetchVariantsQuery;
