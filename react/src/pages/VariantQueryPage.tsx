@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
+    Background,
     Body,
     Button,
     ButtonWrapper,
@@ -129,6 +130,8 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
+    const [geneQuery, setGeneQuery] = useState<boolean>(false);
+
     // Todo: Enable typings for only 'emsembl' | 'local'
     const toggleSource = (source: string) => {
         const update = updateQueryOptionsForm('sources');
@@ -141,92 +144,125 @@ const VariantQueryPage: React.FC<{}> = () => {
     return (
         <Body>
             <div>
-                <Flex>
-                    <Column>
-                        <Typography variant="subtitle" bold>
-                            Sources
-                        </Typography>
-                        <ComboBox
-                            placeholder="Find a source"
-                            value=""
-                            items={sources}
-                            onSelect={item => toggleSource(item.value)}
-                        />
-                        <ErrorIndicator error={queryOptionsForm.sources.error} />
-                    </Column>
-                    <Column>
-                        <Typography variant="subtitle" bold>
-                            Chromosome
-                        </Typography>
-                        <ComboBox
-                            value={queryOptionsForm.chromosome.value}
-                            placeholder="Select Chromosome"
-                            items={chromosomes}
-                            onSelect={e => updateQueryOptionsForm('chromosome')(e.value)}
-                        />
-                        <ErrorIndicator error={queryOptionsForm.chromosome.error} />
-                    </Column>
-                    <Column>
-                        <Typography variant="subtitle" bold>
-                            Start Range
-                        </Typography>
-                        <Input
-                            value={queryOptionsForm.start.value}
-                            onChange={e => updateQueryOptionsForm('start')(e.currentTarget.value)}
-                        />
-                        <ErrorIndicator error={queryOptionsForm.start.error} />
-                    </Column>
-                    <Column>
-                        <Typography variant="subtitle" bold>
-                            End Range
-                        </Typography>
-                        <Input
-                            value={queryOptionsForm.end.value}
-                            onChange={e => updateQueryOptionsForm('end')(e.currentTarget.value)}
-                        />
-                        <ErrorIndicator error={queryOptionsForm.end.error} />
-                    </Column>
-                    <Column>
-                        <Typography variant="subtitle" bold>
-                            Gene
-                        </Typography>
-                        <GeneSearch
-                            onSearch={term => {
-                                updateQueryOptionsForm('gene')(term);
-                                updateQueryOptionsForm('ensemblId')('');
-                            }}
-                            onSelect={({ ensemblId, name }: GeneOption) => {
-                                updateQueryOptionsForm('gene')(name);
-                                updateQueryOptionsForm('ensemblId')(ensemblId);
-                            }}
-                            value={{
-                                name: queryOptionsForm.gene.value,
-                                ensemblId: queryOptionsForm.ensemblId.value,
-                            }}
-                        />
-                        <ErrorIndicator error={queryOptionsForm.end.error} />
-                    </Column>
-                    <ButtonWrapper>
-                        <Button
-                            disabled={
-                                loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
-                            }
-                            onClick={() => fetchVariants({ variables: getArgs() })}
-                            variant="primary"
-                        >
-                            Fetch
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                resetQueryOptionsForm();
-                            }}
-                            variant="primary"
-                        >
-                            Clear
-                        </Button>
-                    </ButtonWrapper>
-                    <Column justifyContent="center">{loading && <Spinner />}</Column>
+                <Flex alignItems="center">
+                    <Typography variant="h4" bold>
+                        Search by:
+                    </Typography>
+                    <Button
+                        variant={geneQuery ? 'secondary' : 'primary'}
+                        onClick={() => setGeneQuery(!geneQuery)}
+                    >
+                        Region
+                    </Button>
+                    <Button
+                        variant={geneQuery ? 'primary' : 'secondary'}
+                        onClick={() => setGeneQuery(!geneQuery)}
+                    >
+                        Gene
+                    </Button>
                 </Flex>
+                <Background variant="light">
+                    <Flex>
+                        {!geneQuery && (
+                            <>
+                                <Column>
+                                    <Typography variant="subtitle" bold>
+                                        Sources
+                                    </Typography>
+                                    <ComboBox
+                                        placeholder="Find a source"
+                                        value=""
+                                        items={sources}
+                                        onSelect={item => toggleSource(item.value)}
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.sources.error} />
+                                </Column>
+                                <Column>
+                                    <Typography variant="subtitle" bold>
+                                        Chromosome
+                                    </Typography>
+                                    <ComboBox
+                                        value={queryOptionsForm.chromosome.value}
+                                        placeholder="Select Chromosome"
+                                        items={chromosomes}
+                                        onSelect={e =>
+                                            updateQueryOptionsForm('chromosome')(e.value)
+                                        }
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.chromosome.error} />
+                                </Column>
+                                <Column>
+                                    <Typography variant="subtitle" bold>
+                                        Start Range
+                                    </Typography>
+                                    <Input
+                                        value={queryOptionsForm.start.value}
+                                        onChange={e =>
+                                            updateQueryOptionsForm('start')(e.currentTarget.value)
+                                        }
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.start.error} />
+                                </Column>
+                                <Column>
+                                    <Typography variant="subtitle" bold>
+                                        End Range
+                                    </Typography>
+                                    <Input
+                                        value={queryOptionsForm.end.value}
+                                        onChange={e =>
+                                            updateQueryOptionsForm('end')(e.currentTarget.value)
+                                        }
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.end.error} />
+                                </Column>
+                            </>
+                        )}
+                        {geneQuery && (
+                            <Column>
+                                <Typography variant="subtitle" bold>
+                                    Gene
+                                </Typography>
+                                <GeneSearch
+                                    onSearch={term => {
+                                        updateQueryOptionsForm('gene')(term);
+                                        updateQueryOptionsForm('ensemblId')('');
+                                    }}
+                                    onSelect={({ ensemblId, name }: GeneOption) => {
+                                        updateQueryOptionsForm('gene')(name);
+                                        updateQueryOptionsForm('ensemblId')(ensemblId);
+                                    }}
+                                    value={{
+                                        name: queryOptionsForm.gene.value,
+                                        ensemblId: queryOptionsForm.ensemblId.value,
+                                    }}
+                                />
+                                <ErrorIndicator error={queryOptionsForm.end.error} />
+                            </Column>
+                        )}
+
+                        <ButtonWrapper>
+                            <Button
+                                disabled={
+                                    loading ||
+                                    !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                                }
+                                onClick={() => fetchVariants({ variables: getArgs() })}
+                                variant="primary"
+                            >
+                                Fetch
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    resetQueryOptionsForm();
+                                }}
+                                variant="primary"
+                            >
+                                Clear
+                            </Button>
+                        </ButtonWrapper>
+                        <Column justifyContent="center">{loading && <Spinner />}</Column>
+                    </Flex>
+                </Background>
             </div>
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
         </Body>

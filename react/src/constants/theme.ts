@@ -4,6 +4,7 @@ const theme: DefaultTheme = {
     background: {
         main: '#fff',
         success: '#effbef',
+        light: '#f8f8ff',
     },
     boxShadow: '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important',
     colors: {

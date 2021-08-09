@@ -58,7 +58,6 @@ const getEnsemblQuery = async (
       transformVariantQueryInputToEnsembl(args)
     );
   } catch (e: unknown) {
-    console.log(e);
     const error = e as AxiosError<EnsemblQueryError>;
     ensemblQueryError = { code: +(error.code || 500), message: error.message };
   }

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 interface ButtonProps {
-    variant: string;
+    variant: 'primary' | 'secondary' | 'light';
     onClick?: () => void;
     disabled?: boolean;
 }
