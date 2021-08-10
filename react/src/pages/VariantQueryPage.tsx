@@ -14,7 +14,7 @@ import {
     Table,
     Typography,
 } from '../components';
-import { useFormReducer } from '../hooks';
+import { useFormReducer, useUserInfo } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
 
@@ -133,6 +133,8 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
+    const userInfo = useUserInfo();
+
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
 
@@ -144,112 +146,114 @@ const VariantQueryPage: React.FC<{}> = () => {
     return (
         <Body>
             <div>
-                {userInfo ? (
+                {userInfo && (
                     <Typography variant="h3" bold>
                         Hi, {userInfo.preferred_username}!
                     </Typography>
-                ) : null}
+                )}
                 <Typography variant="p">
                     The Single-Sided Matching Portal is a resource developed by CCM to make data
                     summary for gene and region query accessible across multiple collaborating
                     organizations. To get started, try searching for a region or a gene.
                 </Typography>
-            <Flex alignItems="center">
-                <Column>
-                    <Flex>
-                        <Typography variant="h4" bold>
-                            Search by:
-                        </Typography>
-                        <Button
-                            variant={
-                                queryOptionsForm.searchType.value === 'region'
-                                    ? 'primary'
-                                    : 'secondary'
-                            }
-                            onClick={() => updateQueryOptionsForm('searchType')('region')}
-                        >
-                            Region
-                        </Button>
-                        <Button
-                            variant={
-                                queryOptionsForm.searchType.value === 'gene'
-                                    ? 'primary'
-                                    : 'secondary'
-                            }
-                            onClick={() => updateQueryOptionsForm('searchType')('gene')}
-                        >
-                            Gene
-                        </Button>
-                    </Flex>
-                </Column>
-                <Column alignItems="flex-start">
-                    <Flex alignItems="center">
-                        <Typography variant="h4" bold>
-                            Select Sources:
-                        </Typography>
-                        <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('local')}
-                            label="Local"
-                            onClick={toggleSource.bind(null, 'local')}
-                        />
-                        <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('ensembl')}
-                            label="Ensembl"
-                            onClick={toggleSource.bind(null, 'ensembl')}
-                        />
-                    </Flex>
-                    <ErrorIndicator error={queryOptionsForm.sources.error} />
-                </Column>
-            </Flex>
-            <Background variant="light">
                 <Flex alignItems="center">
-                    {queryOptionsForm.searchType.value === 'region' && (
-                        <>
-                            <Column alignItems="flex-start">
-                                <Typography variant="subtitle" bold>
-                                    Chromosome
-                                </Typography>
-                                <ComboBox
-                                    value={queryOptionsForm.chromosome.value}
-                                    placeholder="Select Chromosome"
-                                    items={chromosomes}
-                                    onSelect={e => updateQueryOptionsForm('chromosome')(e.value)}
-                                />
-                                <ErrorIndicator error={queryOptionsForm.chromosome.error} />
-                            </Column>
-                            <Column alignItems="flex-start">
-                                <Typography variant="subtitle" bold>
-                                    Start Range
-                                </Typography>
-                                <Input
-                                    value={queryOptionsForm.start.value}
-                                    onChange={e =>
-                                        updateQueryOptionsForm('start')(e.currentTarget.value)
-                                    }
-                                />
-                                <ErrorIndicator error={queryOptionsForm.start.error} />
-                            </Column>
-                            <Column alignItems="flex-start">
-                                <Typography variant="subtitle" bold>
-                                    End Range
-                                </Typography>
-                                <Input
-                                    value={queryOptionsForm.end.value}
-                                    onChange={e =>
-                                        updateQueryOptionsForm('end')(e.currentTarget.value)
-                                    }
-                                />
-                                <ErrorIndicator error={queryOptionsForm.end.error} />
-                            </Column>
-                        </>
-                    )}
-                    {queryOptionsForm.searchType.value === 'gene' && (
-                        <Column alignItems="flex-start">
-                            <Typography variant="subtitle" bold>
-                                Gene
+                    <Column>
+                        <Flex>
+                            <Typography variant="h4" bold>
+                                Search by:
                             </Typography>
-                            {/* todo: find out why this isn't working */}
-                            {/* <GeneSearch
+                            <Button
+                                variant={
+                                    queryOptionsForm.searchType.value === 'region'
+                                        ? 'primary'
+                                        : 'secondary'
+                                }
+                                onClick={() => updateQueryOptionsForm('searchType')('region')}
+                            >
+                                Region
+                            </Button>
+                            <Button
+                                variant={
+                                    queryOptionsForm.searchType.value === 'gene'
+                                        ? 'primary'
+                                        : 'secondary'
+                                }
+                                onClick={() => updateQueryOptionsForm('searchType')('gene')}
+                            >
+                                Gene
+                            </Button>
+                        </Flex>
+                    </Column>
+                    <Column alignItems="flex-start">
+                        <Flex alignItems="center">
+                            <Typography variant="h4" bold>
+                                Select Sources:
+                            </Typography>
+                            <Checkbox
+                                checked={queryOptionsForm.sources.value.includes('local')}
+                                label="Local"
+                                onClick={toggleSource.bind(null, 'local')}
+                            />
+                            <Checkbox
+                                checked={queryOptionsForm.sources.value.includes('ensembl')}
+                                label="Ensembl"
+                                onClick={toggleSource.bind(null, 'ensembl')}
+                            />
+                        </Flex>
+                        <ErrorIndicator error={queryOptionsForm.sources.error} />
+                    </Column>
+                </Flex>
+                <Background variant="light">
+                    <Flex alignItems="center">
+                        {queryOptionsForm.searchType.value === 'region' && (
+                            <>
+                                <Column alignItems="flex-start">
+                                    <Typography variant="subtitle" bold>
+                                        Chromosome
+                                    </Typography>
+                                    <ComboBox
+                                        value={queryOptionsForm.chromosome.value}
+                                        placeholder="Select Chromosome"
+                                        items={chromosomes}
+                                        onSelect={e =>
+                                            updateQueryOptionsForm('chromosome')(e.value)
+                                        }
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.chromosome.error} />
+                                </Column>
+                                <Column alignItems="flex-start">
+                                    <Typography variant="subtitle" bold>
+                                        Start Range
+                                    </Typography>
+                                    <Input
+                                        value={queryOptionsForm.start.value}
+                                        onChange={e =>
+                                            updateQueryOptionsForm('start')(e.currentTarget.value)
+                                        }
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.start.error} />
+                                </Column>
+                                <Column alignItems="flex-start">
+                                    <Typography variant="subtitle" bold>
+                                        End Range
+                                    </Typography>
+                                    <Input
+                                        value={queryOptionsForm.end.value}
+                                        onChange={e =>
+                                            updateQueryOptionsForm('end')(e.currentTarget.value)
+                                        }
+                                    />
+                                    <ErrorIndicator error={queryOptionsForm.end.error} />
+                                </Column>
+                            </>
+                        )}
+                        {queryOptionsForm.searchType.value === 'gene' && (
+                            <Column alignItems="flex-start">
+                                <Typography variant="subtitle" bold>
+                                    Gene
+                                </Typography>
+                                {/* todo: find out why this isn't working */}
+                                {/* <GeneSearch
                                 onSearch={term => {
                                     updateQueryOptionsForm('gene')(term);
                                     updateQueryOptionsForm('ensemblId')('');
@@ -263,40 +267,41 @@ const VariantQueryPage: React.FC<{}> = () => {
                                     ensemblId: queryOptionsForm.ensemblId.value,
                                 }}
                             /> */}
-                            <Input
-                                onChange={e =>
-                                    updateQueryOptionsForm('gene')(e.currentTarget.value)
-                                }
-                                value={queryOptionsForm.gene.value}
-                            />
-                            <ErrorIndicator error={queryOptionsForm.gene.error} />
-                        </Column>
-                    )}
+                                <Input
+                                    onChange={e =>
+                                        updateQueryOptionsForm('gene')(e.currentTarget.value)
+                                    }
+                                    value={queryOptionsForm.gene.value}
+                                />
+                                <ErrorIndicator error={queryOptionsForm.gene.error} />
+                            </Column>
+                        )}
 
-                    <ButtonWrapper>
-                        <Button
-                            disabled={
-                                loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
-                            }
-                            onClick={() => fetchVariants({ variables: getArgs() })}
-                            variant="primary"
-                        >
-                            Fetch
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                resetQueryOptionsForm();
-                            }}
-                            variant="primary"
-                        >
-                            Clear
-                        </Button>
-                    </ButtonWrapper>
-                    <Column justifyContent="center">{loading && <Spinner />}</Column>
-                </Flex>
-            </Background>
-            {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
-        </div>
+                        <ButtonWrapper>
+                            <Button
+                                disabled={
+                                    loading ||
+                                    !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                                }
+                                onClick={() => fetchVariants({ variables: getArgs() })}
+                                variant="primary"
+                            >
+                                Fetch
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    resetQueryOptionsForm();
+                                }}
+                                variant="primary"
+                            >
+                                Clear
+                            </Button>
+                        </ButtonWrapper>
+                        <Column justifyContent="center">{loading && <Spinner />}</Column>
+                    </Flex>
+                </Background>
+                {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
+            </div>
         </Body>
     );
 };

@@ -3,15 +3,7 @@ import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
-import {
-    Background,
-    Body,
-    ButtonWrapper,
-    Column,
-    Container,
-    Flex,
-    InlineFlex,
-} from './Layout';
+import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Spinner from './Spinner';
