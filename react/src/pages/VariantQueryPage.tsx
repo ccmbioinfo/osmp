@@ -143,6 +143,17 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     return (
         <Body>
+            <div>
+                {userInfo ? (
+                    <Typography variant="h3" bold>
+                        Hi, {userInfo.preferred_username}!
+                    </Typography>
+                ) : null}
+                <Typography variant="p">
+                    The Single-Sided Matching Portal is a resource developed by CCM to make data
+                    summary for gene and region query accessible across multiple collaborating
+                    organizations. To get started, try searching for a region or a gene.
+                </Typography>
             <Flex alignItems="center">
                 <Column>
                     <Flex>
@@ -285,6 +296,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 </Flex>
             </Background>
             {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
+        </div>
         </Body>
     );
 };
