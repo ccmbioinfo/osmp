@@ -1,4 +1,5 @@
 import Button from './Button';
+import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
@@ -14,6 +15,7 @@ export {
     Button,
     ButtonWrapper,
     Body,
+    Checkbox,
     Column,
     ComboBox,
     Container,

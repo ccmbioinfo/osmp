@@ -4,7 +4,7 @@ interface BackgroundProps {
     variant?: 'success' | 'main' | 'light';
 }
 
-interface FlexProps {
+export interface FlexProps {
     alignItems?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
     justifyContent?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
     variant?: 'success' | 'main' | 'light';
@@ -28,8 +28,6 @@ export const Flex = styled.div<FlexProps>`
     display: flex;
     flex-wrap: wrap;
     justify-content: ${props => props.justifyContent ?? 'inherit'};
-    margin: ${props => props.theme.space[3]} 0;
-    padding: ${props => props.theme.space[3]};
 `;
 
 export const InlineFlex = styled.div`
@@ -43,7 +41,7 @@ export const Body = styled.div`
 
 export const Column = styled(Flex)<FlexProps>`
     flex-direction: column;
-    margin-right: ${props => props.theme.space[3]};
+    margin: ${props => props.theme.space[3]};
     margin-bottom: 0px;
 `;
 

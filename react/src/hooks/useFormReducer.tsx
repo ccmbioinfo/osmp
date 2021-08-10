@@ -2,14 +2,21 @@ import { Reducer, useReducer } from 'react';
 
 export type FormState<S> = { [K in keyof S]: { value: S[K]; error: string } };
 
+interface RuleFunc<S> {
+    (state: FormState<S>, value: any): boolean;
+}
+
+interface RequiredFunc<S> {
+    (state: FormState<S>): boolean;
+}
 interface Rule<S> {
-    valid: (state: FormState<S>, value: any) => boolean;
+    valid: RuleFunc<S>;
     error: string;
 }
 
 export type Validator<S> = {
     [K in keyof S]?: {
-        required?: boolean;
+        required?: boolean | RequiredFunc<S>;
         rules?: Rule<S>[];
     };
 };
@@ -56,8 +63,22 @@ const validateField = <S,>(
     field: keyof S,
     value: S[keyof S] | undefined
 ) => {
-    if (!validator || !validator[field]) return '';
-    if (!value && validator[field]?.required) return `${field} is required!`;
+    if (!validator || !validator[field]) {
+        return '';
+    }
+    if (!value && !!validator[field]?.required) {
+        const required = validator[field]?.required!;
+        let valid = true;
+        if (typeof required === 'function' && required(state) && !value) {
+            valid = false;
+        }
+        if (typeof required === 'boolean' && required && !value) {
+            valid = false;
+        }
+        if (!valid) {
+            return `${field} is required!`;
+        }
+    }
     let error = '';
     validator[field]?.rules?.forEach(rule => {
         if (!rule.valid(state, value)) {
@@ -79,7 +100,7 @@ export const formIsValid = <S,>(form: FormState<S>, validator: Validator<S>) => 
     let error;
     for (let field in form) {
         error = validateField(form, validator, field, form[field].value);
-        if (error) return;
+        if (error) break;
     }
     return !!error ? false : true;
 };
