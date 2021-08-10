@@ -228,7 +228,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                                         updateQueryOptionsForm('end')(e.currentTarget.value)
                                     }
                                 />
-                                <ErrorIndicator error={queryOptionsForm.end.error} />
+                                <ErrorIndicator error={queryOptionsForm.gene.error} />
                             </Column>
                         </>
                     )}

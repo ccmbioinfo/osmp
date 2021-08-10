@@ -257,15 +257,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             </TableFilters>
 
             {open && (
-                <TableFilters>
-                    {columns.map((v, i) => (
-                        <Column key={i}>
-                            <Typography variant="subtitle" bold>
-                                {v.Header}
-                            </Typography>
-                            <ColumnFilter filters={filters} setFilter={setFilter} columnId={v.id} />
-                        </Column>
-                    ))}
+                <TableFilters justifyContent="flex-start" alignItems="flex-start">
+                    {columns
+                        .map(c => c.columns)
+                        .flat()
+                        .map((v, i) => (
+                            <Column key={i}>
+                                <Typography variant="subtitle" bold>
+                                    {v.Header}
+                                </Typography>
+                                <ColumnFilter
+                                    filters={filters}
+                                    setFilter={setFilter}
+                                    columnId={v.id}
+                                />
+                            </Column>
+                        ))}
                 </TableFilters>
             )}
             <TableStyled {...getTableProps()}>
