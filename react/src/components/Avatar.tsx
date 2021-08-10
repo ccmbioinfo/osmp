@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Flex, Typography } from '../components';
 
-const Circle = styled(Flex)`
+const Circle = styled(props => <Flex {...props} />)`
     height: 40px;
     width: 40px;
     border-radius: ${props => props.theme.radii.round};
