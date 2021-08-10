@@ -158,6 +158,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
+    console.log(columns)
+
     const tableInstance = useTable<VariantQueryResponseSchemaTableRow>(
         {
             columns,
@@ -257,8 +259,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             </TableFilters>
 
             {open && (
-                <TableFilters>
-                    {columns.map((v, i) => (
+                <TableFilters justifyContent="flex-start" alignItems="flex-start">
+                    {columns
+                        .map(c => c.columns)
+                        .flat()
+                        .map((v, i) => (
                         <Column key={i}>
                             <Typography variant="subtitle" bold>
                                 {v.Header}
