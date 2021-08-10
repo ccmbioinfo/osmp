@@ -21,6 +21,9 @@ export const Background = styled.div<BackgroundProps>`
                 return 'inherit';
         }
     }};
+    margin: ${props => props.theme.space[4]} 0;
+    padding: ${props => props.theme.space[4]};
+    border-radius: ${props => props.theme.radii.base};
 `;
 
 export const Flex = styled.div<FlexProps>`
