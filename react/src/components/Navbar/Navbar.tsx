@@ -1,6 +1,6 @@
 import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
-import { Button } from '../index';
+import { Avatar, Button } from '../index';
 import {
     Menu,
     MenuItem,
@@ -36,6 +36,9 @@ const Navbar: React.FC = () => {
                                 Log Out
                             </Button>
                         </MenuItemBtn>
+                        <MenuItem>
+                            <Avatar username="test"/>
+                        </MenuItem>
                     </Menu>
                 </NavbarContainer>
             </Nav>

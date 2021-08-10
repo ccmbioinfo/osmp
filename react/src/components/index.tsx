@@ -1,3 +1,4 @@
+import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
@@ -11,6 +12,7 @@ import Table from './Table/Table';
 import Typography from './Typography';
 
 export {
+    Avatar,
     Background,
     Button,
     ButtonWrapper,
