@@ -6,8 +6,14 @@ import {
     BsFillEyeSlashFill,
 } from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
-import { VariantQueryResponseSchemaTableRow } from '../../types';
-import { Button, Column, InlineFlex, Modal, Typography } from '../index';
+import {
+    CallsetInfoFields,
+    IndividualResponseFields,
+    VariantQueryDataResult,
+    VariantResponseFields,
+} from '../../types';
+import { Button, InlineFlex, Modal, Typography } from '../index';
+import { Column } from '../Layout';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
@@ -21,8 +27,31 @@ import {
 } from './Table.styles';
 
 interface TableProps {
-    variantData: VariantQueryResponseSchemaTableRow[];
+    variantData: VariantQueryDataResult[];
 }
+
+type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
+type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
+type TableRow = TableRowIndividual | TableRowVariant;
+
+const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
+    const results = [] as TableRow[];
+    queryResult.forEach(r => {
+        const source = r.source;
+        r.data.forEach(d => {
+            const { callsets, ...rest } = d.variant;
+            if (callsets.length) {
+                callsets.forEach(cs => {
+                    results.push({ ...cs.info, ...rest, ...d.individual, source });
+                });
+            } else {
+                results.push({ ...rest, ...d.individual, source });
+            }
+        });
+    });
+    console.log(results);
+    return results;
+};
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [open, setOpen] = useState<Boolean>(false);
@@ -45,7 +74,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         },
     ]);
 
-    const tableData = useMemo(() => variantData, [variantData]);
+    const tableData = useMemo(() => prepareData(variantData), [variantData]);
     const sortByArray = useMemo(
         () => [
             {
@@ -63,7 +92,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: 'chromosome',
+                        accessor: 'refseqId',
                         id: 'chromosome',
                         Header: 'Chromosome',
                     },
@@ -73,7 +102,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Alt',
                     },
                     {
-                        accessor: 'ref' as any, // strange typing issue here that should be looked into as things settle down
+                        accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
                     },
@@ -103,16 +132,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'af',
                         Header: 'AF',
                     },
-                    {
-                        accessor: 'rsId',
-                        id: 'rsId',
-                        Header: 'RSID',
-                    },
-                    {
-                        accessor: 'someFakeScore',
-                        id: 'someFakeScore',
-                        Header: 'Some Fake Score',
-                    },
                 ],
             },
             {
@@ -136,7 +155,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Ethnicity',
                     },
                     {
-                        accessor: 'phenotypes',
+                        accessor: (state: any) =>
+                            (state.phenotypicFeatures || [])
+                                .map((p: any) => p.phenotypeId)
+                                .join(', '),
                         id: 'phenotypes',
                         Header: 'Phenotypes',
                     },
@@ -158,7 +180,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    const tableInstance = useTable<VariantQueryResponseSchemaTableRow>(
+    const tableInstance = useTable<TableRow>(
         {
             columns,
             data: tableData,
