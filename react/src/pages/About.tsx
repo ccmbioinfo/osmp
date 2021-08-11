@@ -76,7 +76,7 @@ const AboutPage: React.FC<{}> = () => {
                 </Typography>
             </Flex>
             <Divider />
-            <Flex justifyContent="space-around">
+            <Flex justifyContent="space-around" alignItems="flex-start">
                 <Column>
                     <Typography variant="subtitle" bold>
                         Contributors
@@ -86,6 +86,12 @@ const AboutPage: React.FC<{}> = () => {
                     </Typography>
                     <Typography variant="subtitle">Connor Klamann</Typography>
                     <Typography variant="subtitle">Hannah Le</Typography>
+                </Column>
+                <Column>
+                    <Typography variant="subtitle" bold>
+                        Community
+                    </Typography>
+                    <Typography variant="subtitle">Feedback</Typography>
                 </Column>
                 <Column>
                     <Typography variant="subtitle" bold>
