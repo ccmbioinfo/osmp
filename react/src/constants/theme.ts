@@ -10,9 +10,9 @@ const theme: DefaultTheme = {
     colors: {
         text: '#333',
         background: '#fff',
-        primary: '#783396',
+        primary: '#5c4cdf',
         secondary: '#767676',
-        accent: '#d396c3',
+        accent: '#351f65',
         muted: '#efefef',
         error: '#d0453e',
         success: '#78d380',
