@@ -1,6 +1,7 @@
 import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
-import { Button } from '../index';
+import { useUserInfo } from '../../hooks';
+import { Avatar, Button } from '../index';
 import {
     Menu,
     MenuItem,
@@ -15,6 +16,9 @@ const Navbar: React.FC = () => {
     const {
         keycloak: { logout },
     } = useKeycloak();
+
+    const userInfo = useUserInfo();
+
     return (
         <div>
             <Nav>
@@ -36,6 +40,9 @@ const Navbar: React.FC = () => {
                                 Log Out
                             </Button>
                         </MenuItemBtn>
+                        <MenuItem>
+                            {userInfo && <Avatar username={userInfo.preferred_username} />}
+                        </MenuItem>
                     </Menu>
                 </NavbarContainer>
             </Nav>

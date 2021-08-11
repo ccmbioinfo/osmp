@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { Flex } from '../index';
 
 export const TableFilters = styled(Flex)`
-    align-items: center;
-    justify-content: space-between;
+    padding: 0;
+    margin: 0;
 `;
 
 export const TableStyled = styled.table`
-    margin-top: ${props => props.theme.space[2]};
+    margin-top: ${props => props.theme.space[5]};
     border-collapse: separate;
     width: 100%;
 `;

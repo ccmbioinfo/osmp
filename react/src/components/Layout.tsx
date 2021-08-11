@@ -21,6 +21,9 @@ export const Background = styled.div<BackgroundProps>`
                 return 'inherit';
         }
     }};
+    margin: ${props => props.theme.space[4]} 0;
+    padding: ${props => props.theme.space[4]};
+    border-radius: ${props => props.theme.radii.base};
 `;
 
 export const Flex = styled.div<FlexProps>`
@@ -42,12 +45,11 @@ export const Body = styled.div`
 export const Column = styled(Flex)<FlexProps>`
     flex-direction: column;
     margin: ${props => props.theme.space[3]};
-    margin-bottom: 0px;
 `;
 
 export const ButtonWrapper = styled(Flex)`
     display: inline-flex;
-    margin-top: 1.5rem;
+    align-items: center;
 `;
 
 export const Container = styled.div`

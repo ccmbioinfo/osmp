@@ -48,6 +48,9 @@ export const Menu = styled(Flex)`
 export const MenuItem = styled.li`
     list-style: none;
     height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 export const MenuLink = styled(Link)`
