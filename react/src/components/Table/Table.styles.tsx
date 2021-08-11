@@ -1,8 +1,8 @@
-import { BsFillSkipEndFill, BsFillSkipStartFill, BsFilter } from 'react-icons/bs';
+import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
 import styled from 'styled-components';
 import { Flex } from '../index';
 
-export const TableFilters = styled(Flex)`
+export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin: 0;
 `;
@@ -111,6 +111,6 @@ export const SkipToBeginning = styled(BsFillSkipStartFill)`
     ${Icon}
 `;
 
-export const FilterIcon = styled(BsFilter)`
-    margin-inline-start: inherit;
+export const IconPadder = styled(Flex)`
+    margin-inline-start: ${props => props.theme.space[3]};
 `;

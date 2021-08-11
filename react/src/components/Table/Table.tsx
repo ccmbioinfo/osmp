@@ -4,7 +4,9 @@ import {
     BsFillCaretUpFill,
     BsFillEyeFill,
     BsFillEyeSlashFill,
+    BsFilter,
 } from 'react-icons/bs';
+import { HiSwitchHorizontal } from 'react-icons/hi';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import {
     CallsetInfoFields,
@@ -12,13 +14,13 @@ import {
     VariantQueryDataResult,
     VariantResponseFields,
 } from '../../types';
-import { Button, InlineFlex, Modal, Typography } from '../index';
-import { Column, Flex } from '../Layout';
+import { VariantQueryResponseSchemaTableRow } from '../../types';
+import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
-    FilterIcon,
     Footer,
+    IconPadder,
     Row,
     SkipToBeginning,
     SkipToEnd,
@@ -60,17 +62,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         {
             name: 'Core',
             visible: true,
-            columns: ['alt', 'chromosome', 'end', 'ref', 'start', 'source'],
+            columns: ['alt', 'end', 'ref', 'start', 'source'], // Removed the Chromosome column
         },
         {
             name: 'Variation Details',
             visible: true,
-            columns: ['af', 'rsId', 'someFakeScore'],
+            columns: ['rsId', 'someFakeScore'], // Removed AF
         },
         {
             name: 'Case Details',
             visible: true,
-            columns: ['datasetId', 'dp', 'ethnicity', 'phenotypes', 'sex', 'zygosity'],
+            columns: ['dp', 'ethnicity', 'phenotypes', 'sex', 'zygosity'], // Removed datasetID
         },
     ]);
 
@@ -195,7 +197,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: ['chromosome'],
             },
         },
         useFilters,
@@ -231,7 +232,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setGroup(prev =>
             prev.map(e => {
                 if (e.name === g.name) {
+                    // Hide individual columns
                     e.columns.map(c => toggleHideColumn(c, g.visible));
+                    //Don't hide header
                     return {
                         name: e.name,
                         visible: !g.visible,
@@ -246,11 +249,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     return (
         <>
-            <TableFilters>
+            <TableFilters justifyContent="space-between">
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                     <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
-                        Advanced Filters <FilterIcon />
+                        Advanced Filters <IconPadder><BsFilter /></IconPadder>
                     </Button>
                     <Button
                         disabled={filters.length > 0 ? false : true}
@@ -262,27 +265,34 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
                 <InlineFlex>
                     <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
+                        Customize columns
+                        <IconPadder>
                         {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
+                        </IconPadder>
                     </Button>
                     <Modal
                         active={showModal}
                         hideModal={() => setShowModal(false)}
-                        title="Hide/Unhide Columns"
+                        title="Customize Columns"
                     >
-                        <div>
-                            {group.map((g, id) => (
-                                <div key={id}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={g.visible}
-                                            onChange={() => handleGroupChange(g)}
-                                        />
-                                        {g.name}
-                                    </label>
+                    {group.map((g, id) => (
+                        <div key={id}>
+                            <Checkbox
+                                label={g.name}
+                                checked={g.visible}
+                                onClick={() => handleGroupChange(g)}
+                            />
+                            {g.columns.map((c, id) => (
+                                <div key={id} style={{ paddingLeft: 20 }}>
+                                    <Checkbox
+                                        label={c}
+                                        checked={g.visible}
+                                        onClick={() => toggleHideColumn(c, !g.visible)}
+                                    />
                                 </div>
                             ))}
                         </div>
+                    ))}
                     </Modal>
                 </InlineFlex>
             </TableFilters>
@@ -321,6 +331,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         <th key={key} {...restHeaderProps}>
                                             <span>
                                                 {column.render('Header')}
+                                                {console.log('this is col', column.Header, column.isVisible)}
+                                                {!column.parent &&
+                                                    group.filter(
+                                                        header => header.name === column.Header
+                                                    )[0] && (
+                                                        <HiSwitchHorizontal
+                                                            onClick={() => {
+                                                                handleGroupChange(
+                                                                    group.filter(
+                                                                        header =>
+                                                                            header.name ===
+                                                                            column.Header
+                                                                    )[0]
+                                                                );
+                                                            }}
+                                                        />
+                                                    )}
                                                 {column.isSorted ? (
                                                     column.isSortedDesc ? (
                                                         <BsFillCaretUpFill />

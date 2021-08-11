@@ -11,6 +11,8 @@ import {
     ModalTitle,
 } from './Modal.styles';
 
+import { BsX } from 'react-icons/bs';
+
 interface ModalProps {
     hideModal: () => void;
     active: Boolean;
@@ -28,7 +30,7 @@ const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModa
                         {title && (
                             <ModalHeader>
                                 <ModalTitle>{title}</ModalTitle>
-                                <ModalClose onClick={() => hideModal()}>X</ModalClose>
+                                <ModalClose onClick={() => hideModal()}><BsX /></ModalClose>
                             </ModalHeader>
                         )}
                         <ModalBody>{children}</ModalBody>

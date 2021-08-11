@@ -35,12 +35,12 @@ export const ModalClose = styled.a`
 
 export const ModalContainer = styled.div`
     background: #ffffff;
-    border-radius: 0.1rem;
+    border-radius: ${props => props.theme.radii.base};
     display: flex;
     flex-direction: column;
     max-height: 75vh;
-    padding: 0 0.8rem;
-    width: fit-content;
+    padding: 0 1.75rem;
+    width: 60vh;
     animation: slide-down 0.2s ease 1;
     z-index: 1;
     box-shadow: 0 0.2rem 0.5rem rgba(48, 55, 66, 0.3);

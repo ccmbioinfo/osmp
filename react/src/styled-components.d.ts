@@ -15,6 +15,7 @@ declare module 'styled-components' {
             secondary: string;
             accent: string;
             muted: string;
+            disabled: string;
             error: string;
             success: string;
         };

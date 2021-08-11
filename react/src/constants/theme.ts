@@ -14,6 +14,7 @@ const theme: DefaultTheme = {
         secondary: '#767676',
         accent: '#d396c3',
         muted: '#efefef',
+        disabled: '#f3f3f4',
         error: '#d0453e',
         success: '#78d380',
     },
