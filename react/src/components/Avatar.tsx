@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Flex, Typography } from '../components';
+import { Flex } from '../components';
 
 const Circle = styled(props => <Flex {...props} />)`
     height: 40px;

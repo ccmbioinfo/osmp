@@ -66,8 +66,7 @@ export const MenuLink = styled(Link)`
     height: 100%;
     transition: all 0.2s ease;
     &:hover {
-        color: ${props => props.theme.colors.accent};
-        transform: traslateY(-3rem);
+        transform: scale(1.08);
     }
     &:active {
         transform: traslateY(3rem);
