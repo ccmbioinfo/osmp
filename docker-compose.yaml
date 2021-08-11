@@ -2,10 +2,6 @@ version: "3.9"
 services:
   react:
     image: node:16.3-buster
-    deploy:
-      resources:
-        limits:
-          memory: 4G
     volumes:
       - ./react:/usr/app
     environment:
