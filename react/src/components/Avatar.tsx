@@ -16,9 +16,7 @@ interface AvatarProps {
 const Avatar: React.FC<AvatarProps> = ({ username }) => {
     return (
         <Circle alignItems="center" justifyContent="center">
-            <Typography variant="h3" bold>
-                {username[0].toUpperCase()}
-            </Typography>
+            {username[0].toUpperCase()}
         </Circle>
     );
 };
