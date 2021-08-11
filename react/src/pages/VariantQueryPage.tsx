@@ -79,7 +79,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 assemblyId: 'GRCh38',
                 ensemblId: 'ENSG00000130203',
                 gene: '',
-                maxFrequency: 0,
+                maxFrequency: 1,
                 sources: [],
             },
             queryOptionsFormValidator
@@ -89,7 +89,7 @@ const VariantQueryPage: React.FC<{}> = () => {
         input: {
             variant: {
                 assemblyId: queryOptionsForm.assemblyId.value,
-                maxFrequency: queryOptionsForm.maxFrequency.value,
+                maxFrequency: +queryOptionsForm.maxFrequency.value,
             },
             gene: {
                 ensemblId: queryOptionsForm.ensemblId.value,
@@ -119,12 +119,12 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Checkbox
                             checked={queryOptionsForm.sources.value.includes('local')}
-                            label="Local"
+                            label="Node 1"
                             onClick={toggleSource.bind(null, 'local')}
                         />
                         <Checkbox
                             checked={queryOptionsForm.sources.value.includes('ensembl')}
-                            label="Ensembl"
+                            label="Node 2"
                             onClick={toggleSource.bind(null, 'ensembl')}
                         />
                     </Flex>
@@ -134,8 +134,8 @@ const VariantQueryPage: React.FC<{}> = () => {
             <Background variant="light">
                 <Flex alignItems="center">
                     <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold>
-                            Gene
+                        <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
+                            Gene Name
                         </Typography>
                         {/* todo: find out why this isn't working */}
                         {/* <GeneSearch
@@ -153,11 +153,13 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 }}
                             /> */}
                         <Input
+                            disabled={!!queryOptionsForm.ensemblId.value}
                             onChange={e => updateQueryOptionsForm('gene')(e.currentTarget.value)}
                             value={queryOptionsForm.gene.value}
                         />
                         <ErrorIndicator error={queryOptionsForm.gene.error} />
                     </Column>
+                    <Column>or</Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
                             Ensembl ID

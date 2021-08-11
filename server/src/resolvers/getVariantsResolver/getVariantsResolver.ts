@@ -1,10 +1,10 @@
 import { PubSub } from 'graphql-subscriptions';
 import {
   GqlContext,
+  QueryInput,
   ResolvedVariantQueryResult,
   VariantQueryDataResult,
   VariantQueryErrorResult,
-  VariantQueryInput,
   VariantQueryResponse,
 } from '../../types';
 import getEnsemblQuery from './adapters/ensemblQueryAdapter';
@@ -12,7 +12,7 @@ import getLocalQuery from './adapters/localQueryAdapter';
 
 const getVariants = async (
   parent: any,
-  args: VariantQueryInput,
+  args: QueryInput,
   { pubsub }: GqlContext,
   info: any
 ): Promise<VariantQueryResponse> => {
@@ -28,7 +28,7 @@ const isResolvedVariantQueryResult = (
 ): arg is ResolvedVariantQueryResult => !!(arg as ResolvedVariantQueryResult).data.length;
 
 const resolveVariantQuery = async (
-  args: VariantQueryInput,
+  args: QueryInput,
   pubsub: PubSub
 ): Promise<VariantQueryResponse> => {
   const {
@@ -66,7 +66,7 @@ const resolveVariantQuery = async (
 
 const buildSourceQuery = (
   source: string,
-  args: VariantQueryInput,
+  args: QueryInput,
   pubsub: PubSub
 ): Promise<ResolvedVariantQueryResult> => {
   switch (source) {

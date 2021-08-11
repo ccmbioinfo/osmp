@@ -13,7 +13,7 @@ import {
     VariantResponseFields,
 } from '../../types';
 import { Button, InlineFlex, Modal, Typography } from '../index';
-import { Column } from '../Layout';
+import { Column, Flex } from '../Layout';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
@@ -32,8 +32,9 @@ interface TableProps {
 
 type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
 type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
-type TableRow = TableRowIndividual | TableRowVariant;
+type TableRow = TableRowIndividual | TableRowVariant | { contact: any };
 
+/* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
 const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
     const results = [] as TableRow[];
     queryResult.forEach(r => {
@@ -42,14 +43,13 @@ const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
             const { callsets, ...rest } = d.variant;
             if (callsets.length) {
                 callsets.forEach(cs => {
-                    results.push({ ...cs.info, ...rest, ...d.individual, source });
+                    results.push({ ...cs.info, ...rest, ...d.individual, source, contact: '' });
                 });
             } else {
                 results.push({ ...rest, ...d.individual, source });
             }
         });
     });
-    console.log(results);
     return results;
 };
 
@@ -174,6 +174,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'zygosity',
                         Header: 'Zygosity',
                     },
+                    {
+                        accessor: () => (
+                            <Flex justifyContent="center">
+                                <Button variant="primary">Contact</Button>
+                            </Flex>
+                        ),
+                        id: 'contact',
+                        Header: 'Contact',
+                    },
                 ],
             },
         ],
@@ -279,15 +288,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             </TableFilters>
 
             {open && (
-                <TableFilters>
-                    {columns.map((v, i) => (
-                        <Column key={i}>
-                            <Typography variant="subtitle" bold>
-                                {v.Header}
-                            </Typography>
-                            <ColumnFilter filters={filters} setFilter={setFilter} columnId={v.id} />
-                        </Column>
-                    ))}
+                <TableFilters justifyContent="flex-start" alignItems="flex-start">
+                    {columns
+                        .map(c => c.columns)
+                        .flat()
+                        .map((v, i) => (
+                            <Column key={i}>
+                                <Typography variant="subtitle" bold>
+                                    {v.Header}
+                                </Typography>
+                                <ColumnFilter
+                                    filters={filters}
+                                    setFilter={setFilter}
+                                    columnId={v.id}
+                                />
+                            </Column>
+                        ))}
                 </TableFilters>
             )}
             <TableStyled {...getTableProps()}>

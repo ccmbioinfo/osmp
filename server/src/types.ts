@@ -8,21 +8,58 @@ export interface GqlContext {
   pubsub: PubSub;
 }
 
-export interface VariantQueryResponseSchema {
-  af: Maybe<number>;
+export interface VariantResponseInfoFields {
+  af?: Maybe<number>;
+}
+
+export interface CallsetInfoFields {
+  ad?: Maybe<number>;
+  dp?: Maybe<number>;
+  zygosity?: Maybe<string>;
+}
+
+export interface CallSet {
+  callSetId: string;
+  individualId: String;
+  info: CallsetInfoFields;
+}
+
+export interface VariantResponseFields {
   alt: string;
-  chromosome: string;
-  datasetId: Maybe<string>;
-  dp: Maybe<number>;
-  end: Maybe<number>;
-  ethnicity: Maybe<string>;
-  phenotypes: Maybe<string>;
+  assemblyId: Maybe<string>;
+  callsets: CallSet[];
+  end: number;
+  info: Maybe<VariantResponseInfoFields>;
   ref: string;
-  rsId: Maybe<string>;
-  sex: Maybe<string>;
-  someFakeScore: Maybe<number>;
-  start: Maybe<number>;
-  zygosity: Maybe<string>;
+  refSeqId: string;
+  start: number;
+}
+
+export interface AgeOfOnsetFields {
+  age: Maybe<number>;
+  ageGroup: Maybe<String>;
+}
+
+export interface PhenotypicFeaturesFields {
+  phenotypeId?: Maybe<string>;
+  dateOfOnset?: Maybe<string>;
+  onsetType?: Maybe<string>;
+  ageOfOnset?: Maybe<AgeOfOnsetFields>;
+  levelSeverity?: Maybe<string>;
+}
+
+export interface IndividualResponseFields {
+  individualId?: Maybe<string>;
+  datasetId?: Maybe<string>;
+  taxonId?: Maybe<string>;
+  sex?: Maybe<string>;
+  ethnicity?: Maybe<string>;
+  phenotypicFeatures?: Maybe<PhenotypicFeaturesFields[]>;
+}
+
+export interface VariantQueryResponseSchema {
+  variant: VariantResponseFields;
+  individual: IndividualResponseFields;
 }
 
 export interface VariantQueryErrorResponse {
@@ -55,11 +92,20 @@ export interface VariantQueryResponse {
 }
 
 export interface VariantQueryInput {
+  assemblyId?: string;
+  maxFrequency?: number;
+}
+
+export interface GeneQueryInput {
+  geneName?: string;
+  ensemblId?: string;
+}
+
+export interface QueryInput {
   input: {
-    chromosome: string;
-    start: number;
-    end: number;
     sources: string[];
+    gene: GeneQueryInput;
+    variant: VariantQueryInput;
   };
 }
 
