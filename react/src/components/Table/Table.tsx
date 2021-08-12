@@ -6,6 +6,10 @@ import {
     BsFillEyeSlashFill,
     BsFilter,
 } from 'react-icons/bs';
+import {
+    CgArrowsShrinkH,
+    CgArrowsMergeAltH
+} from 'react-icons/cg'
 import { HiSwitchHorizontal } from 'react-icons/hi';
 import {
     HeaderGroup,
@@ -220,6 +224,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setGlobalFilter,
         prepareRow,
         toggleHideColumn,
+        visibleColumns,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
@@ -319,11 +324,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         <th key={key} {...restHeaderProps}>
                                             <span>
                                                 {column.render('Header')}
-                                                {!column.parent && (
-                                                    <HiSwitchHorizontal
-                                                        onClick={() => handleGroupChange(column)}
-                                                    />
-                                                )}
+                                                
+                                                {!column.parent && column.columns && (
+                                                    column.columns.filter(c => c.isVisible).length === columns.filter(c => c.Header === column.Header)[0].columns.length ? 
+                                                        <IconPadder>
+                                                            <CgArrowsMergeAltH
+                                                                onClick={() => handleGroupChange(column)}
+                                                            />
+                                                        </IconPadder>
+                                                    : 
+                                                        <IconPadder>
+                                                            <CgArrowsShrinkH
+                                                                onClick={() => handleGroupChange(column)}
+                                                            />
+                                                        </IconPadder>
+                                                    )
+                                                }
                                                 {column.isSorted ? (
                                                     column.isSortedDesc ? (
                                                         <BsFillCaretUpFill />
