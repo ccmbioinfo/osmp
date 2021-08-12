@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Flex } from './index';
 
 interface ButtonProps {
     variant: 'primary' | 'secondary' | 'light';
@@ -41,19 +40,19 @@ const Component = styled.button<ButtonProps>`
                     color: ${props.theme.colors.background};
                     background-color: ${props.theme.colors.primary};
                     border-color: ${props.theme.colors.primary};
-                `
+                `;
             case 'secondary':
                 return `
                     color: ${props.theme.colors.primary};
                     background-color: ${props.theme.colors.background};
                     border-color: ${props.theme.colors.primary};
-                `
+                `;
             case 'light':
                 return `
                     color: ${props.theme.colors.text};
                     background-color: ${props.theme.colors.disabled};
                     border: none;
-                `
+                `;
         }
     }}
 `;

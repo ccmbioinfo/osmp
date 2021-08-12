@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { BsX } from 'react-icons/bs';
 import {
     Button,
     ModalBlock,
@@ -10,8 +11,6 @@ import {
     ModalOverlay,
     ModalTitle,
 } from './Modal.styles';
-
-import { BsX } from 'react-icons/bs';
 
 interface ModalProps {
     hideModal: () => void;
@@ -30,7 +29,9 @@ const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModa
                         {title && (
                             <ModalHeader>
                                 <ModalTitle>{title}</ModalTitle>
-                                <ModalClose onClick={() => hideModal()}><BsX /></ModalClose>
+                                <ModalClose onClick={() => hideModal()}>
+                                    <BsX />
+                                </ModalClose>
                             </ModalHeader>
                         )}
                         <ModalBody>{children}</ModalBody>
