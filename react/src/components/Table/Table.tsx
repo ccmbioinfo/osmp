@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     BsFillCaretDownFill,
     BsFillCaretUpFill,
@@ -7,10 +8,9 @@ import {
     BsFilter,
 } from 'react-icons/bs';
 import {
-    CgArrowsShrinkH,
-    CgArrowsMergeAltH
-} from 'react-icons/cg'
-import { HiSwitchHorizontal } from 'react-icons/hi';
+    CgArrowsMergeAltH,
+    CgArrowsShrinkH
+} from 'react-icons/cg';
 import {
     HeaderGroup,
     useFilters,
@@ -85,7 +85,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * This is undesired because user may want to re-expand the column.
      * The workaround for this is to keep some columns with fixed visibility.
      */
-    const fixedColumns = React.useMemo(() => ['chromosome', 'af', 'datasetId'], []);
+    const fixedColumns = React.useMemo(() => ['refseqId', 'alt', 'ref', 'start', 'end', 'source', 'af', 'datasetId'], []);
+
+    const spring = React.useMemo(
+    () => ({
+      type: 'spring',
+      damping: 50,
+      stiffness: 100,
+    }),
+    []
+  )
 
     const columns = React.useMemo(
         () => [
@@ -94,7 +103,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: 'refseqId',
+                        accessor: 'refseqId', 
                         id: 'chromosome',
                         Header: 'Chromosome',
                     },
@@ -309,6 +318,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         ))}
                 </TableFilters>
             )}
+
             <TableStyled {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => {
@@ -321,11 +331,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         column.getSortByToggleProps()
                                     );
                                     return (
-                                        <th key={key} {...restHeaderProps}>
+                                        <motion.th 
+                                            transition={spring}
+                                            key={key}
+                                         {...restHeaderProps}>
                                             <span>
                                                 {column.render('Header')}
-                                                
-                                                {!column.parent && column.columns && (
+                                                {!column.parent && column.Header !== 'Core' && column.columns && (
                                                     column.columns.filter(c => c.isVisible).length === columns.filter(c => c.Header === column.Header)[0].columns.length ? 
                                                         <IconPadder>
                                                             <CgArrowsMergeAltH
@@ -350,7 +362,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                     ''
                                                 )}
                                             </span>
-                                        </th>
+                                        </motion.th>
                                     );
                                 })}
                             </Row>
@@ -358,21 +370,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     })}
                 </thead>
                 <tbody {...getTableBodyProps()}>
+                    <AnimatePresence>
                     {page.length > 0 ? (
                         page.map(row => {
                             prepareRow(row);
                             const { key, ...restRowProps } = row.getRowProps();
                             return (
-                                <Row key={key} {...restRowProps}>
+                                <motion.tr transition={{ type: "spring" }} key={key} {...restRowProps}>
                                     {row.cells.map(cell => {
                                         const { key, ...restCellProps } = cell.getCellProps();
                                         return (
-                                            <td key={key} {...restCellProps}>
+                                            <motion.td transition={{ type: "spring" }} key={key} {...restCellProps}>
                                                 {cell.render('Cell')}
-                                            </td>
+                                            </motion.td>
                                         );
                                     })}
-                                </Row>
+                                </motion.tr>
                             );
                         })
                     ) : (
@@ -380,6 +393,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             There are no records to display.
                         </Typography>
                     )}
+                    </AnimatePresence>
                 </tbody>
             </TableStyled>
             <Footer>
