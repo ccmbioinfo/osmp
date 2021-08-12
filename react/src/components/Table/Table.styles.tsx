@@ -1,4 +1,5 @@
 import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
+import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { Flex } from '../index';
 
@@ -12,11 +13,11 @@ export const TableStyled = styled.table`
     border-collapse: separate;
     width: 100%;
 `;
-export const Row = styled.tr`
+export const Row = styled(motion.tr)`
     thead > & {
         background: #f7f7f7;
         height: 30px;
-        margin-bottom: ${props => props.theme.space[2]};
+        margin-bottom: ${props => props.theme.space[3]};
     }
 
     tbody > & {
@@ -28,7 +29,7 @@ export const Row = styled.tr`
         color: ${props => props.theme.colors.text};
         font-size: ${props => props.theme.fontSizes.s};
         font-weight: ${props => props.theme.fontWeights.bold};
-        padding: ${props => props.theme.space[4]};
+        padding: ${props => props.theme.space[1]};
         text-align: center;
         height: 30px;
         border: none;

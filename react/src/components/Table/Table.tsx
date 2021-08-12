@@ -92,6 +92,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
       type: 'spring',
       damping: 50,
       stiffness: 100,
+      duration: 0.1
     }),
     []
   )
@@ -142,6 +143,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: '',
                         id: 'empty_variation_details',
                         Header: '',
+                        width: 0,
                     },
                     {
                         accessor: 'af',
@@ -158,6 +160,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: '',
                         id: 'empty_case_details',
                         Header: '',
+                        width: 0
                     },
                     {
                         accessor: 'datasetId',
@@ -342,7 +345,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     );
                                     return (
                                         <motion.th 
-                                            transition={spring}
+                                            layout="position"
+                                            
                                             key={key}
                                          {...restHeaderProps}>
                                             <span>
@@ -386,11 +390,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             prepareRow(row);
                             const { key, ...restRowProps } = row.getRowProps();
                             return (
-                                <motion.tr transition={{ type: "spring" }} key={key} {...restRowProps}>
+                                <motion.tr layout="position" key={key} {...restRowProps}>
                                     {row.cells.map(cell => {
                                         const { key, ...restCellProps } = cell.getCellProps();
                                         return (
-                                            <motion.td transition={{ type: "spring" }} key={key} {...restCellProps}>
+                                            <motion.td layout="position" key={key} {...restCellProps}>
                                                 {cell.render('Cell')}
                                             </motion.td>
                                         );
