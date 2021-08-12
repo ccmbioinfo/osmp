@@ -85,7 +85,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * This is undesired because user may want to re-expand the column.
      * The workaround for this is to keep some columns with fixed visibility.
      */
-    const fixedColumns = React.useMemo(() => ['refseqId', 'alt', 'ref', 'start', 'end', 'source', 'af', 'datasetId'], []);
+    const fixedColumns = React.useMemo(() => ['refseqId', 'alt', 'ref', 'start', 'end', 'source', 'empty_variation_details', 'empty_case_details'], []);
 
     const spring = React.useMemo(
     () => ({
@@ -139,6 +139,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'variation_details',
                 columns: [
                     {
+                        accessor: '',
+                        id: 'empty_variation_details',
+                        Header: '',
+                    },
+                    {
                         accessor: 'af',
                         id: 'af',
                         Header: 'AF',
@@ -149,6 +154,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 Header: 'Case Details',
                 id: 'case_details',
                 columns: [
+                    {
+                        accessor: '',
+                        id: 'empty_case_details',
+                        Header: '',
+                    },
                     {
                         accessor: 'datasetId',
                         id: 'datasetId',
