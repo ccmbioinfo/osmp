@@ -1,7 +1,7 @@
 import React from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { useUserInfo } from '../../hooks';
-import { Button } from '../index';
+import { Avatar, Button } from '../index';
 import {
     Menu,
     MenuItem,
@@ -18,6 +18,7 @@ const Navbar: React.FC = () => {
     const {
         keycloak: { logout },
     } = useKeycloak();
+
     return (
         <div>
             <Nav>
@@ -26,13 +27,7 @@ const Navbar: React.FC = () => {
                         {/* <NavIcon />  To-do: Add some logo here ...*/}
                         Single-Sided Matching Portal
                     </NavLogo>
-
                     <Menu>
-                        <MenuItem>
-                            <MenuLink to="#">
-                                Hello, {userInfo && userInfo.preferred_username}!
-                            </MenuLink>
-                        </MenuItem>
                         <MenuItem>
                             <MenuLink to="/">Home</MenuLink>
                         </MenuItem>
@@ -44,6 +39,9 @@ const Navbar: React.FC = () => {
                                 Log Out
                             </Button>
                         </MenuItemBtn>
+                        <MenuItem>
+                            {userInfo && <Avatar username={userInfo.preferred_username} />}
+                        </MenuItem>
                     </Menu>
                 </NavbarContainer>
             </Nav>

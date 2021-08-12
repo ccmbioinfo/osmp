@@ -137,21 +137,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
                             Gene Name
                         </Typography>
-                        {/* todo: find out why this isn't working */}
-                        {/* <GeneSearch
-                                onSearch={term => {
-                                    updateQueryOptionsForm('gene')(term);
-                                    updateQueryOptionsForm('ensemblId')('');
-                                }}
-                                onSelect={({ ensemblId, name }: GeneOption) => {
-                                    updateQueryOptionsForm('gene')(name);
-                                    updateQueryOptionsForm('ensemblId')(ensemblId);
-                                }}
-                                value={{
-                                    name: queryOptionsForm.gene.value,
-                                    ensemblId: queryOptionsForm.ensemblId.value,
-                                }}
-                            /> */}
                         <Input
                             disabled={!!queryOptionsForm.ensemblId.value}
                             onChange={e => updateQueryOptionsForm('gene')(e.currentTarget.value)}
