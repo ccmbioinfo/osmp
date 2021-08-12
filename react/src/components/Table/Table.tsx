@@ -7,7 +7,14 @@ import {
     BsFilter,
 } from 'react-icons/bs';
 import { HiSwitchHorizontal } from 'react-icons/hi';
-import { HeaderGroup, useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
+import {
+    HeaderGroup,
+    useFilters,
+    useGlobalFilter,
+    usePagination,
+    useSortBy,
+    useTable,
+} from 'react-table';
 import {
     CallsetInfoFields,
     IndividualResponseFields,
@@ -217,9 +224,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
-
-    console.log('ALL COLUMNS', allColumns);
-    console.log('ALL HEADERS', headerGroups);
 
     const handleGroupChange = (g: HeaderGroup<TableRow>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
