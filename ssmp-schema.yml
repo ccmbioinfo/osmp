@@ -1,0 +1,119 @@
+# mostly derived from Beacon v2 spec: https://github.com/ga4gh-beacon/specification-v2/blob/master/beacon.yaml
+openapi: "3.0.2"
+info:
+  title: Single-Sided Matching Portal API
+  version: "0.3"
+
+paths:
+  /variants:
+    post:
+      description: |
+        Get variants and related patient information that match a query.
+      operationId: getVariants
+      tags:
+        - Endpoints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestQuery"
+      responses:
+        "200":
+          description: |
+            Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndividualGenomicVariantResponseContent"
+
+components:
+  schemas:
+    Assembly:
+      description: |
+        Assembly identifier (GRC notation, e.g. GRCh37).
+      type: string
+      example: GRCh38
+    Callset:
+      description: |
+        A callset for a variant
+      type: object
+      properties:
+        callSetId:
+          description: |
+            The ID of the callset
+          type: string
+        IndividualId:
+          description: |
+            The ID of the individual
+          type: string
+        info:
+          description: |
+            Key-value pairs for callset info
+          type: object
+          example:
+            infoKey1: infoValue1
+    Variant:
+      allOf:
+        - $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_variant_identification_schema.yaml#/components/schemas/VariantIdentification"
+        - type: object
+          properties:
+            callsets:
+              type: array
+              items:
+                $ref: "#/components/schemas/Callset"
+    RequestQuery:
+      description: |
+        A request to the variants endpoint
+      type: object
+      properties:
+        variant:
+          $ref: "#/components/schemas/GenomicVariantFields"
+        gene:
+          $ref: "#/components/schemas/GeneFields"
+    GenomicVariantFields:
+      description: |
+        All the required fields to query any kind of variant (e.g. SNP, DUP,
+        etc.).
+      type: object
+      properties:
+        assemblyId:
+          $ref: "#/components/schemas/Assembly"
+        maxFrequency:
+          description: |
+            Maximum Frequency of this allele
+          type: number
+    GeneFields:
+      properties:
+        geneName:
+          type: string
+        ensemblId:
+          type: string
+    VariantResponseResults:
+      description: |
+        Description pending
+      properties:
+        variant:
+          $ref: "#/components/schemas/Variant"
+        individual:
+          $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/Individual"
+    IndividualGenomicVariantResponseContent:
+      description: |
+        Description pending
+      type: object
+      required:
+        - exists
+        - results
+      properties:
+        exists:
+          description: |
+            Indicator of whether any variant was observed in any of the
+            datasets queried. This should be non-null, unless there was an
+            error, in which case `error` has to be non-null.
+          type: boolean
+        numTotalResults:
+          type: integer
+          minimum: 0
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/VariantResponseResults"
