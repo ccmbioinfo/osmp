@@ -202,7 +202,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const {
-        allColumns,
         getTableProps,
         getTableBodyProps,
         headerGroups,
