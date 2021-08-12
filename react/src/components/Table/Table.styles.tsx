@@ -48,7 +48,7 @@ export const Row = styled.tr`
     & > td {
         font-size: ${props => props.theme.fontSizes.s};
         padding: ${props => props.theme.space[3]};
-        text-align: center;
+        text-align: left;
         border: none;
     }
 

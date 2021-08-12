@@ -7,7 +7,6 @@ import {
     ButtonWrapper,
     Checkbox,
     Column,
-    ComboBox,
     Flex,
     Input,
     Spinner,
@@ -16,56 +15,34 @@ import {
 } from '../components';
 import { useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
-import { DropdownItem, VariantQueryResponse, VariantQueryResponseSchemaTableRow } from '../types';
-
-const chromosomes: DropdownItem[] = Array.from(Array(22))
-    .map((v, i) => ({
-        id: i,
-        value: (i + 1).toString(),
-        label: (i + 1).toString(),
-    }))
-    .concat(
-        ['X', 'Y'].map((v, i) => ({
-            id: 22 + i,
-            value: v,
-            label: v,
-        }))
-    );
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
-    chromosome: {
-        required: state => state.searchType.value === 'region',
+    assemblyId: {
+        required: true,
+    },
+    ensemblId: {
+        required: state => !state.gene.value,
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!chromosomes.map(c => c.value).includes(state.chromosome.value),
-                error: 'Chromosome is invalid.',
+                    state.ensemblId.value.startsWith('ENSG00'),
+                error: 'Invalid ensembl Id.',
             },
         ],
     },
     gene: {
-        required: state => state.searchType.value === 'gene',
+        required: state => !state.ensemblId.value,
         rules: [
             {
-                valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!chromosomes.map(c => c.value).includes(state.chromosome.value),
-                error: 'Chromosome is invalid.',
+                valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 3,
+                error: 'Gene must be at least three characters long.',
             },
         ],
     },
-    end: {
-        required: state => state.searchType.value === 'region',
-        rules: [
-            {
-                valid: (state: FormState<QueryOptionsFormState>) =>
-                    +state.start.value < +state.end.value,
-                error: 'End must be greater than start!',
-            },
-        ],
+    maxFrequency: {
+        required: false,
     },
-    searchType: {
-        required: true,
-    },
+
     sources: {
         required: true,
         rules: [
@@ -76,28 +53,16 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
             },
         ],
     },
-    start: {
-        required: state => state.searchType.value === 'region',
-        rules: [
-            {
-                valid: (state: FormState<QueryOptionsFormState>) =>
-                    +state.start.value < +state.end.value,
-                error: 'Start must be less than end!',
-            },
-        ],
-    },
 };
 
 type Source = 'ensembl' | 'local';
 
 interface QueryOptionsFormState {
-    chromosome: string;
-    end: number;
+    assemblyId: string;
     ensemblId: string;
     gene: string;
+    maxFrequency: number;
     sources: Source[];
-    start: number;
-    searchType: string;
 }
 
 const ErrorIndicator: React.FC<{ error?: string }> = ({ error }) =>
@@ -111,23 +76,26 @@ const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
-                chromosome: '19',
-                end: 44909393,
-                ensemblId: '',
+                assemblyId: 'GRCh38',
+                ensemblId: 'ENSG00000130203',
                 gene: '',
-                searchType: 'region',
+                maxFrequency: 1,
                 sources: [],
-                start: 44905791,
             },
             queryOptionsFormValidator
         );
 
     const getArgs = () => ({
         input: {
-            chromosome: queryOptionsForm.chromosome.value,
-            end: +queryOptionsForm.end.value,
+            variant: {
+                assemblyId: queryOptionsForm.assemblyId.value,
+                maxFrequency: +queryOptionsForm.maxFrequency.value,
+            },
+            gene: {
+                ensemblId: queryOptionsForm.ensemblId.value,
+                geneName: queryOptionsForm.gene.value,
+            },
             sources: queryOptionsForm.sources.value,
-            start: +queryOptionsForm.start.value,
         },
     });
 
@@ -144,33 +112,6 @@ const VariantQueryPage: React.FC<{}> = () => {
     return (
         <Body>
             <Flex alignItems="center">
-                <Column>
-                    <Flex>
-                        <Typography variant="h4" bold>
-                            Search by:
-                        </Typography>
-                        <Button
-                            variant={
-                                queryOptionsForm.searchType.value === 'region'
-                                    ? 'primary'
-                                    : 'secondary'
-                            }
-                            onClick={() => updateQueryOptionsForm('searchType')('region')}
-                        >
-                            Region
-                        </Button>
-                        <Button
-                            variant={
-                                queryOptionsForm.searchType.value === 'gene'
-                                    ? 'primary'
-                                    : 'secondary'
-                            }
-                            onClick={() => updateQueryOptionsForm('searchType')('gene')}
-                        >
-                            Gene
-                        </Button>
-                    </Flex>
-                </Column>
                 <Column alignItems="flex-start">
                     <Flex alignItems="center">
                         <Typography variant="h4" bold>
@@ -178,12 +119,12 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Checkbox
                             checked={queryOptionsForm.sources.value.includes('local')}
-                            label="Local"
+                            label="Node 1"
                             onClick={toggleSource.bind(null, 'local')}
                         />
                         <Checkbox
                             checked={queryOptionsForm.sources.value.includes('ensembl')}
-                            label="Ensembl"
+                            label="Node 2"
                             onClick={toggleSource.bind(null, 'ensembl')}
                         />
                     </Flex>
@@ -192,75 +133,54 @@ const VariantQueryPage: React.FC<{}> = () => {
             </Flex>
             <Background variant="light">
                 <Flex alignItems="center">
-                    {queryOptionsForm.searchType.value === 'region' && (
-                        <>
-                            <Column alignItems="flex-start">
-                                <Typography variant="subtitle" bold>
-                                    Chromosome
-                                </Typography>
-                                <ComboBox
-                                    value={queryOptionsForm.chromosome.value}
-                                    placeholder="Select Chromosome"
-                                    items={chromosomes}
-                                    onSelect={e => updateQueryOptionsForm('chromosome')(e.value)}
-                                />
-                                <ErrorIndicator error={queryOptionsForm.chromosome.error} />
-                            </Column>
-                            <Column alignItems="flex-start">
-                                <Typography variant="subtitle" bold>
-                                    Start Range
-                                </Typography>
-                                <Input
-                                    value={queryOptionsForm.start.value}
-                                    onChange={e =>
-                                        updateQueryOptionsForm('start')(e.currentTarget.value)
-                                    }
-                                />
-                                <ErrorIndicator error={queryOptionsForm.start.error} />
-                            </Column>
-                            <Column alignItems="flex-start">
-                                <Typography variant="subtitle" bold>
-                                    End Range
-                                </Typography>
-                                <Input
-                                    value={queryOptionsForm.end.value}
-                                    onChange={e =>
-                                        updateQueryOptionsForm('end')(e.currentTarget.value)
-                                    }
-                                />
-                                <ErrorIndicator error={queryOptionsForm.gene.error} />
-                            </Column>
-                        </>
-                    )}
-                    {queryOptionsForm.searchType.value === 'gene' && (
-                        <Column alignItems="flex-start">
-                            <Typography variant="subtitle" bold>
-                                Gene
-                            </Typography>
-                            {/* todo: find out why this isn't working */}
-                            {/* <GeneSearch
-                                onSearch={term => {
-                                    updateQueryOptionsForm('gene')(term);
-                                    updateQueryOptionsForm('ensemblId')('');
-                                }}
-                                onSelect={({ ensemblId, name }: GeneOption) => {
-                                    updateQueryOptionsForm('gene')(name);
-                                    updateQueryOptionsForm('ensemblId')(ensemblId);
-                                }}
-                                value={{
-                                    name: queryOptionsForm.gene.value,
-                                    ensemblId: queryOptionsForm.ensemblId.value,
-                                }}
-                            /> */}
-                            <Input
-                                onChange={e =>
-                                    updateQueryOptionsForm('gene')(e.currentTarget.value)
-                                }
-                                value={queryOptionsForm.gene.value}
-                            />
-                            <ErrorIndicator error={queryOptionsForm.gene.error} />
-                        </Column>
-                    )}
+                    <Column alignItems="flex-start">
+                        <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
+                            Gene Name
+                        </Typography>
+                        <Input
+                            disabled={!!queryOptionsForm.ensemblId.value}
+                            onChange={e => updateQueryOptionsForm('gene')(e.currentTarget.value)}
+                            value={queryOptionsForm.gene.value}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.gene.error} />
+                    </Column>
+                    <Column>or</Column>
+                    <Column alignItems="flex-start">
+                        <Typography variant="subtitle" bold>
+                            Ensembl ID
+                        </Typography>
+                        <Input
+                            onChange={e =>
+                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value)
+                            }
+                            value={queryOptionsForm.ensemblId.value}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.ensemblId.error} />
+                    </Column>
+                    <Column alignItems="flex-start">
+                        <Typography variant="subtitle" bold>
+                            Max Frequency
+                        </Typography>
+                        <Input
+                            onChange={e =>
+                                updateQueryOptionsForm('maxFrequency')(e.currentTarget.value)
+                            }
+                            value={queryOptionsForm.maxFrequency.value}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.maxFrequency.error} />
+                    </Column>
+                    <Column alignItems="flex-start">
+                        <Typography variant="subtitle" bold>
+                            Assembly ID
+                        </Typography>
+                        <Input
+                            onChange={e =>
+                                updateQueryOptionsForm('assemblyId')(e.currentTarget.value)
+                            }
+                            value={queryOptionsForm.assemblyId.value}
+                        />
+                        <ErrorIndicator error={queryOptionsForm.assemblyId.error} />
+                    </Column>
 
                     <ButtonWrapper>
                         <Button
@@ -284,15 +204,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column justifyContent="center">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
-            {data ? <Table variantData={prepareData(data.getVariants)} /> : null}
+            {data ? <Table variantData={data.getVariants.data} /> : null}
         </Body>
     );
 };
-
-const prepareData = (queryResponse: VariantQueryResponse) =>
-    queryResponse.data.reduce(
-        (acc, curr) => (acc = acc.concat(curr.data.map(d => ({ source: curr.source, ...d })))),
-        [] as VariantQueryResponseSchemaTableRow[]
-    );
 
 export default VariantQueryPage;

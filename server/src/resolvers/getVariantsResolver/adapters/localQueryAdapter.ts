@@ -2,9 +2,9 @@ import { PubSub } from 'graphql-subscriptions';
 import { QUERY_RESOLVED } from '../..';
 import {
   ErrorTransformer,
+  QueryInput,
   ResolvedVariantQueryResult,
   ResultTransformer,
-  VariantQueryInput,
 } from '../../../types';
 
 interface LocalQueryResponse {
@@ -26,7 +26,7 @@ interface LocalQueryError {
  * Return some dummy data for testing and design purposes
  */
 const getLocalQuery = async (
-  args: VariantQueryInput,
+  args: QueryInput,
   pubsub: PubSub
 ): Promise<ResolvedVariantQueryResult> => {
   let localQueryResponse: LocalQueryResponse[] | null = null;
@@ -37,7 +37,7 @@ const getLocalQuery = async (
         {
           alternative: 'A',
           reference: 'T',
-          chromosome: args.input.chromosome || '1',
+          chromosome: '1',
           extraneous: 'extr',
         },
       ]);
@@ -61,20 +61,19 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
     return [];
   } else {
     return response.map(r => ({
-      af: undefined,
-      alt: r.alternative,
-      chromosome: r.chromosome,
-      datasetId: undefined,
-      dp: undefined,
-      end: undefined,
-      ethnicity: undefined,
-      phenotypes: undefined,
-      ref: r.reference,
-      start: undefined,
-      sex: undefined,
-      someFakeScore: undefined,
-      rsId: undefined,
-      zygosity: undefined,
+      individual: {
+        individualId: 'testId1',
+      },
+      variant: {
+        alt: r.alternative,
+        assemblyId: 'GRCh37',
+        callsets: [],
+        end: 1,
+        info: {},
+        ref: r.reference,
+        refSeqId: 'Chr2',
+        start: 1,
+      },
     }));
   }
 };
