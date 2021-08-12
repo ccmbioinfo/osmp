@@ -13,11 +13,11 @@ import {
 } from './Navbar.styles';
 
 const Navbar: React.FC = () => {
+    const userInfo = useUserInfo<any>();
+
     const {
         keycloak: { logout },
     } = useKeycloak();
-
-    const userInfo = useUserInfo();
 
     return (
         <div>
@@ -27,7 +27,6 @@ const Navbar: React.FC = () => {
                         {/* <NavIcon />  To-do: Add some logo here ...*/}
                         Single-Sided Matching Portal
                     </NavLogo>
-
                     <Menu>
                         <MenuItem>
                             <MenuLink to="/">Home</MenuLink>

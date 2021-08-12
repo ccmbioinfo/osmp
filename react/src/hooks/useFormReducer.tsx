@@ -57,6 +57,22 @@ const makeReducer =
         }
     };
 
+const getFieldRequired = <S extends {}>(
+    state: FormState<S>,
+    fieldName: keyof S,
+    validator: Validator<S>
+) => {
+    const required = validator[fieldName]?.required!;
+    let isRequired = false;
+    if (typeof required === 'function' && required(state)) {
+        isRequired = true;
+    }
+    if (typeof required === 'boolean' && required) {
+        isRequired = true;
+    }
+    return isRequired;
+};
+
 const validateField = <S,>(
     state: FormState<S>,
     validator: Validator<S> | undefined,
@@ -66,22 +82,15 @@ const validateField = <S,>(
     if (!validator || !validator[field]) {
         return '';
     }
-    if (!value && !!validator[field]?.required) {
-        const required = validator[field]?.required!;
-        let valid = true;
-        if (typeof required === 'function' && required(state) && !value) {
-            valid = false;
-        }
-        if (typeof required === 'boolean' && required && !value) {
-            valid = false;
-        }
-        if (!valid) {
+    if (!!validator[field]?.required) {
+        const required = getFieldRequired(state, field, validator);
+        if (required && !value) {
             return `${field} is required!`;
         }
     }
     let error = '';
     validator[field]?.rules?.forEach(rule => {
-        if (!rule.valid(state, value)) {
+        if (!rule.valid(state, value) && getFieldRequired(state, field, validator)) {
             error = rule.error;
             return;
         }
