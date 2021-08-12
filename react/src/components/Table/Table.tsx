@@ -332,7 +332,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </TableFilters>
             )}
 
-            <TableStyled {...getTableProps()}>
+            <TableStyled layout {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => {
                         // https://github.com/tannerlinsley/react-table/discussions/2647
@@ -346,7 +346,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     return (
                                         <motion.th 
                                             layout="position"
-                                            
+                                            // transition={spring}
                                             key={key}
                                          {...restHeaderProps}>
                                             <span>

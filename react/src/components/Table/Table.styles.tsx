@@ -8,7 +8,7 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     margin: 0;
 `;
 
-export const TableStyled = styled.table`
+export const TableStyled = styled(motion.table)`
     margin-top: ${props => props.theme.space[5]};
     border-collapse: separate;
     width: 100%;
@@ -29,7 +29,7 @@ export const Row = styled(motion.tr)`
         color: ${props => props.theme.colors.text};
         font-size: ${props => props.theme.fontSizes.s};
         font-weight: ${props => props.theme.fontWeights.bold};
-        padding: ${props => props.theme.space[1]};
+        padding: ${props => props.theme.space[3]};
         text-align: center;
         height: 30px;
         border: none;
