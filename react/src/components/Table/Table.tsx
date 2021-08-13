@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     BsFillCaretDownFill,
     BsFillCaretUpFill,
@@ -7,10 +6,7 @@ import {
     BsFillEyeSlashFill,
     BsFilter,
 } from 'react-icons/bs';
-import {
-    CgArrowsMergeAltH,
-    CgArrowsShrinkH
-} from 'react-icons/cg';
+import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
     useFilters,
@@ -36,6 +32,7 @@ import {
     SkipToEnd,
     TableFilters,
     TableStyled,
+    TH,
 } from './Table.styles';
 
 interface TableProps {
@@ -85,17 +82,19 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * This is undesired because user may want to re-expand the column.
      * The workaround for this is to keep some columns with fixed visibility.
      */
-    const fixedColumns = React.useMemo(() => ['refseqId', 'alt', 'ref', 'start', 'end', 'source', 'empty_variation_details', 'empty_case_details'], []);
-
-    const spring = React.useMemo(
-    () => ({
-      type: 'spring',
-      damping: 50,
-      stiffness: 100,
-      duration: 0.1
-    }),
-    []
-  )
+    const fixedColumns = React.useMemo(
+        () => [
+            'refseqId',
+            'alt',
+            'ref',
+            'start',
+            'end',
+            'source',
+            'empty_variation_details',
+            'empty_case_details',
+        ],
+        []
+    );
 
     const columns = React.useMemo(
         () => [
@@ -104,7 +103,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: 'refseqId', 
+                        accessor: 'refseqId',
                         id: 'chromosome',
                         Header: 'Chromosome',
                     },
@@ -160,7 +159,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: '',
                         id: 'empty_case_details',
                         Header: '',
-                        width: 0
+                        width: 0,
                     },
                     {
                         accessor: 'datasetId',
@@ -246,13 +245,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setGlobalFilter,
         prepareRow,
         toggleHideColumn,
-        visibleColumns,
+        // visibleColumns,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
     const handleGroupChange = (g: HeaderGroup<TableRow>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
+
+    const isExpanded = (column: HeaderGroup<TableRow>) =>
+        !column.parent &&
+        column.Header !== 'Core' &&
+        column.columns &&
+        column.columns.filter(c => c.isVisible).length ===
+            columns.filter(c => c.Header === column.Header)[0].columns.length;
 
     return (
         <>
@@ -332,40 +338,51 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </TableFilters>
             )}
 
-            <TableStyled layout {...getTableProps()}>
+            <TableStyled {...getTableProps()}>
                 <thead>
                     {headerGroups.map(headerGroup => {
                         // https://github.com/tannerlinsley/react-table/discussions/2647
                         const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
                         return (
+                            // <Slide key={key}>
                             <Row key={key} {...restHeaderGroupProps}>
                                 {headerGroup.headers.map(column => {
                                     const { key, ...restHeaderProps } = column.getHeaderProps(
                                         column.getSortByToggleProps()
                                     );
                                     return (
-                                        <motion.th 
-                                            layout="position"
-                                            // transition={spring}
+                                        <TH
+                                            expanded={isExpanded(column)}
                                             key={key}
-                                         {...restHeaderProps}>
+                                            {...restHeaderProps}
+                                        >
+                                            {console.log('expanded', isExpanded(column))}
                                             <span>
                                                 {column.render('Header')}
-                                                {!column.parent && column.Header !== 'Core' && column.columns && (
-                                                    column.columns.filter(c => c.isVisible).length === columns.filter(c => c.Header === column.Header)[0].columns.length ? 
+                                                {!column.parent &&
+                                                    column.columns &&
+                                                    column.Header !== 'Core' &&
+                                                    (column.columns.filter(c => c.isVisible)
+                                                        .length ===
+                                                    columns.filter(
+                                                        c => c.Header === column.Header
+                                                    )[0].columns.length ? (
                                                         <IconPadder>
                                                             <CgArrowsMergeAltH
-                                                                onClick={() => handleGroupChange(column)}
+                                                                onClick={() =>
+                                                                    handleGroupChange(column)
+                                                                }
                                                             />
                                                         </IconPadder>
-                                                    : 
+                                                    ) : (
                                                         <IconPadder>
                                                             <CgArrowsShrinkH
-                                                                onClick={() => handleGroupChange(column)}
+                                                                onClick={() =>
+                                                                    handleGroupChange(column)
+                                                                }
                                                             />
                                                         </IconPadder>
-                                                    )
-                                                }
+                                                    ))}
                                                 {column.isSorted ? (
                                                     column.isSortedDesc ? (
                                                         <BsFillCaretUpFill />
@@ -376,7 +393,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                     ''
                                                 )}
                                             </span>
-                                        </motion.th>
+                                        </TH>
                                     );
                                 })}
                             </Row>
@@ -384,22 +401,29 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     })}
                 </thead>
                 <tbody {...getTableBodyProps()}>
-                    <AnimatePresence>
                     {page.length > 0 ? (
                         page.map(row => {
                             prepareRow(row);
                             const { key, ...restRowProps } = row.getRowProps();
                             return (
-                                <motion.tr layout="position" key={key} {...restRowProps}>
+                                <Row
+                                    // layout="position"
+                                    key={key}
+                                    {...restRowProps}
+                                >
                                     {row.cells.map(cell => {
                                         const { key, ...restCellProps } = cell.getCellProps();
                                         return (
-                                            <motion.td layout="position" key={key} {...restCellProps}>
+                                            <td
+                                                // layout="position"
+                                                key={key}
+                                                {...restCellProps}
+                                            >
                                                 {cell.render('Cell')}
-                                            </motion.td>
+                                            </td>
                                         );
                                     })}
-                                </motion.tr>
+                                </Row>
                             );
                         })
                     ) : (
@@ -407,7 +431,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             There are no records to display.
                         </Typography>
                     )}
-                    </AnimatePresence>
                 </tbody>
             </TableStyled>
             <Footer>

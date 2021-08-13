@@ -1,5 +1,4 @@
 import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
-import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { Flex } from '../index';
 
@@ -8,31 +7,46 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     margin: 0;
 `;
 
-export const TableStyled = styled(motion.table)`
+export const TableStyled = styled.table`
     margin-top: ${props => props.theme.space[5]};
     border-collapse: separate;
     width: 100%;
 `;
-export const Row = styled(motion.tr)`
+
+export const THead = styled.thead`
+    background: #f7f7f7;
+    height: 30px;
+    margin-bottom: ${props => props.theme.space[3]};
+`;
+
+export interface THProps {
+    expanded?: boolean;
+}
+
+export const TH = styled.th<THProps>`
+    color: ${props => props.theme.colors.text};
+    font-size: ${props => props.theme.fontSizes.s};
+    font-weight: ${props => props.theme.fontWeights.bold};
+    padding: ${props => props.theme.space[3]};
+    text-align: center;
+    height: 30px;
+    ${props => (!props.expanded ? `width: 80px` : `width: 1000px`)};
+    transition: width 0.5s ease;
+    border: none;
+`;
+
+export const Row = styled.tr`
     thead > & {
         background: #f7f7f7;
         height: 30px;
         margin-bottom: ${props => props.theme.space[3]};
     }
 
-    tbody > & {
+    tbody > * {
         background: #fcfcfc;
         margin-bottom: ${props => props.theme.space[2]};
-    }
-
-    & > th {
-        color: ${props => props.theme.colors.text};
-        font-size: ${props => props.theme.fontSizes.s};
-        font-weight: ${props => props.theme.fontWeights.bold};
-        padding: ${props => props.theme.space[3]};
+        font-size: ${props => props.theme.fontSizes.xs};
         text-align: center;
-        height: 30px;
-        border: none;
     }
 
     th > * {
@@ -47,9 +61,9 @@ export const Row = styled(motion.tr)`
     }
 
     & > td {
-        font-size: ${props => props.theme.fontSizes.s};
+        font-size: ${props => props.theme.fontSizes.xs};
         padding: ${props => props.theme.space[3]};
-        text-align: left;
+        text-align: center;
         border: none;
     }
 
