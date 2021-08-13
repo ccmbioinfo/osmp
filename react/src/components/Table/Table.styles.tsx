@@ -21,6 +21,7 @@ export const THead = styled.thead`
 
 export interface THProps {
     expanded?: boolean;
+    type?: 'groupHeader' | 'columnHeader'
 }
 
 export const TH = styled.th<THProps>`
@@ -30,7 +31,11 @@ export const TH = styled.th<THProps>`
     padding: ${props => props.theme.space[3]};
     text-align: center;
     height: 30px;
-    ${props => (!props.expanded ? `width: 80px` : `width: 1000px`)};
+    ${props => props.type === 'groupHeader' ? (
+        props.expanded ? `width: 1000px` : `width: 80px`
+    ) : (
+        props.expanded? `width: 80px` : `width: 10px`
+    )};
     transition: width 0.5s ease;
     border: none;
 `;

@@ -344,15 +344,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         // https://github.com/tannerlinsley/react-table/discussions/2647
                         const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
                         return (
-                            // <Slide key={key}>
                             <Row key={key} {...restHeaderGroupProps}>
                                 {headerGroup.headers.map(column => {
                                     const { key, ...restHeaderProps } = column.getHeaderProps(
                                         column.getSortByToggleProps()
                                     );
                                     return (
+                                        // Check if child column header is visible 
                                         <TH
-                                            expanded={isExpanded(column)}
+                                            expanded={!column.parent ? isExpanded(column) : column.isVisible}
+                                            type={!column.parent ? 'groupHeader' : 'columnHeader'}
                                             key={key}
                                             {...restHeaderProps}
                                         >
