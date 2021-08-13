@@ -119,3 +119,7 @@ export interface QueryInput {
         variant: VariantQueryInput;
     };
 }
+
+export type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
+export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
+export type TableRow = TableRowIndividual | TableRowVariant | { contact: any };

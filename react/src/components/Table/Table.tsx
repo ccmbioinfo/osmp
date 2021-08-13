@@ -6,12 +6,8 @@ import {
     BsFillEyeSlashFill,
 } from 'react-icons/bs';
 import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
-import {
-    CallsetInfoFields,
-    IndividualResponseFields,
-    VariantQueryDataResult,
-    VariantResponseFields,
-} from '../../types';
+import { downloadCsv } from '../../hooks';
+import { TableRow, VariantQueryDataResult } from '../../types';
 import { Button, InlineFlex, Modal, Typography } from '../index';
 import { Column, Flex } from '../Layout';
 import { ColumnFilter } from './ColumnFilter';
@@ -29,10 +25,6 @@ import {
 interface TableProps {
     variantData: VariantQueryDataResult[];
 }
-
-type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
-type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
-type TableRow = TableRowIndividual | TableRowVariant | { contact: any };
 
 /* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
 const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
@@ -75,6 +67,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     ]);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
+    console.log(tableData);
     const sortByArray = useMemo(
         () => [
             {
@@ -195,7 +188,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: ['chromosome'],
             },
         },
         useFilters,
@@ -223,7 +215,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setGlobalFilter,
         prepareRow,
         toggleHideColumn,
+        visibleColumns,
     } = tableInstance;
+
+    console.log('these are visible', visibleColumns);
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
@@ -263,6 +258,19 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 <InlineFlex>
                     <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
                         {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() =>
+                            downloadCsv(
+                                tableData,
+                                visibleColumns
+                                    .filter(c => c.id !== 'contact')
+                                    .map(c => c.id) as keyof TableRow
+                            )
+                        }
+                    >
+                        Export Data
                     </Button>
                     <Modal
                         active={showModal}
