@@ -26,6 +26,8 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
+type TableKeys = keyof TableRow;
+
 /* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
 const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
     const results = [] as TableRow[];
@@ -67,7 +69,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     ]);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
-    console.log(tableData);
     const sortByArray = useMemo(
         () => [
             {
@@ -218,8 +219,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         visibleColumns,
     } = tableInstance;
 
-    console.log('these are visible', visibleColumns);
-
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
     const handleGroupChange = (g: { name: string; visible: boolean; columns: string[] }) => {
@@ -266,7 +265,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 tableData,
                                 visibleColumns
                                     .filter(c => c.id !== 'contact')
-                                    .map(c => c.id) as keyof TableRow
+                                    .map(c => c.id) as TableKeys
                             )
                         }
                     >
