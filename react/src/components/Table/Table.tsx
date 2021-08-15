@@ -254,12 +254,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
     const isExpanded = (column: HeaderGroup<TableRow>) =>
-        column.Header === 'Core' ? true :     
-            !column.parent &&
-                column.Header !== 'Core' &&
-                column.columns &&
-                column.columns.filter(c => c.isVisible).length ===
-                    columns.filter(c => c.Header === column.Header)[0].columns.length;
+        column.Header === 'Core'
+            ? true
+            : !column.parent &&
+              column.Header !== 'Core' &&
+              column.columns &&
+              column.columns.filter(c => c.isVisible).length ===
+                  columns.filter(c => c.Header === column.Header)[0].columns.length;
 
     return (
         <>
@@ -351,9 +352,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         column.getSortByToggleProps()
                                     );
                                     return (
-                                        // Check if child column header is visible 
+                                        // Check if child column header is visible
                                         <TH
-                                            expanded={!column.parent ? isExpanded(column) : column.isVisible}
+                                            expanded={
+                                                !column.parent
+                                                    ? isExpanded(column)
+                                                    : column.isVisible
+                                            }
                                             type={!column.parent ? 'groupHeader' : 'columnHeader'}
                                             key={key}
                                             {...restHeaderProps}

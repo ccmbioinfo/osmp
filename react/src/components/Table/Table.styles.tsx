@@ -11,7 +11,7 @@ export const TableStyled = styled.table`
     margin-top: ${props => props.theme.space[5]};
     border-collapse: separate;
     width: 100%;
-    table-layout: fixed; 
+    table-layout: fixed;
 `;
 
 export const THead = styled.thead`
@@ -22,7 +22,7 @@ export const THead = styled.thead`
 
 export interface THProps {
     expanded?: boolean;
-    type?: 'groupHeader' | 'columnHeader'
+    type?: 'groupHeader' | 'columnHeader';
 }
 
 export const TH = styled.th<THProps>`
@@ -32,11 +32,14 @@ export const TH = styled.th<THProps>`
     padding: ${props => props.theme.space[3]};
     text-align: center;
     height: 30px;
-    ${props => props.type === 'groupHeader' ? (
-        props.expanded ? `width: 500px` : `width: 80px`
-    ) : (
-        props.expanded? `width: 150px` : `width: 0px`
-    )};
+    ${props =>
+        props.type === 'groupHeader'
+            ? props.expanded
+                ? `width: 600px`
+                : `width: 100px`
+            : props.expanded
+            ? `width: 150px`
+            : `width: 0px`};
     transition: width 0.5s ease;
     border: none;
 `;
