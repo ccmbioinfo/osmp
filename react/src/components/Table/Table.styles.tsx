@@ -11,6 +11,7 @@ export const TableStyled = styled.table`
     margin-top: ${props => props.theme.space[5]};
     border-collapse: separate;
     width: 100%;
+    table-layout: fixed; 
 `;
 
 export const THead = styled.thead`
@@ -32,9 +33,9 @@ export const TH = styled.th<THProps>`
     text-align: center;
     height: 30px;
     ${props => props.type === 'groupHeader' ? (
-        props.expanded ? `width: 1000px` : `width: 80px`
+        props.expanded ? `width: 500px` : `width: 80px`
     ) : (
-        props.expanded? `width: 80px` : `width: 10px`
+        props.expanded? `width: 150px` : `width: 0px`
     )};
     transition: width 0.5s ease;
     border: none;
