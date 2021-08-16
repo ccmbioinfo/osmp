@@ -11,7 +11,7 @@ export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponse
 }
 
 export interface VariantQueryErrorResponse {
-    code: number;
+    code: number | string;
     message: string;
 }
 
@@ -71,11 +71,6 @@ export interface IndividualResponseFields {
 export interface VariantQueryResponseSchema {
     variant: VariantResponseFields;
     individual: IndividualResponseFields;
-}
-
-export interface VariantQueryErrorResponse {
-    code: number;
-    message: string;
 }
 
 export interface VariantQueryBaseResult {

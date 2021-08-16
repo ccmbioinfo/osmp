@@ -30,9 +30,9 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
-type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
+type TableRowIndividual = IndividualResponseFields & CallsetInfoFields & { source: string };
 type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
-type TableRow = TableRowIndividual | TableRowVariant | { contact: any };
+type TableRow = TableRowIndividual & TableRowVariant & { contact: any };
 
 /* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
 const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
@@ -46,7 +46,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
                     results.push({ ...cs.info, ...rest, ...d.individual, source, contact: '' });
                 });
             } else {
-                results.push({ ...rest, ...d.individual, source });
+                results.push({ ...rest, ...d.individual, source, contact: '' });
             }
         });
     });
@@ -65,7 +65,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         {
             name: 'Variation Details',
             visible: true,
-            columns: ['af', 'rsId', 'someFakeScore'],
+            columns: ['af', 'rsId'],
         },
         {
             name: 'Case Details',
@@ -92,7 +92,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: 'refseqId',
+                        accessor: (state: TableRow) => state.refSeqId,
                         id: 'chromosome',
                         Header: 'Chromosome',
                     },
@@ -155,7 +155,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Ethnicity',
                     },
                     {
-                        accessor: (state: any) =>
+                        accessor: (state: TableRow) =>
                             (state.phenotypicFeatures || [])
                                 .map((p: any) => p.phenotypeId)
                                 .join(', '),
@@ -195,7 +195,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: ['chromosome'],
             },
         },
         useFilters,
