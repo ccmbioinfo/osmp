@@ -66,6 +66,7 @@ export interface IndividualResponseFields {
     sex?: Maybe<string>;
     ethnicity?: Maybe<string>;
     phenotypicFeatures?: Maybe<PhenotypicFeaturesFields[]>;
+    contactEmail?: Maybe<string>;
 }
 
 export interface VariantQueryResponseSchema {

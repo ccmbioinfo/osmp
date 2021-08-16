@@ -5,9 +5,9 @@ import {
     BsFillEyeFill,
     BsFillEyeSlashFill,
 } from 'react-icons/bs';
-import { useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
+import { Row, useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { downloadCsv } from '../../hooks';
-import { TableRow, VariantQueryDataResult } from '../../types';
+import { IndividualResponseFields, TableRow, VariantQueryDataResult } from '../../types';
 import { Button, InlineFlex, Modal, Typography } from '../index';
 import { Column, Flex } from '../Layout';
 import { ColumnFilter } from './ColumnFilter';
@@ -15,7 +15,7 @@ import { GlobalFilter } from './GlobalFilters';
 import {
     FilterIcon,
     Footer,
-    Row,
+    RowStyled,
     SkipToBeginning,
     SkipToEnd,
     TableFilters,
@@ -217,9 +217,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         prepareRow,
         toggleHideColumn,
         visibleColumns,
+        rows,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
+
+    const cleanCsvData = (rows: Row<TableRow>[]) => {
+        return rows.map(r => {
+            return { ...r.values, contact: (r.original as IndividualResponseFields).contactEmail };
+        });
+    };
 
     const handleGroupChange = (g: { name: string; visible: boolean; columns: string[] }) => {
         setGroup(prev =>
@@ -262,10 +269,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         variant="primary"
                         onClick={() =>
                             downloadCsv(
-                                tableData,
-                                visibleColumns
-                                    .filter(c => c.id !== 'contact')
-                                    .map(c => c.id) as TableKeys
+                                cleanCsvData(rows),
+                                visibleColumns.map(c => c.id) as TableKeys
                             )
                         }
                     >
@@ -319,7 +324,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         // https://github.com/tannerlinsley/react-table/discussions/2647
                         const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
                         return (
-                            <Row key={key} {...restHeaderGroupProps}>
+                            <RowStyled key={key} {...restHeaderGroupProps}>
                                 {headerGroup.headers.map(column => {
                                     const { key, ...restHeaderProps } = column.getHeaderProps(
                                         column.getSortByToggleProps()
@@ -341,7 +346,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         </th>
                                     );
                                 })}
-                            </Row>
+                            </RowStyled>
                         );
                     })}
                 </thead>
@@ -351,7 +356,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             prepareRow(row);
                             const { key, ...restRowProps } = row.getRowProps();
                             return (
-                                <Row key={key} {...restRowProps}>
+                                <RowStyled key={key} {...restRowProps}>
                                     {row.cells.map(cell => {
                                         const { key, ...restCellProps } = cell.getCellProps();
                                         return (
@@ -360,7 +365,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             </td>
                                         );
                                     })}
-                                </Row>
+                                </RowStyled>
                             );
                         })
                     ) : (
