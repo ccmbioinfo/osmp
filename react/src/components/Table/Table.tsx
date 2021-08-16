@@ -255,8 +255,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
     const isExpanded = (column: HeaderGroup<TableRow>) => {
-        if (column.columns) console.log(column.columns);
-        let a =
+        const status =
             column.Header === 'Core'
                 ? true
                 : !column.parent &&
@@ -266,7 +265,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                       columns.filter(c => c.Header === column.Header)[0].columns.length - 1 &&
                   !column.columns.filter(c => c.id.includes('empty'))[0].isVisible;
 
-        return a;
+        return status;
     };
 
     return (
@@ -370,7 +369,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             key={key}
                                             {...restHeaderProps}
                                         >
-                                            {console.log('expanded', isExpanded(column), column.id)}
                                             <span>
                                                 {column.render('Header')}
                                                 {!column.parent &&
