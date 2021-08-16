@@ -29,6 +29,7 @@ const fetchVariantsQuery = gql`
                     individual {
                         datasetId
                         ethnicity
+                        contactEmail
                         individualId
                         phenotypicFeatures {
                             phenotypeId

@@ -12,7 +12,7 @@ export const TableStyled = styled.table`
     border-collapse: separate;
     width: 100%;
 `;
-export const Row = styled.tr`
+export const RowStyled = styled.tr`
     thead > & {
         background: #f7f7f7;
         height: 30px;

@@ -53,6 +53,7 @@ export default gql`
     taxonId: String
     sex: String
     ethnicity: String
+    contactEmail: String
     phenotypicFeatures: [PhenotypicFeaturesFields]
   }
 
