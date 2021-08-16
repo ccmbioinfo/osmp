@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import { VariantQueryPage } from '.';
-import { Navbar } from '../components';
+import { AboutPage, VariantQueryPage } from '.';
+import { Flex, Navbar, Spinner } from '../components';
 import theme from '../constants/theme';
 
 const App: React.FC<{}> = () => {
@@ -19,14 +19,21 @@ const App: React.FC<{}> = () => {
     }, [initialized, authenticated, login]);
 
     return !initialized ? (
-        <span>Loading...</span>
+        <ThemeProvider theme={theme}>
+            <Flex justifyContent="center" alignItems="center">
+                <Spinner />
+            </Flex>
+        </ThemeProvider>
     ) : authenticated ? (
         <ThemeProvider theme={theme}>
             <div>
                 <Router>
                     <Navbar />
                     <Switch>
-                        <Route path="*">
+                        <Route path="/about">
+                            <AboutPage />
+                        </Route>
+                        <Route path="/">
                             <VariantQueryPage />
                         </Route>
                     </Switch>
