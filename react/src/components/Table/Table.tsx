@@ -222,7 +222,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const cleanCsvData = (rows: Row<TableRow>[]) => {
+    /**
+     * The downloadCsv function takes in a JSON array for the csv export.
+     * However, the contact column contains a button instead of a string.
+     * The formatDataForCsv takes all visible row data that has been materialized on react-table
+     * and replaces the contact button with the original email string.
+     */
+    const formatDataForCsv = (rows: Row<TableRow>[]) => {
         return rows.map(r => {
             return { ...r.values, contact: (r.original as IndividualResponseFields).contactEmail };
         });
@@ -269,7 +275,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         variant="primary"
                         onClick={() =>
                             downloadCsv(
-                                cleanCsvData(rows),
+                                formatDataForCsv(rows),
                                 visibleColumns.map(c => c.id) as TableKeys
                             )
                         }
