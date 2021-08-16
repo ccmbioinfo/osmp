@@ -21,12 +21,12 @@ export type Validator<S> = {
     };
 };
 
-const makeFreshState = <S,>(state: S): FormState<S> =>
+const makeFreshState = <S>(state: S): FormState<S> =>
     Object.entries(state)
         .map(([k, v]: [any, any]) => ({ [k]: { value: v, error: '' } }))
         .reduce((a, c) => ({ ...a, ...c }), {} as FormState<S>);
 
-const useFormReducer = <S,>(initialState: S, Validator?: Validator<S>) => {
+const useFormReducer = <S>(initialState: S, Validator?: Validator<S>) => {
     const stateWithErrorFields = makeFreshState(initialState);
 
     const [state, dispatch] = useReducer<Reducer<FormState<S>, any>>(
@@ -43,7 +43,7 @@ const useFormReducer = <S,>(initialState: S, Validator?: Validator<S>) => {
 };
 
 const makeReducer =
-    <S,>(validator?: Validator<S>) =>
+    <S>(validator?: Validator<S>) =>
     <R extends FormState<S>, A extends { type: string; payload: unknown }>(state: R, action: A) => {
         switch (action.type) {
             case 'update':
@@ -73,7 +73,7 @@ const getFieldRequired = <S extends {}>(
     return isRequired;
 };
 
-const validateField = <S,>(
+const validateField = <S>(
     state: FormState<S>,
     validator: Validator<S> | undefined,
     field: keyof S,
@@ -98,14 +98,14 @@ const validateField = <S,>(
     return error;
 };
 
-export const setErrors = <S,>(form: FormState<S>, validator: Validator<S>) => {
+export const setErrors = <S>(form: FormState<S>, validator: Validator<S>) => {
     for (let field in form) {
         form[field]['error'] = validateField(form, validator, field, form[field].value);
     }
     return form;
 };
 
-export const formIsValid = <S,>(form: FormState<S>, validator: Validator<S>) => {
+export const formIsValid = <S>(form: FormState<S>, validator: Validator<S>) => {
     let error;
     for (let field in form) {
         error = validateField(form, validator, field, form[field].value);

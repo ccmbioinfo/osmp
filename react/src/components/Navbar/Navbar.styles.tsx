@@ -9,7 +9,7 @@ export const Nav = styled(Flex)`
     top: 0;
     z-index: 999;
     height: 80px;
-    background-color: indigo;
+    background-color: #1b0c38;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
     justify-content: center;
     align-items: center;
@@ -66,8 +66,7 @@ export const MenuLink = styled(Link)`
     height: 100%;
     transition: all 0.2s ease;
     &:hover {
-        color: ${props => props.theme.colors.accent};
-        transform: traslateY(-3rem);
+        transform: scale(1.08);
     }
     &:active {
         transform: traslateY(3rem);

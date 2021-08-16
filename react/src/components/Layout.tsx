@@ -6,7 +6,13 @@ interface BackgroundProps {
 
 export interface FlexProps {
     alignItems?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
-    justifyContent?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
+    justifyContent?:
+        | 'flex-start'
+        | 'baseline'
+        | 'flex-end'
+        | 'center'
+        | 'space-between'
+        | 'space-around';
     variant?: 'success' | 'main' | 'light';
 }
 
@@ -39,7 +45,7 @@ export const InlineFlex = styled.div`
 `;
 
 export const Body = styled.div`
-    padding: ${props => props.theme.space[4]};
+    padding: ${props => props.theme.space[5]};
 `;
 
 export const Column = styled(Flex)<FlexProps>`
