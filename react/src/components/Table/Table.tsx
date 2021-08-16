@@ -90,8 +90,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             'start',
             'end',
             'source',
-            'empty_variation_details',
-            'empty_case_details',
+            // 'empty_variation_details',
+            // 'empty_case_details',
         ],
         []
     );
@@ -218,6 +218,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
+                hiddenColumns: ['empty_variation_details', 'empty_case_details'],
             },
         },
         useFilters,
@@ -253,14 +254,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const handleGroupChange = (g: HeaderGroup<TableRow>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
-    const isExpanded = (column: HeaderGroup<TableRow>) =>
-        column.Header === 'Core'
-            ? true
-            : !column.parent &&
-              column.Header !== 'Core' &&
-              column.columns &&
-              column.columns.filter(c => c.isVisible).length ===
-                  columns.filter(c => c.Header === column.Header)[0].columns.length;
+    const isExpanded = (column: HeaderGroup<TableRow>) => {
+        if (column.columns) console.log(column.columns);
+        let a =
+            column.Header === 'Core'
+                ? true
+                : !column.parent &&
+                  column.Header !== 'Core' &&
+                  column.columns &&
+                  column.columns.filter(c => c.isVisible).length ===
+                      columns.filter(c => c.Header === column.Header)[0].columns.length - 1 &&
+                  !column.columns.filter(c => c.id.includes('empty'))[0].isVisible;
+
+        return a;
+    };
 
     return (
         <>

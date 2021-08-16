@@ -35,11 +35,11 @@ export const TH = styled.th<THProps>`
     ${props =>
         props.type === 'groupHeader'
             ? props.expanded
-                ? `width: 600px`
-                : `width: 100px`
+                ? `width: 100%`
+                : `width: 10%`
             : props.expanded
-            ? `width: 150px`
-            : `width: 0px`};
+            ? `width: 60px`
+            : `width: 0%`};
     transition: width 0.5s ease;
     border: none;
 `;
