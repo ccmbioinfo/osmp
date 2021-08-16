@@ -1,10 +1,8 @@
-import { TableRow } from '../types';
-
 function getKeys<O extends {}>(o: O) {
     return Object.keys(o) as Array<keyof O>;
 }
 
-const objectToCsv = (data: TableRow[]) => {
+const objectToCsv = <T extends object>(data: T[]) => {
     const csvRows = [];
     const headers = getKeys(data[0]);
     csvRows.push(headers.join(','));
@@ -32,25 +30,17 @@ const download = (data: BlobPart) => {
     document.body.removeChild(a);
 };
 
-// /**
-//  * @param json The variant query response data
-//  * @param headers A list of column ids that user wants to download
-//  */
+/**
+ * @param rows The values of the table rows
+ * @param headers A list of column ids that user wants to download
+ */
 
-const downloadCsv = (json: TableRow[], headers: (keyof TableRow)[]) => {
-    console.log(json);
-    const redux = (array: TableRow[]) =>
-        array.map(o =>
-            headers.reduce((acc, curr) => {
-                acc[curr] = o[curr];
-                return acc;
-            }, {})
-        );
+const downloadCsv = <T extends object>(rows: T[], selectedHeaders: (keyof T)[]) => {
+    const selectedRows = rows.map(r =>
+        selectedHeaders.reduce((acc, curr) => ({ ...acc, ...{ [curr]: r[curr] } }), {} as T)
+    );
 
-    const filtered = redux(json);
-
-    const csvData = objectToCsv(filtered);
-    console.log(filtered);
+    const csvData = objectToCsv(selectedRows);
     download(csvData);
 };
 
