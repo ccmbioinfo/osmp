@@ -10,6 +10,7 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
     useFilters,
+    useResizeColumns,
     useBlockLayout,
     useGlobalFilter,
     usePagination,
@@ -216,7 +217,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const defaultColumn = React.useMemo(
         () => ({
+            minWidth: 30,
             width: 80,
+            maxWidth: 300,
         }),
         []
     );
@@ -231,6 +234,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 hiddenColumns: ['empty_variation_details', 'empty_case_details'],
             },
         },
+        useResizeColumns,
         useFilters,
         useGlobalFilter,
         useSortBy,
@@ -266,14 +270,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const isExpanded = (column: HeaderGroup<TableRow>) => {
         const status =
-            column.Header === 'Core'
+            column.Header === 'Core' // Always expand the Core group
                 ? true
-                : !column.parent &&
+                : !column.parent && // Must be a header group
                   column.Header !== 'Core' &&
-                  column.columns &&
-                  column.columns.filter(c => c.isVisible).length ===
-                      columns.filter(c => c.Header === column.Header)[0].columns.length - 1 &&
-                  !column.columns.filter(c => c.id.includes('empty'))[0].isVisible;
+                  column.columns && 
+                  column.columns.filter(c => c.isVisible).length >= 1 && // Header group is expanded if there is at least one visible column
+                  !column.columns.filter(c => c.id.includes('empty'))[0].isVisible; // The only column that exists must not be a dummy column.
 
         return status;
     };
