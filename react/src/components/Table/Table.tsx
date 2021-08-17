@@ -10,7 +10,7 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
     useFilters,
-    useFlexLayout,
+    useBlockLayout,
     useGlobalFilter,
     usePagination,
     useSortBy,
@@ -102,7 +102,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Core',
                 id: 'core',
-                width: 400,
+                width: 500,
                 columns: [
                     {
                         accessor: 'refseqId',
@@ -185,7 +185,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 .join(', '),
                         id: 'phenotypes',
                         Header: 'Phenotypes',
-                        minWidth: 300,
+                        width: 200,
                     },
 
                     {

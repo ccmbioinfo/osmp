@@ -39,7 +39,7 @@ export const TH = styled.th<THProps>`
         props.type === 'groupHeader'
             ? props.expanded
                 ? `width: ${props.width ? props.width : '100%'}`
-                : `width: 15%`
+                : `width: ${props.width ? props.width : '14%'}`
             : props.expanded
             ? `width: 150px`
             : `width: 0%`};
