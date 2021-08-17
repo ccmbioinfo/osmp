@@ -66,6 +66,7 @@ export interface IndividualResponseFields {
     sex?: Maybe<string>;
     ethnicity?: Maybe<string>;
     phenotypicFeatures?: Maybe<PhenotypicFeaturesFields[]>;
+    contactEmail?: Maybe<string>;
 }
 
 export interface VariantQueryResponseSchema {
@@ -119,3 +120,7 @@ export interface QueryInput {
         variant: VariantQueryInput;
     };
 }
+
+export type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
+export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
+export type TableRow = TableRowIndividual | TableRowVariant | { contact: any };

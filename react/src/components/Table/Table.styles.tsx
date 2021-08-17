@@ -49,7 +49,7 @@ export const TH = styled.th<THProps>`
     border: none;
 `;
 
-export const Row = styled.tr`
+export const RowStyled = styled.tr`
     thead > & {
         background: #f7f7f7;
         height: 30px;

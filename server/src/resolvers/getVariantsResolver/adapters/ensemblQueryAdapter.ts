@@ -120,6 +120,7 @@ export const transformEnsemblQueryResponse: ResultTransformer<{
           individualId,
           datasetId: Faker.random.alphaNumeric(10),
           ethnicity: ['eth1', 'eth2', 'eth3'][Faker.datatype.number({ min: 0, max: 2 })],
+          contactEmail: 'random@gmail.com',
           sex: ['male', 'female'][Faker.datatype.number({ min: 0, max: 1 })],
           phenotypicFeatures: Faker.lorem
             .words(Faker.datatype.number({ min: 10, max: 20 }))

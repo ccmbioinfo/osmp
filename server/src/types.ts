@@ -54,6 +54,7 @@ export interface IndividualResponseFields {
   taxonId?: Maybe<string>;
   sex?: Maybe<string>;
   ethnicity?: Maybe<string>;
+  contactEmail?: Maybe<string>;
   phenotypicFeatures?: Maybe<PhenotypicFeaturesFields[]>;
 }
 

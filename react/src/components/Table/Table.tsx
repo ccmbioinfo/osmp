@@ -9,25 +9,22 @@ import {
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
+    Row,
     useFilters,
     useGlobalFilter,
     usePagination,
     useSortBy,
     useTable,
 } from 'react-table';
-import {
-    CallsetInfoFields,
-    IndividualResponseFields,
-    VariantQueryDataResult,
-    VariantResponseFields,
-} from '../../types';
+import { downloadCsv } from '../../hooks';
+import { IndividualResponseFields, TableRow, VariantQueryDataResult } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
     IconPadder,
-    Row,
+    RowStyled,
     SkipToBeginning,
     SkipToEnd,
     TableFilters,
@@ -39,9 +36,7 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
-type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
-type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
-type TableRow = TableRowIndividual | TableRowVariant | { contact: any };
+type TableKeys = keyof TableRow;
 
 /* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
 const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
@@ -261,7 +256,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setGlobalFilter,
         prepareRow,
         toggleHideColumn,
-        // visibleColumns,
+        visibleColumns,
+        rows,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
@@ -280,6 +276,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                   !column.columns.filter(c => c.id.includes('empty'))[0].isVisible; // The only column that exists must not be a dummy column.
 
         return status;
+    };
+    /**
+     * The downloadCsv function takes in a JSON array for the csv export.
+     * However, the contact column contains a button instead of a string.
+     * The formatDataForCsv takes all visible row data that has been materialized on react-table
+     * and replaces the contact button with the original email string.
+     */
+    const formatDataForCsv = (rows: Row<TableRow>[]) => {
+        return rows.map(r => {
+            return { ...r.values, contact: (r.original as IndividualResponseFields).contactEmail };
+        });
     };
 
     return (
@@ -307,6 +314,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         <IconPadder>
                             {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
                         </IconPadder>
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() =>
+                            downloadCsv(
+                                formatDataForCsv(rows),
+                                visibleColumns.map(c => c.id) as TableKeys
+                            )
+                        }
+                    >
+                        Export Data
                     </Button>
                     <Modal
                         active={showModal}
@@ -380,7 +398,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         // https://github.com/tannerlinsley/react-table/discussions/2647
                         const { key, ...restHeaderGroupProps } = headerGroup.getHeaderGroupProps();
                         return (
-                            <Row key={key} {...restHeaderGroupProps}>
+                            <RowStyled key={key} {...restHeaderGroupProps}>
                                 {headerGroup.headers.map(column => {
                                     const { key, ...restHeaderProps } = column.getHeaderProps(
                                         column.getSortByToggleProps()
@@ -439,7 +457,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         </TH>
                                     );
                                 })}
-                            </Row>
+                            </RowStyled>
                         );
                     })}
                 </thead>
@@ -449,11 +467,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             prepareRow(row);
                             const { key, ...restRowProps } = row.getRowProps();
                             return (
-                                <Row
-                                    // layout="position"
-                                    key={key}
-                                    {...restRowProps}
-                                >
+                                <RowStyled key={key} {...restRowProps}>
                                     {row.cells.map(cell => {
                                         const { key, ...restCellProps } = cell.getCellProps();
                                         return (
@@ -466,7 +480,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             </td>
                                         );
                                     })}
-                                </Row>
+                                </RowStyled>
                             );
                         })
                     ) : (
