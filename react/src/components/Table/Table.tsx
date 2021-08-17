@@ -10,8 +10,6 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
     useFilters,
-    useResizeColumns,
-    useBlockLayout,
     useGlobalFilter,
     usePagination,
     useSortBy,
@@ -86,6 +84,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      */
     const fixedColumns = React.useMemo(
         () => [
+            'core',
+            'chromosome',
             'refseqId',
             'alt',
             'ref',
@@ -97,6 +97,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         ],
         []
     );
+
+    const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
 
     const columns = React.useMemo(
         () => [
@@ -231,10 +233,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: ['empty_variation_details', 'empty_case_details'],
+                hiddenColumns: dummyColumns,
             },
         },
-        useResizeColumns,
         useFilters,
         useGlobalFilter,
         useSortBy,
@@ -274,7 +275,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ? true
                 : !column.parent && // Must be a header group
                   column.Header !== 'Core' &&
-                  column.columns && 
+                  column.columns &&
                   column.columns.filter(c => c.isVisible).length >= 1 && // Header group is expanded if there is at least one visible column
                   !column.columns.filter(c => c.id.includes('empty'))[0].isVisible; // The only column that exists must not be a dummy column.
 
@@ -315,20 +316,33 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         {headerGroups[0].headers.map((g, id) => (
                             <div key={id}>
                                 <Checkbox
-                                    label={g.id}
+                                    label={g.Header as string}
                                     checked={g.isVisible}
                                     onClick={() => handleGroupChange(g)}
                                 />
                                 {g.columns?.map(
                                     (c, id) =>
-                                        !fixedColumns.includes(c.id) && (
+                                        !fixedColumns.includes(c.id) &&
+                                        !dummyColumns.includes(c.id) && (
                                             <div key={id} style={{ paddingLeft: 20 }}>
                                                 <Checkbox
-                                                    label={c.id}
+                                                    label={c.Header as string}
                                                     checked={c.isVisible}
-                                                    onClick={() =>
-                                                        toggleHideColumn(c.id, c.isVisible)
-                                                    }
+                                                    onClick={() => {
+                                                        if (
+                                                            c.parent &&
+                                                            g.columns?.filter(c => c.isVisible)
+                                                                .length === 1
+                                                        ) {
+                                                            toggleHideColumn(c.id, c.isVisible);
+                                                            toggleHideColumn(
+                                                                'empty_' + c.parent.id,
+                                                                !c.isVisible
+                                                            );
+                                                        } else {
+                                                            toggleHideColumn(c.id, c.isVisible);
+                                                        }
+                                                    }}
                                                 />
                                             </div>
                                         )
@@ -344,6 +358,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {columns
                         .map(c => c.columns)
                         .flat()
+                        .filter(c => !dummyColumns.includes(c.id))
                         .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
@@ -370,7 +385,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     const { key, ...restHeaderProps } = column.getHeaderProps(
                                         column.getSortByToggleProps()
                                     );
-                                    console.log(column);
                                     return (
                                         // Check if child column header is visible
                                         <TH
