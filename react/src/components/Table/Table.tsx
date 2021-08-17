@@ -10,6 +10,7 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
     useFilters,
+    useFlexLayout,
     useGlobalFilter,
     usePagination,
     useSortBy,
@@ -101,6 +102,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Core',
                 id: 'core',
+                width: 400,
                 columns: [
                     {
                         accessor: 'refseqId',
@@ -137,12 +139,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Variation Details',
                 id: 'variation_details',
+                width: 80,
                 columns: [
                     {
                         accessor: '',
                         id: 'empty_variation_details',
                         Header: '',
-                        width: 0,
                     },
                     {
                         accessor: 'af',
@@ -159,7 +161,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: '',
                         id: 'empty_case_details',
                         Header: '',
-                        width: 0,
                     },
                     {
                         accessor: 'datasetId',
@@ -184,6 +185,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 .join(', '),
                         id: 'phenotypes',
                         Header: 'Phenotypes',
+                        minWidth: 300,
                     },
 
                     {
@@ -212,9 +214,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
+    const defaultColumn = React.useMemo(
+        () => ({
+            width: 80,
+        }),
+        []
+    );
+
     const tableInstance = useTable<TableRow>(
         {
             columns,
+            defaultColumn,
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
@@ -357,6 +367,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     const { key, ...restHeaderProps } = column.getHeaderProps(
                                         column.getSortByToggleProps()
                                     );
+                                    console.log(column);
                                     return (
                                         // Check if child column header is visible
                                         <TH
@@ -367,6 +378,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             }
                                             type={!column.parent ? 'groupHeader' : 'columnHeader'}
                                             key={key}
+                                            maxWidth={column.maxWidth}
+                                            minWidth={column.minWidth}
+                                            width={column.width}
                                             {...restHeaderProps}
                                         >
                                             <span>

@@ -23,6 +23,9 @@ export const THead = styled.thead`
 export interface THProps {
     expanded?: boolean;
     type?: 'groupHeader' | 'columnHeader';
+    maxWidth?: number;
+    minWidth?: number;
+    width?: number | string;
 }
 
 export const TH = styled.th<THProps>`
@@ -35,11 +38,13 @@ export const TH = styled.th<THProps>`
     ${props =>
         props.type === 'groupHeader'
             ? props.expanded
-                ? `width: 100%`
-                : `width: 10%`
+                ? `width: ${props.width ? props.width : '100%'}`
+                : `width: 15%`
             : props.expanded
-            ? `width: 60px`
+            ? `width: 150px`
             : `width: 0%`};
+    ${props => (props.maxWidth ? `max-width: ${props.maxWidth}` : '')};
+    ${props => (props.minWidth ? `min-width: ${props.minWidth}` : '')};
     transition: width 0.5s ease;
     border: none;
 `;
