@@ -25,16 +25,16 @@ const App: React.FC<{}> = () => {
         <div>
             <Router>
                 <Navbar />
-                <Switch>
-                    <Route path="/about">
-                        <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <ErrorBoundary FallbackComponent={ErrorFallback}>
+                    <Switch>
+                        <Route path="/about">
                             <AboutPage />
-                        </ErrorBoundary>
-                    </Route>
-                    <Route path="/">
-                        <VariantQueryPage />
-                    </Route>
-                </Switch>
+                        </Route>
+                        <Route path="/">
+                            <VariantQueryPage />
+                        </Route>
+                    </Switch>
+                </ErrorBoundary>
             </Router>
         </div>
     ) : null;
