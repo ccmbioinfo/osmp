@@ -2,6 +2,9 @@ import React from 'react';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
 import ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
+import { ThemeProvider } from 'styled-components';
+import { ErrorFallback } from '../src/components';
+import theme from '../src/constants/theme';
 import { buildLink, client } from './apollo/client';
 import keycloak from './keycloak';
 import App from './pages/App';
@@ -17,9 +20,11 @@ ReactDOM.render(
             onTokens={tokens => client.setLink(buildLink(tokens.token))}
             authClient={keycloak}
         >
-            <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
-                <App />
-            </ErrorBoundary>
+            <ThemeProvider theme={theme}>
+                <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
+                    <App />
+                </ErrorBoundary>
+            </ThemeProvider>
         </ReactKeycloakProvider>
     </React.StrictMode>,
     document.getElementById('root')
