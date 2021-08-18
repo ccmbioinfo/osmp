@@ -7,11 +7,40 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     margin: 0;
 `;
 
-export const TableStyled = styled.table`
-    margin-top: ${props => props.theme.space[5]};
-    border-collapse: separate;
-    width: 100%;
-    table-layout: fixed;
+export const Styles = styled.div`
+    padding: 1rem;
+    display: block;
+    max-width: 100%;
+
+    > table {
+        width: 100%;
+        border-spacing: 0;
+
+        .tr {
+            :last-child {
+                .td {
+                    border-bottom: 0;
+                }
+            }
+        }
+
+        th,
+        td {
+            margin: 0;
+            padding: 0.5rem;
+            border-bottom: 1px solid lightgrey;
+            text-align: center;
+            font-size: ${props => props.theme.fontSizes.xs};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.5s ease;
+
+            :last-child {
+                border-right: 0;
+            }
+        }
+    }
 `;
 
 export const THead = styled.thead`
@@ -34,59 +63,8 @@ export const TH = styled.th<THProps>`
     font-weight: ${props => props.theme.fontWeights.bold};
     padding: ${props => props.theme.space[3]};
     text-align: center;
-    height: 30px;
-    ${props =>
-        props.type === 'groupHeader'
-            ? props.expanded
-                ? `width: ${props.width ? props.width : '100%'}`
-                : `width: ${props.width ? props.width : '14%'}`
-            : props.expanded
-            ? `width: 150px`
-            : `width: 0%`};
-    ${props => (props.maxWidth ? `max-width: ${props.maxWidth}` : '')};
-    ${props => (props.minWidth ? `min-width: ${props.minWidth}` : '')};
-    transition: width 0.5s ease;
+    transition: width 0.3s ease-out;
     border: none;
-`;
-
-export const RowStyled = styled.tr`
-    thead > & {
-        background: #f7f7f7;
-        height: 30px;
-        margin-bottom: ${props => props.theme.space[3]};
-    }
-
-    tbody > * {
-        background: #fcfcfc;
-        margin-bottom: ${props => props.theme.space[2]};
-        font-size: ${props => props.theme.fontSizes.xs};
-        text-align: center;
-    }
-
-    th > * {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    th > span > * {
-        margin: ${props => props.theme.space[3]};
-    }
-
-    & > td {
-        font-size: ${props => props.theme.fontSizes.xs};
-        padding: ${props => props.theme.space[3]};
-        text-align: center;
-        border: none;
-    }
-
-    & > td,
-    th > input {
-        margin-left: ${props => props.theme.space[3]};
-        margin-right: ${props => props.theme.space[3]};
-    }
 `;
 
 export const Footer = styled.div`
@@ -141,7 +119,7 @@ export const SkipToBeginning = styled(BsFillSkipStartFill)`
     ${Icon}
 `;
 
-export const IconPadder = styled(Flex)`
+export const IconPadder = styled.span`
     margin-inline-start: ${props => props.theme.space[3]};
     color: ${props => props.theme.colors.primary};
     transition: all 0.3s ease;
