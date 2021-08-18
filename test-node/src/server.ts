@@ -30,27 +30,6 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
-interface TempLocusResponse {
-  /* eslint-disable camelcase */
-  assembly_name: string;
-  seq_region_name: string;
-  end: number;
-  display_name: string;
-  start: number;
-}
-
-/* 
-  Return variants from 1000 genomes phase 3 https://www.internationalgenome.org/category/phase-3/
- */
-export const transformVariantQueryInputToEnsembl = (args: TempLocusResponse) => ({
-  variantSetId: 1,
-  datasetId: '6e340c4d1e333c7a676b1710d2e3953c',
-  referenceName: args.seq_region_name,
-  start: args.start,
-  end: args.end,
-  pageSize: 20,
-});
-
 app.get('/data', async (req: Request<{ ensemblId: string }>, res) => {
   res.json(createTestQueryResponse());
 });
