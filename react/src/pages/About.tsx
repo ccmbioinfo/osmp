@@ -11,7 +11,6 @@ const Divider = styled.div`
 
 const AboutPage: React.FC<{}> = () => {
     const userInfo = useUserInfo();
-    if (userInfo && userInfo.preferred_username !== 'ssmp') throw new Error('CABOOM!');
 
     return (
         <Body>
