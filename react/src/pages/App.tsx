@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { AboutPage, VariantQueryPage } from '.';
-import { Flex, Navbar, Spinner } from '../components';
+import { ErrorFallback, Flex, Navbar, Spinner } from '../components';
 
 const App: React.FC<{}> = () => {
     const {
@@ -26,7 +27,9 @@ const App: React.FC<{}> = () => {
                 <Navbar />
                 <Switch>
                     <Route path="/about">
-                        <AboutPage />
+                        <ErrorBoundary FallbackComponent={ErrorFallback}>
+                            <AboutPage />
+                        </ErrorBoundary>
                     </Route>
                     <Route path="/">
                         <VariantQueryPage />

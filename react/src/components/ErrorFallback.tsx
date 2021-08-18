@@ -1,20 +1,21 @@
 import React from 'react';
 import { FallbackProps } from 'react-error-boundary';
-import { Button, Typography } from '../components';
+import { Body, Button, Typography } from '../components';
 
-const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBoundary }) => {
+const ErrorFallback: React.FC<FallbackProps> = ({ resetErrorBoundary }) => {
     return (
-        <div role="alert">
-            <Typography variant="p" bold>
-                Something went wrong.
-            </Typography>
-            <Typography variant="subtitle">{error.message}</Typography>
-            {resetErrorBoundary && (
-                <Button variant="primary" onClick={resetErrorBoundary}>
-                    Try again
-                </Button>
-            )}
-        </div>
+        <Body>
+            <div role="alert">
+                <Typography variant="h3" bold>
+                    Something went wrong.
+                </Typography>
+                {resetErrorBoundary && (
+                    <Button variant="primary" onClick={resetErrorBoundary}>
+                        Go back
+                    </Button>
+                )}
+            </div>
+        </Body>
     );
 };
 
