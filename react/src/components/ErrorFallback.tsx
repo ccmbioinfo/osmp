@@ -1,6 +1,6 @@
 import React from 'react';
-import styled from 'styled-components';
 import { FallbackProps } from 'react-error-boundary';
+import styled from 'styled-components';
 import error from '../assets/error.svg';
 import { Body, Button, Typography } from '../components';
 
@@ -23,14 +23,14 @@ const Background = styled.div`
 `;
 const NavLogo = styled.div`
     position: absolute;
-    top: 30px;
+    top: 100px;
     left: 60px;
     color: ${props => props.theme.colors.primary};
     cursor: pointer;
     display: flex;
     align-items: center;
     text-decoration: none;
-    font-size: ${props => props.theme.fontSizes.m};
+    font-size: ${props => props.theme.fontSizes.xl};
     font-family: ${props => props.theme.fontFamily.heading};
     font-weight: ${props => props.theme.fontWeights.bold};
     transition: all 0.5s ease;
