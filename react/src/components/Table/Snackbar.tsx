@@ -9,19 +9,16 @@ import {
 import styled from 'styled-components';
 import { Typography } from '../index';
 
-type Variant = "success" | "error" | "warning" | "info";
-
-interface Variant {
-    
+interface SnackbarVariant {
+    variant:  "success" | "error" | "warning" | "info";
 }
 
-interface SnackbarProps {
+interface SnackbarProps extends SnackbarVariant {
     open: boolean;
-    variant: Variant;
     message?: string;
 }
 
-const Container = styled.div<SnackbarProps>`
+const Container = styled.div<SnackbarVariant>`
     display: flex;
     border-radius: ${props => props.theme.radii.base};
     box-shadow: ${props => props.theme.boxShadow};
@@ -32,10 +29,14 @@ const Container = styled.div<SnackbarProps>`
 const Snackbar: React.FC<SnackbarProps> = ({ open, variant, message }) => {
 
     return (
+        open && (
+        
         <Container variant={variant}>
             <Typography variant="p" bold>
                 {message}
             </Typography>
         </Container>
+        
+        )
     )
 }
