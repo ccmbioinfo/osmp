@@ -1,3 +1,6 @@
 :root {
     font-family: 'Roboto', sans-serif !important;
 }
+iframe {
+    display: none;
+}

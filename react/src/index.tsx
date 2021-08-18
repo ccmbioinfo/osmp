@@ -21,7 +21,16 @@ ReactDOM.render(
             authClient={keycloak}
         >
             <ThemeProvider theme={theme}>
-                <ErrorBoundary FallbackComponent={ErrorFallback} onError={errorHandler}>
+                <ErrorBoundary
+                    FallbackComponent={({ error, resetErrorBoundary }) => (
+                        <ErrorFallback
+                            error={error}
+                            variant="severe"
+                            resetErrorBoundary={resetErrorBoundary}
+                        />
+                    )}
+                    onError={errorHandler}
+                >
                     <App />
                 </ErrorBoundary>
             </ThemeProvider>

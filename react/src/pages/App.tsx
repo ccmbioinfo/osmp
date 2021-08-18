@@ -17,6 +17,8 @@ const App: React.FC<{}> = () => {
         }
     }, [initialized, authenticated, login]);
 
+    throw new Error('failed');
+
     return !initialized ? (
         <Flex justifyContent="center" alignItems="center">
             <Spinner />
@@ -25,7 +27,15 @@ const App: React.FC<{}> = () => {
         <div>
             <Router>
                 <Navbar />
-                <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <ErrorBoundary
+                    FallbackComponent={({ error, resetErrorBoundary }) => (
+                        <ErrorFallback
+                            error={error}
+                            variant="normal"
+                            resetErrorBoundary={resetErrorBoundary}
+                        />
+                    )}
+                >
                     <Switch>
                         <Route path="/about">
                             <AboutPage />
