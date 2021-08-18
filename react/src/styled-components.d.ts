@@ -17,6 +17,8 @@ declare module 'styled-components' {
             muted: string;
             error: string;
             success: string;
+            info: string;
+            warning: string;
         };
         space: string[];
         fontFamily: {
