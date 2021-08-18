@@ -17,8 +17,6 @@ const App: React.FC<{}> = () => {
         }
     }, [initialized, authenticated, login]);
 
-    throw new Error('failed');
-
     return !initialized ? (
         <Flex justifyContent="center" alignItems="center">
             <Spinner />
