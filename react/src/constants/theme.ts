@@ -17,7 +17,7 @@ const theme: DefaultTheme = {
         error: '#d0453e',
         success: '#78d380',
         info: '#2196f3',
-        warning: '#ff9800'
+        warning: '#ff9800',
     },
     space: [
         '0rem',
