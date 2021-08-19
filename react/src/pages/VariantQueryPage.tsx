@@ -9,11 +9,12 @@ import {
     Column,
     Flex,
     Input,
+    Snackbar,
     Spinner,
     Table,
     Typography,
 } from '../components';
-import { useFormReducer } from '../hooks';
+import { useFormReducer, useSnackbar } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
@@ -101,6 +102,8 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
+    const { isActive, message, openSnackBar, closeSnackbar } = useSnackbar();
+
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
 
@@ -113,6 +116,19 @@ const VariantQueryPage: React.FC<{}> = () => {
         <Body>
             <Flex alignItems="center">
                 <Column alignItems="flex-start">
+                    <button
+                        onClick={() => {
+                            openSnackBar('Did you click the button?');
+                        }}
+                    >
+                        Click To Open To Snackbar
+                    </button>
+                    <Snackbar
+                        handleCloseSnackbar={closeSnackbar}
+                        isActive={isActive}
+                        message={message}
+                        variant="warning"
+                    />
                     <Flex alignItems="center">
                         <Typography variant="h4" bold>
                             Select Sources:

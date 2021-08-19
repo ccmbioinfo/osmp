@@ -15,7 +15,7 @@ const theme: DefaultTheme = {
         accent: '#351f65',
         muted: '#efefef',
         error: '#d0453e',
-        success: '#78d380',
+        success: '#4caf50',
         info: '#2196f3',
         warning: '#ff9800',
     },
