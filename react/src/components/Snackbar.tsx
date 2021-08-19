@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FiAlertCircle, FiAlertTriangle, FiCheckCircle, FiInfo, FiX } from 'react-icons/fi';
 import styled, { keyframes } from 'styled-components';
 import { Typography } from './index';
@@ -52,7 +52,7 @@ const Container = styled.div<SnackbarVariant>`
     color: ${props => props.theme.colors.background};
     background-color: ${props => props.theme.colors[props.variant]};
 
-    animation: ${fadein} 0.5s, ${fadeout} 0.5s 3s;
+    animation: ${fadein} 0.5s, ${fadeout} 0.5s 2.5s; // Note: TIME = (timeout - 500) / 1000 + "s";
 `;
 
 const Icons = Object.freeze({
