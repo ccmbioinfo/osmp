@@ -127,7 +127,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         handleCloseSnackbar={closeSnackbar}
                         isActive={isActive}
                         message={message}
-                        variant="warning"
+                        variant="success"
                     />
                     <Flex alignItems="center">
                         <Typography variant="h4" bold>

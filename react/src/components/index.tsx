@@ -7,7 +7,7 @@ import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
-import Snackbar from './Snackbar';
+import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
 import Table from './Table/Table';
 import Typography from './Typography';
