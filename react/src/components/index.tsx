@@ -2,6 +2,7 @@ import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
+import ErrorProvider, { ErrorContext } from './Error/ErrorProvider';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
@@ -22,6 +23,8 @@ export {
     Column,
     ComboBox,
     Container,
+    ErrorContext,
+    ErrorProvider,
     Flex,
     GeneSearch,
     InlineFlex,

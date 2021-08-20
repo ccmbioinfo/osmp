@@ -16,7 +16,6 @@ const Icons = Object.freeze({
 });
 
 const Snackbar: React.FC<SnackbarProps> = ({ isActive, variant, message, handleCloseSnackbar }) => {
-    console.log(isActive, message, variant);
 
     return isActive ? (
         <Container variant={variant} isActive={isActive}>

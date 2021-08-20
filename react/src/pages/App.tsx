@@ -3,7 +3,7 @@ import { useKeycloak } from '@react-keycloak/web';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { AboutPage, VariantQueryPage } from '.';
-import { Flex, Navbar, Spinner } from '../components';
+import { ErrorProvider, Flex, Navbar, Spinner } from '../components';
 import theme from '../constants/theme';
 
 const App: React.FC<{}> = () => {
@@ -20,25 +20,29 @@ const App: React.FC<{}> = () => {
 
     return !initialized ? (
         <ThemeProvider theme={theme}>
-            <Flex justifyContent="center" alignItems="center">
-                <Spinner />
-            </Flex>
+            <ErrorProvider>
+                <Flex justifyContent="center" alignItems="center">
+                    <Spinner />
+                </Flex>
+            </ErrorProvider>
         </ThemeProvider>
     ) : authenticated ? (
         <ThemeProvider theme={theme}>
-            <div>
-                <Router>
-                    <Navbar />
-                    <Switch>
-                        <Route path="/about">
-                            <AboutPage />
-                        </Route>
-                        <Route path="/">
-                            <VariantQueryPage />
-                        </Route>
-                    </Switch>
-                </Router>
-            </div>
+            <ErrorProvider>
+                <div>
+                    <Router>
+                        <Navbar />
+                        <Switch>
+                            <Route path="/about">
+                                <AboutPage />
+                            </Route>
+                            <Route path="/">
+                                <VariantQueryPage />
+                            </Route>
+                        </Switch>
+                    </Router>
+                </div>
+            </ErrorProvider>
         </ThemeProvider>
     ) : null;
 };

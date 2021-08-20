@@ -15,10 +15,13 @@ export const buildLink = (token?: string) => {
     });
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
         if (graphQLErrors) {
+            console.log(graphQLErrors)
             graphQLErrors.forEach(({ message, locations, path }) =>
+            {
                 console.error(
-                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-                )
+                `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+            ); 
+            }
             );
         }
 
