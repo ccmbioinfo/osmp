@@ -26,12 +26,34 @@ services:
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       SERVER_PORT: ${SSMP_SERVER_PORT}
       NODE_ENV: ${NODE_ENV}
+      TEST_NODE_SSMP_TOKEN_CLIENT_ID: ${TEST_NODE_SSMP_TOKEN_CLIENT_ID}
+      TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
+      TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
+      TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
+      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
     user: "1000" #node
     working_dir: /usr/app
     ports:
       - ${SSMP_SERVER_PORT}:${SSMP_SERVER_PORT}
     volumes:
       - ./server:/usr/app
+    entrypoint: "yarn start-dev"
+    networks:
+      - ssmp
+
+  test-node-1:
+    image: node:16.3-buster
+    environment:
+      SERVER_PORT: ${TEST_NODE_PORT}
+      TEST_NODE_TOKEN_ISSUER: ${TEST_NODE_TOKEN_ISSUER}
+      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
+      TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
+    user: "1000" #node
+    working_dir: /usr/app
+    ports:
+      - ${TEST_NODE_PORT}:${TEST_NODE_PORT}
+    volumes:
+      - ./test-node:/usr/app
     entrypoint: "yarn start-dev"
     networks:
       - ssmp
