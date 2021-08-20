@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
 import { AboutPage, VariantQueryPage } from '.';
-import { Flex, Navbar, Spinner } from '../components';
-import theme from '../constants/theme';
+import { ErrorFallback, Flex, Navbar, Spinner } from '../components';
 
 const App: React.FC<{}> = () => {
     const {
@@ -19,16 +18,22 @@ const App: React.FC<{}> = () => {
     }, [initialized, authenticated, login]);
 
     return !initialized ? (
-        <ThemeProvider theme={theme}>
-            <Flex justifyContent="center" alignItems="center">
-                <Spinner />
-            </Flex>
-        </ThemeProvider>
+        <Flex justifyContent="center" alignItems="center">
+            <Spinner />
+        </Flex>
     ) : authenticated ? (
-        <ThemeProvider theme={theme}>
-            <div>
-                <Router>
-                    <Navbar />
+        <div>
+            <Router>
+                <Navbar />
+                <ErrorBoundary
+                    FallbackComponent={({ error, resetErrorBoundary }) => (
+                        <ErrorFallback
+                            error={error}
+                            variant="normal"
+                            resetErrorBoundary={resetErrorBoundary}
+                        />
+                    )}
+                >
                     <Switch>
                         <Route path="/about">
                             <AboutPage />
@@ -37,9 +42,9 @@ const App: React.FC<{}> = () => {
                             <VariantQueryPage />
                         </Route>
                     </Switch>
-                </Router>
-            </div>
-        </ThemeProvider>
+                </ErrorBoundary>
+            </Router>
+        </div>
     ) : null;
 };
 
