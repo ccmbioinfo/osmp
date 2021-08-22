@@ -38,7 +38,6 @@ const download = (data: BlobPart) => {
 //  */
 
 const downloadCsv = (json: TableRow[], headers: (keyof TableRow)[]) => {
-    console.log(json);
     const redux = (array: TableRow[]) =>
         array.map(o =>
             headers.reduce((acc, curr) => {
@@ -50,7 +49,6 @@ const downloadCsv = (json: TableRow[], headers: (keyof TableRow)[]) => {
     const filtered = redux(json);
 
     const csvData = objectToCsv(filtered);
-    console.log(filtered);
     download(csvData);
 };
 

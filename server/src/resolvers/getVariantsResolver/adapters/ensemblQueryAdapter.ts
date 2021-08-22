@@ -72,8 +72,8 @@ const getEnsemblQuery = async (
       transformVariantQueryInputToEnsembl(locusResponse.data)
     );
   } catch (e: unknown) {
-    const error = e as AxiosError<EnsemblQueryError>;
-    ensemblQueryError = { code: +(error.code || 500), message: error.message };
+    const error = e as AxiosError;
+    ensemblQueryError = { code: +(error.response?.status || error.code || 500), message: error.response?.data.error || error.message };
   }
 
   // todo: wrap and make type safe

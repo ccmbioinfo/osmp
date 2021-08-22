@@ -30,6 +30,8 @@ type TableKeys = keyof TableRow;
 
 /* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
 const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
+    console.log(queryResult);
+
     const results = [] as TableRow[];
     queryResult.forEach(r => {
         const source = r.source;

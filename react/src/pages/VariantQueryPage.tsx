@@ -14,7 +14,7 @@ import {
     Table,
     Typography,
 } from '../components';
-import { useFormReducer, useSnackbar } from '../hooks';
+import { useErrorHandler, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
@@ -49,14 +49,14 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!state.sources.value.filter(s => ['local', 'ensembl', 'random'].includes(s)).length,
+                    !!state.sources.value.filter(s => ['local', 'ensembl'].includes(s)).length,
                 error: 'Please specify a source.',
             },
         ],
     },
 };
 
-type Source = 'ensembl' | 'local' | 'random';
+type Source = 'ensembl' | 'local';
 
 interface QueryOptionsFormState {
     assemblyId: string;
@@ -102,9 +102,7 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const [fetchVariants, { error, data, loading }] = useFetchVariantsQuery();
 
-    console.log({error})
-
-    const { isActive, message, openSnackBar, closeSnackbar } = useSnackbar();
+    useErrorHandler(data, error);
 
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
@@ -118,19 +116,6 @@ const VariantQueryPage: React.FC<{}> = () => {
         <Body>
             <Flex alignItems="center">
                 <Column alignItems="flex-start">
-                    {/* <button
-                        onClick={() => {
-                            openSnackBar('Did you click the button?');
-                        }}
-                    >
-                        Click To Open To Snackbar
-                    </button> */}
-                    <Snackbar
-                        handleCloseSnackbar={closeSnackbar}
-                        isActive={isActive}
-                        message={message}
-                        variant="success"
-                    />
                     <Flex alignItems="center">
                         <Typography variant="h4" bold>
                             Select Sources:
@@ -144,11 +129,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                             checked={queryOptionsForm.sources.value.includes('ensembl')}
                             label="Node 2"
                             onClick={toggleSource.bind(null, 'ensembl')}
-                        />
-                        <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('random')}
-                            label="Node Random"
-                            onClick={toggleSource.bind(null, 'random')}
                         />
                     </Flex>
                     <ErrorIndicator error={queryOptionsForm.sources.error} />

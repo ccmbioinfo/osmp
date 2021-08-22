@@ -1,9 +1,9 @@
 import { useContext } from 'react';
 import { ErrorContext } from '../components';
 
-function useError() {
+function useErrorContext() {
     const { state, dispatch } = useContext(ErrorContext);
     return { state, dispatch };
 }
 
-export default useError;
+export default useErrorContext;

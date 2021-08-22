@@ -36,15 +36,16 @@ const resolveVariantQuery = async (
   } = args;
 
   const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
-
   const resolved = await Promise.all(queries);
 
   const mapped = resolved.reduce(
     (a, c) => {
       if (isResolvedVariantQueryResult(c)) {
+        console.log('QUERY SUCCEEDS', a, c)
         const { data, source } = c;
         a.data.push({ data, source });
       } else {
+        console.log('QUERY FAILS', a, c)
         a.errors.push({
           source: (c as VariantQueryErrorResult).source,
           error: (c as VariantQueryErrorResult).error,

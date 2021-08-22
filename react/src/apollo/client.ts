@@ -2,12 +2,14 @@ import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from 
 import { onError } from '@apollo/client/link/error';
 import { ApolloLink, QueryHookOptions, useQuery } from '@apollo/react-hooks';
 import { RestLink } from 'apollo-link-rest';
+import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
 
 const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
 export const buildLink = (token?: string) => {
+    const timeoutLink = new ApolloLinkTimeout(15000); // 15 second timeout
     const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
     const httpLink = createHttpLink({
         uri: `http://${host}:${port}/graphql`,
@@ -15,14 +17,11 @@ export const buildLink = (token?: string) => {
     });
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
         if (graphQLErrors) {
-            console.log(graphQLErrors)
-            graphQLErrors.forEach(({ message, locations, path }) =>
-            {
+            graphQLErrors.forEach(({ message, locations, path }) => {
                 console.error(
-                `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-            ); 
-            }
-            );
+                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+                );
+            });
         }
 
         if (networkError) {
@@ -42,7 +41,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([ebiRestLink, authLink, errorLink, httpLink]);
+    return from([ebiRestLink, authLink, errorLink, httpLink].map(link => timeoutLink.concat(link)));
 };
 
 export const client = new ApolloClient<any>({
@@ -54,6 +53,7 @@ export const useApolloQuery = <T, V>(query: DocumentNode, options: QueryHookOpti
     return useQuery<T, V>(query, {
         client,
         fetchPolicy: 'cache-first',
+        errorPolicy: 'all',
         ...options,
     });
 };
