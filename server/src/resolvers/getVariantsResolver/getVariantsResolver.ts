@@ -45,11 +45,12 @@ const resolveVariantQuery = async (
         const { data, source } = c;
         a.data.push({ data, source });
       } else {
-        console.log('QUERY FAILS', a, c)
+        console.log('QUERY FAILS', a, c);
         a.errors.push({
           source: (c as VariantQueryErrorResult).source,
           error: (c as VariantQueryErrorResult).error,
         });
+        throw c;
       }
       return a;
     },

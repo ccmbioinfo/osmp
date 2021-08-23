@@ -48,14 +48,15 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!state.sources.value.filter(s => ['local', 'ensembl'].includes(s)).length,
+                    !!state.sources.value.filter(s => ['local', 'ensembl', 'test'].includes(s))
+                        .length,
                 error: 'Please specify a source.',
             },
         ],
     },
 };
 
-type Source = 'ensembl' | 'local';
+type Source = 'ensembl' | 'local' | 'test';
 
 interface QueryOptionsFormState {
     assemblyId: string;
@@ -102,6 +103,7 @@ const VariantQueryPage: React.FC<{}> = () => {
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
     const { state: errorState } = useErrorContext();
+    console.log('ALL ERRORS: ', errorState);
 
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
@@ -113,7 +115,6 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     return (
         <Body>
-            <NetworkErrorIndicator error={errorState.errors.networkError} />
             <Flex alignItems="center">
                 <Column alignItems="flex-start">
                     <Flex alignItems="center">
@@ -129,6 +130,11 @@ const VariantQueryPage: React.FC<{}> = () => {
                             checked={queryOptionsForm.sources.value.includes('ensembl')}
                             label="Node 2"
                             onClick={toggleSource.bind(null, 'ensembl')}
+                        />
+                        <Checkbox
+                            checked={queryOptionsForm.sources.value.includes('test')}
+                            label="Node Test Error Handling"
+                            onClick={toggleSource.bind(null, 'test')}
                         />
                     </Flex>
                     <ErrorIndicator error={queryOptionsForm.sources.error} />
@@ -207,7 +213,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column justifyContent="center">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
-            {data ? <Table variantData={data.getVariants.data} /> : null}
+            {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
         </Body>
     );
 };

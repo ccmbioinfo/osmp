@@ -2,7 +2,12 @@ import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
-import ErrorProvider, { ErrorContext } from './Error/ErrorProvider';
+import ErrorProvider, {
+    ErrorContext,
+    makeGraphQLError,
+    makeNetworkError,
+    makeNodeError,
+} from './Error/ErrorProvider';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
@@ -29,6 +34,9 @@ export {
     GeneSearch,
     InlineFlex,
     Input,
+    makeGraphQLError,
+    makeNetworkError,
+    makeNodeError,
     Modal,
     Navbar,
     Snackbar,
