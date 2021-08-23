@@ -15,13 +15,25 @@ interface ErrorAction {
 
 interface ErrorContextType {
     state: {
-        errors: Error[];
+        graphQLErrors: Error[];
+        networkErrors: Error[];
+        nodeErrors: {
+            node1: Error[];
+            node2: Error[];
+        };
     };
     dispatch: React.Dispatch<ErrorAction>;
 }
 
 const initialState = {
-    errors: [] as Error[],
+    errors: {
+        graphQLErrors: [],
+        networkErrors: [],
+        nodeErrors: {
+            node1: {},
+            node2: {},
+        },
+    },
 };
 
 export const ErrorContext = React.createContext<ErrorContextType>({
@@ -33,11 +45,11 @@ export const ErrorContext = React.createContext<ErrorContextType>({
 
 const errorReducer = (state = initialState, action: ErrorAction) => {
     switch (action.type) {
-        case 'ADD':
+        case 'ADD_GRAPHQL_ERROR':
             return {
                 errors: [...state.errors, action.payload],
             };
-        case 'REMOVE':
+        case 'REMOVE_GRAPHQL_ERROR':
             return {
                 errors: state.errors.filter(error => error.uid !== action.payload.uid),
             };
@@ -55,5 +67,18 @@ const ErrorProvider: React.FC<{}> = ({ children }) => {
 
     return <ErrorContext.Provider value={contextValue}>{children}</ErrorContext.Provider>;
 };
+
+const makeGraphQLError = (payload: string) => ({
+    type: 'ADD_GRAPHQL_ERRROR',
+    payload,
+});
+
+const clearGraphQLError = () => ({
+    type: 'CLEAR_GRAPHQL_ERROR',
+});
+
+const clearGraphQLError2 = () => ({
+    type: 'GRAPHQL_ERROR/clear',
+});
 
 export default ErrorProvider;

@@ -13,7 +13,7 @@ import {
     Table,
     Typography,
 } from '../components';
-import { useErrorHandler, useFormReducer } from '../hooks';
+import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
@@ -99,9 +99,9 @@ const VariantQueryPage: React.FC<{}> = () => {
         },
     });
 
-    const [fetchVariants, { error, data, loading }] = useFetchVariantsQuery();
+    const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
-    useErrorHandler(data, error);
+    const { state: errorState } = useErrorContext();
 
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
@@ -113,6 +113,7 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     return (
         <Body>
+            <NetworkErrorIndicator error={errorState.errors.networkError} />
             <Flex alignItems="center">
                 <Column alignItems="flex-start">
                     <Flex alignItems="center">
