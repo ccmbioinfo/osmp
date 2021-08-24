@@ -14,12 +14,6 @@ interface LocalQueryResponse {
   extraneous: string;
 }
 
-interface LocalQueryError {
-  errors: string[];
-  code: number;
-  meta?: string;
-}
-
 /**
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
@@ -30,10 +24,10 @@ const getLocalQuery = async (
   pubsub: PubSub
 ): Promise<ResolvedVariantQueryResult> => {
   let localQueryResponse: LocalQueryResponse[] | null = null;
-  let localQueryError: LocalQueryError | null = null;
+  let localQueryError: Error | null = null;
   try {
     localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
-      return resolve([
+      resolve([
         {
           alternative: 'A',
           reference: 'T',
@@ -41,9 +35,10 @@ const getLocalQuery = async (
           extraneous: 'extr',
         },
       ]);
+      // reject(new Error('test!'));
     });
   } catch (e) {
-    localQueryError = e;
+    localQueryError = e as Error;
   }
 
   // todo: wrap and make type safe
@@ -78,11 +73,11 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
   }
 };
 
-export const transformLocalErrorResponse: ErrorTransformer<LocalQueryError> = error => {
+export const transformLocalErrorResponse: ErrorTransformer<Error> = error => {
   if (!error) {
     return null;
   } else {
-    return { code: error.code, message: error.errors.join('\n') };
+    return { code: 424, message: error.message || '' };
   }
 };
 

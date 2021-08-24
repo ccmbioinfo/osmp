@@ -54,7 +54,7 @@ const getRemoteTestNodeQuery = async (
     );
   } catch (e) {
     logger.error(e);
-    remoteTestNodeQueryError = e;
+    remoteTestNodeQueryError = e as AxiosError;
   }
 
   // todo: wrap and make type safe
@@ -67,13 +67,12 @@ const getRemoteTestNodeQuery = async (
   };
 };
 
-export const transformRemoteTestNodeErrorResponse: ErrorTransformer<RemoteTestNodeQueryError> =
-  error => {
-    if (!error) {
-      return null;
-    } else {
-      return { code: error.code || 500, message: error.message };
-    }
-  };
+export const transformRemoteTestNodeErrorResponse: ErrorTransformer<AxiosError> = error => {
+  if (!error) {
+    return null;
+  } else {
+    return { code: error.response?.status || 500, message: error.response?.data };
+  }
+};
 
 export default getRemoteTestNodeQuery;

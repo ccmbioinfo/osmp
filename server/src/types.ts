@@ -65,7 +65,7 @@ export interface VariantQueryResponseSchema {
 
 export interface VariantQueryErrorResponse {
   code: number | string;
-  message: string;
+  message?: string | null;
 }
 
 export interface VariantQueryBaseResult {
