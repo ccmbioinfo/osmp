@@ -17,6 +17,7 @@ export const Styles = styled.div`
         border-spacing: 0;
 
         .tr {
+            transition: width 0.3s ease-out;
             :last-child {
                 .td {
                     border-bottom: 0;

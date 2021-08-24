@@ -84,6 +84,24 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
 
+
+    type Accessor = string | (() => JSX.Element) | ((state: any) => any);
+    // Dynamically adjust column width based on cell's longest text.
+    const getColumnWidth = React.useCallback((data: TableRow[], accessor: Accessor, headerText: string) => {
+        if (typeof accessor === 'string') {
+          accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
+        }
+        const maxWidth = 600;
+        const magicSpacing = 10;
+        const cellLength = Math.max(
+          ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
+          headerText.length,
+        );
+        return Math.min(maxWidth, cellLength * magicSpacing);
+      }, [])
+    
+    
+
     const columns = React.useMemo(
         () => [
             {
@@ -134,7 +152,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_variation_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 90,
+                        width: 70,
                         maxWidth: 160,
                     },
                     {
@@ -154,8 +172,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_case_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 70,
-                        maxWidth: 160,
+                        width: getColumnWidth(tableData, '', '')
                     },
                     {
                         accessor: 'datasetId',
@@ -168,7 +185,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'dp',
                         Header: 'DP',
                     },
-
+    
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
@@ -184,13 +201,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Phenotypes',
                         width: 250,
                     },
-
+    
                     {
                         accessor: 'sex',
                         id: 'sex',
                         Header: 'Sex',
                     },
-
+    
                     {
                         accessor: 'zygosity',
                         id: 'zygosity',
@@ -210,7 +227,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ],
             },
         ],
-        []
+        [getColumnWidth, tableData]
     );
 
     const defaultColumn = React.useMemo(
