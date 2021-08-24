@@ -104,7 +104,6 @@ const VariantQueryPage: React.FC<{}> = () => {
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
     const { state: errorState, dispatch } = useErrorContext();
-    console.log('ALL ERRORS: ', errorState);
 
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');

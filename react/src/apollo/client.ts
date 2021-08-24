@@ -49,17 +49,9 @@ export const buildLink = (token?: string) => {
             dispatch(makeNetworkError(networkError as ServerError | ServerParseError));
         }
 
-        console.log('ops', operation);
-        console.log('res', response);
-
         if (response && !response?.data?.getVariants) {
-            // Check if node error is the same as graphql
             response.errors?.map(e => dispatch(makeNodeError(e)));
         }
-
-        /* if (operation.query.definitions.has.is.getVariants.query && response?.data.flatMap(r => r.errors).filter(Boolean).length) {
-            dispatch(makeAddRemoteNodeError(remoteNodeError));
-        } */
 
         return forward(operation);
     });
