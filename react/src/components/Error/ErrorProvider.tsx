@@ -21,12 +21,14 @@ interface ErrorAction {
     payload: GraphQLError | Error | ServerParseError | ServerError | Response | string;
 }
 
+interface ErrorContextState {
+    graphQLErrors: Error[];
+    networkErrors: Error[];
+    nodeErrors: NodeError[];
+}
+
 interface ErrorContextType {
-    state: {
-        graphQLErrors: Error[];
-        networkErrors: Error[];
-        nodeErrors: NodeError[];
-    };
+    state: ErrorContextState;
     dispatch: React.Dispatch<ErrorAction>;
 }
 
@@ -36,16 +38,20 @@ const initialState = {
     nodeErrors: [] as NodeError[],
 };
 
+const isGraphQLErrorDuplicate = (incoming: GraphQLError, state: ErrorContextState) => state.graphQLErrors.find(e => e.message === incoming.message && e.code === incoming.extensions?.code) !== undefined;
+
 const errorReducer = (state = initialState, action: ErrorAction) => {
     switch (action.type) {
         case 'ADD_GRAPHQL_ERROR':
             const graphQlError = action.payload as GraphQLError;
-            state.graphQLErrors.push({
-                uid: uuidv4(),
-                code: graphQlError.extensions?.code,
-                message: graphQlError.message,
-                data: graphQlError,
-            });
+            if (!isGraphQLErrorDuplicate(graphQlError, state)) {
+                state.graphQLErrors.push({
+                    uid: uuidv4(),
+                    code: graphQlError.extensions?.code,
+                    message: graphQlError.message,
+                    data: graphQlError,
+                });
+            }
             return state;
 
         case 'REMOVE_GRAPHQL_ERROR':
