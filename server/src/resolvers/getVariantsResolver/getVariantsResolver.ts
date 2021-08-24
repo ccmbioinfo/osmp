@@ -1,4 +1,5 @@
 import { PubSub } from 'graphql-subscriptions';
+import logger from '../../logger';
 import {
   GqlContext,
   QueryInput,
@@ -7,8 +8,8 @@ import {
   VariantQueryErrorResult,
   VariantQueryResponse,
 } from '../../types';
-import getEnsemblQuery from './adapters/ensemblQueryAdapter';
 import getLocalQuery from './adapters/localQueryAdapter';
+import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 
 const getVariants = async (
   parent: any,
@@ -25,7 +26,8 @@ const getVariants = async (
  */
 const isResolvedVariantQueryResult = (
   arg: ResolvedVariantQueryResult | VariantQueryErrorResult
-): arg is ResolvedVariantQueryResult => !!(arg as ResolvedVariantQueryResult).data.length;
+): arg is ResolvedVariantQueryResult =>
+  !Object.values((arg as VariantQueryErrorResult).error || {}).length;
 
 const resolveVariantQuery = async (
   args: QueryInput,
@@ -36,21 +38,39 @@ const resolveVariantQuery = async (
   } = args;
 
   const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
+<<<<<<< HEAD
   const resolved = await Promise.all(queries);
+=======
 
-  const mapped = resolved.reduce(
+  const fulfilled = await Promise.allSettled(queries);
+>>>>>>> develop
+
+  const mapped = fulfilled.reduce(
     (a, c) => {
+<<<<<<< HEAD
       if (isResolvedVariantQueryResult(c)) {
         console.log('QUERY SUCCEEDS', a, c)
         const { data, source } = c;
         a.data.push({ data, source });
       } else {
         console.log('QUERY FAILS', a, c);
+=======
+      if (c.status === 'fulfilled' && isResolvedVariantQueryResult(c.value)) {
+        const { data, source } = c.value;
+        a.data.push({ data, source });
+      } else if (c.status === 'fulfilled') {
+>>>>>>> develop
         a.errors.push({
-          source: (c as VariantQueryErrorResult).source,
-          error: (c as VariantQueryErrorResult).error,
+          source: c.value.source,
+          error: c.value.error!,
         });
+<<<<<<< HEAD
         throw c;
+=======
+      } else if (c.status === 'rejected') {
+        logger.error('UNHANDLED REJECTION!');
+        logger.error(c.reason);
+>>>>>>> develop
       }
       return a;
     },
@@ -74,8 +94,8 @@ const buildSourceQuery = (
   switch (source) {
     case 'local':
       return getLocalQuery(args, pubsub);
-    case 'ensembl':
-      return getEnsemblQuery(args, pubsub);
+    case 'remote-test':
+      return getRemoteTestNodeQuery(args, pubsub);
     default:
       throw new Error(`source ${source} not found!`);
   }

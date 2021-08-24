@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useKeycloak } from '@react-keycloak/web';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
 import { AboutPage, VariantQueryPage } from '.';
-import { ErrorProvider, Flex, Navbar, Spinner } from '../components';
-import theme from '../constants/theme';
+import { ErrorProvider, ErrorFallback, Flex, Navbar, Spinner } from '../components';
 
 const App: React.FC<{}> = () => {
     const {
@@ -19,31 +18,35 @@ const App: React.FC<{}> = () => {
     }, [initialized, authenticated, login]);
 
     return !initialized ? (
-        <ThemeProvider theme={theme}>
-            <ErrorProvider>
-                <Flex justifyContent="center" alignItems="center">
-                    <Spinner />
-                </Flex>
-            </ErrorProvider>
-        </ThemeProvider>
+        <Flex justifyContent="center" alignItems="center">
+            <Spinner />
+        </Flex>
     ) : authenticated ? (
-        <ThemeProvider theme={theme}>
+        <div>
             <ErrorProvider>
-                <div>
-                    <Router>
-                        <Navbar />
-                        <Switch>
-                            <Route path="/about">
-                                <AboutPage />
-                            </Route>
-                            <Route path="/">
-                                <VariantQueryPage />
-                            </Route>
-                        </Switch>
-                    </Router>
-                </div>
+            <Router>
+                <Navbar />
+                <ErrorBoundary
+                    FallbackComponent={({ error, resetErrorBoundary }) => (
+                        <ErrorFallback
+                            error={error}
+                            variant="normal"
+                            resetErrorBoundary={resetErrorBoundary}
+                        />
+                    )}
+                >
+                    <Switch>
+                        <Route path="/about">
+                            <AboutPage />
+                        </Route>
+                        <Route path="/">
+                            <VariantQueryPage />
+                        </Route>
+                    </Switch>
+                </ErrorBoundary>
+            </Router>
             </ErrorProvider>
-        </ThemeProvider>
+        </div>
     ) : null;
 };
 

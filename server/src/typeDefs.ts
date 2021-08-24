@@ -68,7 +68,7 @@ export default gql`
   }
 
   type VariantQueryErrorResponse {
-    code: Int!
+    code: String
     message: String
   }
 

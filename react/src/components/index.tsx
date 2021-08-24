@@ -8,6 +8,7 @@ import ErrorProvider, {
     makeNetworkError,
     makeNodeError,
 } from './Error/ErrorProvider';
+import ErrorFallback from './ErrorFallback';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
@@ -30,6 +31,7 @@ export {
     Container,
     ErrorContext,
     ErrorProvider,
+    ErrorFallback,
     Flex,
     GeneSearch,
     InlineFlex,

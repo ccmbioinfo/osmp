@@ -48,15 +48,14 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!state.sources.value.filter(s => ['local', 'ensembl', 'test'].includes(s))
-                        .length,
+                    !!state.sources.value.filter(s => ['local', 'remote-test', 'test'].includes(s)).length,
                 error: 'Please specify a source.',
             },
         ],
     },
 };
 
-type Source = 'ensembl' | 'local' | 'test';
+type Source = 'local' | 'remote-test' | 'test';
 
 interface QueryOptionsFormState {
     assemblyId: string;
@@ -123,13 +122,13 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Checkbox
                             checked={queryOptionsForm.sources.value.includes('local')}
-                            label="Node 1"
+                            label="Local"
                             onClick={toggleSource.bind(null, 'local')}
                         />
                         <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('ensembl')}
-                            label="Node 2"
-                            onClick={toggleSource.bind(null, 'ensembl')}
+                            checked={queryOptionsForm.sources.value.includes('remote-test')}
+                            label="Remote-Test"
+                            onClick={toggleSource.bind(null, 'remote-test')}
                         />
                         <Checkbox
                             checked={queryOptionsForm.sources.value.includes('test')}

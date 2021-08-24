@@ -7,7 +7,13 @@ import {
 } from 'react-icons/bs';
 import { Row, useFilters, useGlobalFilter, usePagination, useSortBy, useTable } from 'react-table';
 import { downloadCsv } from '../../hooks';
-import { IndividualResponseFields, TableRow, VariantQueryDataResult } from '../../types';
+import {
+    CallsetInfoFields,
+    IndividualResponseFields,
+    VariantQueryDataResult,
+    VariantResponseFields,
+    VariantResponseInfoFields,
+} from '../../types';
 import { Button, InlineFlex, Modal, Typography } from '../index';
 import { Column, Flex } from '../Layout';
 import { ColumnFilter } from './ColumnFilter';
@@ -26,20 +32,21 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
-type TableKeys = keyof TableRow;
+type FlattenedQueryResponse = IndividualResponseFields &
+    Omit<VariantResponseFields, 'callsets' | 'info'> &
+    CallsetInfoFields &
+    VariantResponseInfoFields & { source: string };
 
 /* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
-const prepareData = (queryResult: VariantQueryDataResult[]): TableRow[] => {
-    console.log(queryResult);
-
-    const results = [] as TableRow[];
+const prepareData = (queryResult: VariantQueryDataResult[]) => {
+    const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(r => {
         const source = r.source;
         r.data.forEach(d => {
             const { callsets, ...rest } = d.variant;
             if (callsets.length) {
                 callsets.forEach(cs => {
-                    results.push({ ...cs.info, ...rest, ...d.individual, source, contact: '' });
+                    results.push({ ...cs.info, ...rest, ...d.individual, source });
                 });
             } else {
                 results.push({ ...rest, ...d.individual, source });
@@ -61,7 +68,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         {
             name: 'Variation Details',
             visible: true,
-            columns: ['af', 'rsId', 'someFakeScore'],
+            columns: ['af', 'rsId'],
         },
         {
             name: 'Case Details',
@@ -88,7 +95,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: 'refseqId',
+                        accessor: (state: FlattenedQueryResponse) => state.refSeqId,
                         id: 'chromosome',
                         Header: 'Chromosome',
                     },
@@ -151,7 +158,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Ethnicity',
                     },
                     {
-                        accessor: (state: any) =>
+                        accessor: (state: FlattenedQueryResponse) =>
                             (state.phenotypicFeatures || [])
                                 .map((p: any) => p.phenotypeId)
                                 .join(', '),
@@ -185,7 +192,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    const tableInstance = useTable<TableRow>(
+    const tableInstance = useTable(
         {
             columns,
             data: tableData,
@@ -230,11 +237,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * The formatDataForCsv takes all visible row data that has been materialized on react-table
      * and replaces the contact button with the original email string.
      */
-    const formatDataForCsv = (rows: Row<TableRow>[]) => {
-        return rows.map(r => {
-            return { ...r.values, contact: (r.original as IndividualResponseFields).contactEmail };
-        });
-    };
+    const formatDataForCsv = <T extends Row<any>>(rows: T[]): T['values'][] =>
+        rows.map(r => ({
+            ...r.values,
+            contact: (r.original as IndividualResponseFields).contactEmail,
+        }));
 
     const handleGroupChange = (g: { name: string; visible: boolean; columns: string[] }) => {
         setGroup(prev =>
@@ -275,12 +282,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() =>
+                        onClick={() => {
                             downloadCsv(
                                 formatDataForCsv(rows),
-                                visibleColumns.map(c => c.id) as TableKeys
-                            )
-                        }
+                                visibleColumns.map(c => c.id)
+                            );
+                        }}
                     >
                         Export Data
                     </Button>
