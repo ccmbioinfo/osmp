@@ -94,7 +94,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'refseqId',
                         id: 'chromosome',
                         Header: 'Chromosome',
-                        width: 110,
+                        width: 90,
                     },
                     {
                         accessor: 'alt',
@@ -134,14 +134,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_variation_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 150,
+                        width: 90,
                         maxWidth: 160,
                     },
                     {
                         accessor: 'af',
                         id: 'af',
                         Header: 'AF',
-                        width: 180,
+                        width: 150,
                     },
                 ],
             },
@@ -154,7 +154,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_case_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 150,
+                        width: 70,
                         maxWidth: 160,
                     },
                     {
@@ -396,7 +396,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             column.getSortByToggleProps()
                                         );
                                         return (
-                                            <TH key={key} {...restHeaderProps}>
+                                            <TH variant="pureCssAnimation" key={key} {...restHeaderProps}>
                                                 <span>
                                                     {column.render('Header')}
                                                     {!column.parent &&

@@ -50,21 +50,30 @@ export const THead = styled.thead`
 `;
 
 export interface THProps {
-    expanded?: boolean;
-    type?: 'groupHeader' | 'columnHeader';
-    maxWidth?: number;
-    minWidth?: number;
-    width?: number | string;
+    // expanded?: boolean;
+    // type?: 'groupHeader' | 'columnHeader';
+    // maxWidth?: number;
+    // minWidth?: number;
+    // width?: number | string;
+
+    variant: string
 }
 
 export const TH = styled.th<THProps>`
-    color: ${props => props.theme.colors.text};
-    font-size: ${props => props.theme.fontSizes.s};
-    font-weight: ${props => props.theme.fontWeights.bold};
-    padding: ${props => props.theme.space[3]};
-    text-align: center;
-    transition: width 0.3s ease-out;
-    border: none;
+    ${props => {
+        switch (props.variant) {
+            case 'pureCssAnimation':
+                return `color: ${props.theme.colors.text};
+                font-size: ${props.theme.fontSizes.s};
+                font-weight: ${props.theme.fontWeights.bold};
+                padding: ${props.theme.space[3]};
+                text-align: center;
+                transition: width 0.3s ease-out;
+                border: none;`
+            default:
+                return 'inherit';
+        }
+    }};
 `;
 
 export const Footer = styled.div`
