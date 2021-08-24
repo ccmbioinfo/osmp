@@ -6,6 +6,8 @@ import {
     Button,
     ButtonWrapper,
     Checkbox,
+    clearNetworkError,
+    clearNodeError,
     Column,
     Flex,
     Input,
@@ -48,14 +50,14 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!state.sources.value.filter(s => ['local', 'remote-test', 'test'].includes(s)).length,
+                    !!state.sources.value.filter(s => ['local', 'remote-test'].includes(s)).length,
                 error: 'Please specify a source.',
             },
         ],
     },
 };
 
-type Source = 'local' | 'remote-test' | 'test';
+type Source = 'local' | 'remote-test';
 
 interface QueryOptionsFormState {
     assemblyId: string;
@@ -101,7 +103,7 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
-    const { state: errorState } = useErrorContext();
+    const { state: errorState, dispatch } = useErrorContext();
     console.log('ALL ERRORS: ', errorState);
 
     const toggleSource = (source: Source) => {
@@ -129,11 +131,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                             checked={queryOptionsForm.sources.value.includes('remote-test')}
                             label="Remote-Test"
                             onClick={toggleSource.bind(null, 'remote-test')}
-                        />
-                        <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('test')}
-                            label="Node Test Error Handling"
-                            onClick={toggleSource.bind(null, 'test')}
                         />
                     </Flex>
                     <ErrorIndicator error={queryOptionsForm.sources.error} />
@@ -212,6 +209,34 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column justifyContent="center">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
+
+            {errorState.nodeErrors.map(e => (
+                <Background key={e.uid} variant="error">
+                    <Typography variant="p" bold error>
+                        {e.message}
+                    </Typography>
+                    <Button variant="secondary" onClick={() => dispatch(clearNodeError(e.uid))}>
+                        Dismiss
+                    </Button>
+                </Background>
+            ))}
+
+            {errorState.networkErrors.map(e => (
+                <Background key={e.uid} variant="error">
+                    <Flex alignItems="center">
+                        <Typography variant="p" bold error>
+                            {e.message}
+                        </Typography>
+                        <Button
+                            variant="secondary"
+                            onClick={() => dispatch(clearNetworkError(e.uid))}
+                        >
+                            Dismiss
+                        </Button>
+                    </Flex>
+                </Background>
+            ))}
+
             {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
         </Body>
     );

@@ -15,7 +15,7 @@ const Component = styled.button<ButtonProps>`
     text-align: center;
     font-family: ${props => props.theme.fontFamily.heading};
     padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
-    margin: ${props => props.theme.space[3]} ${props => props.theme.space[2]};
+    margin: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
     color: ${props =>
         props.variant === 'primary' ? props.theme.colors.background : props.theme.colors.primary};
     background-color: ${props =>

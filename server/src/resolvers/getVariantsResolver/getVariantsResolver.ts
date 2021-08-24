@@ -38,39 +38,24 @@ const resolveVariantQuery = async (
   } = args;
 
   const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
-<<<<<<< HEAD
-  const resolved = await Promise.all(queries);
-=======
 
   const fulfilled = await Promise.allSettled(queries);
->>>>>>> develop
 
   const mapped = fulfilled.reduce(
     (a, c) => {
-<<<<<<< HEAD
-      if (isResolvedVariantQueryResult(c)) {
-        console.log('QUERY SUCCEEDS', a, c)
-        const { data, source } = c;
-        a.data.push({ data, source });
-      } else {
-        console.log('QUERY FAILS', a, c);
-=======
       if (c.status === 'fulfilled' && isResolvedVariantQueryResult(c.value)) {
         const { data, source } = c.value;
         a.data.push({ data, source });
       } else if (c.status === 'fulfilled') {
->>>>>>> develop
         a.errors.push({
           source: c.value.source,
           error: c.value.error!,
         });
-<<<<<<< HEAD
-        throw c;
-=======
+        throw c.value.error;
       } else if (c.status === 'rejected') {
         logger.error('UNHANDLED REJECTION!');
         logger.error(c.reason);
->>>>>>> develop
+        throw c
       }
       return a;
     },

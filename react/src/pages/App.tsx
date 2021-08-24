@@ -3,7 +3,7 @@ import { useKeycloak } from '@react-keycloak/web';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { AboutPage, VariantQueryPage } from '.';
-import { ErrorProvider, ErrorFallback, Flex, Navbar, Spinner } from '../components';
+import { ErrorFallback, ErrorProvider, Flex, Navbar, Spinner } from '../components';
 
 const App: React.FC<{}> = () => {
     const {
@@ -24,27 +24,27 @@ const App: React.FC<{}> = () => {
     ) : authenticated ? (
         <div>
             <ErrorProvider>
-            <Router>
-                <Navbar />
-                <ErrorBoundary
-                    FallbackComponent={({ error, resetErrorBoundary }) => (
-                        <ErrorFallback
-                            error={error}
-                            variant="normal"
-                            resetErrorBoundary={resetErrorBoundary}
-                        />
-                    )}
-                >
-                    <Switch>
-                        <Route path="/about">
-                            <AboutPage />
-                        </Route>
-                        <Route path="/">
-                            <VariantQueryPage />
-                        </Route>
-                    </Switch>
-                </ErrorBoundary>
-            </Router>
+                <Router>
+                    <Navbar />
+                    <ErrorBoundary
+                        FallbackComponent={({ error, resetErrorBoundary }) => (
+                            <ErrorFallback
+                                error={error}
+                                variant="normal"
+                                resetErrorBoundary={resetErrorBoundary}
+                            />
+                        )}
+                    >
+                        <Switch>
+                            <Route path="/about">
+                                <AboutPage />
+                            </Route>
+                            <Route path="/">
+                                <VariantQueryPage />
+                            </Route>
+                        </Switch>
+                    </ErrorBoundary>
+                </Router>
             </ErrorProvider>
         </div>
     ) : null;

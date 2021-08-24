@@ -3,8 +3,6 @@ import { ServerError, ServerParseError } from '@apollo/client';
 import { ExecutionResult, GraphQLError } from 'graphql';
 import { v4 as uuidv4 } from 'uuid';
 
-type ErrorCategory = 'GRAPHQL' | 'NETWORK' | 'NODE';
-
 interface Error {
     uid: string;
     code: string;
@@ -12,19 +10,15 @@ interface Error {
     data: [] | {}; // Actual response from the API
 }
 
-interface NodeError extends Error {
-    source: 'local' | 'ensembl';
-}
-
 interface ErrorAction {
-    type: `ADD_${ErrorCategory}_ERROR` | `REMOVE_${ErrorCategory}_ERROR`;
+    type: string;
     payload: GraphQLError | Error | ServerParseError | ServerError | Response | string;
 }
 
 interface ErrorContextState {
     graphQLErrors: Error[];
     networkErrors: Error[];
-    nodeErrors: NodeError[];
+    nodeErrors: Error[];
 }
 
 interface ErrorContextType {
@@ -35,58 +29,68 @@ interface ErrorContextType {
 const initialState = {
     graphQLErrors: [] as Error[],
     networkErrors: [] as Error[],
-    nodeErrors: [] as NodeError[],
+    nodeErrors: [] as Error[],
 };
 
-const isGraphQLErrorDuplicate = (incoming: GraphQLError, state: ErrorContextState) => state.graphQLErrors.find(e => e.message === incoming.message && e.code === incoming.extensions?.code) !== undefined;
+const isGraphQLErrorDuplicate = (incoming: GraphQLError, state: ErrorContextState) =>
+    state.graphQLErrors.find(
+        e => e.message === incoming.message && e.code === incoming.extensions?.code
+    ) !== undefined;
+
+const responseErrorTransformer = (error: GraphQLError) => ({
+    uid: uuidv4(),
+    code: error.extensions?.code,
+    message: error.message,
+    data: error,
+});
+
+const networkErrorTransformer = (error: ServerError | ServerParseError) => ({
+    uid: uuidv4(),
+    code: 'statusCode' in error ? error.statusCode.toString() : '',
+    message: error.message,
+    data: error,
+});
 
 const errorReducer = (state = initialState, action: ErrorAction) => {
+    const { graphQLErrors, networkErrors, nodeErrors } = state;
     switch (action.type) {
         case 'ADD_GRAPHQL_ERROR':
             const graphQlError = action.payload as GraphQLError;
             if (!isGraphQLErrorDuplicate(graphQlError, state)) {
-                state.graphQLErrors.push({
-                    uid: uuidv4(),
-                    code: graphQlError.extensions?.code,
-                    message: graphQlError.message,
-                    data: graphQlError,
-                });
+                state.graphQLErrors.push(responseErrorTransformer(graphQlError));
             }
             return state;
 
         case 'REMOVE_GRAPHQL_ERROR':
-            state.graphQLErrors = state.graphQLErrors.filter(e => e.uid !== action.payload);
-            return state;
+            return {
+                graphQLErrors: graphQLErrors.filter(e => e.uid !== action.payload),
+                networkErrors,
+                nodeErrors,
+            };
 
         case 'ADD_NETWORK_ERROR':
             const networkError = action.payload as ServerError | ServerParseError;
-            state.networkErrors.push({
-                uid: uuidv4(),
-                code: 'statusCode' in networkError ? networkError.statusCode.toString() : '',
-                message: networkError.message,
-                data: networkError,
-            });
+            state.networkErrors.push(networkErrorTransformer(networkError));
             return state;
 
         case 'REMOVE_NETWORK_ERROR':
-            state.networkErrors = state.networkErrors.filter(e => e.uid !== action.payload);
-            return state;
+            return {
+                graphQLErrors,
+                networkErrors: networkErrors.filter(e => e.uid !== action.payload),
+                nodeErrors,
+            };
 
         case 'ADD_NODE_ERROR':
             const nodeError = action.payload as GraphQLError;
-            state.nodeErrors.push({
-                uid: uuidv4(),
-                code: nodeError.extensions?.code,
-                message: nodeError.message,
-                data: nodeError,
-                source: 'local',
-            });
-
+            state.nodeErrors.push(responseErrorTransformer(nodeError));
             return state;
 
         case 'REMOVE_NODE_ERROR':
-            state.nodeErrors = state.nodeErrors.filter(e => e.uid !== action.payload);
-            return state;
+            return {
+                graphQLErrors,
+                networkErrors,
+                nodeErrors: nodeErrors.filter(e => e.uid !== action.payload),
+            };
 
         default:
             return state;
@@ -114,8 +118,13 @@ export const makeNodeError = (payload: ExecutionResult) => ({
 });
 
 // @param string is uuid of error
-export const clearError = (payload: string, type: ErrorCategory) => ({
-    type: `CLEAR_${type}_ERROR`,
+export const clearNetworkError = (payload: string) => ({
+    type: 'REMOVE_NETWORK_ERROR',
+    payload,
+});
+
+export const clearNodeError = (payload: string) => ({
+    type: 'REMOVE_NODE_ERROR',
     payload,
 });
 

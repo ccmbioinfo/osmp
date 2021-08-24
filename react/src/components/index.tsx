@@ -3,6 +3,8 @@ import Button from './Button';
 import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
 import ErrorProvider, {
+    clearNetworkError,
+    clearNodeError,
     ErrorContext,
     makeGraphQLError,
     makeNetworkError,
@@ -25,6 +27,8 @@ export {
     Button,
     ButtonWrapper,
     Body,
+    clearNetworkError,
+    clearNodeError,
     Checkbox,
     Column,
     ComboBox,
