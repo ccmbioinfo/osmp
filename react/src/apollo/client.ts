@@ -19,7 +19,7 @@ const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(30000); // 30 second timeout
+    const timeoutLink = new ApolloLinkTimeout(2000); // 30 second timeout
     const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
     const httpLink = createHttpLink({
         uri: `http://${host}:${port}/graphql`,
@@ -28,7 +28,13 @@ export const buildLink = (token?: string) => {
 
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
         const { dispatch } = operation.getContext();
-        if (graphQLErrors) {
+        /**
+         * Any errors besides strictly network errors often get passed to both response and graphQLErrors.
+         * Here we want to check that only typings errors in the GraphQL schema get passed into graphQL errors.
+         * The rest will get passed to response and classified as node errors. 
+         */
+
+        if (graphQLErrors && response?.data?.getVariants) {
             graphQLErrors.forEach(graphQLError => {
                 const { message, locations, path } = graphQLError;
                 console.log('this is graphql error', graphQLError);
@@ -47,7 +53,8 @@ export const buildLink = (token?: string) => {
         console.log('ops', operation);
         console.log('res', response);
 
-        if (response) {
+        if (response && !response?.data?.getVariants) {
+            // Check if node error is the same as graphql
             response.errors?.map(e => dispatch(makeNodeError(e)));
         }
 
