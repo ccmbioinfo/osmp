@@ -12,7 +12,7 @@ The front end is a React.js SPA bootstrapped with [create-react-app](https://git
     ```
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='' react yarn install
+    docker-compose run --rm --entrypoint='yarn install' react 
     ```
 - bring up the react app using [docker-compose](https://docs.docker.com/compose/):
 
@@ -35,7 +35,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='' ssmp-server yarn install
+    docker-compose run --rm --entrypoint='yarn install' ssmp-server 
     ```
 - bring up the server using [docker-compose](https://docs.docker.com/compose/):
 
@@ -46,7 +46,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 
 - to run the tests:
   - ```bash
-    docker-compose run --rm --entrypoint='' ssmp-server yarn test
+    docker-compose run --rm --entrypoint='yarn test' ssmp-server 
     ```
 
 ## Keycloak
