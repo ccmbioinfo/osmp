@@ -55,7 +55,7 @@ const resolveVariantQuery = async (
       } else if (c.status === 'rejected') {
         logger.error('UNHANDLED REJECTION!');
         logger.error(c.reason);
-        throw c
+        throw c;
       }
       return a;
     },

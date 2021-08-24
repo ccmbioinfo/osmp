@@ -73,7 +73,10 @@ const getEnsemblQuery = async (
     );
   } catch (e: unknown) {
     const error = e as AxiosError;
-    ensemblQueryError = { code: +(error.response?.status || error.code || 500), message: error.response?.data.error || error.message };
+    ensemblQueryError = {
+      code: +(error.response?.status || error.code || 500),
+      message: error.response?.data.error || error.message,
+    };
   }
 
   // todo: wrap and make type safe
