@@ -96,6 +96,11 @@ components:
           $ref: "#/components/schemas/Variant"
         individual:
           $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/Individual"
+        contactInfo:
+          type: string
+          description: Contact information for the record owner
+          example: "DrExample@example.ca"
+          
     IndividualGenomicVariantResponseContent:
       description: |
         Description pending
