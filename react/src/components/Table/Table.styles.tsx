@@ -17,7 +17,7 @@ export const Styles = styled.div`
         border-spacing: 0;
 
         .tr {
-            transition: width 0.3s ease-out;
+            transition: all 0.3s ease-out;
             :last-child {
                 .td {
                     border-bottom: 0;
@@ -35,7 +35,7 @@ export const Styles = styled.div`
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: width 0.5s ease;
+            transition: all 0.5s ease;
 
             :last-child {
                 border-right: 0;
@@ -57,7 +57,7 @@ export interface THProps {
     // minWidth?: number;
     // width?: number | string;
 
-    variant: string
+    variant: string;
 }
 
 export const TH = styled.th<THProps>`
@@ -69,8 +69,8 @@ export const TH = styled.th<THProps>`
                 font-weight: ${props.theme.fontWeights.bold};
                 padding: ${props.theme.space[3]};
                 text-align: center;
-                transition: width 0.3s ease-out;
-                border: none;`
+                transition: all 0.5s ease;
+                border: none;`;
             default:
                 return 'inherit';
         }

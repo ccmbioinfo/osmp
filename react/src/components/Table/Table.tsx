@@ -6,6 +6,7 @@ import {
     BsFillEyeSlashFill,
     BsFilter,
 } from 'react-icons/bs';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import {
     HeaderGroup,
@@ -17,6 +18,8 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
+import './transition.css';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { downloadCsv } from '../../hooks';
 import { IndividualResponseFields, TableRow, VariantQueryDataResult } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
@@ -84,23 +87,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
 
-
     type Accessor = string | (() => JSX.Element) | ((state: any) => any);
     // Dynamically adjust column width based on cell's longest text.
-    const getColumnWidth = React.useCallback((data: TableRow[], accessor: Accessor, headerText: string) => {
-        if (typeof accessor === 'string') {
-          accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
-        }
-        const maxWidth = 600;
-        const magicSpacing = 10;
-        const cellLength = Math.max(
-          ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
-          headerText.length,
-        );
-        return Math.min(maxWidth, cellLength * magicSpacing);
-      }, [])
-    
-    
+    const getColumnWidth = React.useCallback(
+        (data: TableRow[], accessor: Accessor, headerText: string) => {
+            if (typeof accessor === 'string') {
+                accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
+            }
+            const maxWidth = 600;
+            const magicSpacing = 10;
+            const cellLength = Math.max(
+                ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
+                headerText.length
+            );
+            return Math.min(maxWidth, cellLength * magicSpacing);
+        },
+        []
+    );
 
     const columns = React.useMemo(
         () => [
@@ -112,34 +115,37 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'refseqId',
                         id: 'chromosome',
                         Header: 'Chromosome',
-                        width: 90,
+                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
                     },
                     {
                         accessor: 'alt',
                         id: 'alt',
                         Header: 'Alt',
+                        width: getColumnWidth(tableData, 'alt', 'Alt'),
                     },
                     {
                         accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
+                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
                     },
                     {
                         accessor: 'start',
                         id: 'start',
                         Header: 'Start',
-                        width: 80,
+                        width: getColumnWidth(tableData, 'start', 'Start'),
                     },
                     {
                         accessor: 'end',
                         id: 'end',
                         Header: 'End',
-                        width: 80,
+                        width: getColumnWidth(tableData, 'end', 'End'),
                     },
                     {
                         accessor: 'source',
                         id: 'source',
                         Header: 'Source',
+                        width: getColumnWidth(tableData, 'source', 'Source'),
                     },
                 ],
             },
@@ -152,8 +158,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_variation_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 70,
-                        maxWidth: 160,
+                        width: 90,
                     },
                     {
                         accessor: 'af',
@@ -172,25 +177,26 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_case_details',
                         Header: '',
                         disableSortBy: true,
-                        width: getColumnWidth(tableData, '', '')
+                        width: 90,
                     },
                     {
                         accessor: 'datasetId',
                         id: 'datasetId',
                         Header: 'Dataset ID',
-                        width: 80,
+                        width: getColumnWidth(tableData, 'datasetId', 'Dataset ID'),
                     },
                     {
                         accessor: 'dp',
                         id: 'dp',
                         Header: 'DP',
+                        width: getColumnWidth(tableData, 'dp', 'DP'),
                     },
-    
+
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
                         Header: 'Ethnicity',
-                        width: 90,
+                        width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
                     {
                         accessor: (state: any) =>
@@ -199,20 +205,28 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 .join(', '),
                         id: 'phenotypes',
                         Header: 'Phenotypes',
-                        width: 250,
+                        width: getColumnWidth(
+                            tableData,
+                            (state: any) =>
+                                (state.phenotypicFeatures || [])
+                                    .map((p: any) => p.phenotypeId)
+                                    .join(', '),
+                            'Phenotypes'
+                        ),
                     },
-    
+
                     {
                         accessor: 'sex',
                         id: 'sex',
                         Header: 'Sex',
+                        width: getColumnWidth(tableData, 'sex', 'Sex'),
                     },
-    
+
                     {
                         accessor: 'zygosity',
                         id: 'zygosity',
                         Header: 'Zygosity',
-                        width: 90,
+                        width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
                     },
                     {
                         accessor: () => (
@@ -222,7 +236,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         ),
                         id: 'contact',
                         Header: 'Contact',
-                        width: 100,
                     },
                 ],
             },
@@ -230,9 +243,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         [getColumnWidth, tableData]
     );
 
+    React.useEffect(() => {
+        console.log('COLUMNS CONFIG', columns);
+    }, [columns]);
+
     const defaultColumn = React.useMemo(
         () => ({
-            minWidth: 30,
+            minWidth: 10,
             width: 60,
             maxWidth: 300,
         }),
@@ -276,6 +293,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         prepareRow,
         toggleHideColumn,
         visibleColumns,
+        allColumns,
         rows,
     } = tableInstance;
 
@@ -407,74 +425,133 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             const { key, ...restHeaderGroupProps } =
                                 headerGroup.getHeaderGroupProps();
                             return (
-                                <tr key={key} {...restHeaderGroupProps}>
-                                    {headerGroup.headers.map(column => {
-                                        const { key, ...restHeaderProps } = column.getHeaderProps(
-                                            column.getSortByToggleProps()
-                                        );
-                                        return (
-                                            <TH variant="pureCssAnimation" key={key} {...restHeaderProps}>
-                                                <span>
-                                                    {column.render('Header')}
-                                                    {!column.parent &&
-                                                        column.columns &&
-                                                        column.Header !== 'Core' &&
-                                                        (column.columns.filter(c => c.isVisible)
-                                                            .length ===
-                                                        columns.filter(
-                                                            c => c.Header === column.Header
-                                                        )[0].columns.length ? (
-                                                            <IconPadder>
-                                                                <CgArrowsMergeAltH
-                                                                    onClick={() =>
-                                                                        handleGroupChange(column)
-                                                                    }
-                                                                />
-                                                            </IconPadder>
-                                                        ) : (
-                                                            <IconPadder>
-                                                                <CgArrowsShrinkH
-                                                                    onClick={() =>
-                                                                        handleGroupChange(column)
-                                                                    }
-                                                                />
-                                                            </IconPadder>
-                                                        ))}
-                                                    {column.isSorted ? (
-                                                        column.isSortedDesc ? (
-                                                            <BsFillCaretUpFill />
-                                                        ) : (
-                                                            <BsFillCaretDownFill />
-                                                        )
-                                                    ) : (
-                                                        ''
-                                                    )}
-                                                </span>
-                                            </TH>
-                                        );
-                                    })}
-                                </tr>
+                                <TransitionGroup key={key} component="tr" appear enter>
+                                    <motion.tr layout key={key} {...restHeaderGroupProps}>
+                                        {console.log(headerGroup.headers)}
+                                        {headerGroup.headers.map(column => {
+                                            const { key, ...restHeaderProps } =
+                                                column.getHeaderProps(
+                                                    column.getSortByToggleProps()
+                                                );
+                                            return (
+                                                <CSSTransition
+                                                    key={key}
+                                                    timeout={500}
+                                                    classNames="fade"
+                                                >
+                                                    <TH
+                                                        variant="pureCssAnimation"
+                                                        key={key}
+                                                        {...restHeaderProps}
+                                                    >
+                                                        <AnimatePresence initial={false}>
+                                                            {column.isVisible && (
+                                                                <motion.section
+                                                                    key="content"
+                                                                    initial="collapsed"
+                                                                    animate="open"
+                                                                    exit="collapsed"
+                                                                    variants={{
+                                                                        open: {
+                                                                            opacity: 1,
+                                                                            width: 'auto',
+                                                                        },
+                                                                        collapsed: {
+                                                                            opacity: 0,
+                                                                            width: 0,
+                                                                        },
+                                                                    }}
+                                                                    transition={{
+                                                                        duration: 0.8,
+                                                                        ease: [
+                                                                            0.04, 0.62, 0.23, 0.98,
+                                                                        ],
+                                                                    }}
+                                                                >
+                                                                    <span>
+                                                                        {column.render('Header')}
+                                                                        {console.log(
+                                                                            'COLUMN',
+                                                                            column
+                                                                        )}
+                                                                        {!column.parent &&
+                                                                            column.columns &&
+                                                                            column.Header !==
+                                                                                'Core' &&
+                                                                            (column.columns.filter(
+                                                                                c => c.isVisible
+                                                                            ).length ===
+                                                                            columns.filter(
+                                                                                c =>
+                                                                                    c.Header ===
+                                                                                    column.Header
+                                                                            )[0].columns.length ? (
+                                                                                <IconPadder>
+                                                                                    <CgArrowsMergeAltH
+                                                                                        onClick={() =>
+                                                                                            handleGroupChange(
+                                                                                                column
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                </IconPadder>
+                                                                            ) : (
+                                                                                <IconPadder>
+                                                                                    <CgArrowsShrinkH
+                                                                                        onClick={() =>
+                                                                                            handleGroupChange(
+                                                                                                column
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                </IconPadder>
+                                                                            ))}
+                                                                        {column.isSorted ? (
+                                                                            column.isSortedDesc ? (
+                                                                                <BsFillCaretUpFill />
+                                                                            ) : (
+                                                                                <BsFillCaretDownFill />
+                                                                            )
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
+                                                                    </span>
+                                                                </motion.section>
+                                                            )}
+                                                        </AnimatePresence>
+                                                    </TH>
+                                                </CSSTransition>
+                                            );
+                                        })}
+                                    </motion.tr>
+                                </TransitionGroup>
                             );
                         })}
                     </thead>
+
                     <tbody {...getTableBodyProps()}>
                         {page.length > 0 ? (
-                            page.map(row => {
-                                prepareRow(row);
-                                const { key, ...restRowProps } = row.getRowProps();
-                                return (
-                                    <tr key={key} {...restRowProps}>
-                                        {row.cells.map(cell => {
-                                            const { key, ...restCellProps } = cell.getCellProps();
-                                            return (
-                                                <td key={key} {...restCellProps}>
-                                                    {cell.render('Cell')}
-                                                </td>
-                                            );
-                                        })}
-                                    </tr>
-                                );
-                            })
+                            <TransitionGroup appear enter>
+                                {page.map(row => {
+                                    prepareRow(row);
+                                    const { key, ...restRowProps } = row.getRowProps();
+                                    return (
+                                        <CSSTransition key={key} timeout={500} classNames="fade">
+                                            <motion.tr layout="position" {...restRowProps}>
+                                                {row.cells.map(cell => {
+                                                    const { key, ...restCellProps } =
+                                                        cell.getCellProps();
+                                                    return (
+                                                        <td key={key} {...restCellProps}>
+                                                            {cell.render('Cell')}
+                                                        </td>
+                                                    );
+                                                })}
+                                            </motion.tr>
+                                        </CSSTransition>
+                                    );
+                                })}
+                            </TransitionGroup>
                         ) : (
                             <Typography variant="p" error>
                                 There are no records to display.
