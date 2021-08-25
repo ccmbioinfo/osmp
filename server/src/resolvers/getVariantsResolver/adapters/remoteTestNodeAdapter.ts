@@ -61,7 +61,7 @@ const getRemoteTestNodeQuery = async (
   pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
 
   return {
-    data: remoteTestNodeQueryResponse?.data,
+    data: remoteTestNodeQueryResponse?.data || [],
     error: transformRemoteTestNodeErrorResponse(remoteTestNodeQueryError),
     source: 'remote-test',
   };
@@ -71,7 +71,10 @@ export const transformRemoteTestNodeErrorResponse: ErrorTransformer<AxiosError> 
   if (!error) {
     return null;
   } else {
-    return { code: error.response?.status || 500, message: error.response?.data };
+    return {
+      code: error.response?.status || 500,
+      message: error.response?.data,
+    };
   }
 };
 

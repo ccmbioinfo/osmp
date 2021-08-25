@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   type VariantQueryResponse {
-    data: [VariantQueryDataResult]!
+    data: [VariantQueryDataResult!]!
     errors: [VariantQueryErrorResult]!
     meta: String
   }

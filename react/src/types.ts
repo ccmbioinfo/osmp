@@ -1,3 +1,4 @@
+import { FetchResult } from '@apollo/client';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 export interface DropdownItem {
@@ -119,3 +120,11 @@ export interface QueryInput {
 export type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
 export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
 export type TableRow = TableRowIndividual | TableRowVariant | { contact: any };
+
+//typeguard
+
+export const isGetVariantsQueryResponse = (
+    result: FetchResult<{ getVariants: VariantQueryResponse }> | FetchResult<any>
+): result is FetchResult<{ getVariants: VariantQueryResponse }> => {
+    return !!result.data.getVariants;
+};

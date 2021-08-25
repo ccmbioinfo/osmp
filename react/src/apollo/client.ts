@@ -3,8 +3,7 @@ import {
     createHttpLink,
     from,
     InMemoryCache,
-    ServerError,
-    ServerParseError,
+    Observable,
     useLazyQuery,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
@@ -14,6 +13,7 @@ import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
 import { makeGraphQLError, makeNetworkError, makeNodeError } from '../components';
 import { useErrorContext } from '../hooks';
+import { isGetVariantsQueryResponse } from '../types';
 
 const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
@@ -26,13 +26,27 @@ export const buildLink = (token?: string) => {
         headers: { accept: 'application/json' },
     });
 
+    const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
+        return new Observable(observer => {
+            const sub = forward(operation).subscribe({
+                next: response => {
+                    if (response && isGetVariantsQueryResponse(response)) {
+                        response.data?.getVariants.errors.map(e =>
+                            operation.getContext().dispatch(makeNodeError(e))
+                        );
+                    }
+                    observer.next(response);
+                },
+            });
+
+            return () => {
+                if (sub) sub.unsubscribe();
+            };
+        });
+    });
+
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
         const { dispatch } = operation.getContext();
-        /**
-         * Any errors besides strictly network errors often get passed to both response and graphQLErrors.
-         * Here we want to check that only typings errors in the GraphQL schema get passed into graphQL errors.
-         * The rest will get passed to response and classified as node errors.
-         */
 
         if (graphQLErrors && response?.data?.getVariants) {
             graphQLErrors.forEach(graphQLError => {
@@ -46,11 +60,7 @@ export const buildLink = (token?: string) => {
 
         if (networkError) {
             console.error(`[Network error]: ${networkError}`);
-            dispatch(makeNetworkError(networkError as ServerError | ServerParseError));
-        }
-
-        if (response && !response?.data?.getVariants) {
-            response.errors?.map(e => dispatch(makeNodeError(e)));
+            dispatch(makeNetworkError(networkError));
         }
 
         return forward(operation);
@@ -67,7 +77,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([ebiRestLink, authLink, errorLink, timeoutLink, httpLink]);
+    return from([ebiRestLink, authLink, remoteNodeErrorLink, errorLink, timeoutLink, httpLink]);
 };
 
 export const client = new ApolloClient<any>({

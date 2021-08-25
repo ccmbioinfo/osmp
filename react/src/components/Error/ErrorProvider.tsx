@@ -1,24 +1,33 @@
 import React, { useMemo, useReducer } from 'react';
 import { ServerError, ServerParseError } from '@apollo/client';
-import { ExecutionResult, GraphQLError } from 'graphql';
+import { GraphQLError } from 'graphql';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import { v4 as uuidv4 } from 'uuid';
+import { VariantQueryErrorResult } from '../../types';
 
-interface Error {
+interface FetchError {
     uid: string;
     code: string;
-    message: string;
-    data: [] | {}; // Actual response from the API
+    message: Maybe<string>;
+    data: [] | {} | undefined; // Actual response from the API
 }
 
 interface ErrorAction {
     type: string;
-    payload: GraphQLError | Error | ServerParseError | ServerError | Response | string;
+    payload:
+        | GraphQLError
+        | Error
+        | ServerParseError
+        | ServerError
+        | Response
+        | string
+        | VariantQueryErrorResult;
 }
 
 interface ErrorContextState {
-    graphQLErrors: Error[];
-    networkErrors: Error[];
-    nodeErrors: Error[];
+    graphQLErrors: FetchError[];
+    networkErrors: FetchError[];
+    nodeErrors: FetchError[];
 }
 
 interface ErrorContextType {
@@ -26,10 +35,10 @@ interface ErrorContextType {
     dispatch: React.Dispatch<ErrorAction>;
 }
 
-const initialState = {
-    graphQLErrors: [] as Error[],
-    networkErrors: [] as Error[],
-    nodeErrors: [] as Error[],
+const initialState: ErrorContextState = {
+    graphQLErrors: [] as FetchError[],
+    networkErrors: [] as FetchError[],
+    nodeErrors: [] as FetchError[],
 };
 
 const isGraphQLErrorDuplicate = (incoming: GraphQLError, state: ErrorContextState) =>
@@ -44,10 +53,17 @@ const responseErrorTransformer = (error: GraphQLError) => ({
     data: error,
 });
 
-const networkErrorTransformer = (error: ServerError | ServerParseError) => ({
+const transformNodeError = (result: VariantQueryErrorResult) => ({
     uid: uuidv4(),
-    code: 'statusCode' in error ? error.statusCode.toString() : '',
-    message: error.message,
+    code: String(result.error.code),
+    message: result.error.message,
+    data: result,
+});
+
+const networkErrorTransformer = (error: ServerError | ServerParseError | Error | undefined) => ({
+    uid: uuidv4(),
+    code: error && 'statusCode' in error ? error.statusCode.toString() : '',
+    message: error?.message,
     data: error,
 });
 
@@ -69,7 +85,11 @@ const errorReducer = (state = initialState, action: ErrorAction) => {
             };
 
         case 'ADD_NETWORK_ERROR':
-            const networkError = action.payload as ServerError | ServerParseError;
+            const networkError = action.payload as
+                | ServerError
+                | ServerParseError
+                | Error
+                | undefined;
             state.networkErrors.push(networkErrorTransformer(networkError));
             return state;
 
@@ -81,8 +101,8 @@ const errorReducer = (state = initialState, action: ErrorAction) => {
             };
 
         case 'ADD_NODE_ERROR':
-            const nodeError = action.payload as GraphQLError;
-            state.nodeErrors.push(responseErrorTransformer(nodeError));
+            const nodeError = action.payload as VariantQueryErrorResult;
+            state.nodeErrors.push(transformNodeError(nodeError));
             return state;
 
         case 'REMOVE_NODE_ERROR':
@@ -107,12 +127,12 @@ export const makeGraphQLError = (payload: GraphQLError) => ({
     payload,
 });
 
-export const makeNetworkError = (payload: ServerError | ServerParseError) => ({
+export const makeNetworkError = (payload: ServerError | ServerParseError | Error | undefined) => ({
     type: 'ADD_NETWORK_ERROR',
     payload,
 });
 
-export const makeNodeError = (payload: ExecutionResult) => ({
+export const makeNodeError = (payload: VariantQueryErrorResult) => ({
     type: 'ADD_NODE_ERROR',
     payload,
 });

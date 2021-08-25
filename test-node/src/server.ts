@@ -32,8 +32,8 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
 
 app.get('/data', async (req: Request<{ ensemblId: string }>, res) => {
   res.json(createTestQueryResponse());
-  // res.statusCode = 422;
-  // res.json('invalid request'); 
+  //res.statusCode = 422;
+  //res.json('invalid request');
 });
 
 export const createTestQueryResponse = () => {
