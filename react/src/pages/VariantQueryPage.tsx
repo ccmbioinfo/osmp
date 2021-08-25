@@ -6,9 +6,9 @@ import {
     Button,
     ButtonWrapper,
     Checkbox,
-    clearNetworkError,
-    clearNodeError,
+    clearError,
     Column,
+    ErrorIndicator,
     Flex,
     Input,
     Spinner,
@@ -67,7 +67,7 @@ interface QueryOptionsFormState {
     sources: Source[];
 }
 
-const ErrorIndicator: React.FC<{ error?: string }> = ({ error }) =>
+const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
     error ? (
         <Typography error variant="subtitle" bold>
             {error}
@@ -105,6 +105,7 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const { state: errorState, dispatch } = useErrorContext();
 
+    console.log(errorState);
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
 
@@ -132,7 +133,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onClick={toggleSource.bind(null, 'remote-test')}
                         />
                     </Flex>
-                    <ErrorIndicator error={queryOptionsForm.sources.error} />
+                    <ErrorText error={queryOptionsForm.sources.error} />
                 </Column>
             </Flex>
             <Background variant="light">
@@ -146,7 +147,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onChange={e => updateQueryOptionsForm('gene')(e.currentTarget.value)}
                             value={queryOptionsForm.gene.value}
                         />
-                        <ErrorIndicator error={queryOptionsForm.gene.error} />
+                        <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>
                     <Column>or</Column>
                     <Column alignItems="flex-start">
@@ -159,7 +160,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             value={queryOptionsForm.ensemblId.value}
                         />
-                        <ErrorIndicator error={queryOptionsForm.ensemblId.error} />
+                        <ErrorText error={queryOptionsForm.ensemblId.error} />
                     </Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
@@ -171,7 +172,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             value={queryOptionsForm.maxFrequency.value}
                         />
-                        <ErrorIndicator error={queryOptionsForm.maxFrequency.error} />
+                        <ErrorText error={queryOptionsForm.maxFrequency.error} />
                     </Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
@@ -183,7 +184,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             value={queryOptionsForm.assemblyId.value}
                         />
-                        <ErrorIndicator error={queryOptionsForm.assemblyId.error} />
+                        <ErrorText error={queryOptionsForm.assemblyId.error} />
                     </Column>
 
                     <ButtonWrapper>
@@ -208,34 +209,13 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column justifyContent="center">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
-
-            {errorState.nodeErrors.map(e => (
-                <Background key={e.uid} variant="error">
-                    <Typography variant="p" bold error>
-                        {e.message}
-                    </Typography>
-                    <Button variant="secondary" onClick={() => dispatch(clearNodeError(e.uid))}>
-                        Dismiss
-                    </Button>
-                </Background>
+            {[errorState.nodeErrors, errorState.networkErrors].flat().map(e => (
+                <ErrorIndicator
+                    key={e.uid}
+                    message={`Error: ${e.code} - ${e.message}`}
+                    handleCloseError={() => dispatch(clearError(e.uid))}
+                />
             ))}
-
-            {errorState.networkErrors.map(e => (
-                <Background key={e.uid} variant="error">
-                    <Flex alignItems="center">
-                        <Typography variant="p" bold error>
-                            {e.message}
-                        </Typography>
-                        <Button
-                            variant="secondary"
-                            onClick={() => dispatch(clearNetworkError(e.uid))}
-                        >
-                            Dismiss
-                        </Button>
-                    </Flex>
-                </Background>
-            ))}
-
             {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
         </Body>
     );

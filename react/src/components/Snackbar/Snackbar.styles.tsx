@@ -16,27 +16,11 @@ const fadein = keyframes`
     }
 `;
 
-const fadeout = keyframes`
-    from {
-      bottom: 1rem;
-      opacity: 1;
-    }
-    to {
-      bottom: 0;
-      opacity: 0;
-    }
-`;
-
 export const Container = styled.div<SnackbarVariant>`
-    position: fixed;
-    z-index: 1000;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    height: auto;
-
     display: flex;
     align-items: center;
+    width: 50vw;
+    margin: ${props => props.theme.space[4]} 0;
 
     gap: ${props => props.theme.space[4]};
     padding: 0 ${props => props.theme.space[4]};
@@ -45,7 +29,7 @@ export const Container = styled.div<SnackbarVariant>`
     color: ${props => props.theme.colors.background};
     background-color: ${props => props.theme.colors[props.variant]};
 
-    animation: ${fadein} 0.5s, ${fadeout} 0.5s 2.5s;
+    animation: ${fadein} 0.5s;
 `;
 // Note: TIME = (timeout - 500) / 1000 + "s";
 

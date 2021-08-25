@@ -1,10 +1,11 @@
 import React from 'react';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import { FiAlertCircle, FiAlertTriangle, FiCheckCircle, FiInfo, FiX } from 'react-icons/fi';
 import { Typography } from '../index';
 import { Button, Container, SnackbarVariant } from './Snackbar.styles';
 
 interface SnackbarProps extends SnackbarVariant {
-    message?: string;
+    message: Maybe<string>;
     handleCloseSnackbar: () => void;
 }
 
@@ -19,7 +20,7 @@ const Snackbar: React.FC<SnackbarProps> = ({ isActive, variant, message, handleC
     return isActive ? (
         <Container variant={variant} isActive={isActive}>
             {Icons[variant]}
-            <Typography variant="subtitle" bold>
+            <Typography variant="p" bold>
                 {message}
             </Typography>
             <Button onClick={handleCloseSnackbar}>

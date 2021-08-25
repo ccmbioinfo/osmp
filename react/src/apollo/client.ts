@@ -35,6 +35,7 @@ export const buildLink = (token?: string) => {
                             operation.getContext().dispatch(makeNodeError(e))
                         );
                     }
+                    console.log('res', response);
                     observer.next(response);
                 },
             });

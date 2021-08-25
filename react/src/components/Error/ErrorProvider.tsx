@@ -62,7 +62,7 @@ const transformNodeError = (result: VariantQueryErrorResult) => ({
 
 const networkErrorTransformer = (error: ServerError | ServerParseError | Error | undefined) => ({
     uid: uuidv4(),
-    code: error && 'statusCode' in error ? error.statusCode.toString() : '',
+    code: error && 'statusCode' in error ? error.statusCode.toString() : '500',
     message: error?.message,
     data: error,
 });
@@ -77,13 +77,6 @@ const errorReducer = (state = initialState, action: ErrorAction) => {
             }
             return state;
 
-        case 'REMOVE_GRAPHQL_ERROR':
-            return {
-                graphQLErrors: graphQLErrors.filter(e => e.uid !== action.payload),
-                networkErrors,
-                nodeErrors,
-            };
-
         case 'ADD_NETWORK_ERROR':
             const networkError = action.payload as
                 | ServerError
@@ -93,23 +86,17 @@ const errorReducer = (state = initialState, action: ErrorAction) => {
             state.networkErrors.push(networkErrorTransformer(networkError));
             return state;
 
-        case 'REMOVE_NETWORK_ERROR':
-            return {
-                graphQLErrors,
-                networkErrors: networkErrors.filter(e => e.uid !== action.payload),
-                nodeErrors,
-            };
-
         case 'ADD_NODE_ERROR':
             const nodeError = action.payload as VariantQueryErrorResult;
             state.nodeErrors.push(transformNodeError(nodeError));
             return state;
 
-        case 'REMOVE_NODE_ERROR':
+        case 'REMOVE_ERROR':
+            const errorUid = action.payload as string;
             return {
-                graphQLErrors,
-                networkErrors,
-                nodeErrors: nodeErrors.filter(e => e.uid !== action.payload),
+                graphQLErrors: graphQLErrors.filter(e => e.uid !== errorUid),
+                nodeErrors: nodeErrors.filter(e => e.uid !== errorUid),
+                networkErrors: networkErrors.filter(e => e.uid !== errorUid),
             };
 
         default:
@@ -138,13 +125,8 @@ export const makeNodeError = (payload: VariantQueryErrorResult) => ({
 });
 
 // @param string is uuid of error
-export const clearNetworkError = (payload: string) => ({
-    type: 'REMOVE_NETWORK_ERROR',
-    payload,
-});
-
-export const clearNodeError = (payload: string) => ({
-    type: 'REMOVE_NODE_ERROR',
+export const clearError = (payload: string) => ({
+    type: 'REMOVE_ERROR',
     payload,
 });
 

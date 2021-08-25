@@ -1,18 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Maybe } from 'graphql/jsutils/Maybe';
 
 export default function useSnackbar() {
     const [isActive, setIsActive] = useState<boolean>(false);
-    const [message, setMessage] = useState<string>();
+    const [message, setMessage] = useState<Maybe<string>>();
 
-    useEffect(() => {
-        if (isActive) {
-            setTimeout(() => {
-                setIsActive(false);
-            }, 3000);
-        }
-    }, [isActive]);
-
-    const openSnackBar = (msg = 'Something went wrong...') => {
+    const openSnackbar = (msg: Maybe<string> = 'Something went wrong...') => {
         setMessage(msg);
         setIsActive(true);
     };
@@ -21,5 +14,5 @@ export default function useSnackbar() {
         setIsActive(false);
     };
 
-    return { isActive, message, openSnackBar, closeSnackbar };
+    return { isActive, message, openSnackbar, closeSnackbar };
 }

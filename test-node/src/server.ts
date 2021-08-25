@@ -63,7 +63,7 @@ export const createTestQueryResponse = () => {
             af: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
           },
           ref,
-          refSeqId: '19',
+          refSeqId: {foo: 'bar'},
           start: end - 1,
         },
         individual: {

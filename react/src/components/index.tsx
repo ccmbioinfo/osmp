@@ -3,14 +3,14 @@ import Button from './Button';
 import Checkbox from './Checkbox';
 import ComboBox from './ComboBox/ComboBox';
 import ErrorProvider, {
-    clearNetworkError,
-    clearNodeError,
+    clearError,
     ErrorContext,
     makeGraphQLError,
     makeNetworkError,
     makeNodeError,
 } from './Error/ErrorProvider';
 import ErrorFallback from './ErrorFallback';
+import ErrorIndicator from './ErrorIndicator';
 import GeneSearch from './GeneSearch';
 import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
@@ -27,8 +27,7 @@ export {
     Button,
     ButtonWrapper,
     Body,
-    clearNetworkError,
-    clearNodeError,
+    clearError,
     Checkbox,
     Column,
     ComboBox,
@@ -36,6 +35,7 @@ export {
     ErrorContext,
     ErrorProvider,
     ErrorFallback,
+    ErrorIndicator,
     Flex,
     GeneSearch,
     InlineFlex,
