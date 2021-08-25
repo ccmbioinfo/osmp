@@ -158,7 +158,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_variation_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 90,
+                        width: 79,
                     },
                     {
                         accessor: 'af',
@@ -177,7 +177,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'empty_case_details',
                         Header: '',
                         disableSortBy: true,
-                        width: 90,
+                        width: 70,
                     },
                     {
                         accessor: 'datasetId',
