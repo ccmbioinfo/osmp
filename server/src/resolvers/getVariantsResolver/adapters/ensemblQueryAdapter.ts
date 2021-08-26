@@ -3,6 +3,7 @@ import axios, { AxiosError } from 'axios';
 import Faker from 'faker';
 import { QUERY_RESOLVED } from '../..';
 import { QueryInput, ResolvedVariantQueryResult, ResultTransformer } from '../../../types';
+import { v4 as uuidv4 } from 'uuid';
 
 /* This is a test module that fetches some remote data using the ensembl api, \
    which saves some of the trouble of setting up detailed fake data and queries. \
@@ -75,6 +76,7 @@ const getEnsemblQuery = async (
   } catch (e: unknown) {
     const error = e as AxiosError;
     ensemblQueryError = {
+      id: uuidv4(),
       code: +(error.response?.status || error.code || 500),
       message: error.response?.data.error || error.message,
     };
