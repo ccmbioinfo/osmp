@@ -3,6 +3,7 @@ import { PubSub } from 'graphql-subscriptions';
 import { QUERY_RESOLVED } from '../..';
 import logger from '../../../logger';
 import { ErrorTransformer, QueryInput, ResolvedVariantQueryResult } from '../../../types';
+import { v4 as uuidv4 } from 'uuid';
 
 type RemoteTestNodeQueryError = AxiosError;
 
@@ -34,7 +35,7 @@ const getRemoteTestNodeQuery = async (
       logger.error(e);
       return {
         data: [],
-        error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN' },
+        error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
         source: 'remote-test',
       };
     }
@@ -72,6 +73,7 @@ export const transformRemoteTestNodeErrorResponse: ErrorTransformer<AxiosError> 
     return null;
   } else {
     return {
+      id: uuidv4(),
       code: error.response?.status || 500,
       message: error.response?.data,
     };

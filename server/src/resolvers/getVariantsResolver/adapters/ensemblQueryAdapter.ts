@@ -37,6 +37,7 @@ interface EnsemblQueryVariantResponse {
 }
 
 interface EnsemblQueryError {
+  id: string;
   code: number;
   message: string;
 }

@@ -84,6 +84,11 @@ export const buildLink = (token?: string) => {
 export const client = new ApolloClient<any>({
     link: buildLink(),
     cache: new InMemoryCache(),
+    defaultOptions: {
+        watchQuery: {
+            nextFetchPolicy: 'cache-only',
+        },
+    },
 });
 
 export const useApolloQuery = <T, V>(query: DocumentNode, options: QueryHookOptions<T, V> = {}) => {

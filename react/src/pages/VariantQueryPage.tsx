@@ -1,4 +1,5 @@
 import React from 'react';
+import { useApolloClient } from '@apollo/client';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Background,
@@ -17,6 +18,7 @@ import {
 } from '../components';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
+import { formatErrorMessage } from '../utils';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
@@ -105,7 +107,8 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const { state: errorState, dispatch } = useErrorContext();
 
-    console.log(errorState);
+    const client = useApolloClient();
+
     const toggleSource = (source: Source) => {
         const update = updateQueryOptionsForm('sources');
 
@@ -209,13 +212,25 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Column justifyContent="center">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
-            {[errorState.nodeErrors, errorState.networkErrors].flat().map(e => (
-                <ErrorIndicator
-                    key={e.uid}
-                    message={`Error: ${e.code} - ${e.message}`}
-                    handleCloseError={() => dispatch(clearError(e.uid))}
-                />
-            ))}
+            {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]
+                .flat()
+                .map(e => (
+                    <ErrorIndicator
+                        key={e.uid}
+                        message={formatErrorMessage(e.code, e.message)}
+                        handleCloseError={() => {
+                            const cache = client.cache;
+                            if (data) {
+                                data.getVariants.errors.forEach(e => {
+                                    let id = cache.identify({ ...e.error });
+                                    cache.evict({ id: id });
+                                    cache.gc();
+                                });
+                            }
+                            dispatch(clearError(e.uid));
+                        }}
+                    />
+                ))}
             {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
         </Body>
     );

@@ -54,7 +54,7 @@ const responseErrorTransformer = (error: GraphQLError) => ({
 });
 
 const transformNodeError = (result: VariantQueryErrorResult) => ({
-    uid: uuidv4(),
+    uid: result.error.id,
     code: String(result.error.code),
     message: result.error.message,
     data: result,

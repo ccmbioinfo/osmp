@@ -41,6 +41,7 @@ const fetchVariantsQuery = gql`
             }
             errors {
                 error {
+                    id
                     code
                     message
                 }
