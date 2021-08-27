@@ -12,9 +12,10 @@ export const Styles = styled.div`
     display: block;
     max-width: 100%;
 
-    > table {
+    > div > table {
         width: 100%;
         border-spacing: 0;
+        transform: rotateX(180deg);
 
         .tr {
             transition: all 0.3s ease-out;

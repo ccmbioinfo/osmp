@@ -8,6 +8,7 @@ import {
 } from 'react-icons/bs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
+import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     HeaderGroup,
     Row,
@@ -34,6 +35,7 @@ import {
     TableFilters,
     TH,
 } from './Table.styles';
+
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -418,6 +420,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             )}
 
             <Styles>
+                <ScrollContainer className="container" hideScrollbars={false}>
                 <table {...getTableProps()}>
                     <thead>
                         {headerGroups.map(headerGroup => {
@@ -559,6 +562,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         )}
                     </tbody>
                 </table>
+                </ScrollContainer>
             </Styles>
             <Footer>
                 <span>
