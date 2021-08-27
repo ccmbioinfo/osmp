@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
     BsFillCaretDownFill,
     BsFillCaretUpFill,
@@ -6,7 +7,6 @@ import {
     BsFillEyeSlashFill,
     BsFilter,
 } from 'react-icons/bs';
-import { motion, AnimatePresence } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
@@ -19,9 +19,8 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
-import './transition.css';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import { downloadCsv } from '../../hooks';
+import './dragscroll.css';
+import { downloadCsv, useOverflow } from '../../hooks';
 import { IndividualResponseFields, TableRow, VariantQueryDataResult } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
@@ -35,7 +34,6 @@ import {
     TableFilters,
     TH,
 } from './Table.styles';
-import { useOverflow } from '../../hooks';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -291,7 +289,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         prepareRow,
         toggleHideColumn,
         visibleColumns,
-        allColumns,
         rows,
     } = tableInstance;
 
@@ -299,8 +296,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
-
-    console.log('overflowing', refXOverflowing);
 
     const handleGroupChange = (g: HeaderGroup<TableRow>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
@@ -430,7 +425,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 const { key, ...restHeaderGroupProps } =
                                     headerGroup.getHeaderGroupProps();
                                 return (
-                                    <TransitionGroup key={key} component="tr" appear enter>
                                         <motion.tr layout key={key} {...restHeaderGroupProps}>
                                             {headerGroup.headers.map(column => {
                                                 const { key, ...restHeaderProps } =
@@ -438,11 +432,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                         column.getSortByToggleProps()
                                                     );
                                                 return (
-                                                    <CSSTransition
-                                                        key={key}
-                                                        timeout={500}
-                                                        classNames="fade"
-                                                    >
                                                         <TH
                                                             variant="pureCssAnimation"
                                                             key={key}
@@ -524,28 +513,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                 )}
                                                             </AnimatePresence>
                                                         </TH>
-                                                    </CSSTransition>
                                                 );
                                             })}
                                         </motion.tr>
-                                    </TransitionGroup>
                                 );
                             })}
                         </thead>
 
                         <tbody {...getTableBodyProps()}>
-                            {page.length > 0 ? (
-                                <TransitionGroup appear enter>
-                                    {page.map(row => {
+                            {page.length > 0 ? 
+                                page.map(row => {
                                         prepareRow(row);
                                         const { key, ...restRowProps } = row.getRowProps();
                                         return (
-                                            <CSSTransition
-                                                key={key}
-                                                timeout={500}
-                                                classNames="fade"
-                                            >
-                                                <motion.tr layout="position" {...restRowProps}>
+                                                <motion.tr key = {key} layout="position" {...restRowProps}>
                                                     {row.cells.map(cell => {
                                                         const { key, ...restCellProps } =
                                                             cell.getCellProps();
@@ -556,11 +537,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                         );
                                                     })}
                                                 </motion.tr>
-                                            </CSSTransition>
                                         );
-                                    })}
-                                </TransitionGroup>
-                            ) : (
+                                    })
+                                : (
                                 <Typography variant="p" error>
                                     There are no records to display.
                                 </Typography>

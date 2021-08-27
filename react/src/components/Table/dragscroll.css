@@ -1,21 +1,3 @@
-.fade-enter div {
-    max-width: 0;
-}
-
-.fade-enter-active div {
-    max-width: 50px;
-    transition: all 5000ms ease;
-}
-
-.fade-exit div {
-    max-width: 50px;
-}
-
-.fade-exit-active div {
-    max-width: 0;
-    transition: all 5000ms ease;
-}
-
 .container {
     width: 100%;
     padding-bottom: 20px;
