@@ -16,39 +16,37 @@
     transition: all 5000ms ease;
 }
 
-
 .container {
     width: 100%;
     padding-bottom: 20px;
     overflow: hidden !important;
     overflow-x: scroll !important;
-    transform: rotateX(180deg); 
-    position:sticky;
-    top: 0
-  }
-  
-  .container::-webkit-scrollbar {
+    transform: rotateX(180deg);
+    position: sticky;
+    top: 0;
+}
+
+.container::-webkit-scrollbar {
     height: 10px;
     width: 8px;
     background-color: #ddd;
-  }
-  
-  /**  STYLE 11 */
-  .container::-webkit-scrollbar-track {
+}
+
+/**  STYLE 11 */
+.container::-webkit-scrollbar-track {
     border-radius: 8px;
     background: #ddd;
-  }
-  
-  .container::-webkit-scrollbar-thumb {
+}
+
+.container::-webkit-scrollbar-thumb {
     border-radius: 8px;
     background: #999;
-  }
-  
-  .container::-webkit-scrollbar-thumb:hover {
+}
+
+.container::-webkit-scrollbar-thumb:hover {
     background: #666;
-  }
-  
-  .container::-webkit-scrollbar-thumb:active {
+}
+
+.container::-webkit-scrollbar-thumb:active {
     background: #333;
-  }
-  
+}

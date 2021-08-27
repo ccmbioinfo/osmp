@@ -35,7 +35,7 @@ import {
     TableFilters,
     TH,
 } from './Table.styles';
-
+import { useOverflow } from '../../hooks';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -245,10 +245,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         [getColumnWidth, tableData]
     );
 
-    React.useEffect(() => {
-        console.log('COLUMNS CONFIG', columns);
-    }, [columns]);
-
     const defaultColumn = React.useMemo(
         () => ({
             minWidth: 10,
@@ -300,6 +296,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
+
+    const horizonstalRef = React.useRef(null);
+    const { refXOverflowing } = useOverflow(horizonstalRef);
+
+    console.log('overflowing', refXOverflowing);
 
     const handleGroupChange = (g: HeaderGroup<TableRow>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
@@ -420,148 +421,152 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             )}
 
             <Styles>
-                <ScrollContainer className="container" hideScrollbars={false}>
-                <table {...getTableProps()}>
-                    <thead>
-                        {headerGroups.map(headerGroup => {
-                            // https://github.com/tannerlinsley/react-table/discussions/2647
-                            const { key, ...restHeaderGroupProps } =
-                                headerGroup.getHeaderGroupProps();
-                            return (
-                                <TransitionGroup key={key} component="tr" appear enter>
-                                    <motion.tr layout key={key} {...restHeaderGroupProps}>
-                                        {console.log(headerGroup.headers)}
-                                        {headerGroup.headers.map(column => {
-                                            const { key, ...restHeaderProps } =
-                                                column.getHeaderProps(
-                                                    column.getSortByToggleProps()
-                                                );
-                                            return (
-                                                <CSSTransition
-                                                    key={key}
-                                                    timeout={500}
-                                                    classNames="fade"
-                                                >
-                                                    <TH
-                                                        variant="pureCssAnimation"
-                                                        key={key}
-                                                        {...restHeaderProps}
-                                                    >
-                                                        <AnimatePresence initial={false}>
-                                                            {column.isVisible && (
-                                                                <motion.section
-                                                                    key="content"
-                                                                    initial="collapsed"
-                                                                    animate="open"
-                                                                    exit="collapsed"
-                                                                    variants={{
-                                                                        open: {
-                                                                            opacity: 1,
-                                                                            width: 'auto',
-                                                                        },
-                                                                        collapsed: {
-                                                                            opacity: 0,
-                                                                            width: 0,
-                                                                        },
-                                                                    }}
-                                                                    transition={{
-                                                                        duration: 0.8,
-                                                                        ease: [
-                                                                            0.04, 0.62, 0.23, 0.98,
-                                                                        ],
-                                                                    }}
-                                                                >
-                                                                    <span>
-                                                                        {column.render('Header')}
-                                                                        {console.log(
-                                                                            'COLUMN',
-                                                                            column
-                                                                        )}
-                                                                        {!column.parent &&
-                                                                            column.columns &&
-                                                                            column.Header !==
-                                                                                'Core' &&
-                                                                            (column.columns.filter(
-                                                                                c => c.isVisible
-                                                                            ).length ===
-                                                                            columns.filter(
-                                                                                c =>
-                                                                                    c.Header ===
-                                                                                    column.Header
-                                                                            )[0].columns.length ? (
-                                                                                <IconPadder>
-                                                                                    <CgArrowsMergeAltH
-                                                                                        onClick={() =>
-                                                                                            handleGroupChange(
-                                                                                                column
-                                                                                            )
-                                                                                        }
-                                                                                    />
-                                                                                </IconPadder>
-                                                                            ) : (
-                                                                                <IconPadder>
-                                                                                    <CgArrowsShrinkH
-                                                                                        onClick={() =>
-                                                                                            handleGroupChange(
-                                                                                                column
-                                                                                            )
-                                                                                        }
-                                                                                    />
-                                                                                </IconPadder>
-                                                                            ))}
-                                                                        {column.isSorted ? (
-                                                                            column.isSortedDesc ? (
-                                                                                <BsFillCaretUpFill />
-                                                                            ) : (
-                                                                                <BsFillCaretDownFill />
-                                                                            )
-                                                                        ) : (
-                                                                            ''
-                                                                        )}
-                                                                    </span>
-                                                                </motion.section>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </TH>
-                                                </CSSTransition>
-                                            );
-                                        })}
-                                    </motion.tr>
-                                </TransitionGroup>
-                            );
-                        })}
-                    </thead>
-
-                    <tbody {...getTableBodyProps()}>
-                        {page.length > 0 ? (
-                            <TransitionGroup appear enter>
-                                {page.map(row => {
-                                    prepareRow(row);
-                                    const { key, ...restRowProps } = row.getRowProps();
-                                    return (
-                                        <CSSTransition key={key} timeout={500} classNames="fade">
-                                            <motion.tr layout="position" {...restRowProps}>
-                                                {row.cells.map(cell => {
-                                                    const { key, ...restCellProps } =
-                                                        cell.getCellProps();
-                                                    return (
-                                                        <td key={key} {...restCellProps}>
-                                                            {cell.render('Cell')}
-                                                        </td>
+                {/* If not overflowing, top scrollbar is not shown.  */}
+                <ScrollContainer className="container" hideScrollbars={!refXOverflowing}>
+                    <table {...getTableProps()} ref={horizonstalRef}>
+                        <thead>
+                            {headerGroups.map(headerGroup => {
+                                // https://github.com/tannerlinsley/react-table/discussions/2647
+                                const { key, ...restHeaderGroupProps } =
+                                    headerGroup.getHeaderGroupProps();
+                                return (
+                                    <TransitionGroup key={key} component="tr" appear enter>
+                                        <motion.tr layout key={key} {...restHeaderGroupProps}>
+                                            {headerGroup.headers.map(column => {
+                                                const { key, ...restHeaderProps } =
+                                                    column.getHeaderProps(
+                                                        column.getSortByToggleProps()
                                                     );
-                                                })}
-                                            </motion.tr>
-                                        </CSSTransition>
-                                    );
-                                })}
-                            </TransitionGroup>
-                        ) : (
-                            <Typography variant="p" error>
-                                There are no records to display.
-                            </Typography>
-                        )}
-                    </tbody>
-                </table>
+                                                return (
+                                                    <CSSTransition
+                                                        key={key}
+                                                        timeout={500}
+                                                        classNames="fade"
+                                                    >
+                                                        <TH
+                                                            variant="pureCssAnimation"
+                                                            key={key}
+                                                            {...restHeaderProps}
+                                                        >
+                                                            <AnimatePresence initial={false}>
+                                                                {column.isVisible && (
+                                                                    <motion.section
+                                                                        key="content"
+                                                                        initial="collapsed"
+                                                                        animate="open"
+                                                                        exit="collapsed"
+                                                                        variants={{
+                                                                            open: {
+                                                                                opacity: 1,
+                                                                                width: 'auto',
+                                                                            },
+                                                                            collapsed: {
+                                                                                opacity: 0,
+                                                                                width: 0,
+                                                                            },
+                                                                        }}
+                                                                        transition={{
+                                                                            duration: 0.8,
+                                                                            ease: [
+                                                                                0.04, 0.62, 0.23,
+                                                                                0.98,
+                                                                            ],
+                                                                        }}
+                                                                    >
+                                                                        <span>
+                                                                            {column.render(
+                                                                                'Header'
+                                                                            )}
+                                                                            {!column.parent &&
+                                                                                column.columns &&
+                                                                                column.Header !==
+                                                                                    'Core' &&
+                                                                                (column.columns.filter(
+                                                                                    c => c.isVisible
+                                                                                ).length ===
+                                                                                columns.filter(
+                                                                                    c =>
+                                                                                        c.Header ===
+                                                                                        column.Header
+                                                                                )[0].columns
+                                                                                    .length ? (
+                                                                                    <IconPadder>
+                                                                                        <CgArrowsMergeAltH
+                                                                                            onClick={() =>
+                                                                                                handleGroupChange(
+                                                                                                    column
+                                                                                                )
+                                                                                            }
+                                                                                        />
+                                                                                    </IconPadder>
+                                                                                ) : (
+                                                                                    <IconPadder>
+                                                                                        <CgArrowsShrinkH
+                                                                                            onClick={() =>
+                                                                                                handleGroupChange(
+                                                                                                    column
+                                                                                                )
+                                                                                            }
+                                                                                        />
+                                                                                    </IconPadder>
+                                                                                ))}
+                                                                            {column.isSorted ? (
+                                                                                column.isSortedDesc ? (
+                                                                                    <BsFillCaretUpFill />
+                                                                                ) : (
+                                                                                    <BsFillCaretDownFill />
+                                                                                )
+                                                                            ) : (
+                                                                                ''
+                                                                            )}
+                                                                        </span>
+                                                                    </motion.section>
+                                                                )}
+                                                            </AnimatePresence>
+                                                        </TH>
+                                                    </CSSTransition>
+                                                );
+                                            })}
+                                        </motion.tr>
+                                    </TransitionGroup>
+                                );
+                            })}
+                        </thead>
+
+                        <tbody {...getTableBodyProps()}>
+                            {page.length > 0 ? (
+                                <TransitionGroup appear enter>
+                                    {page.map(row => {
+                                        prepareRow(row);
+                                        const { key, ...restRowProps } = row.getRowProps();
+                                        return (
+                                            <CSSTransition
+                                                key={key}
+                                                timeout={500}
+                                                classNames="fade"
+                                            >
+                                                <motion.tr layout="position" {...restRowProps}>
+                                                    {row.cells.map(cell => {
+                                                        const { key, ...restCellProps } =
+                                                            cell.getCellProps();
+                                                        return (
+                                                            <td key={key} {...restCellProps}>
+                                                                {cell.render('Cell')}
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </motion.tr>
+                                            </CSSTransition>
+                                        );
+                                    })}
+                                </TransitionGroup>
+                            ) : (
+                                <Typography variant="p" error>
+                                    There are no records to display.
+                                </Typography>
+                            )}
+                        </tbody>
+                    </table>
                 </ScrollContainer>
             </Styles>
             <Footer>
