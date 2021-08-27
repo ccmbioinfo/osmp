@@ -425,121 +425,114 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 const { key, ...restHeaderGroupProps } =
                                     headerGroup.getHeaderGroupProps();
                                 return (
-                                        <motion.tr layout key={key} {...restHeaderGroupProps}>
-                                            {headerGroup.headers.map(column => {
-                                                const { key, ...restHeaderProps } =
-                                                    column.getHeaderProps(
-                                                        column.getSortByToggleProps()
-                                                    );
-                                                return (
-                                                        <TH
-                                                            variant="pureCssAnimation"
-                                                            key={key}
-                                                            {...restHeaderProps}
-                                                        >
-                                                            <AnimatePresence initial={false}>
-                                                                {column.isVisible && (
-                                                                    <motion.section
-                                                                        key="content"
-                                                                        initial="collapsed"
-                                                                        animate="open"
-                                                                        exit="collapsed"
-                                                                        variants={{
-                                                                            open: {
-                                                                                opacity: 1,
-                                                                                width: 'auto',
-                                                                            },
-                                                                            collapsed: {
-                                                                                opacity: 0,
-                                                                                width: 0,
-                                                                            },
-                                                                        }}
-                                                                        transition={{
-                                                                            duration: 0.8,
-                                                                            ease: [
-                                                                                0.04, 0.62, 0.23,
-                                                                                0.98,
-                                                                            ],
-                                                                        }}
-                                                                    >
-                                                                        <span>
-                                                                            {column.render(
-                                                                                'Header'
-                                                                            )}
-                                                                            {!column.parent &&
-                                                                                column.columns &&
-                                                                                column.Header !==
-                                                                                    'Core' &&
-                                                                                (column.columns.filter(
-                                                                                    c => c.isVisible
-                                                                                ).length ===
-                                                                                columns.filter(
-                                                                                    c =>
-                                                                                        c.Header ===
-                                                                                        column.Header
-                                                                                )[0].columns
-                                                                                    .length ? (
-                                                                                    <IconPadder>
-                                                                                        <CgArrowsMergeAltH
-                                                                                            onClick={() =>
-                                                                                                handleGroupChange(
-                                                                                                    column
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                    </IconPadder>
-                                                                                ) : (
-                                                                                    <IconPadder>
-                                                                                        <CgArrowsShrinkH
-                                                                                            onClick={() =>
-                                                                                                handleGroupChange(
-                                                                                                    column
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                    </IconPadder>
-                                                                                ))}
-                                                                            {column.isSorted ? (
-                                                                                column.isSortedDesc ? (
-                                                                                    <BsFillCaretUpFill />
-                                                                                ) : (
-                                                                                    <BsFillCaretDownFill />
-                                                                                )
-                                                                            ) : (
-                                                                                ''
-                                                                            )}
-                                                                        </span>
-                                                                    </motion.section>
-                                                                )}
-                                                            </AnimatePresence>
-                                                        </TH>
+                                    <motion.tr layout key={key} {...restHeaderGroupProps}>
+                                        {headerGroup.headers.map(column => {
+                                            const { key, ...restHeaderProps } =
+                                                column.getHeaderProps(
+                                                    column.getSortByToggleProps()
                                                 );
-                                            })}
-                                        </motion.tr>
+                                            return (
+                                                <TH
+                                                    variant="pureCssAnimation"
+                                                    key={key}
+                                                    {...restHeaderProps}
+                                                >
+                                                    <AnimatePresence initial={false}>
+                                                        {column.isVisible && (
+                                                            <motion.section
+                                                                key="content"
+                                                                initial="collapsed"
+                                                                animate="open"
+                                                                exit="collapsed"
+                                                                variants={{
+                                                                    open: {
+                                                                        opacity: 1,
+                                                                        width: 'auto',
+                                                                    },
+                                                                    collapsed: {
+                                                                        opacity: 0,
+                                                                        width: 0,
+                                                                    },
+                                                                }}
+                                                                transition={{
+                                                                    duration: 0.8,
+                                                                    ease: [0.04, 0.62, 0.23, 0.98],
+                                                                }}
+                                                            >
+                                                                <span>
+                                                                    {column.render('Header')}
+                                                                    {!column.parent &&
+                                                                        column.columns &&
+                                                                        column.Header !== 'Core' &&
+                                                                        (column.columns.filter(
+                                                                            c => c.isVisible
+                                                                        ).length ===
+                                                                        columns.filter(
+                                                                            c =>
+                                                                                c.Header ===
+                                                                                column.Header
+                                                                        )[0].columns.length ? (
+                                                                            <IconPadder>
+                                                                                <CgArrowsMergeAltH
+                                                                                    onClick={() =>
+                                                                                        handleGroupChange(
+                                                                                            column
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </IconPadder>
+                                                                        ) : (
+                                                                            <IconPadder>
+                                                                                <CgArrowsShrinkH
+                                                                                    onClick={() =>
+                                                                                        handleGroupChange(
+                                                                                            column
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </IconPadder>
+                                                                        ))}
+                                                                    {column.isSorted ? (
+                                                                        column.isSortedDesc ? (
+                                                                            <BsFillCaretUpFill />
+                                                                        ) : (
+                                                                            <BsFillCaretDownFill />
+                                                                        )
+                                                                    ) : (
+                                                                        ''
+                                                                    )}
+                                                                </span>
+                                                            </motion.section>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </TH>
+                                            );
+                                        })}
+                                    </motion.tr>
                                 );
                             })}
                         </thead>
 
                         <tbody {...getTableBodyProps()}>
-                            {page.length > 0 ? 
+                            {page.length > 0 ? (
                                 page.map(row => {
-                                        prepareRow(row);
-                                        const { key, ...restRowProps } = row.getRowProps();
-                                        return (
-                                                <motion.tr key = {key} layout="position" {...restRowProps}>
-                                                    {row.cells.map(cell => {
-                                                        const { key, ...restCellProps } =
-                                                            cell.getCellProps();
-                                                        return (
-                                                            <td key={key} {...restCellProps}>
-                                                                {cell.render('Cell')}
-                                                            </td>
-                                                        );
-                                                    })}
-                                                </motion.tr>
-                                        );
-                                    })
-                                : (
+                                    prepareRow(row);
+                                    const { key, ...restRowProps } = row.getRowProps();
+                                    return (
+                                        <motion.tr key={key} layout="position" {...restRowProps}>
+                                            {row.cells.map(cell => {
+                                                const { key, ...restCellProps } =
+                                                    cell.getCellProps();
+                                                return (
+                                                    <td key={key} {...restCellProps}>
+                                                        {cell.render('Cell')}
+                                                    </td>
+                                                );
+                                            })}
+                                        </motion.tr>
+                                    );
+                                })
+                            ) : (
                                 <Typography variant="p" error>
                                     There are no records to display.
                                 </Typography>
