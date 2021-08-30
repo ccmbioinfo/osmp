@@ -442,10 +442,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                     column.getSortByToggleProps()
                                                 );
                                             return (
-                                                <TH
-                                                    key={key}
-                                                    {...restHeaderProps}
-                                                >
+                                                <TH key={key} {...restHeaderProps}>
                                                     <AnimatePresence initial={false}>
                                                         {column.isVisible && (
                                                             <motion.section

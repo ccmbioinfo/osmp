@@ -22,7 +22,8 @@ export type Validator<S> = {
 };
 
 // @ts-ignore
-const makeFreshState = <S>(state: S): FormState<S> => Object.entries(state)
+const makeFreshState = <S>(state: S): FormState<S> =>
+    Object.entries(state)
         .map(([k, v]: [any, any]) => ({ [k]: { value: v, error: '' } }))
         .reduce((a, c) => ({ ...a, ...c }), {} as FormState<S>);
 
