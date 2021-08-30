@@ -443,7 +443,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 );
                                             return (
                                                 <TH
-                                                    variant="pureCssAnimation"
                                                     key={key}
                                                     {...restHeaderProps}
                                                 >
