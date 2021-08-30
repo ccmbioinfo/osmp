@@ -24,7 +24,7 @@ function useWindowSize(): { height: number | undefined; width: number | undefine
         window.addEventListener('resize', handleResize);
 
         return (): void => window.removeEventListener('resize', handleResize);
-    }, []); // Empty array ensures that effect is only run on mount and unmount
+    });
 
     return windowSize;
 }

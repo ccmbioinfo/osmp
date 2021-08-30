@@ -25,6 +25,9 @@ function useOverflow(ref: RefObject<HTMLElement>): {
         if (!ref?.current) {
             return;
         }
+
+        let observerRef = ref.current;
+
         const isXOverflowing = ref.current.scrollWidth > ref.current.clientWidth;
         const isYOverflowing = ref.current.scrollHeight > ref.current.clientHeight;
 
@@ -66,10 +69,10 @@ function useOverflow(ref: RefObject<HTMLElement>): {
             }
         };
 
-        ref.current.addEventListener('scroll', handleScroll);
+        observerRef.addEventListener('scroll', handleScroll);
 
-        return (): void => ref.current?.removeEventListener('scroll', handleScroll);
-    }, [ref, size.width]); // Empty array ensures that effect is only run on mount and unmount
+        return (): void => observerRef?.removeEventListener('scroll', handleScroll);
+    }, [ref, refXOverflowing, refYOverflowing, refXScrollEnd, refYScrollEnd, size.width]); // Empty array ensures that effect is only run on mount and unmount
 
     return {
         refXOverflowing,
