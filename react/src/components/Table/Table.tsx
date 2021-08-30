@@ -21,7 +21,14 @@ import {
 } from 'react-table';
 import './dragscroll.css';
 import { downloadCsv, useOverflow } from '../../hooks';
-import { CallsetInfoFields, IndividualResponseFields, TableRow, VariantQueryDataResult, VariantResponseFields, VariantResponseInfoFields } from '../../types';
+import {
+    CallsetInfoFields,
+    IndividualResponseFields,
+    TableRow,
+    VariantQueryDataResult,
+    VariantResponseFields,
+    VariantResponseInfoFields,
+} from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
