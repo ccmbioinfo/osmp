@@ -1,4 +1,3 @@
-import { FetchResult } from '@apollo/client';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 export interface DropdownItem {
