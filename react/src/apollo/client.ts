@@ -19,7 +19,7 @@ const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(10000); // 30 second timeout
+    const timeoutLink = new ApolloLinkTimeout(10); // 30 second timeout
     const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
     const httpLink = createHttpLink({
         uri: `http://${host}:${port}/graphql`,
@@ -28,15 +28,19 @@ export const buildLink = (token?: string) => {
 
     const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
         return new Observable(observer => {
+            const dispatcherContext = operation.getContext();
             const sub = forward(operation).subscribe({
                 next: response => {
                     if (response && operation.operationName === 'GetVariants') {
                         response?.data?.getVariants.errors.map((e: VariantQueryErrorResult) =>
-                            operation.getContext().dispatch(makeNodeError(e))
+                            dispatcherContext.dispatch(makeNodeError(e))
                         );
                     }
-                    console.log('res', response);
                     observer.next(response);
+                },
+                error: response => {
+                    const error = { response };
+                    dispatcherContext.dispatch(makeNetworkError(error.response));
                 },
             });
 
@@ -78,7 +82,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([ebiRestLink, authLink, errorLink, remoteNodeErrorLink, timeoutLink, httpLink]);
+    return from([ebiRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, httpLink]);
 };
 
 export const client = new ApolloClient<any>({
