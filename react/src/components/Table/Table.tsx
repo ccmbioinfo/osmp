@@ -427,7 +427,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
             <Styles>
                 {/* If not overflowing, top scrollbar is not shown.  */}
-                <ScrollContainer className="container" hideScrollbars={!refXOverflowing}>
+                <ScrollContainer
+                    className="container"
+                    hideScrollbars={!refXOverflowing}
+                    ignoreElements="p"
+                >
                     <table {...getTableProps()} ref={horizonstalRef}>
                         <thead>
                             {headerGroups.map(headerGroup => {
@@ -465,7 +469,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     ease: [0.04, 0.62, 0.23, 0.98],
                                                                 }}
                                                             >
-                                                                <Flex alignItems="center" justifyContent="center">
+                                                                <Flex
+                                                                    alignItems="center"
+                                                                    justifyContent="center"
+                                                                >
                                                                     {column.render('Header')}
                                                                     {!column.parent &&
                                                                         column.columns &&
@@ -533,7 +540,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                     cell.getCellProps();
                                                 return (
                                                     <td key={key} {...restCellProps}>
-                                                        {cell.render('Cell')}
+                                                        <Typography variant="subtitle">
+                                                            {cell.render('Cell')}
+                                                        </Typography>
                                                     </td>
                                                 );
                                             })}
