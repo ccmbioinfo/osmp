@@ -17,7 +17,7 @@ export const buildLink = (token?: string) => {
         if (graphQLErrors) {
             graphQLErrors.forEach(({ message, locations, path }) =>
                 console.error(
-                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path} `
                 )
             );
         }

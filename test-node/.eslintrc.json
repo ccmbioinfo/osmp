@@ -1,0 +1,29 @@
+{
+  "env": {
+    "es2021": true,
+    "jest": true
+  },
+  "extends": ["standard"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint", "@graphql-eslint", "import", "node", "prettier", "promise"],
+  "rules": {
+    "comma-dangle": "off",
+    "semi": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "processor": "@graphql-eslint/graphql"
+    },
+    {
+      "files": ["*.graphql"],
+      "parser": "@graphql-eslint/eslint-plugin",
+      "plugins": ["@graphql-eslint"],
+      "rules": {}
+    }
+  ]
+}

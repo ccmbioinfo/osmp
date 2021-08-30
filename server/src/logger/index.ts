@@ -1,6 +1,6 @@
 import buildDevLogger from './devLogger';
 import buildProdLogger from './prodLogger';
 
-const logger = process.env.TS_NODE_DEV ? buildDevLogger() : buildProdLogger();
+const logger = process.env.NODE_ENV !== 'production' ? buildDevLogger() : buildProdLogger();
 
 export default logger;

@@ -44,6 +44,7 @@ const fetchVariantsQuery = gql`
                     code
                     message
                 }
+                source
             }
             meta
         }

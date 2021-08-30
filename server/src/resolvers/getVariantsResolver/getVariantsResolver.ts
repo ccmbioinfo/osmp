@@ -1,4 +1,5 @@
 import { PubSub } from 'graphql-subscriptions';
+import logger from '../../logger';
 import {
   GqlContext,
   QueryInput,
@@ -7,8 +8,8 @@ import {
   VariantQueryErrorResult,
   VariantQueryResponse,
 } from '../../types';
-import getEnsemblQuery from './adapters/ensemblQueryAdapter';
 import getLocalQuery from './adapters/localQueryAdapter';
+import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 
 const getVariants = async (
   parent: any,
@@ -25,7 +26,8 @@ const getVariants = async (
  */
 const isResolvedVariantQueryResult = (
   arg: ResolvedVariantQueryResult | VariantQueryErrorResult
-): arg is ResolvedVariantQueryResult => !!(arg as ResolvedVariantQueryResult).data.length;
+): arg is ResolvedVariantQueryResult =>
+  !Object.values((arg as VariantQueryErrorResult).error || {}).length;
 
 const resolveVariantQuery = async (
   args: QueryInput,
@@ -37,18 +39,21 @@ const resolveVariantQuery = async (
 
   const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
 
-  const resolved = await Promise.all(queries);
+  const fulfilled = await Promise.allSettled(queries);
 
-  const mapped = resolved.reduce(
+  const mapped = fulfilled.reduce(
     (a, c) => {
-      if (isResolvedVariantQueryResult(c)) {
-        const { data, source } = c;
+      if (c.status === 'fulfilled' && isResolvedVariantQueryResult(c.value)) {
+        const { data, source } = c.value;
         a.data.push({ data, source });
-      } else {
+      } else if (c.status === 'fulfilled') {
         a.errors.push({
-          source: (c as VariantQueryErrorResult).source,
-          error: (c as VariantQueryErrorResult).error,
+          source: c.value.source,
+          error: c.value.error!,
         });
+      } else if (c.status === 'rejected') {
+        logger.error('UNHANDLED REJECTION!');
+        logger.error(c.reason);
       }
       return a;
     },
@@ -72,8 +77,8 @@ const buildSourceQuery = (
   switch (source) {
     case 'local':
       return getLocalQuery(args, pubsub);
-    case 'ensembl':
-      return getEnsemblQuery(args, pubsub);
+    case 'remote-test':
+      return getRemoteTestNodeQuery(args, pubsub);
     default:
       throw new Error(`source ${source} not found!`);
   }
