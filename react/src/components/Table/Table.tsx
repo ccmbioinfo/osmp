@@ -465,7 +465,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     ease: [0.04, 0.62, 0.23, 0.98],
                                                                 }}
                                                             >
-                                                                <span>
+                                                                <Flex alignItems="center">
                                                                     {column.render('Header')}
                                                                     {!column.parent &&
                                                                         column.columns &&
@@ -480,6 +480,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                         )[0].columns.length ? (
                                                                             <IconPadder>
                                                                                 <CgArrowsMergeAltH
+                                                                                    size={18}
                                                                                     onClick={() =>
                                                                                         handleGroupChange(
                                                                                             column
@@ -490,6 +491,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                         ) : (
                                                                             <IconPadder>
                                                                                 <CgArrowsShrinkH
+                                                                                    size={18}
                                                                                     onClick={() =>
                                                                                         handleGroupChange(
                                                                                             column
@@ -507,7 +509,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     ) : (
                                                                         ''
                                                                     )}
-                                                                </span>
+                                                                </Flex>
                                                             </motion.section>
                                                         )}
                                                     </AnimatePresence>
