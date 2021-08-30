@@ -465,7 +465,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     ease: [0.04, 0.62, 0.23, 0.98],
                                                                 }}
                                                             >
-                                                                <Flex alignItems="center">
+                                                                <Flex alignItems="center" justifyContent="center">
                                                                     {column.render('Header')}
                                                                     {!column.parent &&
                                                                         column.columns &&
