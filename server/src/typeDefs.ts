@@ -58,13 +58,13 @@ export default gql`
   }
 
   type VariantQueryResponseSchema {
-    variant: VariantResponseFields
-    individual: IndividualResponseFields
+    variant: VariantResponseFields!
+    individual: IndividualResponseFields!
   }
 
   type VariantQueryDataResult {
     source: String!
-    data: [VariantQueryResponseSchema]!
+    data: [VariantQueryResponseSchema!]!
   }
 
   type VariantQueryErrorResponse {
@@ -103,6 +103,6 @@ export default gql`
   }
 
   type Query {
-    getVariants(input: QueryInput): VariantQueryResponse
+    getVariants(input: QueryInput): VariantQueryResponse!
   }
 `;

@@ -13,13 +13,13 @@ import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
 import { makeGraphQLError, makeNetworkError, makeNodeError } from '../components';
 import { useErrorContext } from '../hooks';
-import { isGetVariantsQueryResponse } from '../types';
+import { VariantQueryErrorResult } from '../types';
 
 const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(30000); // 30 second timeout
+    const timeoutLink = new ApolloLinkTimeout(10000); // 30 second timeout
     const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
     const httpLink = createHttpLink({
         uri: `http://${host}:${port}/graphql`,
@@ -30,8 +30,8 @@ export const buildLink = (token?: string) => {
         return new Observable(observer => {
             const sub = forward(operation).subscribe({
                 next: response => {
-                    if (response && isGetVariantsQueryResponse(response)) {
-                        response.data?.getVariants.errors.map(e =>
+                    if (response && operation.operationName === 'GetVariants') {
+                        response?.data?.getVariants.errors.map((e: VariantQueryErrorResult) =>
                             operation.getContext().dispatch(makeNodeError(e))
                         );
                     }
@@ -49,7 +49,7 @@ export const buildLink = (token?: string) => {
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
         const { dispatch } = operation.getContext();
 
-        if (graphQLErrors && response?.data?.getVariants) {
+        if (graphQLErrors) {
             graphQLErrors.forEach(graphQLError => {
                 const { message, locations, path } = graphQLError;
                 console.error(
@@ -78,7 +78,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([ebiRestLink, authLink, remoteNodeErrorLink, errorLink, timeoutLink, httpLink]);
+    return from([ebiRestLink, authLink, errorLink, remoteNodeErrorLink, timeoutLink, httpLink]);
 };
 
 export const client = new ApolloClient<any>({
