@@ -217,7 +217,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 .map(e => (
                     <ErrorIndicator
                         key={e.uid}
-                        message={formatErrorMessage(e.code, e.message)}
+                        message={formatErrorMessage(e.code, e.message, e.source)}
                         handleCloseError={() => {
                             const cache = client.cache;
                             if (data) {

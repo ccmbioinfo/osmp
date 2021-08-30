@@ -19,7 +19,7 @@ const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(10); // 30 second timeout
+    const timeoutLink = new ApolloLinkTimeout(3000); // 30 second timeout
     const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
     const httpLink = createHttpLink({
         uri: `http://${host}:${port}/graphql`,
@@ -40,7 +40,12 @@ export const buildLink = (token?: string) => {
                 },
                 error: response => {
                     const error = { response };
-                    dispatcherContext.dispatch(makeNetworkError(error.response));
+                    dispatcherContext.dispatch(
+                        makeNetworkError({
+                            ...error.response,
+                            source: operation.variables.input.sources,
+                        })
+                    );
                 },
             });
 
@@ -52,6 +57,7 @@ export const buildLink = (token?: string) => {
 
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
         const { dispatch } = operation.getContext();
+        const sources = operation.variables.input.sources;
 
         if (graphQLErrors) {
             graphQLErrors.forEach(graphQLError => {
@@ -59,12 +65,14 @@ export const buildLink = (token?: string) => {
                 console.error(
                     `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
                 );
+                graphQLError.message = `${message} (Source: ${sources.join(', ')})`;
                 dispatch(makeGraphQLError(graphQLError));
             });
         }
 
         if (networkError) {
             console.error(`[Network error]: ${networkError}`);
+            networkError.message = `${networkError.message} (Source: ${sources.join(', ')})`;
             dispatch(makeNetworkError(networkError));
         }
 

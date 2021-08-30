@@ -9,6 +9,7 @@ interface FetchError {
     uid: string;
     code: string;
     message: Maybe<string>;
+    source?: string[];
     data: [] | {} | undefined; // Actual response from the API
 }
 
@@ -58,6 +59,7 @@ const transformNodeError = (result: VariantQueryErrorResult) => ({
     code: String(result.error.code),
     message: result.error.message,
     data: result,
+    source: [result.source],
 });
 
 const networkErrorTransformer = (error: ServerError | ServerParseError | Error | undefined) => ({

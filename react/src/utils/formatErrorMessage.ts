@@ -1,4 +1,8 @@
-const formatErrorMessage = (code: string, message: string | null | undefined) => {
+const formatErrorMessage = (
+    code: string,
+    message: string | null | undefined,
+    source: string[] | null | undefined
+) => {
     let serverMessage;
     if (code.startsWith('5') && !message) {
         switch (code) {
@@ -41,7 +45,8 @@ const formatErrorMessage = (code: string, message: string | null | undefined) =>
     } else {
         serverMessage = message;
     }
-    return `Error: ${code} - ${serverMessage}`;
+    const sourceMessage = source && !!source.length ? `(Source: ${source.join(', ')})` : '';
+    return `Error: ${code} - ${serverMessage} ${sourceMessage}`;
 };
 
 export default formatErrorMessage;
