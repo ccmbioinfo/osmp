@@ -322,6 +322,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             contact: (r.original as IndividualResponseFields).contactEmail,
         }));
 
+    const isHeader = (column: HeaderGroup<FlattenedQueryResponse>) => !column.parent;
+
+    const isHeaderExpanded = (column: HeaderGroup<FlattenedQueryResponse>) => {
+        if (isHeader(column) && column.columns && column.Header !== 'Core') {
+            const visibleColumns = column.columns.filter(c => c.isVisible).map(c => c.id);
+            const intersection = visibleColumns.filter(value => dummyColumns.includes(value));
+            return !intersection.length;
+        }
+        return false;
+    };
+
     return (
         <>
             <TableFilters justifyContent="space-between">
@@ -474,17 +485,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     justifyContent="center"
                                                                 >
                                                                     {column.render('Header')}
-                                                                    {!column.parent &&
-                                                                        column.columns &&
-                                                                        column.Header !== 'Core' &&
-                                                                        (column.columns.filter(
-                                                                            c => c.isVisible
-                                                                        ).length ===
-                                                                        columns.filter(
-                                                                            c =>
-                                                                                c.Header ===
-                                                                                column.Header
-                                                                        )[0].columns.length ? (
+                                                                    {isHeader(column) &&
+                                                                        (isHeaderExpanded(
+                                                                            column
+                                                                        ) ? (
                                                                             <IconPadder>
                                                                                 <CgArrowsMergeAltH
                                                                                     size={18}
