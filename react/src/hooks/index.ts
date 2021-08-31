@@ -7,4 +7,13 @@ import useSnackbar from './useSnackbar';
 import useUserInfo from './useUserInfo';
 import useWindowSize from './useWindowSize';
 
-export { useClickAway, downloadCsv, useErrorContext, useFormReducer, useOverflow, useSnackbar, useUserInfo, useWindowSize };
+export {
+    useClickAway,
+    downloadCsv,
+    useErrorContext,
+    useFormReducer,
+    useOverflow,
+    useSnackbar,
+    useUserInfo,
+    useWindowSize,
+};
