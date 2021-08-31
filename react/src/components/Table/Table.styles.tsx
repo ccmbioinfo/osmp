@@ -1,62 +1,64 @@
-import { BsFillSkipEndFill, BsFillSkipStartFill, BsFilter } from 'react-icons/bs';
+import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
 import styled from 'styled-components';
 import { Flex } from '../index';
 
-export const TableFilters = styled(Flex)`
+export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin: 0;
 `;
 
-export const TableStyled = styled.table`
-    margin-top: ${props => props.theme.space[5]};
-    border-collapse: separate;
-    width: 100%;
+export const Styles = styled.div`
+    padding: 1rem;
+    display: block;
+    max-width: 100%;
+
+    > div > table {
+        width: 100%;
+        border-spacing: 0;
+        transform: rotateX(180deg);
+
+        .tr {
+            transition: all 0.3s ease-out;
+            :last-child {
+                .td {
+                    border-bottom: 0;
+                }
+            }
+        }
+
+        th,
+        td {
+            margin: 0;
+            padding: 0.5rem;
+            border-bottom: 1px solid lightgrey;
+            text-align: center;
+            font-size: ${props => props.theme.fontSizes.xs};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+
+            :last-child {
+                border-right: 0;
+            }
+        }
+    }
 `;
-export const RowStyled = styled.tr`
-    thead > & {
-        background: #f7f7f7;
-        height: 30px;
-        margin-bottom: ${props => props.theme.space[2]};
-    }
 
-    tbody > & {
-        background: #fcfcfc;
-        margin-bottom: ${props => props.theme.space[2]};
-    }
+export const THead = styled.thead`
+    background: #f7f7f7;
+    height: 30px;
+    margin-bottom: ${props => props.theme.space[3]};
+`;
 
-    & > th {
-        color: ${props => props.theme.colors.text};
-        font-size: ${props => props.theme.fontSizes.s};
-        font-weight: ${props => props.theme.fontWeights.bold};
-        padding: ${props => props.theme.space[4]};
-        text-align: center;
-        height: 30px;
-        border: none;
-    }
-
-    th > * {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-    }
-
-    th > span > * {
-        margin: ${props => props.theme.space[3]};
-    }
-
-    & > td {
-        font-size: ${props => props.theme.fontSizes.s};
-        padding: ${props => props.theme.space[3]};
-        text-align: left;
-        border: none;
-    }
-
-    & > td,
-    th > input {
-        margin-left: ${props => props.theme.space[3]};
-        margin-right: ${props => props.theme.space[3]};
-    }
+export const TH = styled.th`
+    color: ${props => props.theme.colors.text};
+    font-size: ${props => props.theme.fontSizes.s};
+    font-weight: ${props => props.theme.fontWeights.bold};
+    padding: ${props => props.theme.space[3]};
+    text-align: center;
+    transition: all 0.5s ease;
+    border: none;
 `;
 
 export const Footer = styled.div`
@@ -111,6 +113,12 @@ export const SkipToBeginning = styled(BsFillSkipStartFill)`
     ${Icon}
 `;
 
-export const FilterIcon = styled(BsFilter)`
-    margin-inline-start: inherit;
+export const IconPadder = styled.span`
+    margin-inline-start: ${props => props.theme.space[3]};
+    color: ${props => props.theme.colors.primary};
+    transition: all 0.3s ease;
+    &:hover {
+        transform: scale(1.4);
+        cursor: pointer;
+    }
 `;
