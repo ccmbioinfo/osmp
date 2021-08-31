@@ -23,7 +23,7 @@ export type Validator<S> = {
 
 const makeFreshState = <S>(state: S): FormState<S> =>
     Object.entries(state)
-        .map(([k, v]: [any, any]) => ({ [k]: { value: v, error: '' } }))
+        .map(([k, v]: [string, keyof S]) => ({ [k]: { value: v, error: '' } }))
         .reduce((a, c) => ({ ...a, ...c }), {} as FormState<S>);
 
 const useFormReducer = <S>(initialState: S, Validator?: Validator<S>) => {

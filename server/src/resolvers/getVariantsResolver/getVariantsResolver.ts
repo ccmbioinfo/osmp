@@ -1,5 +1,6 @@
 import { PubSub } from 'graphql-subscriptions';
 import logger from '../../logger';
+import { v4 as uuidv4 } from 'uuid';
 import {
   GqlContext,
   QueryInput,
@@ -47,13 +48,15 @@ const resolveVariantQuery = async (
         const { data, source } = c.value;
         a.data.push({ data, source });
       } else if (c.status === 'fulfilled') {
+        console.log(c.value.error);
         a.errors.push({
           source: c.value.source,
-          error: c.value.error!,
+          error: { ...c.value.error!, id: uuidv4() },
         });
       } else if (c.status === 'rejected') {
         logger.error('UNHANDLED REJECTION!');
         logger.error(c.reason);
+        throw new Error(c.reason);
       }
       return a;
     },

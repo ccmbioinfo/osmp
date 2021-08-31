@@ -1,5 +1,6 @@
 import { PubSub } from 'graphql-subscriptions';
 import { QUERY_RESOLVED } from '../..';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ErrorTransformer,
   QueryInput,
@@ -27,15 +28,15 @@ const getLocalQuery = async (
   let localQueryError: Error | null = null;
   try {
     localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
-      resolve([
-        {
-          alternative: 'A',
-          reference: 'T',
-          chromosome: '1',
-          extraneous: 'extr',
-        },
-      ]);
-      // reject(new Error('test!'));
+      // resolve([
+      //   {
+      //     alternative: 'A',
+      //     reference: 'T',
+      //     chromosome: '1',
+      //     extraneous: 'extr',
+      //   },
+      // ]);
+      reject(new Error('test!'));
     });
   } catch (e) {
     localQueryError = e as Error;
@@ -77,7 +78,7 @@ export const transformLocalErrorResponse: ErrorTransformer<Error> = error => {
   if (!error) {
     return null;
   } else {
-    return { code: 424, message: error.message || '' };
+    return { code: 424, message: error.message || '', id: uuidv4() };
   }
 };
 

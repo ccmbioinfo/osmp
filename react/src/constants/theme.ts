@@ -5,6 +5,7 @@ const theme: DefaultTheme = {
         main: '#fff',
         success: '#effbef',
         light: '#f8f8ff',
+        error: '#fecec6',
     },
     boxShadow: '0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important',
     colors: {
@@ -15,7 +16,9 @@ const theme: DefaultTheme = {
         accent: '#351f65',
         muted: '#efefef',
         error: '#d0453e',
-        success: '#78d380',
+        success: '#4caf50',
+        info: '#2196f3',
+        warning: '#ff9800',
     },
     space: [
         '0rem',
