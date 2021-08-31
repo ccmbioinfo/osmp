@@ -19,7 +19,7 @@ const port = process.env.REACT_APP_API_PORT,
     host = process.env.REACT_APP_API_HOST;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(3000); // 30 second timeout
+    const timeoutLink = new ApolloLinkTimeout(30000); // 30 second timeout
     const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
     const httpLink = createHttpLink({
         uri: `http://${host}:${port}/graphql`,
@@ -37,15 +37,6 @@ export const buildLink = (token?: string) => {
                         );
                     }
                     observer.next(response);
-                },
-                error: response => {
-                    const error = { response };
-                    dispatcherContext.dispatch(
-                        makeNetworkError({
-                            ...error.response,
-                            source: operation.variables.input.sources,
-                        })
-                    );
                 },
             });
 
