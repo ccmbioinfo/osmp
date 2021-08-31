@@ -6,6 +6,7 @@ declare module 'styled-components' {
             main: string;
             success: string;
             light: string;
+            error: string;
         };
         boxShadow: string;
         colors: {
@@ -18,6 +19,8 @@ declare module 'styled-components' {
             disabled: string;
             error: string;
             success: string;
+            info: string;
+            warning: string;
         };
         space: string[];
         fontFamily: {
