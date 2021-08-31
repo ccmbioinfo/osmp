@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 interface BackgroundProps {
-    variant?: 'success' | 'main' | 'light';
+    variant?: 'success' | 'error' | 'main' | 'light';
 }
 
 export interface FlexProps {
@@ -21,6 +21,8 @@ export const Background = styled.div<BackgroundProps>`
         switch (props.variant) {
             case 'success':
                 return props.theme.background.success;
+            case 'error':
+                return props.theme.background.error;
             case 'light':
                 return props.theme.background.light;
             default:

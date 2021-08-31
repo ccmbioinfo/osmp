@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   type VariantQueryResponse {
-    data: [VariantQueryDataResult]!
+    data: [VariantQueryDataResult!]!
     errors: [VariantQueryErrorResult]!
     meta: String
   }
@@ -58,16 +58,17 @@ export default gql`
   }
 
   type VariantQueryResponseSchema {
-    variant: VariantResponseFields
-    individual: IndividualResponseFields
+    variant: VariantResponseFields!
+    individual: IndividualResponseFields!
   }
 
   type VariantQueryDataResult {
     source: String!
-    data: [VariantQueryResponseSchema]!
+    data: [VariantQueryResponseSchema!]!
   }
 
   type VariantQueryErrorResponse {
+    id: String
     code: String
     message: String
   }
@@ -102,6 +103,6 @@ export default gql`
   }
 
   type Query {
-    getVariants(input: QueryInput): VariantQueryResponse
+    getVariants(input: QueryInput): VariantQueryResponse!
   }
 `;

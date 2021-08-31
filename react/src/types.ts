@@ -11,6 +11,7 @@ export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponse
 }
 
 export interface VariantQueryErrorResponse {
+    id: string;
     code: number | string;
     message?: string | null;
 }

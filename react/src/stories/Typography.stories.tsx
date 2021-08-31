@@ -8,7 +8,7 @@ export default {
     component: Typography,
     argTypes: {
         variant: {
-            options: ['h3', 'p'],
+            options: ['h3', 'p', 'h4'],
             control: { type: 'radio' },
         },
     },
