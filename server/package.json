@@ -9,7 +9,8 @@
     "start-dev": "ts-node-dev src/server.ts",
     "format": "prettier --check src/",
     "lint": "eslint --max-warnings=0 src/",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "build": "tsc --build src/ --noEmit false"
   },
   "devDependencies": {
     "@graphql-eslint/eslint-plugin": "^1.1.2",
