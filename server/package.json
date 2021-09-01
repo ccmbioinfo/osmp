@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "start-dev": "ts-node-dev src/server.ts",
-    "start-prod": "ts-node dist/server.js",
+    "start-prod": "node dist/server.js",
     "format": "prettier --check src/",
     "lint": "eslint --max-warnings=0 src/",
     "tsc": "tsc",
