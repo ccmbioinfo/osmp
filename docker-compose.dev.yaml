@@ -2,9 +2,6 @@ version: "3.9"
 services:
   react:
     image: node:16.3-buster
-    build: 
-      dockerfile: Dockerfile
-      context: ./react
     volumes:
       - ./react:/usr/app
     environment:
@@ -24,9 +21,6 @@ services:
 
   ssmp-server:
     image: node:16.3-buster
-    build:
-      dockerfile: Dockerfile
-      context: ./server
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
@@ -80,17 +74,6 @@ services:
       - ./keycloak/scripts:/usr/scripts
     networks:
       - ssmp
-
-  nginx:
-    depends_on:
-      - ssmp-server
-      - react
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ./nginx
-    ports:
-      - "3050:80"
 
 networks:
   ssmp:
