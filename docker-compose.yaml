@@ -84,10 +84,10 @@ services:
 
   nginx:
     volumes:
+      - ./react/build:/var/www
       - ./nginx:/etc/nginx/conf.d
     depends_on:
       - ssmp-server
-      - react
     restart: always
     build:
       dockerfile: Dockerfile
