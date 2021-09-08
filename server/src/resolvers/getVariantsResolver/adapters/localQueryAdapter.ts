@@ -28,15 +28,15 @@ const getLocalQuery = async (
   let localQueryError: Error | null = null;
   try {
     localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
-      // resolve([
-      //   {
-      //     alternative: 'A',
-      //     reference: 'T',
-      //     chromosome: '1',
-      //     extraneous: 'extr',
-      //   },
-      // ]);
-      reject(new Error('test!'));
+      resolve([
+        {
+          alternative: 'A',
+          reference: 'T',
+          chromosome: '1',
+          extraneous: 'extr',
+        },
+      ]);
+      // reject(new Error('test!'));
     });
   } catch (e) {
     localQueryError = e as Error;
