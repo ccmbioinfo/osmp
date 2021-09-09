@@ -1,11 +1,26 @@
 version: "3.9"
 services:
+  react:
+    image: node:16.3-buster
+    volumes:
+      - ./react:/usr/app
+    environment:
+      REACT_APP_API_HOST: ${REACT_APP_API_HOST}
+      REACT_APP_API_PORT: ${REACT_APP_API_PORT}
+      REACT_APP_KEYCLOAK_AUTH_URL: ${REACT_APP_KEYCLOAK_FRONT_END_AUTH_URL}
+      REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
+    ports:
+      - ${STORYBOOK_PORT:-6006}:6001
+      - ${REACT_PORT}:3000
+    working_dir: /usr/app
+    user: "1000" #node
+    entrypoint: "yarn start"
+    networks:
+      - ssmp
+
   ssmp-server:
     image: node:16.3-buster
-    container_name: server
-    build:
-      dockerfile: Dockerfile
-      context: ./server
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
@@ -45,7 +60,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:14.0.0
-    container_name: keycloak
     environment:
       KEYCLOAK_SERVER_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
       KEYCLOAK_REACT_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
@@ -59,21 +73,6 @@ services:
     volumes:
       - ./keycloak/scripts:/usr/scripts
     networks:
-      - ssmp
-
-  nginx:
-    volumes:
-      - ./react/build:/var/www
-      - ./nginx:/etc/nginx/conf.d
-    depends_on:
-      - ssmp-server
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ./nginx
-    ports:
-      - "${REACT_PORT}:80"
-    networks: 
       - ssmp
 
 networks:
