@@ -18,8 +18,8 @@
     "@types/faker": "^5.5.7",
     "@types/jest": "^26.0.24",
     "@types/node": "^16.0.1",
-    "@types/ws": "^7.4.7",
     "@types/uuid": "^8.3.1",
+    "@types/ws": "^7.4.7",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
     "eslint": "^7.12.1",
@@ -51,6 +51,6 @@
     "winston": "^3.3.3"
   },
   "resolutions": {
-    "ws" : ">=7.4.6"
+    "ws": ">=7.4.6"
   }
 }
