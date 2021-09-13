@@ -30,13 +30,19 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
-app.get('/data', async (req: Request<{ ensemblId: string }>, res) => {
-  res.json(createTestQueryResponse());
-  //res.statusCode = 422;
-  //res.json('invalid request');
-});
+app.get(
+  '/data',
+  async (
+    { body: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
+    res
+  ) => {
+    res.json(createTestQueryResponse(geneName));
+    //res.statusCode = 422;
+    //res.json('invalid request');
+  }
+);
 
-export const createTestQueryResponse = () => {
+export const createTestQueryResponse = (geneName: string) => {
   return Array(50)
     .fill(null)
     .map(() => {
@@ -44,39 +50,70 @@ export const createTestQueryResponse = () => {
       const bases = ['A', 'T', 'C', 'G'];
       const end = Faker.datatype.number({ min: 1000000, max: 2000000 });
       const ref = Faker.helpers.randomize(bases);
+      const alt = Faker.helpers.randomize(bases.filter(b => b !== ref));
       return {
         variant: {
-          alt: Faker.helpers.randomize(bases.filter(b => b !== ref)),
+          alt,
           assemblyId: 'GRCh37',
           callsets: [
             {
               callSetId: Faker.random.alphaNumeric(10),
               individualId,
               info: {
+                ad: Faker.datatype.number({ min: 10000, max: 20000 }),
                 dp: Faker.datatype.number({ min: 10000, max: 20000 }),
+                gq: Faker.datatype.number({ min: 1, max: 60 }),
+                qual: Faker.datatype.number({ min: 1, max: 50 }),
                 zygosity: Faker.helpers.randomize(['het', 'het', 'het', 'hom']),
               },
             },
           ],
           end,
           info: {
-            af: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
+            aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,
+            cDna: 'sampleCDA value',
+            geneName,
+            gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
+            gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
+            transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
           },
           ref,
           refSeqId: '19',
           start: end - 1,
         },
         individual: {
-          individualId,
-          contactEmail: Faker.internet.exampleEmail(),
           datasetId: Faker.random.alphaNumeric(10),
+          diseases: [
+            {
+              ageOfOnset: {
+                age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
+                ageGroup: 'some group',
+              },
+            },
+          ],
           ethnicity: ['eth1', 'eth2', 'eth3'][Faker.datatype.number({ min: 0, max: 2 })],
+          geographicOrigin: Faker.address.country,
+          individualId,
+          info: {
+            candidateGene: 'SOME_GENE',
+            classifications: 'SOME_CLASSIFICATIONS',
+            diagnosis: 'SOME_DIAGNOSIS',
+          },
+          phenotypicFeatures: [
+            {
+              ageOfOnset: {
+                age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
+                ageGroup: 'some group',
+              },
+              dateOfOnset: Faker.date.past(),
+              levelSeverity: Faker.helpers.randomize(['high', 'moderate', 'low']),
+              onsetType: 'SOME_ONSETTYPE',
+              phenotypeId: Faker.datatype.string(12),
+            },
+          ],
           sex: ['male', 'female'][Faker.datatype.number({ min: 0, max: 1 })],
-          phenotypicFeatures: Faker.lorem
-            .words(Faker.datatype.number({ min: 10, max: 20 }))
-            .split(' ')
-            .map(p => ({ phenotypeId: p })),
         },
+        contactInfo: Faker.internet.exampleEmail(),
       };
     });
 };

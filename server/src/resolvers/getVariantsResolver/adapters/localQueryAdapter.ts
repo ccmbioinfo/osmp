@@ -70,6 +70,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
         refSeqId: 'Chr2',
         start: 1,
       },
+      contactInfo: 'DrExample@gmail.com',
     }));
   }
 };

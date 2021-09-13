@@ -1,32 +1,20 @@
 import { Maybe } from 'graphql/jsutils/Maybe';
 
-export interface DropdownItem {
-    id: number;
-    value: string;
-    label: string;
-}
-
-export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponseSchema {
-    source: string;
-}
-
-export interface VariantQueryErrorResponse {
-    id: string;
-    code: number | string;
-    message?: string | null;
-}
-
-export interface VariantQueryBaseResult {
-    source: string;
-}
-
+/* typescript types that map to graphql types, should be updated whenever schema is updated */
 export interface VariantResponseInfoFields {
-    af?: Maybe<number>;
+    aaChanges?: Maybe<string>;
+    cDna?: Maybe<string>;
+    geneName?: Maybe<string>;
+    gnomadHet?: Maybe<number>;
+    gnomadHom?: Maybe<number>;
+    transcript?: Maybe<string>;
 }
 
 export interface CallsetInfoFields {
     ad?: Maybe<number>;
     dp?: Maybe<number>;
+    gq?: Maybe<number>;
+    qual?: Maybe<number>;
     zygosity?: Maybe<string>;
 }
 
@@ -41,10 +29,11 @@ export interface VariantResponseFields {
     assemblyId: Maybe<string>;
     callsets: CallSet[];
     end: number;
-    info: Maybe<VariantResponseInfoFields>;
+    info?: Maybe<VariantResponseInfoFields>;
     ref: string;
     refSeqId: string;
     start: number;
+    variantType?: Maybe<string>;
 }
 
 export interface AgeOfOnsetFields {
@@ -53,26 +42,49 @@ export interface AgeOfOnsetFields {
 }
 
 export interface PhenotypicFeaturesFields {
-    phenotypeId?: Maybe<string>;
-    dateOfOnset?: Maybe<string>;
-    onsetType?: Maybe<string>;
     ageOfOnset?: Maybe<AgeOfOnsetFields>;
+    dateOfOnset?: Maybe<string>;
     levelSeverity?: Maybe<string>;
+    onsetType?: Maybe<string>;
+    phenotypeId?: Maybe<string>;
 }
 
 export interface IndividualResponseFields {
-    individualId?: Maybe<string>;
     datasetId?: Maybe<string>;
-    taxonId?: Maybe<string>;
-    sex?: Maybe<string>;
+    diseases?: Maybe<DiseaseFields[]>;
     ethnicity?: Maybe<string>;
+    geographicOrigin?: Maybe<string>;
+    individualId?: Maybe<string>;
+    info?: Maybe<IndividualInfoFields>;
     phenotypicFeatures?: Maybe<PhenotypicFeaturesFields[]>;
-    contactEmail?: Maybe<string>;
+    sex?: Maybe<string>;
+}
+
+export interface IndividualInfoFields {
+    cadidateGeme?: Maybe<string>;
+    classifications?: Maybe<string>;
+    diagnosis?: Maybe<string>;
+}
+
+export interface DiseaseFields {
+    ageOfOnset?: Maybe<AgeOfOnsetFields>;
+    description?: Maybe<string>;
+    diseaseId: string;
+    levelSeverity?: Maybe<string>;
+    outcome?: Maybe<string>;
+    stage?: Maybe<string>;
 }
 
 export interface VariantQueryResponseSchema {
     variant: VariantResponseFields;
     individual: IndividualResponseFields;
+    contactInfo: string;
+}
+
+export interface VariantQueryErrorResponse {
+    id: string;
+    code: number | string;
+    message?: string | null;
 }
 
 export interface VariantQueryBaseResult {
@@ -85,12 +97,6 @@ export interface VariantQueryDataResult extends VariantQueryBaseResult {
 
 export interface VariantQueryErrorResult extends VariantQueryBaseResult {
     error: VariantQueryErrorResponse;
-}
-
-export interface ResolvedVariantQueryResult {
-    data: VariantQueryResponseSchema[];
-    error: VariantQueryErrorResponse | null;
-    source: string;
 }
 
 export interface VariantQueryResponse {
@@ -117,6 +123,23 @@ export interface QueryInput {
     };
 }
 
-export type TableRowIndividual = IndividualResponseFields | CallsetInfoFields | { source: string };
+/* end graphql schema types */
+
+export interface ResolvedVariantQueryResult {
+    data: VariantQueryResponseSchema[];
+    error: VariantQueryErrorResponse | null;
+    source: string;
+}
+
+export type TableRowIndividual = IndividualResponseFields & CallsetInfoFields & { source: string };
 export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
-export type TableRow = TableRowIndividual | TableRowVariant | { contact: any };
+
+export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponseSchema {
+    source: string;
+}
+
+export interface DropdownItem {
+    id: number;
+    value: string;
+    label: string;
+}

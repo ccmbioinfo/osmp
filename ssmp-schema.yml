@@ -55,6 +55,8 @@ components:
           type: number
         QUAL:
           type: number
+        zygosity:
+          type: string
     GeneFilters:
       properties:
         geneName:

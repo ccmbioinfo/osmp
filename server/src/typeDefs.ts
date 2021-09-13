@@ -8,12 +8,19 @@ export default gql`
   }
 
   type VariantResponseInfoFields {
-    af: Float
+    aaChanges: String
+    cDna: String
+    geneName: String
+    gnomadHet: Int
+    gnomadHom: Int
+    transcript: String
   }
 
   type CallSetInfoFields {
     ad: Float
     dp: Int
+    gq: Float
+    qual: Float
     zygosity: String
   }
 
@@ -32,6 +39,7 @@ export default gql`
     ref: String!
     refSeqId: String
     start: Int!
+    variantType: String
   }
 
   type AgeOfOnsetFields {
@@ -40,26 +48,43 @@ export default gql`
   }
 
   type PhenotypicFeaturesFields {
-    phenotypeId: String
-    dateOfOnset: String
-    onsetType: String
     ageOfOnset: AgeOfOnsetFields
+    dateOfOnset: String
     levelSeverity: String
+    onsetType: String
+    phenotypeId: String
   }
 
   type IndividualResponseFields {
-    individualId: String
     datasetId: String
-    taxonId: String
-    sex: String
+    diseases: DiseaseFields
     ethnicity: String
-    contactEmail: String
+    geographicOrigin: String
+    individualId: String
+    info: IndividualInfoFields
     phenotypicFeatures: [PhenotypicFeaturesFields]
+    sex: String
+  }
+
+  type IndividualInfoFields {
+    cadidateGeme: String
+    classifications: String
+    diagnosis: String
+  }
+
+  type DiseaseFields {
+    ageOfOnset: AgeOfOnsetFields
+    description: String
+    diseaseId: String
+    levelSeverity: String
+    outcome: String
+    stage: String
   }
 
   type VariantQueryResponseSchema {
     variant: VariantResponseFields!
     individual: IndividualResponseFields!
+    contactInfo: String!
   }
 
   type VariantQueryDataResult {

@@ -20,7 +20,12 @@ const fetchVariantsQuery = gql`
                         }
                         end
                         info {
-                            af
+                            aaChanges
+                            cDna
+                            geneName
+                            gnomadHet
+                            gnomadHom
+                            transcript
                         }
                         ref
                         refSeqId
@@ -29,13 +34,13 @@ const fetchVariantsQuery = gql`
                     individual {
                         datasetId
                         ethnicity
-                        contactEmail
                         individualId
                         phenotypicFeatures {
                             phenotypeId
                         }
                         sex
                     }
+                    contactInfo
                 }
                 source
             }
