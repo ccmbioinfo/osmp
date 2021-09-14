@@ -15,6 +15,8 @@ const fetchVariantsQuery = gql`
                             info {
                                 ad
                                 dp
+                                gq
+                                qual
                                 zygosity
                             }
                         }
@@ -33,9 +35,33 @@ const fetchVariantsQuery = gql`
                     }
                     individual {
                         datasetId
+                        diseases {
+                            ageOfOnset {
+                                age
+                                ageGroup
+                            }
+                            description
+                            diseaseId
+                            levelSeverity
+                            outcome
+                            stage
+                        }
                         ethnicity
+                        geographicOrigin
                         individualId
+                        info {
+                            diagnosis
+                            candidateGene
+                            classifications
+                        }
                         phenotypicFeatures {
+                            ageOfOnset {
+                                age
+                                ageGroup
+                            }
+                            dateOfOnset
+                            levelSeverity
+                            onsetType
                             phenotypeId
                         }
                         sex

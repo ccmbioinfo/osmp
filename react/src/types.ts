@@ -61,7 +61,7 @@ export interface IndividualResponseFields {
 }
 
 export interface IndividualInfoFields {
-    cadidateGeme?: Maybe<string>;
+    cadidateGene?: Maybe<string>;
     classifications?: Maybe<string>;
     diagnosis?: Maybe<string>;
 }

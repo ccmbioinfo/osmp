@@ -71,13 +71,12 @@ const flattenBaseResults = (
         phenotypicFeatures,
         ...restIndividual
     } = result.individual;
-
     const flattenedDiseases = (diseases || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}:${c.description}`,
+        (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
         ''
     );
     const flattenedPhenotypes = (phenotypicFeatures || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}:${c.levelSeverity}`,
+        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
         ''
     );
 
@@ -87,6 +86,7 @@ const flattenBaseResults = (
         phenotypes: flattenedPhenotypes,
         ...restVariant,
         ...restIndividual,
+        ...individualInfo,
         source,
         ...variantInfo,
     };
@@ -216,12 +216,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableSortBy: true,
                         width: 79,
                     },
-                    {
-                        accessor: 'af',
-                        id: 'af',
-                        Header: 'AF',
-                        width: 150,
-                    },
+                    { accessor: 'aaChanges', id: 'aaChanges', Header: 'AA Changes', width: 105 },
+                    { accessor: 'cDna', id: 'cDna', Header: 'cDNA', width: 105 },
+                    { accessor: 'geneName', id: 'geneName', Header: 'Gene Name', width: 105 },
+                    { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomAD Het', width: 105 },
+                    { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomAD Hom', width: 105 },
+                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 105 },
                 ],
             },
             {
@@ -247,7 +247,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'DP',
                         width: getColumnWidth(tableData, 'dp', 'DP'),
                     },
-
+                    {
+                        accessor: 'ad',
+                        id: 'ad',
+                        Header: 'AD',
+                        width: getColumnWidth(tableData, 'ad', 'AD'),
+                    },
+                    {
+                        accessor: 'gq',
+                        id: 'gq',
+                        Header: 'GQ',
+                        width: getColumnWidth(tableData, 'gq', 'GQ'),
+                    },
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
@@ -267,19 +278,47 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             'Phenotypes'
                         ),
                     },
-
                     {
                         accessor: 'sex',
                         id: 'sex',
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
                     },
-
                     {
                         accessor: 'zygosity',
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
+                    },
+                    {
+                        accessor: 'geographicOrigin',
+                        id: 'geographicOrigin',
+                        Header: 'Geographic Origin',
+                        width: getColumnWidth(tableData, 'geographicOrigin', 'Geographic Origin'),
+                    },
+                    {
+                        accessor: 'candidateGene',
+                        id: 'candidateGene',
+                        Header: 'Candidate Gene',
+                        width: getColumnWidth(tableData, 'candidateGene', 'Candidate Gene'),
+                    },
+                    {
+                        accessor: 'classifications',
+                        id: 'classifications',
+                        Header: 'Classifications',
+                        width: getColumnWidth(tableData, 'classifications', 'Classifications'),
+                    },
+                    {
+                        accessor: 'diseases',
+                        id: 'diseases',
+                        Header: 'Diseases',
+                        width: getColumnWidth(tableData, 'diseases', 'Diseases'),
+                    },
+                    {
+                        accessor: 'diagnosis',
+                        id: 'diagnosis',
+                        Header: 'Diagnosis',
+                        width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
                         accessor: () => (

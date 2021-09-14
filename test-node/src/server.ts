@@ -36,13 +36,13 @@ app.get(
     { body: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
     res
   ) => {
-    res.json(createTestQueryResponse(geneName));
+    res.json(createTestQueryResponse(geneName, ensemblId));
     //res.statusCode = 422;
     //res.json('invalid request');
   }
 );
 
-export const createTestQueryResponse = (geneName: string) => {
+export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
   return Array(50)
     .fill(null)
     .map(() => {
@@ -72,7 +72,7 @@ export const createTestQueryResponse = (geneName: string) => {
           info: {
             aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,
             cDna: 'sampleCDA value',
-            geneName,
+            geneName: geneName || ensemblId || 'GENENAME',
             gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
             gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
             transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
@@ -89,10 +89,12 @@ export const createTestQueryResponse = (geneName: string) => {
                 age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
                 ageGroup: 'some group',
               },
+              diseaseId: `ID${Faker.datatype.number(25)}`,
+              description: `Description`,
             },
           ],
           ethnicity: ['eth1', 'eth2', 'eth3'][Faker.datatype.number({ min: 0, max: 2 })],
-          geographicOrigin: Faker.address.country,
+          geographicOrigin: Faker.address.country(),
           individualId,
           info: {
             candidateGene: 'SOME_GENE',
@@ -108,10 +110,10 @@ export const createTestQueryResponse = (geneName: string) => {
               dateOfOnset: Faker.date.past(),
               levelSeverity: Faker.helpers.randomize(['high', 'moderate', 'low']),
               onsetType: 'SOME_ONSETTYPE',
-              phenotypeId: Faker.datatype.string(12),
+              phenotypeId: 'SOME_PHENOTYPE',
             },
           ],
-          sex: ['male', 'female'][Faker.datatype.number({ min: 0, max: 1 })],
+          sex: Faker.helpers.randomize(['male', 'female']),
         },
         contactInfo: Faker.internet.exampleEmail(),
       };

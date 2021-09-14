@@ -57,7 +57,7 @@ export default gql`
 
   type IndividualResponseFields {
     datasetId: String
-    diseases: DiseaseFields
+    diseases: [DiseaseFields]
     ethnicity: String
     geographicOrigin: String
     individualId: String
@@ -67,7 +67,7 @@ export default gql`
   }
 
   type IndividualInfoFields {
-    cadidateGeme: String
+    candidateGene: String
     classifications: String
     diagnosis: String
   }
