@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Roboto:wght@100;300;400;500&display=swap');
+
+.login-pf body {
+    background: darkslateblue none;
+}
+
+.login-pf-page .card-pf {
+    padding: 3rem;
+}
+
+.pf-c-button.pf-m-primary {
+    background-color: #5c4cdf;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+}
+
+.pf-c-button.pf-m-primary:hover {
+    background-color: #351f65;
+}
+
+.card-pf {
+    border-top: none;
+    border-radius: 1.25rem;
+}
+
+h1#kc-page-title {
+    font-weight: bold;
+    font-family: 'DM Sans', sans-serif;
+    padding: 1.5rem;
+}
+
+form#kc-form-login {
+    padding: 1.25rem 0;
+    font-family: 'Roboto', sans-serif;
+}
