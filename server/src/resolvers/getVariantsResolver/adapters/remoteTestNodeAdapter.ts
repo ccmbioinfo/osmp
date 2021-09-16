@@ -48,7 +48,7 @@ const getRemoteTestNodeQuery = async (
 
   try {
     remoteTestNodeQueryResponse = await axios.get(
-      `http://test-node-1:9915/data?ensemblId=${args.input.gene.ensemblId}`,
+      `${process.env.TEST_NODE_URL}?ensemblId=${args.input.gene.ensemblId}`,
       {
         headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
       }

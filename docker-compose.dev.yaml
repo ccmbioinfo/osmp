@@ -1,16 +1,12 @@
 version: "3.9"
 services:
   ssmp-server:
-    image: node:16.3-buster
-    container_name: server
-    build:
-      dockerfile: Dockerfile
-      context: ./server
+    image: ssmp:dev
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       SERVER_PORT: ${SSMP_SERVER_PORT}
-      NODE_ENV: ${NODE_ENV}
+      NODE_ENV: development
       TEST_NODE_SSMP_TOKEN_CLIENT_ID: ${TEST_NODE_SSMP_TOKEN_CLIENT_ID}
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
@@ -18,61 +14,59 @@ services:
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
     user: "1000" #node
     working_dir: /usr/app
-    ports:
-      - ${SSMP_SERVER_PORT}:${SSMP_SERVER_PORT}
-    volumes:
-      - ./server:/usr/app
-    entrypoint: "yarn start-dev"
     networks:
-      - ssmp
+      - ssmp-dev
 
-  test-node-1:
-    image: node:16.3-buster
-    environment:
-      SERVER_PORT: ${TEST_NODE_PORT}
-      TEST_NODE_TOKEN_ISSUER: ${TEST_NODE_TOKEN_ISSUER}
-      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
-      TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
-    user: "1000" #node
-    working_dir: /usr/app
-    ports:
-      - ${TEST_NODE_PORT}:${TEST_NODE_PORT}
-    volumes:
-      - ./test-node:/usr/app
-    entrypoint: "yarn start-dev"
-    networks:
-      - ssmp
-
+  # needed for testing but eventually we'll want keycloak running on another host
   keycloak:
     image: quay.io/keycloak/keycloak:14.0.0
-    container_name: keycloak
     environment:
-      KEYCLOAK_SERVER_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
-      KEYCLOAK_REACT_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
       KEYCLOAK_USER: ${KEYCLOAK_USER}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
-      KEYCLOAK_PORT: ${KEYCLOAK_PORT}
+      KEYCLOAK_SERVER_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      KEYCLOAK_REACT_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      REACT_PORT: ${REACT_PORT}
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: "${KEYCLOAK_DATABASE}"
+      DB_USER: "${KEYCLOAK_DB_USER}"
+      DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
+      REACT_URL: ${REACT_URL}
     ports:
       - ${KEYCLOAK_PORT}:8080
     volumes:
       - ./keycloak/scripts:/usr/scripts
     networks:
-      - ssmp
+      - ssmp-dev
+
+  # for keycloak
+  mysql:
+    image: mysql:8.0
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: "${KEYCLOAK_DATABASE}"
+      MYSQL_USER: "${KEYCLOAK_DB_USER}"
+      MYSQL_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - ./keycloak/mysql:/var/lib/mysql
+    networks:
+      - ssmp-dev
 
   nginx:
+    image: nginx
     volumes:
-      - ./react/build:/var/www
+      - ${REACT_BUILD_DIR}:/var/www
       - ./nginx:/etc/nginx/conf.d
     depends_on:
       - ssmp-server
     restart: always
+    # hardcoded here for local testing -- we'll eventually want 80:80/443:443
     ports:
-      - "${REACT_PORT}:80"
-    networks: 
-      - ssmp
+      - "4777:80"
+    networks:
+      - ssmp-dev
 
 networks:
-  ssmp:
+  ssmp-dev:
     driver: bridge
