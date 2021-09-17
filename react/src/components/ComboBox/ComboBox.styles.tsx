@@ -40,7 +40,7 @@ export const List = styled.div`
     max-height: 100px;
     overflow: auto;
     position: absolute;
-    top: 430px;
+    top: 300px;
     z-index: 1;
     /* Dropdown List Styling */
     > li {

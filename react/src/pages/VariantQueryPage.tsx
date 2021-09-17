@@ -11,6 +11,7 @@ import {
     Column,
     ErrorIndicator,
     Flex,
+    GeneSearch,
     Input,
     Spinner,
     Table,
@@ -145,10 +146,12 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
                             Gene Name
                         </Typography>
-                        <Input
-                            disabled={!!queryOptionsForm.ensemblId.value}
-                            onChange={e => updateQueryOptionsForm('gene')(e.currentTarget.value)}
-                            value={queryOptionsForm.gene.value}
+                        <GeneSearch
+                            selectedGene={queryOptionsForm.gene.value}
+                            onSelect={geneOption => {
+                                updateQueryOptionsForm('gene')(geneOption.value.name);
+                                updateQueryOptionsForm('ensemblId')(geneOption.value.ensemblId);
+                            }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>

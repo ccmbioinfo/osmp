@@ -1,30 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
-import { useFetchAutocompleteQuery, useFetchEnsemblIdQuery } from '../apollo/hooks';
+import { useFetchAutocompleteQuery } from '../apollo/hooks';
 import { DropdownItem } from '../types';
 import ComboBox from './ComboBox/ComboBox';
 
-export interface GeneOption {
+export type GeneOption = DropdownItem<SelectionValue>;
+
+interface SelectionValue {
     ensemblId: string;
     name: string;
 }
 
 interface GeneSearchProps {
-    value: GeneOption;
+    selectedGene: string;
     onSelect: (gene: GeneOption) => void;
-    onSearch: (name: string) => void;
 }
 
-const GeneSearch: React.FC<GeneSearchProps> = ({ onSearch, onSelect, value: { name } }) => {
-    const [options, setOptions] = useState<DropdownItem[]>([]);
+const GeneSearch: React.FC<GeneSearchProps> = ({ onSelect, selectedGene }) => {
+    const [options, setOptions] = useState<GeneOption[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedTerm, setSelectedTerm] = useState('');
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
-
-    const [fetchEnsemblIdResults, { data: ensemblIdResults, loading: ensemblIdLoading }] =
-        useFetchEnsemblIdQuery();
 
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
 
@@ -33,47 +30,37 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ onSearch, onSelect, value: { na
             setOptions([]);
         }
         if (searchTerm.length > 2) {
-            debouncedAutocompleteFetch({ variables: { term: searchTerm.toLowerCase() } });
+            debouncedAutocompleteFetch({ variables: { q: searchTerm.toLowerCase() } });
         }
     }, [debouncedAutocompleteFetch, searchTerm]);
 
     useEffect(() => {
         if (autocompleteResults) {
             setOptions(
-                (autocompleteResults.autocompleteResults.suggestions || []).map(
-                    (s: { suggestion: string }, i: number) => ({
-                        value: s.suggestion.toUpperCase(),
-                        id: i,
-                        label: s.suggestion.toUpperCase(),
-                    })
-                )
+                (autocompleteResults.autocompleteResults.hits || []).map((hit, i) => ({
+                    value: {
+                        name: hit.symbol.toUpperCase(),
+                        ensemblId: hit.ensembl?.gene,
+                    },
+                    id: i,
+                    label: hit.symbol.toUpperCase(),
+                }))
             );
         }
     }, [autocompleteResults]);
 
-    useEffect(() => {
-        if (ensemblIdResults && selectedTerm) {
-            onSelect({
-                ensemblId: ensemblIdResults.fetchEnsemblIdResults.entries[0]['id'],
-                name: selectedTerm,
-            });
-            setSelectedTerm('');
-        }
-    }, [ensemblIdResults, onSelect, selectedTerm]);
-
     return (
         <ComboBox
             items={options}
-            loading={autocompleteLoading || ensemblIdLoading}
+            loading={autocompleteLoading}
             onChange={term => setSearchTerm(term)}
             onClose={() => setOptions([])}
             onSelect={item => {
                 setSearchTerm(item.label);
-                setSelectedTerm(item.label);
-                fetchEnsemblIdResults({ variables: { query: item.value } });
+                onSelect(item);
             }}
             placeholder="Gene Search"
-            value={name || ''}
+            value={selectedGene || ''}
         />
     );
 };

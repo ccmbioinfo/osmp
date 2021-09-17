@@ -5,17 +5,17 @@ import { useClickAway } from '../../hooks';
 import { DropdownItem } from '../../types';
 import { Header, Input, List, Wrapper } from './ComboBox.styles';
 
-interface ComboBoxProps {
-    items: DropdownItem[];
+interface ComboBoxProps<T> {
+    items: DropdownItem<T>[];
     loading?: boolean;
-    onSelect: (item: DropdownItem) => void;
+    onSelect: (item: DropdownItem<T>) => void;
     onChange?: (searchTerm: string) => void;
     onClose?: () => void;
     placeholder: string;
     value: string;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({
+function ComboBox<T extends {}>({
     items,
     loading,
     onChange,
@@ -23,7 +23,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     onSelect,
     placeholder,
     value,
-}) => {
+}: ComboBoxProps<T>) {
     const [searchTerm, setSearchTerm] = useState(value);
     const [open, setOpen] = useState<Boolean>(false);
 
@@ -36,7 +36,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
         }
     };
 
-    function handleOnClick(item: DropdownItem) {
+    function handleOnClick(item: DropdownItem<T>) {
         setSearchTerm(item.label);
         onSelect(item);
         setOpen(false);
@@ -74,6 +74,6 @@ const ComboBox: React.FC<ComboBoxProps> = ({
             </Wrapper>
         </div>
     );
-};
+}
 
 export default ComboBox;
