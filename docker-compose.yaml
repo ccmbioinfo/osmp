@@ -17,9 +17,9 @@ services:
     entrypoint: "yarn start"
     networks:
       - ssmp
-
   ssmp-server:
-    image: node:16.3-buster
+    build: server
+    image: ghcr.io/ccmbioinfo/ssmp:dev
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
