@@ -1,43 +1,71 @@
-name: "Node: Typescript, eslint, prettier"
+name: "Node: build and push development image"
 on:
+  push:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/node.yml
+      - server/**
   pull_request:
     branches:
       - develop
     paths:
       - .github/workflows/node.yml
-      - server/src/**/*
+      - server/**
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: server
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: docker/setup-buildx-action@v1
       - uses: actions/cache@v2
-        id: yarn-cache
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: install dependencies
+            ${{ runner.os }}-buildx-
+
+      - uses: docker/metadata-action@v3
+        id: meta
+        with:
+          images: ghcr.io/${{ github.repository }}:dev
+          tags: type=sha,format=long
+
+      - name: Build development image
+        uses: docker/build-push-action@v2
+        with:
+          context: server
+          load: true
+          tags: test-image
+          pull: true
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+
+      - name: Run eslint
+        if: github.event_name == 'pull_request'
         run: |
-          yarn --prefer-offline
-      - name: run eslint
+          docker run --rm test-image yarn lint
+
+      - name: Run prettier
+        if: github.event_name == 'pull_request'
         run: |
-          yarn lint
-      - name: run prettier
-        run: |
-          yarn format
-      - name: compile typescript
-        run: |
-          yarn tsc
+          docker run --rm test-image yarn format
+
+      - name: Log in to registry
+      - uses: docker/login-action@v1
+        if: github.event_name == 'push'
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push development image
+        uses: docker/build-push-action@v2
+        with:
+          context: server
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
