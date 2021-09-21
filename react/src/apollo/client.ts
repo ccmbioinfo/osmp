@@ -15,16 +15,13 @@ import { makeGraphQLError, makeNetworkError, makeNodeError } from '../components
 import { useErrorContext } from '../hooks';
 import { VariantQueryErrorResult } from '../types';
 
-const port = process.env.REACT_APP_API_PORT,
-    host = process.env.REACT_APP_API_HOST;
-
 export const buildLink = (token?: string) => {
     const timeoutLink = new ApolloLinkTimeout(30000); // 30 second timeout
     const mygeneRestLink = new RestLink({
         uri: 'https://mygene.info/v3/',
     });
     const httpLink = createHttpLink({
-        uri: `http://${host}:${port}/graphql`,
+        uri: process.env.REACT_APP_GRAPHQL_URL,
         headers: { accept: 'application/json' },
     });
 
