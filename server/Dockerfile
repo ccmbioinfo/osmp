@@ -7,7 +7,7 @@ COPY . .
 
 RUN yarn && yarn run build
 
-FROM node:16-alpine
+FROM node:16-alpine as DEPLOY_IMAGE
 
 WORKDIR /usr/app
 
