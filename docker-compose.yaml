@@ -19,7 +19,9 @@ services:
     networks:
       - ssmp
   ssmp-server:
-    build: server
+    build:
+      context: server
+      target: BUILD_IMAGE
     image: ghcr.io/ccmbioinfo/ssmp:dev
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
