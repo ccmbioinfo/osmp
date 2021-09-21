@@ -32,12 +32,12 @@ export const Header = styled(Flex)`
 `;
 
 export const List = styled.div`
-    box-shadow: ${props => props.theme.boxShadow}
+    box-shadow: ${props => props.theme.boxShadow};
     padding: 0;
     margin: 0;
     width: inherit;
-    margin-top: ${props => props.theme.space[4]};
-    max-height: 100px;
+    margin-top: ${props => props.theme.space[5]};
+    max-height: 200px;
     overflow: auto;
     position: absolute;
     top: 300px;
@@ -47,15 +47,15 @@ export const List = styled.div`
         list-style-type: none;
         &:first-of-type {
             > button {
-                border-top: ${props => props.theme.borders.thin} ${props =>
-    props.theme.colors.muted};
+                border-top: ${props => props.theme.borders.thin}
+                    ${props => props.theme.colors.muted};
                 border-top-left-radius: ${props => props.theme.radii.base};
                 border-top-right-radius: ${props => props.theme.radii.base};
             }
         }
         &:last-of-type > button {
-          border-bottom-left-radius: ${props => props.theme.radii.base};
-          border-bottom-right-radius: ${props => props.theme.radii.base};
+            border-bottom-left-radius: ${props => props.theme.radii.base};
+            border-bottom-right-radius: ${props => props.theme.radii.base};
         }
         button {
             display: flex;
@@ -64,8 +64,7 @@ export const List = styled.div`
             font-size: ${props => props.theme.fontSizes.s};
             padding: 15px 20px 15px 20px;
             border: 0;
-            border-bottom: ${props => props.theme.borders.thin} ${props =>
-    props.theme.colors.muted};
+            border-bottom: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
             width: 100%;
             text-align: left;
             border-left: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};

@@ -155,7 +155,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>
-                    <Column>or</Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
                             Ensembl ID
