@@ -9,7 +9,7 @@ interface ComboBoxProps<T> {
     items: DropdownItem<T>[];
     loading?: boolean;
     onSelect: (item: DropdownItem<T>) => void;
-    onChange?: (searchTerm: string) => void;
+    onChange: (searchTerm: string) => void;
     onClose?: () => void;
     placeholder: string;
     value: string;
@@ -24,20 +24,15 @@ function ComboBox<T extends {}>({
     placeholder,
     value,
 }: ComboBoxProps<T>) {
-    const [searchTerm, setSearchTerm] = useState(value);
     const [open, setOpen] = useState<Boolean>(false);
 
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setSearchTerm(value);
         setOpen(true);
-        if (onChange) {
-            onChange(value);
-        }
+        onChange(value);
     };
 
     function handleOnClick(item: DropdownItem<T>) {
-        setSearchTerm(item.label);
         onSelect(item);
         setOpen(false);
     }
@@ -55,13 +50,13 @@ function ComboBox<T extends {}>({
         <div>
             <Wrapper>
                 <Header tabIndex={0} role="button">
-                    <Input value={searchTerm} placeholder={placeholder} onChange={getSuggestions} />
+                    <Input value={value} placeholder={placeholder} onChange={getSuggestions} />
                     {loading ? <Spinner size={5} /> : <BsSearch />}
                 </Header>
                 {open && (
                     <List ref={fragmentRef}>
                         {items
-                            .filter(i => i.label.toLowerCase().includes(searchTerm.toLowerCase()))
+                            .filter(i => i.label.toLowerCase().includes(value.toLowerCase()))
                             .map(item => (
                                 <li key={item.id}>
                                     <button type="button" onClick={() => handleOnClick(item)}>

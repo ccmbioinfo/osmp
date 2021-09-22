@@ -12,13 +12,13 @@ interface SelectionValue {
 }
 
 interface GeneSearchProps {
-    selectedGene: string;
+    geneName: string;
     onSelect: (gene: GeneOption) => void;
+    onChange: (geneName: string) => void;
 }
 
-const GeneSearch: React.FC<GeneSearchProps> = ({ onSelect, selectedGene }) => {
+const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect }) => {
     const [options, setOptions] = useState<GeneOption[]>([]);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
@@ -26,13 +26,15 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ onSelect, selectedGene }) => {
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
 
     useEffect(() => {
-        if (!searchTerm) {
-            setOptions([]);
+        if (options.length) {
+            if (!geneName) {
+                setOptions([]);
+            }
         }
-        if (searchTerm.length > 2) {
-            debouncedAutocompleteFetch({ variables: { q: searchTerm.toLowerCase() } });
+        if (geneName.length > 2 && !options.map(o => o.value.name).includes(geneName)) {
+            debouncedAutocompleteFetch({ variables: { q: geneName.toLowerCase() } });
         }
-    }, [debouncedAutocompleteFetch, searchTerm]);
+    }, [debouncedAutocompleteFetch, geneName, options]);
 
     useEffect(() => {
         if (autocompleteResults) {
@@ -55,14 +57,10 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ onSelect, selectedGene }) => {
         <ComboBox
             items={options}
             loading={autocompleteLoading}
-            onChange={term => setSearchTerm(term)}
-            onClose={() => setOptions([])}
-            onSelect={item => {
-                setSearchTerm(item.label);
-                onSelect(item);
-            }}
+            onChange={term => onChange(term)}
+            onSelect={item => onSelect(item)}
             placeholder="Gene Search"
-            value={selectedGene || ''}
+            value={geneName || ''}
         />
     );
 };

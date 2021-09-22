@@ -15,6 +15,7 @@ export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
     flex-grow: 0;
+    position: relative;
     width: 200px;
 `;
 
@@ -40,7 +41,7 @@ export const List = styled.div`
     max-height: 200px;
     overflow: auto;
     position: absolute;
-    top: 300px;
+    top: 20px;
     z-index: 1;
     /* Dropdown List Styling */
     > li {

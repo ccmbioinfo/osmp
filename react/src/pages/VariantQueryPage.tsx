@@ -31,7 +31,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     state.ensemblId.value.startsWith('ENSG00'),
-                error: 'Invalid ensembl Id.',
+                error: 'Invalid ensembl ID format.',
             },
         ],
     },
@@ -147,7 +147,8 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Gene Name
                         </Typography>
                         <GeneSearch
-                            selectedGene={queryOptionsForm.gene.value}
+                            geneName={queryOptionsForm.gene.value}
+                            onChange={geneName => updateQueryOptionsForm('gene')(geneName)}
                             onSelect={geneOption => {
                                 updateQueryOptionsForm('gene')(geneOption.value.name);
                                 updateQueryOptionsForm('ensemblId')(geneOption.value.ensemblId);
@@ -160,9 +161,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Ensembl ID
                         </Typography>
                         <Input
-                            onChange={e =>
-                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value)
-                            }
+                            onChange={e => {
+                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value);
+                                updateQueryOptionsForm('gene')('');
+                            }}
                             value={queryOptionsForm.ensemblId.value}
                         />
                         <ErrorText error={queryOptionsForm.ensemblId.error} />
