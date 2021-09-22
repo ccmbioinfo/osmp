@@ -37,14 +37,16 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ onSelect, selectedGene }) => {
     useEffect(() => {
         if (autocompleteResults) {
             setOptions(
-                (autocompleteResults.autocompleteResults.hits || []).map((hit, i) => ({
-                    value: {
-                        name: hit.symbol.toUpperCase(),
-                        ensemblId: hit.ensembl?.gene,
-                    },
-                    id: i,
-                    label: hit.symbol.toUpperCase(),
-                }))
+                (autocompleteResults.autocompleteResults.hits || [])
+                    .filter(hit => !!hit.ensembl?.gene)
+                    .map((hit, i) => ({
+                        value: {
+                            name: hit.symbol.toUpperCase(),
+                            ensemblId: hit.ensembl?.gene,
+                        },
+                        id: i,
+                        label: hit.symbol.toUpperCase(),
+                    }))
             );
         }
     }, [autocompleteResults]);
