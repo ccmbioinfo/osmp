@@ -9,6 +9,7 @@ import {
 } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { FaClipboard, FaClipboardCheck } from 'react-icons/fa';
+import { IoIosClose } from 'react-icons/io';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     HeaderGroup,
@@ -337,7 +338,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             <Popover content="Contact">
                                 <Background variant="light">
                                     <Flex alignItems="center">
-                                        <Typography variant="p">DrExample@gmail.com</Typography>
+                                        <Typography variant="p">{state.contactInfo}</Typography>
                                         <Button
                                             variant="light"
                                             onClick={() => {
@@ -346,6 +347,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             }}
                                         >
                                             {copied ? <FaClipboardCheck /> : <FaClipboard />}
+                                        </Button>
+                                        <Button variant="light" onClick={() => setCopied(false)}>
+                                            <IoIosClose />
                                         </Button>
                                     </Flex>
                                 </Background>
