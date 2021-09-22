@@ -8,6 +8,7 @@ import {
     BsFilter,
 } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
+import { FaClipboard, FaClipboardCheck } from 'react-icons/fa';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     HeaderGroup,
@@ -30,7 +31,17 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
-import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
+import {
+    Background,
+    Button,
+    Checkbox,
+    Column,
+    Flex,
+    InlineFlex,
+    Modal,
+    Popover,
+    Typography,
+} from '../index';
 import { ColumnFilter } from './ColumnFilter';
 import { GlobalFilter } from './GlobalFilters';
 import {
@@ -117,6 +128,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
+    const [copied, setCopied] = useState(false); // Whether text is copied
     const [open, setOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
 
@@ -321,10 +333,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: () => (
-                            <Flex justifyContent="center">
-                                <Button variant="primary">Contact</Button>
-                            </Flex>
+                        accessor: (state: any) => (
+                            <Popover content="Contact">
+                                <Background variant="light">
+                                    <Flex alignItems="center">
+                                        <Typography variant="p">DrExample@gmail.com</Typography>
+                                        <Button
+                                            variant="light"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(state.contactInfo);
+                                                setCopied(true);
+                                            }}
+                                        >
+                                            {copied ? <FaClipboardCheck /> : <FaClipboard />}
+                                        </Button>
+                                    </Flex>
+                                </Background>
+                            </Popover>
                         ),
                         id: 'contact',
                         Header: 'Contact',
@@ -332,7 +357,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ],
             },
         ],
-        [getColumnWidth, tableData]
+        [copied, getColumnWidth, tableData]
     );
 
     const defaultColumn = React.useMemo(

@@ -1,12 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface ButtonProps {
-    variant: 'primary' | 'secondary' | 'light';
-    onClick?: () => void;
-    disabled?: boolean;
-}
-
 const Component = styled.button<ButtonProps>`
     box-sizing: border-box;
     display: flex;
@@ -57,12 +51,21 @@ const Component = styled.button<ButtonProps>`
     }}
 `;
 
-const Button: React.FC<ButtonProps> = ({ variant, children, onClick, ...userStyles }) => {
+interface ButtonProps {
+    variant: 'primary' | 'secondary' | 'light';
+    onClick?: () => void;
+    children?: React.ReactNode;
+    disabled?: boolean;
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+    const { variant, onClick, children, ...userStyles } = props;
+
     return (
-        <Component variant={variant} onClick={onClick} {...userStyles}>
+        <Component ref={ref} variant={variant} onClick={onClick} {...userStyles}>
             {children}
         </Component>
     );
-};
+});
 
 export default Button;

@@ -16,6 +16,7 @@ import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
+import Popover from './Popover/Popover';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
 import Table from './Table/Table';
@@ -45,6 +46,7 @@ export {
     makeNodeError,
     Modal,
     Navbar,
+    Popover,
     Snackbar,
     Spinner,
     Table,
