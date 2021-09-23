@@ -8,8 +8,6 @@ import {
     BsFilter,
 } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
-import { FaClipboard, FaClipboardCheck } from 'react-icons/fa';
-import { IoIosClose } from 'react-icons/io';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     HeaderGroup,
@@ -32,18 +30,9 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
-import {
-    Background,
-    Button,
-    Checkbox,
-    Column,
-    Flex,
-    InlineFlex,
-    Modal,
-    Popover,
-    Typography,
-} from '../index';
+import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
+import { ContactPopover } from './ContactPopover';
 import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
@@ -129,7 +118,6 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
-    const [copied, setCopied] = useState(false); // Whether text is copied
     const [open, setOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
 
@@ -334,34 +322,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: (state: any) => (
-                            <Popover content="Contact">
-                                <Background variant="light">
-                                    <Flex alignItems="center">
-                                        <Typography variant="p">{state.contactInfo}</Typography>
-                                        <Button
-                                            variant="light"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(state.contactInfo);
-                                                setCopied(true);
-                                            }}
-                                        >
-                                            {copied ? <FaClipboardCheck /> : <FaClipboard />}
-                                        </Button>
-                                        <Button variant="light" onClick={() => setCopied(false)}>
-                                            <IoIosClose />
-                                        </Button>
-                                    </Flex>
-                                </Background>
-                            </Popover>
-                        ),
+                        accessor: (state: any) => <ContactPopover state={state} />,
                         id: 'contact',
                         Header: 'Contact',
                     },
                 ],
             },
         ],
-        [copied, getColumnWidth, tableData]
+        [getColumnWidth, tableData]
     );
 
     const defaultColumn = React.useMemo(

@@ -12,6 +12,7 @@ import ErrorProvider, {
 import ErrorFallback from './ErrorFallback';
 import ErrorIndicator from './ErrorIndicator';
 import GeneSearch from './GeneSearch';
+import IconButton from './IconButton';
 import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
 import Modal from './Modal/Modal';
@@ -40,6 +41,7 @@ export {
     Flex,
     GeneSearch,
     InlineFlex,
+    IconButton,
     Input,
     makeGraphQLError,
     makeNetworkError,

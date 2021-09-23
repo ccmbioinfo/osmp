@@ -5,17 +5,17 @@ import { Button } from '../index';
 
 interface Props {
     content: string;
+    isOpen: boolean;
+    onClick: () => void;
     children?: React.ReactNode;
 }
 
-const Popover: React.FC<Props> = ({ content, children }) => {
-    const [isOpen, setOpen] = React.useState(false);
-
+const Popover: React.FC<Props> = ({ content, children, isOpen, onClick }) => {
     const { renderLayer, triggerProps, layerProps } = useLayer({ isOpen });
 
     return (
         <>
-            <Button variant="primary" {...triggerProps} onClick={() => setOpen(!isOpen)}>
+            <Button variant="primary" {...triggerProps} onClick={onClick}>
                 {content}
             </Button>
             {renderLayer(

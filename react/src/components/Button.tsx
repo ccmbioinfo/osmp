@@ -51,7 +51,7 @@ const Component = styled.button<ButtonProps>`
     }}
 `;
 
-interface ButtonProps {
+export interface ButtonProps {
     variant: 'primary' | 'secondary' | 'light';
     onClick?: () => void;
     children?: React.ReactNode;
