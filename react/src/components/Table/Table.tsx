@@ -344,6 +344,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
+    const getHeaderColumns = (headerId: string) =>
+        columns
+            .filter(header => header.id === headerId)[0]
+            .columns.map(c => c.id)
+            .filter(id => !dummyColumns.includes(id));
+
     const tableInstance = useTable(
         {
             columns,
@@ -351,7 +357,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: dummyColumns,
+                hiddenColumns: [
+                    getHeaderColumns('case_details'),
+                    getHeaderColumns('variation_details'),
+                ].flat(),
             },
         },
         useFilters,
