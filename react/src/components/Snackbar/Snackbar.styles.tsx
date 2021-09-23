@@ -18,8 +18,9 @@ const fadein = keyframes`
 
 export const Container = styled.div<SnackbarVariant>`
     display: flex;
+    color: ${props => props.theme.colors.background} !important;
     align-items: center;
-    width: 50vw;
+    width: 40vw;
     margin: ${props => props.theme.space[4]} 0;
 
     gap: ${props => props.theme.space[4]};
