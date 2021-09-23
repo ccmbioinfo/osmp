@@ -32,6 +32,7 @@ import {
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
+import { ContactPopover } from './ContactPopover';
 import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
@@ -321,11 +322,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: () => (
-                            <Flex justifyContent="center">
-                                <Button variant="primary">Contact</Button>
-                            </Flex>
-                        ),
+                        accessor: (state: any) => <ContactPopover state={state} />,
                         id: 'contact',
                         Header: 'Contact',
                     },
