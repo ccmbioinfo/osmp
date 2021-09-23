@@ -11,6 +11,7 @@ import {
     Column,
     ErrorIndicator,
     Flex,
+    GeneSearch,
     Input,
     Spinner,
     Table,
@@ -30,7 +31,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     state.ensemblId.value.startsWith('ENSG00'),
-                error: 'Invalid ensembl Id.',
+                error: 'Invalid ensembl ID format.',
             },
         ],
     },
@@ -145,22 +146,25 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
                             Gene Name
                         </Typography>
-                        <Input
-                            disabled={!!queryOptionsForm.ensemblId.value}
-                            onChange={e => updateQueryOptionsForm('gene')(e.currentTarget.value)}
-                            value={queryOptionsForm.gene.value}
+                        <GeneSearch
+                            geneName={queryOptionsForm.gene.value}
+                            onChange={geneName => updateQueryOptionsForm('gene')(geneName)}
+                            onSelect={geneOption => {
+                                updateQueryOptionsForm('gene')(geneOption.value.name);
+                                updateQueryOptionsForm('ensemblId')(geneOption.value.ensemblId);
+                            }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>
-                    <Column>or</Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
                             Ensembl ID
                         </Typography>
                         <Input
-                            onChange={e =>
-                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value)
-                            }
+                            onChange={e => {
+                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value);
+                                updateQueryOptionsForm('gene')('');
+                            }}
                             value={queryOptionsForm.ensemblId.value}
                         />
                         <ErrorText error={queryOptionsForm.ensemblId.error} />

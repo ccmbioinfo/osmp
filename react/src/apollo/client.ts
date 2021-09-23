@@ -17,7 +17,9 @@ import { VariantQueryErrorResult } from '../types';
 
 export const buildLink = (token?: string) => {
     const timeoutLink = new ApolloLinkTimeout(30000); // 30 second timeout
-    const ebiRestLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
+    const mygeneRestLink = new RestLink({
+        uri: 'https://mygene.info/v3/',
+    });
     const httpLink = createHttpLink({
         uri: process.env.REACT_APP_GRAPHQL_URL,
         headers: { accept: 'application/json' },
@@ -78,7 +80,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([ebiRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, httpLink]);
+    return from([mygeneRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, httpLink]);
 };
 
 export const client = new ApolloClient<any>({

@@ -138,8 +138,8 @@ export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponse
     source: string;
 }
 
-export interface DropdownItem {
+export interface DropdownItem<T> {
     id: number;
-    value: string;
+    value: T;
     label: string;
 }
