@@ -1,6 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLayer } from 'react-laag';
+import styled from 'styled-components';
 import { Button } from '../index';
 
 interface Props {
@@ -9,6 +10,14 @@ interface Props {
     onClick: () => void;
     children?: React.ReactNode;
 }
+
+const Container = styled(motion.div)`
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    position: fixed;
+    right: 10px;
+`;
 
 const Popover: React.FC<Props> = ({ content, children, isOpen, onClick }) => {
     const { renderLayer, triggerProps, layerProps } = useLayer({ isOpen });
@@ -21,7 +30,7 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick }) => {
             {renderLayer(
                 <AnimatePresence>
                     {isOpen && (
-                        <motion.div
+                        <Container
                             {...layerProps}
                             initial={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate from
                             animate={{ opacity: 1, scale: 1, x: 0, y: 0 }} // animate to
@@ -33,7 +42,7 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick }) => {
                             }}
                         >
                             {children}
-                        </motion.div>
+                        </Container>
                     )}
                 </AnimatePresence>
             )}

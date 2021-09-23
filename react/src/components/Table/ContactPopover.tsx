@@ -9,7 +9,7 @@ interface ContactPopoverProps {
 }
 
 const Container = styled(props => <Background {...props} />)`
-    margin: ${props => props.theme.space[4]};
+    padding: ${props => props.theme.space[1]} ${props => props.theme.space[5]};
     width: 300px;
 `;
 
@@ -23,8 +23,11 @@ export const ContactPopover: React.FC<ContactPopoverProps> = ({ state }) => {
             <Snackbar
                 isActive={snackbarActive}
                 variant="success"
-                message={`${state.contactInfo} copied to clipboard.`}
-                handleCloseSnackbar={() => setSnackbarActive(false)}
+                message={`${state.contactInfo} copied to clipboard successfully.`}
+                handleCloseSnackbar={() => {
+                    setSnackbarActive(false);
+                    setOpenContact(false);
+                }}
             />
             <Container variant="light">
                 <Flex alignItems="center" justifyContent="space-between">
