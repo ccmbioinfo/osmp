@@ -326,6 +326,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: (state: any) => <ContactPopover state={state} />,
                         id: 'contact',
                         Header: 'Contact',
+                        width: 120,
                     },
                 ],
             },
