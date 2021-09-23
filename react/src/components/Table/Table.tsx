@@ -567,7 +567,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     justifyContent="center"
                                                                 >
                                                                     {column.render('Header')}
-                                                                    {isHeader(column) &&
+                                                                    {column.Header !== 'Core' &&
+                                                                        isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
                                                                         ) ? (
