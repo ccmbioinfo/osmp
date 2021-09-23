@@ -18,16 +18,24 @@ export const ContactPopover: React.FC<ContactPopoverProps> = ({ state }) => {
     const [openContact, setOpenContact] = useState(false);
     const [snackbarActive, setSnackbarActive] = useState(false);
 
+    const handleClosePopover = () => {
+        setCopied(false);
+        setOpenContact(false);
+        setSnackbarActive(false);
+    };
+
     return (
-        <Popover content="Contact" isOpen={openContact} onClick={() => setOpenContact(true)}>
+        <Popover
+            content="Contact"
+            isOpen={openContact}
+            onClick={() => setOpenContact(true)}
+            onOutsideClick={handleClosePopover}
+        >
             <Snackbar
                 isActive={snackbarActive}
                 variant="success"
                 message={`${state.contactInfo} copied to clipboard successfully.`}
-                handleCloseSnackbar={() => {
-                    setSnackbarActive(false);
-                    setOpenContact(false);
-                }}
+                handleCloseSnackbar={handleClosePopover}
             />
             <Container variant="light">
                 <Flex alignItems="center" justifyContent="space-between">
@@ -42,14 +50,7 @@ export const ContactPopover: React.FC<ContactPopoverProps> = ({ state }) => {
                     >
                         {copied ? <FaClipboardCheck /> : <FaClipboard />}
                     </IconButton>
-                    <IconButton
-                        variant="light"
-                        onClick={() => {
-                            setCopied(false);
-                            setOpenContact(false);
-                            setSnackbarActive(false);
-                        }}
-                    >
+                    <IconButton variant="light" onClick={handleClosePopover}>
                         <IoIosClose />
                     </IconButton>
                 </Flex>

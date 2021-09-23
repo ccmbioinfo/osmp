@@ -8,6 +8,7 @@ interface Props {
     content: string;
     isOpen: boolean;
     onClick: () => void;
+    onOutsideClick: () => void;
     children?: React.ReactNode;
 }
 
@@ -19,8 +20,11 @@ const Container = styled(motion.div)`
     right: 10px;
 `;
 
-const Popover: React.FC<Props> = ({ content, children, isOpen, onClick }) => {
-    const { renderLayer, triggerProps, layerProps } = useLayer({ isOpen });
+const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsideClick }) => {
+    const { renderLayer, triggerProps, layerProps } = useLayer({
+        isOpen,
+        onOutsideClick: onOutsideClick,
+    });
 
     return (
         <>
