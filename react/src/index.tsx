@@ -10,9 +10,7 @@ import keycloak from './keycloak';
 import App from './pages/App';
 import './index.css';
 
-const errorHandler = (error: Error) => {
-    console.log('error', error.message);
-};
+const errorHandler = (error: Error) => console.error(error);
 
 ReactDOM.render(
     <React.StrictMode>
