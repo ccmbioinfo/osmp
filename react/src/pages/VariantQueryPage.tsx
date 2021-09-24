@@ -141,7 +141,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 </Column>
             </Flex>
             <Background variant="light">
-                <Flex alignItems="center">
+                <Flex alignItems="flex-end">
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
                             Gene Name
@@ -213,7 +213,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Clear
                         </Button>
                     </ButtonWrapper>
-                    <Column justifyContent="center">{loading && <Spinner />}</Column>
+                    <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
             {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]

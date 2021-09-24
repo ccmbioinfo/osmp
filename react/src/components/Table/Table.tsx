@@ -343,6 +343,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
+    const getHeaderColumns = (headerId: string) =>
+        columns
+            .filter(header => header.id === headerId)[0]
+            .columns.map(c => c.id)
+            .filter(id => !dummyColumns.includes(id));
+
     const tableInstance = useTable(
         {
             columns,
@@ -350,7 +356,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: dummyColumns,
+                hiddenColumns: [
+                    getHeaderColumns('case_details'),
+                    getHeaderColumns('variation_details'),
+                ].flat(),
             },
         },
         useFilters,
@@ -456,42 +465,44 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         hideModal={() => setShowModal(false)}
                         title="Customize Columns"
                     >
-                        {headerGroups[0].headers.map((g, id) => (
-                            <div key={id}>
-                                <Checkbox
-                                    label={g.Header as string}
-                                    checked={g.isVisible}
-                                    onClick={() => handleGroupChange(g)}
-                                />
-                                {g.columns?.map(
-                                    (c, id) =>
-                                        !fixedColumns.includes(c.id) &&
-                                        !dummyColumns.includes(c.id) && (
-                                            <div key={id} style={{ paddingLeft: 20 }}>
-                                                <Checkbox
-                                                    label={c.Header as string}
-                                                    checked={c.isVisible}
-                                                    onClick={() => {
-                                                        if (
-                                                            c.parent &&
-                                                            g.columns?.filter(c => c.isVisible)
-                                                                .length === 1
-                                                        ) {
-                                                            toggleHideColumn(c.id, c.isVisible);
-                                                            toggleHideColumn(
-                                                                'empty_' + c.parent.id,
-                                                                !c.isVisible
-                                                            );
-                                                        } else {
-                                                            toggleHideColumn(c.id, c.isVisible);
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                        )
-                                )}
-                            </div>
-                        ))}
+                        {headerGroups[0].headers
+                            .filter(header => header.Header !== 'Core')
+                            .map((g, id) => (
+                                <div key={id}>
+                                    <Checkbox
+                                        label={g.Header as string}
+                                        checked={g.isVisible}
+                                        onClick={() => handleGroupChange(g)}
+                                    />
+                                    {g.columns?.map(
+                                        (c, id) =>
+                                            !fixedColumns.includes(c.id) &&
+                                            !dummyColumns.includes(c.id) && (
+                                                <div key={id} style={{ paddingLeft: 20 }}>
+                                                    <Checkbox
+                                                        label={c.Header as string}
+                                                        checked={c.isVisible}
+                                                        onClick={() => {
+                                                            if (
+                                                                c.parent &&
+                                                                g.columns?.filter(c => c.isVisible)
+                                                                    .length === 1
+                                                            ) {
+                                                                toggleHideColumn(c.id, c.isVisible);
+                                                                toggleHideColumn(
+                                                                    'empty_' + c.parent.id,
+                                                                    !c.isVisible
+                                                                );
+                                                            } else {
+                                                                toggleHideColumn(c.id, c.isVisible);
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            )
+                                    )}
+                                </div>
+                            ))}
                     </Modal>
                 </InlineFlex>
             </TableFilters>
@@ -572,7 +583,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     justifyContent="center"
                                                                 >
                                                                     {column.render('Header')}
-                                                                    {isHeader(column) &&
+                                                                    {column.Header !== 'Core' &&
+                                                                        isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
                                                                         ) ? (

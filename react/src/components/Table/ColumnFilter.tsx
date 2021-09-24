@@ -21,7 +21,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({ filters, setFilter, 
         <Flex>
             <SearchInput
                 value={value || ''}
-                placeholder={columnId}
+                placeholder="Search"
                 onChange={e => setFilter(columnId, e.target.value)}
             />
         </Flex>
