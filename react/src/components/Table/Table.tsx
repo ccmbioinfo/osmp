@@ -32,6 +32,7 @@ import {
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
+import { ContactPopover } from './ContactPopover';
 import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
@@ -41,6 +42,7 @@ import {
     Styles,
     TableFilters,
     TH,
+    THead,
 } from './Table.styles';
 
 interface TableProps {
@@ -321,13 +323,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: () => (
-                            <Flex justifyContent="center">
-                                <Button variant="primary">Contact</Button>
-                            </Flex>
-                        ),
+                        accessor: (state: any) => <ContactPopover state={state} />,
                         id: 'contact',
                         Header: 'Contact',
+                        width: 120,
                     },
                 ],
             },
@@ -536,8 +535,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     hideScrollbars={!refXOverflowing}
                     ignoreElements="p"
                 >
-                    <table {...getTableProps()} ref={horizonstalRef}>
-                        <thead>
+                    <table
+                        {...getTableProps()}
+                        ref={horizonstalRef}
+                        style={{
+                            height: '200px', // This will force the table body to overflow and scroll, since there is not enough room
+                        }}
+                    >
+                        <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
                                 const { key, ...restHeaderGroupProps } =
@@ -624,35 +629,41 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     </motion.tr>
                                 );
                             })}
-                        </thead>
+                        </THead>
 
-                        <tbody {...getTableBodyProps()}>
-                            {page.length > 0 ? (
-                                page.map(row => {
-                                    prepareRow(row);
-                                    const { key, ...restRowProps } = row.getRowProps();
-                                    return (
-                                        <motion.tr key={key} layout="position" {...restRowProps}>
-                                            {row.cells.map(cell => {
-                                                const { key, ...restCellProps } =
-                                                    cell.getCellProps();
-                                                return (
-                                                    <td key={key} {...restCellProps}>
-                                                        <Typography variant="subtitle">
-                                                            {cell.render('Cell')}
-                                                        </Typography>
-                                                    </td>
-                                                );
-                                            })}
-                                        </motion.tr>
-                                    );
-                                })
-                            ) : (
-                                <Typography variant="p" error>
-                                    There are no records to display.
-                                </Typography>
-                            )}
-                        </tbody>
+                        <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
+                            <tbody {...getTableBodyProps()}>
+                                {page.length > 0 ? (
+                                    page.map(row => {
+                                        prepareRow(row);
+                                        const { key, ...restRowProps } = row.getRowProps();
+                                        return (
+                                            <motion.tr
+                                                key={key}
+                                                layout="position"
+                                                {...restRowProps}
+                                            >
+                                                {row.cells.map(cell => {
+                                                    const { key, ...restCellProps } =
+                                                        cell.getCellProps();
+                                                    return (
+                                                        <td key={key} {...restCellProps}>
+                                                            <Typography variant="subtitle">
+                                                                {cell.render('Cell')}
+                                                            </Typography>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </motion.tr>
+                                        );
+                                    })
+                                ) : (
+                                    <Typography variant="p" error>
+                                        There are no records to display.
+                                    </Typography>
+                                )}
+                            </tbody>
+                        </div>
                     </table>
                 </ScrollContainer>
             </Styles>
