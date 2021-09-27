@@ -4,8 +4,8 @@
 
 set -euo pipefail
 
-MINIO_HOST_ALIAS="${MINIO_HOST_ALIAS}"
-DEPLOY_BUCKET="${MINIO_BUCKET}"
+MINIO_HOST_ALIAS=$1
+DEPLOY_BUCKET=$2
 
 # Collect file names from previous deployment, in deterministic order
 mc find $MINIO_HOST_ALIAS/$DEPLOY_BUCKET | sed "s/^$MINIO_HOST_ALIAS\/$DEPLOY_BUCKET\///" | sort > old.out
