@@ -30,7 +30,7 @@ jobs:
         shell: bash
         #Set working directory to react for shell script
         working-directory: react
-    # When application is successfully tested and build has been generated
+    # When build has been generated for React app
     # Then we can start with deployment
     needs: build
     steps:
