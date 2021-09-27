@@ -81,6 +81,21 @@ services:
     networks:
       - ssmp
 
+  minio:
+    image: quay.io/minio/minio
+    user: "${MINIO_UIDGID}"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD}"
+    volumes:
+      - ${MINIO_VOLUME}:/data
+    ports:
+      - ${MINIO_HOST_PORT}:9000
+    command: server --console-address ":9001" /data
+    networks: 
+        - ssmp
+
+
 networks:
   ssmp:
     driver: bridge
