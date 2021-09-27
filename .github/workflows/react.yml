@@ -34,4 +34,7 @@ jobs:
       - name: Generate build
         run: yarn build
       - name: Upload to Minio bucket
-        run: bash deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
+        run: |
+          chmod +x mc
+          ./mc --help
+          bash deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
