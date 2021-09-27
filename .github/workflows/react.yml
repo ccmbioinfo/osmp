@@ -36,4 +36,6 @@ jobs:
     steps:
       # Can add secrets to GitHub 
       - name: Upload to Minio bucket
-        run: ./deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca 
+        run: |
+        chmod +x ./deploy.sh
+        ./deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
