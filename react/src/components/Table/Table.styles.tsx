@@ -42,6 +42,11 @@ export const Styles = styled.div`
                 border-right: 0;
             }
         }
+
+        tbody {
+            max-height: 60vh;
+            overflow: auto;
+        }
     }
 `;
 

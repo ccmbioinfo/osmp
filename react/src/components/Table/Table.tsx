@@ -10,6 +10,7 @@ import {
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
+    ColumnGroup,
     HeaderGroup,
     Row,
     useFilters,
@@ -94,7 +95,7 @@ const flattenBaseResults = (
     };
 };
 
-/* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
+/* flatten data */
 const prepareData = (queryResult: VariantQueryDataResult[]) => {
     const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(r => {
@@ -119,7 +120,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
-    const [open, setOpen] = useState<Boolean>(false);
+    const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
@@ -164,13 +165,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const columns = React.useMemo(
-        () => [
+        (): ColumnGroup<FlattenedQueryResponse>[] => [
             {
                 Header: 'Core',
                 id: 'core',
                 columns: [
                     {
-                        accessor: (state: FlattenedQueryResponse) => state.refSeqId,
+                        accessor: state => state.refSeqId,
                         id: 'chromosome',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
@@ -212,7 +213,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'variation_details',
                 columns: [
                     {
-                        accessor: '',
                         id: 'empty_variation_details',
                         Header: '',
                         disableSortBy: true,
@@ -231,7 +231,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'case_details',
                 columns: [
                     {
-                        accessor: '',
                         id: 'empty_case_details',
                         Header: '',
                         disableSortBy: true,
@@ -273,7 +272,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Phenotypes',
                         width: getColumnWidth(
                             tableData,
-                            (state: any) =>
+                            state =>
                                 (state.phenotypicFeatures || [])
                                     .map((p: any) => p.phenotypeId)
                                     .join(', '),
@@ -323,7 +322,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: (state: any) => <ContactPopover state={state} />,
+                        accessor: state => <ContactPopover state={state} />,
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
@@ -343,11 +342,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    const getHeaderColumns = (headerId: string) =>
-        columns
-            .filter(header => header.id === headerId)[0]
-            .columns.map(c => c.id)
-            .filter(id => !dummyColumns.includes(id));
+    const getChildColumns = (groupId: string) => {
+        const targetGroup = columns.find(header => header.id === groupId);
+        if (targetGroup) {
+            return targetGroup.columns
+                .map(c => c.id)
+                .filter(id => id && !dummyColumns.includes(id)) as string[];
+        } else throw new Error(`Group ${groupId} not found!`);
+    };
 
     const tableInstance = useTable(
         {
@@ -357,8 +359,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             initialState: {
                 sortBy: sortByArray,
                 hiddenColumns: [
-                    getHeaderColumns('case_details'),
-                    getHeaderColumns('variation_details'),
+                    getChildColumns('case_details'),
+                    getChildColumns('variation_details'),
                 ].flat(),
             },
         },
@@ -428,7 +430,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             <TableFilters justifyContent="space-between">
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-                    <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setadvancedFiltersOpen(prev => !prev)}
+                    >
                         Advanced Filters{' '}
                         <IconPadder>
                             <BsFilter />
@@ -507,12 +512,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
             </TableFilters>
 
-            {open && (
+            {advancedFiltersOpen && (
                 <TableFilters justifyContent="flex-start" alignItems="flex-start">
                     {columns
                         .map(c => c.columns)
                         .flat()
-                        .filter(c => !dummyColumns.includes(c.id))
+                        .filter(c => !dummyColumns.includes(c.id as string))
                         .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
@@ -521,7 +526,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 <ColumnFilter
                                     filters={filters}
                                     setFilter={setFilter}
-                                    columnId={v.id}
+                                    columnId={v.id as string}
                                 />
                             </Column>
                         ))}
@@ -561,10 +566,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                             <motion.section
                                                                 key="content"
                                                                 initial="collapsed"
-                                                                animate="open"
+                                                                animate="advancedFiltersOpen"
                                                                 exit="collapsed"
                                                                 variants={{
-                                                                    open: {
+                                                                    advancedFiltersOpen: {
                                                                         opacity: 1,
                                                                         width: 'auto',
                                                                     },

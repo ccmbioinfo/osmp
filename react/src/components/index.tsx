@@ -18,8 +18,11 @@ import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } 
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Popover from './Popover/Popover';
+import Select from './Select';
+import SelectableList from './SelectableList';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
+import StyledInput from './StyledInput';
 import Table from './Table/Table';
 import Typography from './Typography';
 
@@ -49,8 +52,11 @@ export {
     Modal,
     Navbar,
     Popover,
+    SelectableList,
+    Select,
     Snackbar,
     Spinner,
+    StyledInput,
     Table,
     Typography,
 };

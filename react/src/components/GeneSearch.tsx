@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
 import { useFetchAutocompleteQuery } from '../apollo/hooks';
-import { DropdownItem } from '../types';
 import ComboBox from './ComboBox/ComboBox';
-
-export type GeneOption = DropdownItem<SelectionValue>;
+import { SelectableListItem } from './SelectableList';
 
 interface SelectionValue {
     ensemblId: string;
@@ -13,12 +11,12 @@ interface SelectionValue {
 
 interface GeneSearchProps {
     geneName: string;
-    onSelect: (gene: GeneOption) => void;
+    onSelect: (gene: SelectionValue) => void;
     onChange: (geneName: string) => void;
 }
 
 const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect }) => {
-    const [options, setOptions] = useState<GeneOption[]>([]);
+    const [options, setOptions] = useState<SelectableListItem<SelectionValue>[]>([]);
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
@@ -58,7 +56,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect })
             items={options}
             loading={autocompleteLoading}
             onChange={term => onChange(term)}
-            onSelect={item => onSelect(item)}
+            onSelect={(item: SelectionValue) => onSelect(item)}
             placeholder="Gene Search"
             value={geneName || ''}
         />

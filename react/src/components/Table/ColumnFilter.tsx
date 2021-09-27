@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { Flex, Input } from '../index';
+import { Flex, Input } from '..';
+import Select from '../Select';
 
 interface ColumnFilterProps {
     filters: {
@@ -10,20 +10,36 @@ interface ColumnFilterProps {
     columnId: string;
 }
 
-const SearchInput = styled(Input)`
-    min-height: 30px;
-`;
-
 export const ColumnFilter: React.FC<ColumnFilterProps> = ({ filters, setFilter, columnId }) => {
-    const value = filters.filter(f => f.id === columnId)[0]?.value;
+    const filter = filters.find(f => f.id === columnId);
 
-    return (
-        <Flex>
-            <SearchInput
-                value={value || ''}
-                placeholder="Search"
-                onChange={e => setFilter(columnId, e.target.value)}
-            />
-        </Flex>
-    );
+    const placeholder = 'Search';
+
+    const resolveComponent = () => {
+        if (columnId === 'source') {
+            return (
+                <Select
+                    options={['local', 'remote-test']
+                        .map((n, id) => ({
+                            id,
+                            value: n,
+                            label: n,
+                        }))
+                        .concat({ id: 3, label: 'all', value: '' })}
+                    onChange={val => setFilter('source', val)}
+                    selectedLabel={filter ? filter.value.toString() : ''}
+                />
+            );
+        } else {
+            return (
+                <Input
+                    value={filter ? filter.value.toString() : ''}
+                    placeholder={placeholder}
+                    onChange={e => setFilter(columnId, e.target.value)}
+                />
+            );
+        }
+    };
+
+    return <Flex>{resolveComponent()}</Flex>;
 };

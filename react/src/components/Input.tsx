@@ -1,30 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
+import StyledInput from './StyledInput';
 
 interface InputProps {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    value?: number | string;
-    placeholder?: string;
-    error?: boolean;
     disabled?: boolean;
+    error?: boolean;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+    value?: number | string;
 }
 
-const Component = styled.input<InputProps>`
-    background-color: ${props => props.theme.background.main};
+const Component = styled(StyledInput)<InputProps>`
     border-color: ${props =>
         props.error ? props.theme.colors.error : props.theme.colors.muted} !important;
-    color: ${props => props.theme.colors.text};
-    border-radius: ${props => props.theme.radii.base};
-    border: ${props => props.theme.borders.thin};
-    box-shadow: ${props => props.theme.boxShadow};
-    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
-    font-family: ${props => props.theme.fontFamily.body};
-    font-size: ${props => props.theme.fontSizes.s};
-    min-height: 46px;
+    position: relative;
 `;
 
-const Input: React.FC<InputProps> = ({ ...userStyles }) => {
-    return <Component {...userStyles} />;
-};
+const Input: React.FC<InputProps> = props => <Component {...props} />;
 
 export default Input;
