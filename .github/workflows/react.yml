@@ -36,4 +36,5 @@ jobs:
     steps:
       # Can add secrets to GitHub 
       - name: Upload to Minio bucket
-        run: cd react && bash deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
+        run: bash deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
+        working-directory: react
