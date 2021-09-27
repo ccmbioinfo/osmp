@@ -34,7 +34,8 @@ jobs:
       - name: Generate build
         run: yarn build
       - name: Upload to Minio bucket
+        if: github.event_name == 'push'
         run: |
-          chmod +x mc
-          ./mc --help
-          bash deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
+          sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          sudo chmod +x /usr/local/bin/mc
+          ./deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
