@@ -1,5 +1,20 @@
 version: "3.9"
 services:
+  minio: 
+    image: quay.io/minio/minio:RELEASE.2021-09-24T00-24-24Z
+    expose:
+      - "9000"
+      - "9001"
+    environment:
+      MINIO_ACCESS_KEY: "${MINIO_ACCESS_KEY}"
+      MINIO_SECRET_KEY: "${MINIO_SECRET_KEY}"
+    ports:
+      - "${MINIO_HOST_PORT}:9000"
+    volumes:
+      - ${MINIO_VOLUME}:/data
+    command: server --console-address ":9001" /data
+    networks:
+      - ssmp
   react:
     image: node:16.3-buster
     volumes:
