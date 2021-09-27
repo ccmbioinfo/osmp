@@ -8,7 +8,7 @@ on:
       - react/src/**/*
 
 jobs:
-  build:
+  build-react:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -23,18 +23,5 @@ jobs:
         run: yarn install
       - name: Generate build
         run: yarn build
-  deploy:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        #Set working directory to react for shell script
-        working-directory: react
-    # When build has been generated for React app
-    # Then we can start with deployment
-    needs: build
-    steps:
-      # Can add secrets to GitHub 
       - name: Upload to Minio bucket
         run: bash deploy.sh minio ssmp-site-dev.minio.genomics4rd.ca
-        working-directory: react
