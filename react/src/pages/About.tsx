@@ -23,7 +23,7 @@ const AboutPage: React.FC<{}> = () => {
             </Flex>
             <Flex>
                 <Typography variant="h3" bold>
-                    Welcome to the Single-sided Matching Portal.
+                    TESTESTETSTES
                 </Typography>
             </Flex>
             <Divider />
