@@ -34,7 +34,7 @@ jobs:
       - name: Generate build
         run: yarn build
       - name: Upload to Minio bucket
-        if: github.event_name == 'push'
+        # if: github.event_name == 'push'
         run: |
           sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           sudo chmod +x /usr/local/bin/mc
