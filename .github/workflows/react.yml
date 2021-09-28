@@ -37,8 +37,8 @@ jobs:
         # Uncomment during actual deploy to dev server
         # if: github.event_name == 'push'  
         env:
-          MC_HOST_minio: http://hle:M6RJPeR+eBe4DAIMeMWX00qLgZ1lkaLm5vcQbixn@minio.ccm.sickkids.ca
+          MC_HOST_minio: https://hle:M6RJPeR+eBe4DAIMeMWX00qLgZ1lkaLm5vcQbixn@minio.ccm.sickkids.ca
         run: |
           sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           sudo chmod +x /usr/local/bin/mc
-          ./deploy.sh minio ssmp-react-build
+          ./deploy.sh hle-minio ssmp-react-build
