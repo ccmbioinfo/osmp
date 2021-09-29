@@ -2,7 +2,7 @@
     "name": "client",
     "version": "0.1.0",
     "private": true,
-    "proxy": "http://ssmp-server:5862",
+    "proxy": "http://ssmp-server:3000",
     "dependencies": {
         "@apollo/react-hooks": "^4.0.0",
         "@react-keycloak/web": "^3.4.0",
