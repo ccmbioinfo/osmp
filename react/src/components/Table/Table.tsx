@@ -10,6 +10,7 @@ import {
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
+    ColumnGroup,
     HeaderGroup,
     Row,
     useFilters,
@@ -32,6 +33,7 @@ import {
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ColumnFilter } from './ColumnFilter';
+import { ContactPopover } from './ContactPopover';
 import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
@@ -41,6 +43,7 @@ import {
     Styles,
     TableFilters,
     TH,
+    THead,
 } from './Table.styles';
 
 interface TableProps {
@@ -92,7 +95,7 @@ const flattenBaseResults = (
     };
 };
 
-/* flatten calls, will eventually need to make sure call.individualId is reliably mapped to individualId on variant */
+/* flatten data */
 const prepareData = (queryResult: VariantQueryDataResult[]) => {
     const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(r => {
@@ -117,7 +120,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
-    const [open, setOpen] = useState<Boolean>(false);
+    const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
@@ -162,13 +165,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const columns = React.useMemo(
-        () => [
+        (): ColumnGroup<FlattenedQueryResponse>[] => [
             {
                 Header: 'Core',
                 id: 'core',
                 columns: [
                     {
-                        accessor: (state: FlattenedQueryResponse) => state.refSeqId,
+                        accessor: state => state.refSeqId,
                         id: 'chromosome',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
@@ -210,7 +213,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'variation_details',
                 columns: [
                     {
-                        accessor: '',
                         id: 'empty_variation_details',
                         Header: '',
                         disableSortBy: true,
@@ -229,7 +231,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'case_details',
                 columns: [
                     {
-                        accessor: '',
                         id: 'empty_case_details',
                         Header: '',
                         disableSortBy: true,
@@ -271,7 +272,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Phenotypes',
                         width: getColumnWidth(
                             tableData,
-                            (state: any) =>
+                            state =>
                                 (state.phenotypicFeatures || [])
                                     .map((p: any) => p.phenotypeId)
                                     .join(', '),
@@ -321,13 +322,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: () => (
-                            <Flex justifyContent="center">
-                                <Button variant="primary">Contact</Button>
-                            </Flex>
-                        ),
+                        accessor: state => <ContactPopover state={state} />,
                         id: 'contact',
                         Header: 'Contact',
+                        width: 120,
                     },
                 ],
             },
@@ -344,6 +342,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
+    const getChildColumns = (groupId: string) => {
+        const targetGroup = columns.find(header => header.id === groupId);
+        if (targetGroup) {
+            return targetGroup.columns
+                .map(c => c.id)
+                .filter(id => id && !dummyColumns.includes(id)) as string[];
+        } else throw new Error(`Group ${groupId} not found!`);
+    };
+
     const tableInstance = useTable(
         {
             columns,
@@ -351,7 +358,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             initialState: {
                 sortBy: sortByArray,
-                hiddenColumns: dummyColumns,
+                hiddenColumns: [
+                    getChildColumns('case_details'),
+                    getChildColumns('variation_details'),
+                ].flat(),
             },
         },
         useFilters,
@@ -420,7 +430,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             <TableFilters justifyContent="space-between">
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-                    <Button variant="secondary" onClick={() => setOpen(prev => !prev)}>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setadvancedFiltersOpen(prev => !prev)}
+                    >
                         Advanced Filters{' '}
                         <IconPadder>
                             <BsFilter />
@@ -457,52 +470,54 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         hideModal={() => setShowModal(false)}
                         title="Customize Columns"
                     >
-                        {headerGroups[0].headers.map((g, id) => (
-                            <div key={id}>
-                                <Checkbox
-                                    label={g.Header as string}
-                                    checked={g.isVisible}
-                                    onClick={() => handleGroupChange(g)}
-                                />
-                                {g.columns?.map(
-                                    (c, id) =>
-                                        !fixedColumns.includes(c.id) &&
-                                        !dummyColumns.includes(c.id) && (
-                                            <div key={id} style={{ paddingLeft: 20 }}>
-                                                <Checkbox
-                                                    label={c.Header as string}
-                                                    checked={c.isVisible}
-                                                    onClick={() => {
-                                                        if (
-                                                            c.parent &&
-                                                            g.columns?.filter(c => c.isVisible)
-                                                                .length === 1
-                                                        ) {
-                                                            toggleHideColumn(c.id, c.isVisible);
-                                                            toggleHideColumn(
-                                                                'empty_' + c.parent.id,
-                                                                !c.isVisible
-                                                            );
-                                                        } else {
-                                                            toggleHideColumn(c.id, c.isVisible);
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                        )
-                                )}
-                            </div>
-                        ))}
+                        {headerGroups[0].headers
+                            .filter(header => header.Header !== 'Core')
+                            .map((g, id) => (
+                                <div key={id}>
+                                    <Checkbox
+                                        label={g.Header as string}
+                                        checked={g.isVisible}
+                                        onClick={() => handleGroupChange(g)}
+                                    />
+                                    {g.columns?.map(
+                                        (c, id) =>
+                                            !fixedColumns.includes(c.id) &&
+                                            !dummyColumns.includes(c.id) && (
+                                                <div key={id} style={{ paddingLeft: 20 }}>
+                                                    <Checkbox
+                                                        label={c.Header as string}
+                                                        checked={c.isVisible}
+                                                        onClick={() => {
+                                                            if (
+                                                                c.parent &&
+                                                                g.columns?.filter(c => c.isVisible)
+                                                                    .length === 1
+                                                            ) {
+                                                                toggleHideColumn(c.id, c.isVisible);
+                                                                toggleHideColumn(
+                                                                    'empty_' + c.parent.id,
+                                                                    !c.isVisible
+                                                                );
+                                                            } else {
+                                                                toggleHideColumn(c.id, c.isVisible);
+                                                            }
+                                                        }}
+                                                    />
+                                                </div>
+                                            )
+                                    )}
+                                </div>
+                            ))}
                     </Modal>
                 </InlineFlex>
             </TableFilters>
 
-            {open && (
+            {advancedFiltersOpen && (
                 <TableFilters justifyContent="flex-start" alignItems="flex-start">
                     {columns
                         .map(c => c.columns)
                         .flat()
-                        .filter(c => !dummyColumns.includes(c.id))
+                        .filter(c => !dummyColumns.includes(c.id as string))
                         .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
@@ -511,7 +526,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 <ColumnFilter
                                     filters={filters}
                                     setFilter={setFilter}
-                                    columnId={v.id}
+                                    columnId={v.id as string}
                                 />
                             </Column>
                         ))}
@@ -525,8 +540,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     hideScrollbars={!refXOverflowing}
                     ignoreElements="p"
                 >
-                    <table {...getTableProps()} ref={horizonstalRef}>
-                        <thead>
+                    <table
+                        {...getTableProps()}
+                        ref={horizonstalRef}
+                        style={{
+                            height: '200px', // This will force the table body to overflow and scroll, since there is not enough room
+                        }}
+                    >
+                        <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
                                 const { key, ...restHeaderGroupProps } =
@@ -545,10 +566,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                             <motion.section
                                                                 key="content"
                                                                 initial="collapsed"
-                                                                animate="open"
+                                                                animate="advancedFiltersOpen"
                                                                 exit="collapsed"
                                                                 variants={{
-                                                                    open: {
+                                                                    advancedFiltersOpen: {
                                                                         opacity: 1,
                                                                         width: 'auto',
                                                                     },
@@ -567,7 +588,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     justifyContent="center"
                                                                 >
                                                                     {column.render('Header')}
-                                                                    {isHeader(column) &&
+                                                                    {column.Header !== 'Core' &&
+                                                                        isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
                                                                         ) ? (
@@ -612,35 +634,41 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     </motion.tr>
                                 );
                             })}
-                        </thead>
+                        </THead>
 
-                        <tbody {...getTableBodyProps()}>
-                            {page.length > 0 ? (
-                                page.map(row => {
-                                    prepareRow(row);
-                                    const { key, ...restRowProps } = row.getRowProps();
-                                    return (
-                                        <motion.tr key={key} layout="position" {...restRowProps}>
-                                            {row.cells.map(cell => {
-                                                const { key, ...restCellProps } =
-                                                    cell.getCellProps();
-                                                return (
-                                                    <td key={key} {...restCellProps}>
-                                                        <Typography variant="subtitle">
-                                                            {cell.render('Cell')}
-                                                        </Typography>
-                                                    </td>
-                                                );
-                                            })}
-                                        </motion.tr>
-                                    );
-                                })
-                            ) : (
-                                <Typography variant="p" error>
-                                    There are no records to display.
-                                </Typography>
-                            )}
-                        </tbody>
+                        <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
+                            <tbody {...getTableBodyProps()}>
+                                {page.length > 0 ? (
+                                    page.map(row => {
+                                        prepareRow(row);
+                                        const { key, ...restRowProps } = row.getRowProps();
+                                        return (
+                                            <motion.tr
+                                                key={key}
+                                                layout="position"
+                                                {...restRowProps}
+                                            >
+                                                {row.cells.map(cell => {
+                                                    const { key, ...restCellProps } =
+                                                        cell.getCellProps();
+                                                    return (
+                                                        <td key={key} {...restCellProps}>
+                                                            <Typography variant="subtitle">
+                                                                {cell.render('Cell')}
+                                                            </Typography>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </motion.tr>
+                                        );
+                                    })
+                                ) : (
+                                    <Typography variant="p" error>
+                                        There are no records to display.
+                                    </Typography>
+                                )}
+                            </tbody>
+                        </div>
                     </table>
                 </ScrollContainer>
             </Styles>
