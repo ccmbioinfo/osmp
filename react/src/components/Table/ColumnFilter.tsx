@@ -1,4 +1,5 @@
 import { Flex, Input } from '..';
+import SOURCES from '../../constants/sources';
 import Select from '../Select';
 
 interface ColumnFilterProps {
@@ -19,14 +20,12 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({ filters, setFilter, 
         if (columnId === 'source') {
             return (
                 <Select
-                    options={['local', 'remote-test']
-                        .map((n, id) => ({
-                            id,
-                            value: n,
-                            label: n,
-                        }))
-                        .concat({ id: 3, label: 'all', value: '' })}
-                    onChange={val => setFilter('source', val)}
+                    options={SOURCES.map((n, id) => ({
+                        id,
+                        value: n,
+                        label: n,
+                    })).concat({ id: 3, label: 'all', value: '' })}
+                    onSelect={val => setFilter('source', val)}
                     selectedLabel={filter ? filter.value.toString() : ''}
                 />
             );

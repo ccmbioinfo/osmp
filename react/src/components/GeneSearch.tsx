@@ -53,7 +53,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect })
 
     return (
         <ComboBox
-            items={options}
+            options={options}
             loading={autocompleteLoading}
             onChange={term => onChange(term)}
             onSelect={(item: SelectionValue) => onSelect(item)}

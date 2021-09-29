@@ -184,7 +184,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Assembly ID
                         </Typography>
                         <Select
-                            onChange={val => updateQueryOptionsForm('assemblyId')(val)}
+                            onSelect={val => updateQueryOptionsForm('assemblyId')(val)}
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
                                 value: a,

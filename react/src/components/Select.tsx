@@ -7,7 +7,7 @@ import { Flex } from './Layout';
 import SelectableList, { SelectableListItem } from './SelectableList';
 
 interface SelectProps<T extends {}> {
-    onChange: (val: T) => void;
+    onSelect: (val: T) => void;
     options: SelectableListItem<T>[];
     selectedLabel: string;
 }
@@ -16,32 +16,33 @@ const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
     flex-grow: 0;
+    max-width: 213px;
     position: relative;
-    width: 213px;
+    width: 100%;
 `;
 
 const StyledInput = styled(Input)`
+    border: none;
     box-shadow: transparent 0px 0px !important;
     cursor: pointer;
-    width: 70%;
-    border: none;
     outline: none;
+    width: 70%;
 `;
 
 export const Header = styled(Flex)`
-    background-color: ${props => props.theme.background.main};
-    border-color: ${props => props.theme.colors.muted};
-    color: ${props => props.theme.colors.muted};
-    border-radius: ${props => props.theme.radii.base};
-    border: ${props => props.theme.borders.thin};
-    box-shadow: ${props => props.theme.boxShadow};
-    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
-    justify-content: space-between;
     align-items: center;
+    background-color: ${props => props.theme.background.main};
+    border: ${props => props.theme.borders.thin};
+    border-color: ${props => props.theme.colors.muted};
+    border-radius: ${props => props.theme.radii.base};
+    box-shadow: ${props => props.theme.boxShadow};
+    color: ${props => props.theme.colors.muted};
+    justify-content: space-between;
+    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     width: inherit;
 `;
 
-export default function Select<T>({ onChange, options, selectedLabel }: SelectProps<T>) {
+export default function Select<T>({ onSelect, options, selectedLabel }: SelectProps<T>) {
     const [open, setOpen] = useState(false);
 
     const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
@@ -58,7 +59,7 @@ export default function Select<T>({ onChange, options, selectedLabel }: SelectPr
                 <SelectableList
                     options={options}
                     onSelect={item => {
-                        onChange(item as T);
+                        onSelect(item as T);
                         setOpen(false);
                     }}
                 />
