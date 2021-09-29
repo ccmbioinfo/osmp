@@ -99,6 +99,6 @@ const startServer = async () => {
 
 startServer();
 
-httpServer.listen(3000, () => {
-  logger.info('Server running on port 3000');
+httpServer.listen(5862, () => {
+  logger.info('Server running on port 5862');
 });
