@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface InputProps {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    value?: number | string;
-    placeholder?: string;
-    error?: boolean;
+export interface InputProps {
     disabled?: boolean;
+    error?: boolean;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    placeholder?: string;
+    value?: number | string;
 }
 
 const Component = styled.input<InputProps>`
@@ -23,8 +23,6 @@ const Component = styled.input<InputProps>`
     min-height: 46px;
 `;
 
-const Input: React.FC<InputProps> = ({ ...userStyles }) => {
-    return <Component {...userStyles} />;
-};
+const Input: React.FC<InputProps> = props => <Component {...props} />;
 
 export default Input;
