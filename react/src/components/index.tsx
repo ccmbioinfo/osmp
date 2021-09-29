@@ -1,7 +1,7 @@
 import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
-import ComboBox from './ComboBox/ComboBox';
+import ComboBox from './ComboBox';
 import ErrorProvider, {
     clearError,
     ErrorContext,
@@ -18,7 +18,6 @@ import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } 
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Popover from './Popover/Popover';
-import Select from './Select';
 import SelectableList from './SelectableList';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
@@ -53,7 +52,6 @@ export {
     Navbar,
     Popover,
     SelectableList,
-    Select,
     Snackbar,
     Spinner,
     StyledInput,

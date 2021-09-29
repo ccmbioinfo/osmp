@@ -1,6 +1,6 @@
 import { Flex, Input } from '..';
 import SOURCES from '../../constants/sources';
-import Select from '../Select';
+import ComboBox from '../ComboBox';
 
 interface ColumnFilterProps {
     filters: {
@@ -19,14 +19,15 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({ filters, setFilter, 
     const resolveComponent = () => {
         if (columnId === 'source') {
             return (
-                <Select
+                <ComboBox
                     options={SOURCES.map((n, id) => ({
                         id,
                         value: n,
                         label: n,
                     })).concat({ id: 3, label: 'all', value: '' })}
                     onSelect={val => setFilter('source', val)}
-                    selectedLabel={filter ? filter.value.toString() : ''}
+                    placeholder="Select"
+                    value={filter ? filter.value.toString() : ''}
                 />
             );
         } else {

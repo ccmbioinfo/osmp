@@ -9,11 +9,11 @@ import {
     Checkbox,
     clearError,
     Column,
+    ComboBox,
     ErrorIndicator,
     Flex,
     GeneSearch,
     Input,
-    Select,
     Spinner,
     Table,
     Typography,
@@ -183,14 +183,15 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="subtitle" bold>
                             Assembly ID
                         </Typography>
-                        <Select
+                        <ComboBox
                             onSelect={val => updateQueryOptionsForm('assemblyId')(val)}
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
                                 value: a,
                                 label: a,
                             }))}
-                            selectedLabel={queryOptionsForm.assemblyId.value}
+                            placeholder="Select"
+                            value={queryOptionsForm.assemblyId.value}
                         />
                         <ErrorText error={queryOptionsForm.assemblyId.error} />
                     </Column>

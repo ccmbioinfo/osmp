@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
 import { useFetchAutocompleteQuery } from '../apollo/hooks';
-import ComboBox from './ComboBox/ComboBox';
+import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
 
 interface SelectionValue {
@@ -58,6 +58,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect })
             onChange={term => onChange(term)}
             onSelect={(item: SelectionValue) => onSelect(item)}
             placeholder="Gene Search"
+            searchable
             value={geneName || ''}
         />
     );

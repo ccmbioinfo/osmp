@@ -1,20 +1,20 @@
 import React, { ChangeEvent, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
+import { FaCaretDown } from 'react-icons/fa';
 import styled from 'styled-components';
-import { useClickAway } from '../../hooks';
-import Input from '../Input';
-import { Flex } from '../Layout';
-import SelectableList, { SelectableListItem } from '../SelectableList';
-import Spinner from '../Spinner';
-
-//import { Header, Input, Wrapper } from './ComboBox.styles';
+import { useClickAway } from '../hooks';
+import Input, { InputProps } from './Input';
+import { Flex } from './Layout';
+import SelectableList, { SelectableListItem } from './SelectableList';
+import Spinner from './Spinner';
 
 interface ComboBoxProps<T> {
     options: SelectableListItem<T>[];
     loading?: boolean;
     onSelect: (item: T) => void;
-    onChange: (searchTerm: string) => void;
+    onChange?: (searchTerm: string) => void;
     placeholder: string;
+    searchable?: boolean;
     value: string;
 }
 
@@ -27,10 +27,12 @@ export const Wrapper = styled(Flex)`
     width: 100%;
 `;
 
-export const StyledInput = styled(Input)`
+export const StyledInput = styled(Input)<InputProps>`
     border: none;
     box-shadow: transparent 0px 0px !important;
+    cursor: ${props => (props.disabled ? 'pointer' : 'inherit')};
     outline: none;
+    position: relative;
     width: 70%;
 `;
 
@@ -53,9 +55,14 @@ export default function ComboBox<T extends {}>({
     onChange,
     onSelect,
     placeholder,
+    searchable,
     value,
 }: ComboBoxProps<T>) {
     const [open, setOpen] = useState<Boolean>(false);
+
+    if (searchable && !onChange) {
+        console.error('An onChange function is required for searchable comboboxes!');
+    }
 
     const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
@@ -63,14 +70,27 @@ export default function ComboBox<T extends {}>({
 
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         setOpen(true);
-        onChange(e.target.value);
+        !!onChange && onChange(e.target.value);
     };
 
     return (
         <Wrapper ref={ref}>
-            <Header tabIndex={0} role="button">
-                <StyledInput value={value} placeholder={placeholder} onChange={getSuggestions} />
-                {loading ? <Spinner size={5} /> : <BsSearch />}
+            <Header tabIndex={0} role="button" onClick={() => setOpen(true)}>
+                {searchable ? (
+                    <>
+                        <StyledInput
+                            value={value}
+                            placeholder={placeholder}
+                            onChange={getSuggestions}
+                        />
+                        {loading ? <Spinner size={5} /> : <BsSearch />}
+                    </>
+                ) : (
+                    <>
+                        <StyledInput disabled value={value} placeholder={placeholder} />
+                        <FaCaretDown />
+                    </>
+                )}
             </Header>
             {open && (
                 <SelectableList
