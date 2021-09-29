@@ -7,6 +7,14 @@ on:
       - .github/workflows/react.yml
       - react/src/**/*
 
+
+# Testing with hardcoded values, will change these to environmental secrets
+env:
+  REACT_APP_GRAPHQL_URL: http://localhost:4777/graphql
+  REACT_APP_KEYCLOAK_AUTH_URL: http://localhost:9821/auth
+  REACT_APP_KEYCLOAK_REALM: ssmp
+  REACT_APP_KEYCLOAK_CLIENT_ID: ssmp-app
+
 jobs:
   build-react:
     environment: SSMP_BUILD
