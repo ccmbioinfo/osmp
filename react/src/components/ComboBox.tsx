@@ -33,6 +33,7 @@ export const StyledInput = styled(Input)<InputProps>`
     cursor: ${props => (props.disabled ? 'pointer' : 'inherit')};
     outline: none;
     position: relative;
+    padding: 0;
     width: 70%;
 `;
 

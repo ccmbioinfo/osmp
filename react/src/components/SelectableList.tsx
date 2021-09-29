@@ -4,7 +4,6 @@ const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
     padding: 0;
     list-style-type: none;
-    margin: 0;
     width: inherit;
     margin-top: ${props => props.theme.space[5]};
     max-height: 200px;
