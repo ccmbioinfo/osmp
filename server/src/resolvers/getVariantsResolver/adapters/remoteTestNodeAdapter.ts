@@ -22,7 +22,7 @@ const getRemoteTestNodeQuery = async (
   if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
     try {
       tokenResponse = await axios.post(
-        'https://ssmp-dev.us.auth0.com/oauth/token',
+        process.env.TEST_NODE_SSMP_TOKEN_ENDPOINT!,
         {
           client_id: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_ID,
           client_secret: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_SECRET,

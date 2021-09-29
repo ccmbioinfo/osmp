@@ -5,17 +5,17 @@ import { useClickAway } from '../../hooks';
 import { DropdownItem } from '../../types';
 import { Header, Input, List, Wrapper } from './ComboBox.styles';
 
-interface ComboBoxProps {
-    items: DropdownItem[];
+interface ComboBoxProps<T> {
+    items: DropdownItem<T>[];
     loading?: boolean;
-    onSelect: (item: DropdownItem) => void;
-    onChange?: (searchTerm: string) => void;
+    onSelect: (item: DropdownItem<T>) => void;
+    onChange: (searchTerm: string) => void;
     onClose?: () => void;
     placeholder: string;
     value: string;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({
+function ComboBox<T extends {}>({
     items,
     loading,
     onChange,
@@ -23,21 +23,16 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     onSelect,
     placeholder,
     value,
-}) => {
-    const [searchTerm, setSearchTerm] = useState(value);
+}: ComboBoxProps<T>) {
     const [open, setOpen] = useState<Boolean>(false);
 
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setSearchTerm(value);
         setOpen(true);
-        if (onChange) {
-            onChange(value);
-        }
+        onChange(value);
     };
 
-    function handleOnClick(item: DropdownItem) {
-        setSearchTerm(item.label);
+    function handleOnClick(item: DropdownItem<T>) {
         onSelect(item);
         setOpen(false);
     }
@@ -55,13 +50,13 @@ const ComboBox: React.FC<ComboBoxProps> = ({
         <div>
             <Wrapper>
                 <Header tabIndex={0} role="button">
-                    <Input value={searchTerm} placeholder={placeholder} onChange={getSuggestions} />
+                    <Input value={value} placeholder={placeholder} onChange={getSuggestions} />
                     {loading ? <Spinner size={5} /> : <BsSearch />}
                 </Header>
                 {open && (
                     <List ref={fragmentRef}>
                         {items
-                            .filter(i => i.label.toLowerCase().includes(searchTerm.toLowerCase()))
+                            .filter(i => i.label.toLowerCase().includes(value.toLowerCase()))
                             .map(item => (
                                 <li key={item.id}>
                                     <button type="button" onClick={() => handleOnClick(item)}>
@@ -74,6 +69,6 @@ const ComboBox: React.FC<ComboBoxProps> = ({
             </Wrapper>
         </div>
     );
-};
+}
 
 export default ComboBox;

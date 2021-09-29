@@ -46,9 +46,7 @@ export const Styles = styled.div`
 `;
 
 export const THead = styled.thead`
-    background: #f7f7f7;
-    height: 30px;
-    margin-bottom: ${props => props.theme.space[3]};
+    box-shadow: ${props => props.theme.boxShadow};
 `;
 
 export const TH = styled.th`

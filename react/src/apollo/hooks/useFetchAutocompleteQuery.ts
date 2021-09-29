@@ -2,11 +2,17 @@ import gql from 'graphql-tag';
 import { useLazyApolloQuery } from '../client';
 
 const autocompleteQuery = gql`
-    query FetchAutocomplete($term: String) {
-        autocompleteResults(term: $term)
-            @rest(type: "AutoCompleteSuggestion", path: "ensembl/autocomplete?{args}") {
-            suggestions {
-                suggestion
+    query FetchAutocomplete($q: String) {
+        autocompleteResults(q: $q)
+            @rest(
+                type: "AutoCompleteSuggestion"
+                path: "query?species=human&fields=symbol,ensembl.gene&{args}"
+            ) {
+            hits {
+                symbol
+                ensembl {
+                    gene
+                }
             }
         }
     }
@@ -14,8 +20,8 @@ const autocompleteQuery = gql`
 
 const useFetchAutocompleteQuery = () =>
     useLazyApolloQuery<
-        { autocompleteResults: { suggestions: { suggestion: string }[] } },
-        { term: string }
+        { autocompleteResults: { hits: { symbol: string; ensembl: { gene: string } }[] } },
+        { q: string }
     >(autocompleteQuery);
 
 export default useFetchAutocompleteQuery;

@@ -1,8 +1,7 @@
-# mostly derived from Beacon v2 spec: https://github.com/ga4gh-beacon/specification-v2/blob/master/beacon.yaml
 openapi: "3.0.2"
 info:
   title: Single-Sided Matching Portal API
-  version: "0.3"
+  version: "0.4"
 
 paths:
   /variants:
@@ -16,7 +15,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RequestQuery"
+              $ref: "#/components/schemas/Query"
       responses:
         "200":
           description: |
@@ -24,15 +23,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IndividualGenomicVariantResponseContent"
-
+                $ref: "#/components/schemas/QueryResponse"
 components:
   schemas:
-    Assembly:
-      description: |
-        Assembly identifier (GRC notation, e.g. GRCh37).
-      type: string
-      example: GRCh38
     Callset:
       description: |
         A callset for a variant
@@ -47,61 +40,101 @@ components:
             The ID of the individual
           type: string
         info:
-          description: |
-            Key-value pairs for callset info
-          type: object
-          example:
-            infoKey1: infoValue1
-    Variant:
-      allOf:
-        - $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_variant_identification_schema.yaml#/components/schemas/VariantIdentification"
-        - type: object
-          properties:
-            callsets:
-              type: array
-              items:
-                $ref: "#/components/schemas/Callset"
-    RequestQuery:
+          $ref: "#/components/schemas/CallsetInfo"
+    CallsetInfo:
       description: |
-        A request to the variants endpoint
+        Additional metadata about the callset
       type: object
+      example: "TBD"
       properties:
-        variant:
-          $ref: "#/components/schemas/GenomicVariantFields"
-        gene:
-          $ref: "#/components/schemas/GeneFields"
-    GenomicVariantFields:
-      description: |
-        All the required fields to query any kind of variant (e.g. SNP, DUP,
-        etc.).
-      type: object
-      properties:
-        assemblyId:
-          $ref: "#/components/schemas/Assembly"
-        maxFrequency:
-          description: |
-            Maximum Frequency of this allele
+        AD:
           type: number
-    GeneFields:
+        DP:
+          type: number
+        GQ:
+          type: number
+        QUAL:
+          type: number
+        zygosity:
+          type: string
+    GeneFilters:
       properties:
         geneName:
           type: string
         ensemblId:
           type: string
-    VariantResponseResults:
+    Individual:
+      properties:
+        individualId:
+          description: |
+            Individual identifier (external accession or internal ID).
+          type: string
+          example: P0001
+        datasetId:
+          description: Reference to dataset ID.
+          type: string
+        diseases:
+          description: |
+            List of disease(s) been diagnosed to the individual, defined by
+            disease ICD10 code, optionally other disease ontology ID(s), age of
+            onset, stage and the presence of family history.
+          type: array
+          items:
+            $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/Disease"
+        ethnicity:
+          description: |
+            Ethnic background of the individual. Value from NCIT Race ontology 
+            (NCIT:C17049), e.g. NCIT:C126531 (Latin American).
+          type: string
+          example: "NCIT:C126531"
+        geographicOrigin:
+          description: |
+            Individual's country or region of origin (birthplace or residence 
+            place regardless of ethnic origin). Value from GAZ Geographic 
+            Location ontology (GAZ:00000448), e.g. GAZ:00002459 (United States 
+            of America).
+          type: string
+          example: "GAZ:00002459"
+        info:
+          $ref: "#/components/schemas/IndividualInfo"
+        phenotypicFeatures:
+          type: array
+          items:
+            $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/PhenotypicFeature"
+        sex:
+          description: |
+            Sex of the individual.
+            Value from NCIT General Qualifier (NCIT:C27993) ontology: UNKNOWN 
+            (not assessed or not available) (NCIT:C17998), FEMALE (NCIT:C46113), 
+            MALE, (NCIT:C46112) or OTHER SEX (NCIT:C45908).
+          type: string
+          enum:
+            - NCIT:C17998
+            - NCIT:C46113
+            - NCIT:C46112
+            - NCIT:C45908
+          example: "NCIT:C17998"
+    IndividualInfo:
+      type: object
       description: |
-        Description pending
+        Additional metadata about the individual
+      properties:
+        diagnosis:
+          type: string
+        candidateGene:
+          type: string
+        classifications:
+          type: string
+    Query:
+      description: |
+        A request to the variants endpoint
+      type: object
       properties:
         variant:
-          $ref: "#/components/schemas/Variant"
-        individual:
-          $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/Individual"
-        contactInfo:
-          type: string
-          description: Contact information for the record owner
-          example: "DrExample@example.ca"
-          
-    IndividualGenomicVariantResponseContent:
+          $ref: "#/components/schemas/VariantFilters"
+        gene:
+          $ref: "#/components/schemas/GeneFilters"
+    QueryResponse:
       description: |
         Description pending
       type: object
@@ -122,3 +155,62 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/VariantResponseResults"
+    Variant:
+      allOf:
+        - $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_variant_identification_schema.yaml#/components/schemas/VariantIdentification"
+        - type: object
+          properties:
+            callsets:
+              type: array
+              items:
+                $ref: "#/components/schemas/Callset"
+        - type: object
+          properties:
+            info:
+              $ref: "#/components/schemas/VariantInfo"
+    VariantInfo:
+      description: |
+        Additional metadata about the variant
+      type: object
+      example: "TBD"
+      properties:
+        geneName:
+          type: string
+          example: APOE
+        cDNA:
+          type: string
+        AAChanges:
+          type: string
+        transcript:
+          type: string
+        gnomadHet:
+          type: number
+        gnomadHom:
+          type: number
+    VariantFilters:
+      description: |
+        All the required fields to query any kind of variant (e.g. SNP, DUP,
+        etc.).
+      type: object
+      properties:
+        assemblyId:
+          description: |
+            Assembly identifier (GRC notation, e.g. GRCh37).
+          type: string
+          example: GRCh38
+        maxFrequency:
+          description: |
+            Maximum Frequency of this allele
+          type: number
+    VariantResponseResults:
+      description: |
+        Description pending
+      properties:
+        variant:
+          $ref: "#/components/schemas/Variant"
+        individual:
+          $ref: "#/components/schemas/Individual"
+        contactInfo:
+          type: string
+          description: Contact information for the record owner
+          example: "DrExample@example.ca"

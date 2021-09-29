@@ -12,3 +12,5 @@ kcadm.sh create clients -r "${KEYCLOAK_REALM}" -s clientId="${KEYCLOAK_SERVER_CL
 
 kcadm.sh create users -s username=ssmp-user -s enabled=true -r "${KEYCLOAK_REALM}"
 kcadm.sh set-password -r "${KEYCLOAK_REALM}" --username ssmp-user --new-password secret --temporary
+
+kcadm.sh update realms/"${KEYCLOAK_REALM}" -s "loginTheme=ssmp"

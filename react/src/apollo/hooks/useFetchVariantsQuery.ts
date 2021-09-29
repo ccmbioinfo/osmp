@@ -15,12 +15,19 @@ const fetchVariantsQuery = gql`
                             info {
                                 ad
                                 dp
+                                gq
+                                qual
                                 zygosity
                             }
                         }
                         end
                         info {
-                            af
+                            aaChanges
+                            cDna
+                            geneName
+                            gnomadHet
+                            gnomadHom
+                            transcript
                         }
                         ref
                         refSeqId
@@ -28,14 +35,38 @@ const fetchVariantsQuery = gql`
                     }
                     individual {
                         datasetId
+                        diseases {
+                            ageOfOnset {
+                                age
+                                ageGroup
+                            }
+                            description
+                            diseaseId
+                            levelSeverity
+                            outcome
+                            stage
+                        }
                         ethnicity
-                        contactEmail
+                        geographicOrigin
                         individualId
+                        info {
+                            diagnosis
+                            candidateGene
+                            classifications
+                        }
                         phenotypicFeatures {
+                            ageOfOnset {
+                                age
+                                ageGroup
+                            }
+                            dateOfOnset
+                            levelSeverity
+                            onsetType
                             phenotypeId
                         }
                         sex
                     }
+                    contactInfo
                 }
                 source
             }

@@ -18,6 +18,7 @@ export const Loader = styled.div<LoaderProps>`
     border-top: ${props => props.theme.borders.thin} #767676;
     border-radius: 50%;
     margin-inline-start: ${props => props.theme.space[3]};
+    margin-bottom: inherit;
     width: ${props => (props.size ? `${props.size}px` : props.theme.space[5])};
     height: ${props => (props.size ? `${props.size}px` : props.theme.space[5])};
     animation: ${spin} 0.6s linear infinite;
