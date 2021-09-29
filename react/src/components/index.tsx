@@ -21,7 +21,6 @@ import Popover from './Popover/Popover';
 import SelectableList from './SelectableList';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
-import StyledInput from './StyledInput';
 import Table from './Table/Table';
 import Typography from './Typography';
 
@@ -54,7 +53,6 @@ export {
     SelectableList,
     Snackbar,
     Spinner,
-    StyledInput,
     Table,
     Typography,
 };
