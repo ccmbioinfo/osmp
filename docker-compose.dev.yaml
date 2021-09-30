@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   ssmp-server:
-    image: ssmp:dev
+    image: ghcr.io/ccmbioinfo/ssmp:dev
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
@@ -12,6 +12,7 @@ services:
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
       TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
+      TEST_NODE_URL: ${TEST_NODE_URL}
     user: "1000" #node
     working_dir: /usr/app
     networks:

@@ -9,11 +9,9 @@
     "build": "tsc --build ./",
     "start-prod": "nodemon dist/server.js",
     "start-dev": "ts-node-dev src/server.ts",
-    "start-prod": "node dist/server.js",
     "format": "prettier --check src/",
     "lint": "eslint --max-warnings=0 src/",
     "tsc": "tsc",
-    "build": "tsc --build ./"
   },
   "devDependencies": {
     "@graphql-eslint/eslint-plugin": "^1.1.2",
