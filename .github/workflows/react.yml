@@ -55,7 +55,7 @@ jobs:
         # Uncomment during actual deploy to dev server
         # if: github.event_name == 'push'  
         env:
-          MC_HOST_minio: ${{ secrets.MINIO_HOST }}
+          MC_HOST_minio: ${{ secrets.MC_HOST }}
         run: |
           sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           sudo chmod +x /usr/local/bin/mc
