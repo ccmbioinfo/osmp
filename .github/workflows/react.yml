@@ -53,7 +53,7 @@ jobs:
         run: yarn build
       - name: Upload to Minio bucket
         # Uncomment during actual deploy to dev server
-        if: github.event_name == 'push'  
+        # if: github.event_name == 'push'  
         env:
           MC_HOST_minio: ${{ secrets.MINIO_HOST }}
         run: |
