@@ -40,6 +40,15 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: install dependencies
         run: yarn install
+      - name: run eslint
+        run: |
+          yarn lint
+      - name: run prettier
+        run: |
+          yarn format
+      - name: compile typescript
+        run: |
+          yarn tsc
       - name: Generate build
         run: yarn build
       - name: Upload to Minio bucket
