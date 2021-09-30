@@ -1,3 +1,6 @@
+# Currently, this file does not have a test-node service like docker-compose.yaml, so the test-node option would not work. 
+# We are leaving it as is until the Phenotips instances are ready. 
+
 version: "3.9"
 services:
   ssmp-server:
