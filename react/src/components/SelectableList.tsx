@@ -1,41 +1,9 @@
 import styled from 'styled-components';
 
-const Flex = styled.div`
-    display: flex;
-`;
-
-export const Input = styled.input`
-    min-height: 45px;
-    border: none;
-    outline: none;
-    font-size: ${props => props.theme.fontSizes.s};
-    width: 70%;
-`;
-export const Wrapper = styled(Flex)`
-    min-height: 38px;
-    flex-wrap: wrap;
-    flex-grow: 0;
-    position: relative;
-    width: 200px;
-`;
-
-export const Header = styled(Flex)`
-    background-color: ${props => props.theme.background.main};
-    border-color: ${props => props.theme.colors.muted};
-    color: ${props => props.theme.colors.muted};
-    border-radius: ${props => props.theme.radii.base};
-    border: ${props => props.theme.borders.thin};
-    box-shadow: ${props => props.theme.boxShadow};
-    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
-    justify-content: space-between;
-    align-items: center;
-    width: inherit;
-`;
-
-export const List = styled.div`
+const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
     padding: 0;
-    margin: 0;
+    list-style-type: none;
     width: inherit;
     margin-top: ${props => props.theme.space[5]};
     max-height: 200px;
@@ -43,9 +11,9 @@ export const List = styled.div`
     position: absolute;
     top: 20px;
     z-index: 1;
-    /* Dropdown List Styling */
-    > li {
-        list-style-type: none;
+`;
+
+const StyledListItem = styled.li`        
         &:first-of-type {
             > button {
                 border-top: ${props => props.theme.borders.thin}
@@ -65,7 +33,8 @@ export const List = styled.div`
             font-size: ${props => props.theme.fontSizes.s};
             padding: 15px 20px 15px 20px;
             border: 0;
-            border-bottom: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
+            border-bottom: ${props => props.theme.borders.thin} ${props =>
+    props.theme.colors.muted};
             width: 100%;
             text-align: left;
             border-left: ${props => props.theme.borders.thin} ${props => props.theme.colors.muted};
@@ -73,9 +42,36 @@ export const List = styled.div`
             &:hover {
                 cursor: pointer;
                 font-weight: bold;
-                color: ${props => props.theme.colors.success};
-                background-color: ${props => props.theme.background.success};
+                color: ${props => props.theme.colors.accent};
+                background-color: ${props => props.theme.background.light};
             }
         }
     }
 `;
+
+export interface SelectableListItem<T> {
+    id: number;
+    value: T;
+    label: string;
+}
+
+interface ListProps<T> {
+    onSelect: (val: T) => void;
+    options: SelectableListItem<T>[];
+}
+
+function SelectableList<T>({ onSelect, options }: ListProps<T>) {
+    return (
+        <StyledList>
+            {options.map(item => (
+                <StyledListItem key={item.id}>
+                    <button type="button" onClick={() => onSelect(item.value)}>
+                        <span>{item.label}</span>
+                    </button>
+                </StyledListItem>
+            ))}
+        </StyledList>
+    );
+}
+
+export default SelectableList;

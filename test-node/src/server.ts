@@ -122,6 +122,6 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
 
 const server = createServer(app);
 
-server.listen({ port: process.env.SERVER_PORT }, () => {
-  console.log(`Test node is running on port ${process.env.SERVER_PORT}!`);
+server.listen(3000, () => {
+  console.log(`Test node is running on port 3000!`);
 });

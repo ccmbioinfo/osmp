@@ -9,6 +9,7 @@ import {
     Checkbox,
     clearError,
     Column,
+    ComboBox,
     ErrorIndicator,
     Flex,
     GeneSearch,
@@ -17,6 +18,7 @@ import {
     Table,
     Typography,
 } from '../components';
+import SOURCES from '../constants/sources';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { formatErrorMessage } from '../utils';
@@ -53,21 +55,19 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    !!state.sources.value.filter(s => ['local', 'remote-test'].includes(s)).length,
+                    !!state.sources.value.filter(s => SOURCES.includes(s)).length,
                 error: 'Please specify a source.',
             },
         ],
     },
 };
 
-type Source = 'local' | 'remote-test';
-
 interface QueryOptionsFormState {
     assemblyId: string;
     ensemblId: string;
     gene: string;
     maxFrequency: number;
-    sources: Source[];
+    sources: string[];
 }
 
 const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
@@ -110,7 +110,7 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const client = useApolloClient();
 
-    const toggleSource = (source: Source) => {
+    const toggleSource = (source: string) => {
         const update = updateQueryOptionsForm('sources');
 
         queryOptionsForm.sources.value.includes(source)
@@ -126,16 +126,14 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="h4" bold>
                             Select Sources:
                         </Typography>
-                        <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('local')}
-                            label="Local"
-                            onClick={toggleSource.bind(null, 'local')}
-                        />
-                        <Checkbox
-                            checked={queryOptionsForm.sources.value.includes('remote-test')}
-                            label="Remote-Test"
-                            onClick={toggleSource.bind(null, 'remote-test')}
-                        />
+                        {SOURCES.map(source => (
+                            <Checkbox
+                                key={source}
+                                checked={queryOptionsForm.sources.value.includes(source)}
+                                label={source.toLocaleLowerCase()}
+                                onClick={toggleSource.bind(null, source)}
+                            />
+                        ))}
                     </Flex>
                     <ErrorText error={queryOptionsForm.sources.error} />
                 </Column>
@@ -149,9 +147,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <GeneSearch
                             geneName={queryOptionsForm.gene.value}
                             onChange={geneName => updateQueryOptionsForm('gene')(geneName)}
-                            onSelect={geneOption => {
-                                updateQueryOptionsForm('gene')(geneOption.value.name);
-                                updateQueryOptionsForm('ensemblId')(geneOption.value.ensemblId);
+                            onSelect={val => {
+                                updateQueryOptionsForm('gene')(val.name);
+                                updateQueryOptionsForm('ensemblId')(val.ensemblId);
                             }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
@@ -185,10 +183,14 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="subtitle" bold>
                             Assembly ID
                         </Typography>
-                        <Input
-                            onChange={e =>
-                                updateQueryOptionsForm('assemblyId')(e.currentTarget.value)
-                            }
+                        <ComboBox
+                            onSelect={val => updateQueryOptionsForm('assemblyId')(val)}
+                            options={['GRCh37', 'GRCh38'].map((a, id) => ({
+                                id,
+                                value: a,
+                                label: a,
+                            }))}
+                            placeholder="Select"
                             value={queryOptionsForm.assemblyId.value}
                         />
                         <ErrorText error={queryOptionsForm.assemblyId.error} />

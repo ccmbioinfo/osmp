@@ -61,7 +61,7 @@ export interface IndividualResponseFields {
 }
 
 export interface IndividualInfoFields {
-    cadidateGene?: Maybe<string>;
+    candidateGene?: Maybe<string>;
     classifications?: Maybe<string>;
     diagnosis?: Maybe<string>;
 }
@@ -136,10 +136,4 @@ export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
 
 export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponseSchema {
     source: string;
-}
-
-export interface DropdownItem<T> {
-    id: number;
-    value: T;
-    label: string;
 }
