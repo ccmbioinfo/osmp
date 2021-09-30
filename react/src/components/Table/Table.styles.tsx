@@ -44,8 +44,9 @@ export const Styles = styled.div`
         }
 
         tbody {
-            max-height: '60vh';
-            overflow: 'auto';
+            max-height: 60vh;
+            overflow: scroll;
+            display: block;
         }
     }
 `;
