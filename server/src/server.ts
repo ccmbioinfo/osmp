@@ -99,6 +99,6 @@ const startServer = async () => {
 
 startServer();
 
-httpServer.listen({ port: process.env.SERVER_PORT }, () => {
-  logger.info(`Our server is punning on port ${process.env.SERVER_PORT}`);
+httpServer.listen(3000, () => {
+  logger.info('Server running on port 3000');
 });

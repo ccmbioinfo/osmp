@@ -17,25 +17,26 @@ services:
     entrypoint: "yarn start"
     networks:
       - ssmp
-
   ssmp-server:
-    image: node:16.3-buster
+    build:
+      context: server
+      target: BUILD_IMAGE
+    image: ghcr.io/ccmbioinfo/ssmp:dev
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
-      SERVER_PORT: ${SSMP_SERVER_PORT}
       NODE_ENV: local
+      TEST_NODE_URL: ${TEST_NODE_URL}
       TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
       TEST_NODE_SSMP_TOKEN_CLIENT_ID: ${TEST_NODE_SSMP_TOKEN_CLIENT_ID}
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
-      TEST_NODE_URL: ${TEST_NODE_URL}
     user: "1000" #node
     working_dir: /usr/app
     ports:
-      - ${SSMP_SERVER_PORT}:${SSMP_SERVER_PORT}
+      - ${SSMP_SERVER_PORT}:3000
     volumes:
       - ./server:/usr/app
     entrypoint: "yarn start-dev"
@@ -45,14 +46,13 @@ services:
   test-node-1:
     image: node:16.3-buster
     environment:
-      SERVER_PORT: ${TEST_NODE_PORT}
       TEST_NODE_TOKEN_ISSUER: ${TEST_NODE_TOKEN_ISSUER}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
       TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
     user: "1000" #node
     working_dir: /usr/app
     ports:
-      - ${TEST_NODE_PORT}:${TEST_NODE_PORT}
+      - ${TEST_NODE_PORT}:3000
     volumes:
       - ./test-node:/usr/app
     entrypoint: "yarn start-dev"
@@ -70,6 +70,10 @@ services:
       KEYCLOAK_PORT: ${KEYCLOAK_PORT}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       REACT_URL: ${REACT_URL}
+      AUTH0_BROKER_AUTH_URL: ${TEST_NODE_TOKEN_ISSUER}authorize
+      AUTH0_BROKER_TOKEN_URL: ${TEST_NODE_TOKEN_ISSUER}oauth/token
+      AUTH0_BROKER_CLIENT_ID: ${KEYCLOAK_AUTH0_CLIENT_ID}
+      AUTH0_BROKER_CLIENT_SECRET: ${KEYCLOAK_AUTH0_CLIENT_SECRET}
     ports:
       - ${KEYCLOAK_PORT}:8080
     volumes:
