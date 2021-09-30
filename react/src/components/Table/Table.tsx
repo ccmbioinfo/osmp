@@ -540,13 +540,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     hideScrollbars={!refXOverflowing}
                     ignoreElements="p"
                 >
-                    <table
-                        {...getTableProps()}
-                        ref={horizonstalRef}
-                        style={{
-                            height: '200px', // This will force the table body to overflow and scroll, since there is not enough room
-                        }}
-                    >
+                    <table {...getTableProps()} ref={horizonstalRef}>
                         <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
@@ -636,39 +630,33 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             })}
                         </THead>
 
-                        <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
-                            <tbody {...getTableBodyProps()}>
-                                {page.length > 0 ? (
-                                    page.map(row => {
-                                        prepareRow(row);
-                                        const { key, ...restRowProps } = row.getRowProps();
-                                        return (
-                                            <motion.tr
-                                                key={key}
-                                                layout="position"
-                                                {...restRowProps}
-                                            >
-                                                {row.cells.map(cell => {
-                                                    const { key, ...restCellProps } =
-                                                        cell.getCellProps();
-                                                    return (
-                                                        <td key={key} {...restCellProps}>
-                                                            <Typography variant="subtitle">
-                                                                {cell.render('Cell')}
-                                                            </Typography>
-                                                        </td>
-                                                    );
-                                                })}
-                                            </motion.tr>
-                                        );
-                                    })
-                                ) : (
-                                    <Typography variant="p" error>
-                                        There are no records to display.
-                                    </Typography>
-                                )}
-                            </tbody>
-                        </div>
+                        <tbody {...getTableBodyProps()}>
+                            {page.length > 0 ? (
+                                page.map(row => {
+                                    prepareRow(row);
+                                    const { key, ...restRowProps } = row.getRowProps();
+                                    return (
+                                        <motion.tr key={key} layout="position" {...restRowProps}>
+                                            {row.cells.map(cell => {
+                                                const { key, ...restCellProps } =
+                                                    cell.getCellProps();
+                                                return (
+                                                    <td key={key} {...restCellProps}>
+                                                        <Typography variant="subtitle">
+                                                            {cell.render('Cell')}
+                                                        </Typography>
+                                                    </td>
+                                                );
+                                            })}
+                                        </motion.tr>
+                                    );
+                                })
+                            ) : (
+                                <Typography variant="p" error>
+                                    There are no records to display.
+                                </Typography>
+                            )}
+                        </tbody>
                     </table>
                 </ScrollContainer>
             </Styles>

@@ -45,7 +45,8 @@ export const Styles = styled.div`
 
         tbody {
             max-height: 60vh;
-            overflow: auto;
+            overflow: scroll;
+            display: block;
         }
     }
 `;
