@@ -9,4 +9,4 @@ yarn-error.log*
 
 .devcontainer
 
-todo.*
+*/mysql

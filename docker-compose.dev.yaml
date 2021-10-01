@@ -1,0 +1,83 @@
+# Currently, this file does not have a test-node service like docker-compose.yaml, so the test-node option would not work. 
+# We are leaving it as is until the Phenotips instances are ready. 
+
+version: "3.9"
+services:
+  ssmp-server:
+    image: ghcr.io/ccmbioinfo/ssmp:dev
+    environment:
+      KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      SERVER_PORT: ${SSMP_SERVER_PORT}
+      NODE_ENV: development
+      TEST_NODE_SSMP_TOKEN_CLIENT_ID: ${TEST_NODE_SSMP_TOKEN_CLIENT_ID}
+      TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
+      TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
+      TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
+      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
+      TEST_NODE_URL: ${TEST_NODE_URL}
+    user: "1000" #node
+    working_dir: /usr/app
+    networks:
+      - ssmp-dev
+
+  # needed for testing but eventually we'll want keycloak running on another host
+  keycloak:
+    image: quay.io/keycloak/keycloak:14.0.0
+    environment:
+      KEYCLOAK_SERVER_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      KEYCLOAK_REACT_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KEYCLOAK_PORT: ${KEYCLOAK_PORT}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      AUTH0_BROKER_AUTH_URL: ${TEST_NODE_TOKEN_ISSUER}authorize
+      AUTH0_BROKER_TOKEN_URL: ${TEST_NODE_TOKEN_ISSUER}oauth/token
+      AUTH0_BROKER_CLIENT_ID: ${KEYCLOAK_AUTH0_CLIENT_ID}
+      AUTH0_BROKER_CLIENT_SECRET: ${KEYCLOAK_AUTH0_CLIENT_SECRET}
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: "${KEYCLOAK_DATABASE}"
+      DB_USER: "${KEYCLOAK_DB_USER}"
+      DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
+      REACT_URL: ${REACT_DEV_URL}
+    ports:
+      - ${KEYCLOAK_PORT}:8080
+    volumes:
+      - ./keycloak/scripts:/usr/scripts
+    networks:
+      - ssmp-dev
+    depends_on:
+      - mysql
+
+  # for keycloak
+  mysql:
+    image: mysql:8.0
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: "${KEYCLOAK_DATABASE}"
+      MYSQL_USER: "${KEYCLOAK_DB_USER}"
+      MYSQL_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    volumes:
+      - ./keycloak/mysql:/var/lib/mysql
+    networks:
+      - ssmp-dev
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - ssmp-server
+    restart: always
+    # hardcoded here for local testing -- we'll eventually want 80:80/443:443
+    ports:
+      - "4777:80"
+    networks:
+      - ssmp-dev
+
+networks:
+  ssmp-dev:
+    driver: bridge

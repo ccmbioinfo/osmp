@@ -40,8 +40,8 @@ const keycloak = new Keycloak(
   }
 );
 
-// monkeypatch token validator in local environments
-if (process.env.NODE_ENV === 'local') {
+// monkeypatch token validator in local and (currently) dev environments
+if (process.env.NODE_ENV !== 'production') {
   keycloak.grantManager.validateToken = validateToken;
 }
 
