@@ -23,10 +23,10 @@ const variantAnnotationSchema = new mongoose.Schema(
       type: String
     },
     gnomad_het: {
-      type: String
+      type: Number
     },
     gnomad_hom: {
-      type: String
+      type: Number
     },
     transcript: {
       type: String
