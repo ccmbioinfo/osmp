@@ -12,6 +12,7 @@ import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
+import { connectDb } from './models';
 
 const app = express();
 
@@ -47,6 +48,12 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(keycloak.middleware());
 app.use(express.json());
+
+connectDb().then(async () => {
+  app.listen(process.env.MONGO_INITDB_PORT, () =>
+    console.log(`MongoDB listening on port ${process.env.MONGO_INITDB_PORT}!`),
+  );
+})
 
 app.post('/graphql', keycloak.protect(), (req, res, next) => {
   const grant = (req as any).kauth.grant;

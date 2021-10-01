@@ -10,3 +10,4 @@ yarn-error.log*
 .devcontainer
 
 */mysql
+data

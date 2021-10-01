@@ -49,6 +49,7 @@
     "graphql-middleware": "^6.0.10",
     "graphql-subscriptions": "^1.2.1",
     "keycloak-connect": "14.0.0",
+    "mongoose": "^6.0.8",
     "subscriptions-transport-ws": "^0.9.19",
     "winston": "^3.3.3"
   },
