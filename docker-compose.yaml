@@ -86,3 +86,4 @@ services:
 networks:
   ssmp:
     driver: bridge
+    
