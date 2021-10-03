@@ -1,12 +1,16 @@
 import mongoose from 'mongoose';
-import VariationAnnotation from './variantAnnotation';
+import VariantAnnotation from './variantAnnotation';
+import createDummyVariantAnnotations from './seedData';
 const connectDb = () => {
   return mongoose.connect(process.env.ME_DATABASE_URL!);
 };
 
 const models = {
-  VariationAnnotation
+  VariantAnnotation
 };
 
-export { connectDb };
+export {
+  connectDb,
+  createDummyVariantAnnotations
+};
 export default models;

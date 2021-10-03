@@ -12,7 +12,7 @@ import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
-import { connectDb } from './models';
+import models, { connectDb, createDummyVariantAnnotations } from './models';
 
 const app = express();
 
@@ -49,7 +49,17 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
+// Change flag to false once DB has been seeded
+const eraseDatabaseOnSync = false;
+
 connectDb().then(async () => {
+  if (eraseDatabaseOnSync) {
+    await Promise.all([
+      models.VariantAnnotation.deleteMany({})
+    ]);
+
+    createDummyVariantAnnotations();
+  }
   app.listen(process.env.MONGO_INITDB_PORT, () =>
     console.log(`MongoDB listening on port ${process.env.MONGO_INITDB_PORT}!`),
   );
