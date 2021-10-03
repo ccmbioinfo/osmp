@@ -3,14 +3,14 @@ import logger from '../logger';
 import models from './index';
 
 const createDummyVariantAnnotations = async () => {
-  const variants = Array(1000)
+  const variants = Array(50000)
     .fill(null)
     .map(() => {
       const bases = ['A', 'T', 'C', 'G'];
       const ref = Faker.helpers.randomize(bases);
       const alt = Faker.helpers.randomize(bases.filter(b => b !== ref));
       const chr = Faker.helpers.randomize(['X', 'Y', ...[...Array(22).keys()].map(x => x + 1)]);
-      const assembly = Faker.lorem.words(6);
+      const assembly = Faker.helpers.randomize(['GRCh37', 'GRCh38']);
       const aaChanges = `Z[${ref}GC] > Y[${alt}GC]`;
       const cdna = Array(100).fill(null).map(() => Faker.helpers.randomize(bases)).join('');
       const geneName = 'SOME_GENE_NAME';

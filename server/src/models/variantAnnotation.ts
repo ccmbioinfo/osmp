@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+
+//chr-ref-alt-assembly
 const variantAnnotationSchema = new mongoose.Schema(
   {
     alt: {
@@ -33,5 +35,24 @@ const variantAnnotationSchema = new mongoose.Schema(
     }
   }
 );
+
+interface VariantAnnotationId {
+  alt: string;
+  assembly: string;
+  chr: string;
+  ref: string;
+}
+
+variantAnnotationSchema.statics.getAnnotations = async function (annotation: VariantAnnotationId) {
+  const variant = await this.find({
+    alt: annotation.alt,
+    assembly: annotation.assembly,
+    chr: annotation.chr,
+    ref: annotation.ref
+  });
+
+  return variant;
+};
+
 const VariantAnnotation = mongoose.model('VariantAnnotation', variantAnnotationSchema);
 export default VariantAnnotation;
