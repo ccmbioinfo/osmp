@@ -1,40 +1,37 @@
 import mongoose from 'mongoose';
 
-//chr-ref-alt-assembly
-const variantAnnotationSchema = new mongoose.Schema(
-  {
-    alt: {
-      type: String
-    },
-    ref: {
-      type: String
-    },
-    chr: {
-      type: String
-    },
-    assembly: {
-      type: String
-    },
-    aa_changes: {
-      type: String
-    },
-    cdna: {
-      type: String
-    },
-    gene_name: {
-      type: String
-    },
-    gnomad_het: {
-      type: Number
-    },
-    gnomad_hom: {
-      type: Number
-    },
-    transcript: {
-      type: String
-    }
-  }
-);
+const variantAnnotationSchema = new mongoose.Schema({
+  alt: {
+    type: String,
+  },
+  ref: {
+    type: String,
+  },
+  chr: {
+    type: String,
+  },
+  assembly: {
+    type: Number, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
+  },
+  aa_changes: {
+    type: String,
+  },
+  cdna: {
+    type: String,
+  },
+  gene_name: {
+    type: String,
+  },
+  gnomad_het: {
+    type: Number,
+  },
+  gnomad_hom: {
+    type: Number,
+  },
+  transcript: {
+    type: String,
+  },
+});
 
 interface VariantAnnotationId {
   alt: string;
@@ -48,7 +45,7 @@ variantAnnotationSchema.statics.getAnnotations = async function (annotation: Var
     alt: annotation.alt,
     assembly: annotation.assembly,
     chr: annotation.chr,
-    ref: annotation.ref
+    ref: annotation.ref,
   });
 
   return variant;

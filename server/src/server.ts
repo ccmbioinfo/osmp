@@ -49,21 +49,28 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
-// Change flag to false once DB has been seeded
+/**
+ * Setting eraseDatabaseOnSync to true would wipe out existing data and seed the database with fresh data.
+ * It should be set to false again once the database has been intitiated.
+ */
 const eraseDatabaseOnSync = false;
 
 connectDb().then(async () => {
   if (eraseDatabaseOnSync) {
-    await Promise.all([
-      models.VariantAnnotation.deleteMany({})
-    ]);
+    await Promise.all([models.VariantAnnotation.deleteMany({})]);
 
     createDummyVariantAnnotations();
+    models.VariantAnnotation.createIndexes({
+      assembly: 1,
+      alt: 1,
+      chr: 1,
+      ref: 1,
+    });
   }
   app.listen(process.env.MONGO_INITDB_PORT, () =>
-    console.log(`MongoDB listening on port ${process.env.MONGO_INITDB_PORT}!`),
+    console.log(`MongoDB listening on port ${process.env.MONGO_INITDB_PORT}!`)
   );
-})
+});
 
 app.post('/graphql', keycloak.protect(), (req, res, next) => {
   const grant = (req as any).kauth.grant;
