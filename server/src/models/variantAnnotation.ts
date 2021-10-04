@@ -1,4 +1,26 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model, model, Types, Schema, Query } from 'mongoose';
+
+interface VariantAnnotationId {
+  alt: string;
+  assembly: number;
+  chr: string;
+  ref: string;
+}
+
+export interface Variant {
+  alt: string;
+  ref: string;
+  chr: string;
+  assembly: number;
+  aaChanges: string;
+  cdna: string;
+  geneName: string;
+  gnomadHet: number;
+  gnomadHom: number;
+  transcript: string;
+}
+
+interface VariantAnnotationDocument extends Document, Variant {}
 
 const variantAnnotationSchema = new mongoose.Schema({
   alt: {
@@ -13,19 +35,19 @@ const variantAnnotationSchema = new mongoose.Schema({
   assembly: {
     type: Number, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
   },
-  aa_changes: {
+  aaChanges: {
     type: String,
   },
   cdna: {
     type: String,
   },
-  gene_name: {
+  geneName: {
     type: String,
   },
-  gnomad_het: {
+  gnomadHet: {
     type: Number,
   },
-  gnomad_hom: {
+  gnomadHom: {
     type: Number,
   },
   transcript: {
@@ -33,14 +55,15 @@ const variantAnnotationSchema = new mongoose.Schema({
   },
 });
 
-interface VariantAnnotationId {
-  alt: string;
-  assembly: string;
-  chr: string;
-  ref: string;
+// For model
+export interface VariantAnnotationModel extends Model<Variant> {
+  getAnnotations(id: VariantAnnotationId): Promise<VariantAnnotationId>;
 }
 
-variantAnnotationSchema.statics.getAnnotations = async function (annotation: VariantAnnotationId) {
+variantAnnotationSchema.statics.getAnnotations = async function (
+  this: Model<VariantDocument>,
+  annotation: VariantAnnotationId
+) {
   const variant = await this.find({
     alt: annotation.alt,
     assembly: annotation.assembly,
@@ -48,8 +71,12 @@ variantAnnotationSchema.statics.getAnnotations = async function (annotation: Var
     ref: annotation.ref,
   });
 
+  console.log(variant);
   return variant;
 };
 
-const VariantAnnotation = mongoose.model('VariantAnnotation', variantAnnotationSchema);
+const VariantAnnotation = model<VariantAnnotationDocument, VariantAnnotationModel>(
+  'VariantAnnotation',
+  variantAnnotationSchema
+);
 export default VariantAnnotation;

@@ -53,7 +53,7 @@ app.use(express.json());
  * Setting eraseDatabaseOnSync to true would wipe out existing data and seed the database with fresh data.
  * It should be set to false again once the database has been intitiated.
  */
-const eraseDatabaseOnSync = false;
+const eraseDatabaseOnSync = true;
 
 connectDb().then(async () => {
   if (eraseDatabaseOnSync) {
@@ -67,6 +67,7 @@ connectDb().then(async () => {
       ref: 1,
     });
   }
+  models.VariantAnnotation.getAnnotations({ assembly: 37, alt: 'C', chr: '16', ref: 'T' });
   app.listen(process.env.MONGO_INITDB_PORT, () =>
     console.log(`MongoDB listening on port ${process.env.MONGO_INITDB_PORT}!`)
   );

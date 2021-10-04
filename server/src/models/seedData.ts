@@ -3,7 +3,7 @@ import logger from '../logger';
 import models from './index';
 
 const createDummyVariantAnnotations = async () => {
-  const variants = Array(50000)
+  const variants = Array(5000)
     .fill(null)
     .map(() => {
       const bases = ['A', 'T', 'C', 'G'];
