@@ -33,7 +33,7 @@ services:
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
-      ME_DATABASE_URL: ${ME_DATABASE_URL}
+      MONGO_DATABASE_URL: ${MONGO_DATABASE_URL}
       MONGO_INITDB_PORT: ${MONGO_INITDB_PORT}
     user: "1000" #node
     working_dir: /usr/app
@@ -94,25 +94,6 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - ${MONGO_INITDB_PORT}:27017
-    volumes: 
-      - ./data:/data/db
-    networks: 
-      - ssmp
-
-  mongo-express:
-    image: mongo-express
-    container_name: mongo-express
-    links:
-      - ${ME_CONFIG_MONGODB_SERVER}:mongo
-    environment:
-      - ME_CONFIG_MONGODB_SERVER=${ME_CONFIG_MONGODB_SERVER}
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=${ME_CONFIG_MONGODB_ADMINUSERNAME}
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=${ME_CONFIG_MONGODB_ADMINPASSWORD}
-      - ME_CONFIG_BASICAUTH_USERNAME=${ME_CONFIG_BASICAUTH_USERNAME}
-      - ME_CONFIG_BASICAUTH_PASSWORD=${ME_CONFIG_BASICAUTH_PASSWORD}
-      - ME_CONFIG_MONGODB_PORT=27017
-    ports:
-      - ${ME_CONFIG_MONGODB_PORT}:8081
     volumes: 
       - ./data:/data/db
     networks: 
