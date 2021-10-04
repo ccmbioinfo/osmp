@@ -61,7 +61,7 @@ export interface VariantAnnotationModel extends Model<Variant> {
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
-  this: Model<VariantDocument>,
+  this: Model<VariantAnnotationDocument>,
   annotation: VariantAnnotationId
 ) {
   const variant = await this.find({
