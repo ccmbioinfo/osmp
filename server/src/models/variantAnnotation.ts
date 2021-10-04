@@ -1,4 +1,6 @@
-import mongoose, { Document, Model, model, Types, Schema, Query } from 'mongoose';
+// import mongoose, { Document, Model, model, Types, Schema, Query } from 'mongoose';
+import mongoose, { Document, Model, model } from 'mongoose';
+import logger from '../logger';
 
 interface VariantAnnotationId {
   alt: string;
@@ -71,7 +73,9 @@ variantAnnotationSchema.statics.getAnnotations = async function (
     ref: annotation.ref,
   });
 
-  console.log(variant);
+  logger.info(`
+  VARIANT ANNOTATIONS:
+    ${JSON.stringify(variant)}`);
   return variant;
 };
 

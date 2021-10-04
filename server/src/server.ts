@@ -53,7 +53,7 @@ app.use(express.json());
  * Setting eraseDatabaseOnSync to true would wipe out existing data and seed the database with fresh data.
  * It should be set to false again once the database has been intitiated.
  */
-const eraseDatabaseOnSync = true;
+const eraseDatabaseOnSync = false;
 
 connectDb().then(async () => {
   if (eraseDatabaseOnSync) {
