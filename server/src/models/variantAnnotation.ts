@@ -1,17 +1,13 @@
 import mongoose, { Document, Model, model } from 'mongoose';
 
-interface VariantAnnotationId {
-  alt: string;
+export interface VariantAnnotationCoordinates {
   assembly: number;
-  chr: string;
+  alt: string;
+  chr: number;
   ref: string;
 }
 
-export interface Variant {
-  alt: string;
-  ref: string;
-  chr: string;
-  assembly: number;
+export interface Variant extends VariantAnnotationCoordinates {
   aaChanges: string;
   cdna: string;
   geneName: string;
@@ -30,7 +26,7 @@ const variantAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   chr: {
-    type: String,
+    type: Number,
   },
   assembly: {
     type: Number, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
@@ -57,12 +53,12 @@ const variantAnnotationSchema = new mongoose.Schema({
 
 // For model
 export interface VariantAnnotationModel extends Model<Variant> {
-  getAnnotations(id: VariantAnnotationId): Promise<VariantAnnotationId>;
+  getAnnotations(id: VariantAnnotationCoordinates): Promise<VariantAnnotationCoordinates>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
   this: Model<VariantAnnotationDocument>,
-  annotation: VariantAnnotationId
+  annotation: VariantAnnotationCoordinates
 ) {
   const variant = await this.find({
     alt: annotation.alt,
