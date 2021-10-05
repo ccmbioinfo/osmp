@@ -95,8 +95,7 @@ services:
     ports:
       - ${MONGO_INITDB_PORT}:27017
     volumes: 
-      - ./server/src/models/seedData.ts:/docker-entrypoint-initdb.d/seedData.ts
-      - ./data:/data/db
+      - ./mongo/data:/data/db
     networks: 
       - ssmp
 

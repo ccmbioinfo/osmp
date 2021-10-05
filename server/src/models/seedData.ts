@@ -9,7 +9,7 @@ import { variantAnnotationSchema, VariantAnnotationDocument, VariantAnnotationMo
  */
 
 const createDummyVariantAnnotations = async (model: VariantAnnotationModel) => {
-  const variants = Array(10000)
+  const variants = Array(100)
     .fill(null)
     .map(() => {
       const bases = ['A', 'T', 'C', 'G'];
@@ -40,24 +40,31 @@ const createDummyVariantAnnotations = async (model: VariantAnnotationModel) => {
       };
     });
   try {
+    console.log(variants);
     await model.create(variants);
   } catch (err) {
     logger.error(err);
   }
 };
 
-const connection = mongoose.createConnection(process.env.MONGO_DATABASE_URL!);
-const model = connection.model<VariantAnnotationDocument, VariantAnnotationModel>(
-  'VariantAnnotation',
-  variantAnnotationSchema
-);
-console.log('hello')
-createDummyVariantAnnotations(model);
-model.createIndexes([{
-  assembly: 1,
-  alt: 1,
-  chr: 1,
-  ref: 1,
-}]);
+const URL = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:${process.env.MONGO_INITDB_PORT}`;
+
+console.log(URL)
+
+mongoose.connect(URL!)
+  .then(async () => {
+    const model = mongoose.model<VariantAnnotationDocument, VariantAnnotationModel>(
+      'VariantAnnotation',
+      variantAnnotationSchema
+    );
+    await Promise.all([model.deleteMany({})]);
+    createDummyVariantAnnotations(model);
+    model.createIndexes([{
+      assembly: 1,
+      alt: 1,
+      chr: 1,
+      ref: 1,
+    }]);
+  });
 
 export default createDummyVariantAnnotations;
