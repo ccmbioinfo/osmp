@@ -1,7 +1,11 @@
 import Faker from 'faker';
 import logger from '../logger';
 import mongoose from 'mongoose';
-import { variantAnnotationSchema, VariantAnnotationDocument, VariantAnnotationModel } from './variantAnnotation';
+import {
+  variantAnnotationSchema,
+  VariantAnnotationDocument,
+  VariantAnnotationModel,
+} from './variantAnnotation';
 
 /**
  * @param model: Each Mongoose model is scoped to a single connection only. To use this function, a connection must be established beforehand.
@@ -9,7 +13,7 @@ import { variantAnnotationSchema, VariantAnnotationDocument, VariantAnnotationMo
  */
 
 const createDummyVariantAnnotations = async (model: VariantAnnotationModel) => {
-  const variants = Array(100)
+  const variants = Array(5000)
     .fill(null)
     .map(() => {
       const bases = ['A', 'T', 'C', 'G'];
@@ -47,24 +51,23 @@ const createDummyVariantAnnotations = async (model: VariantAnnotationModel) => {
   }
 };
 
-const URL = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:${process.env.MONGO_INITDB_PORT}`;
+const MONGO_URL = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:${process.env.MONGO_INITDB_PORT}`;
 
-console.log(URL)
-
-mongoose.connect(URL!)
-  .then(async () => {
-    const model = mongoose.model<VariantAnnotationDocument, VariantAnnotationModel>(
-      'VariantAnnotation',
-      variantAnnotationSchema
-    );
-    await Promise.all([model.deleteMany({})]);
-    createDummyVariantAnnotations(model);
-    model.createIndexes([{
+mongoose.connect(MONGO_URL!).then(async () => {
+  const model = mongoose.model<VariantAnnotationDocument, VariantAnnotationModel>(
+    'VariantAnnotation',
+    variantAnnotationSchema
+  );
+  await Promise.all([model.deleteMany({})]);
+  createDummyVariantAnnotations(model);
+  model.createIndexes([
+    {
       assembly: 1,
       alt: 1,
       chr: 1,
       ref: 1,
-    }]);
-  });
+    },
+  ]);
+});
 
 export default createDummyVariantAnnotations;
