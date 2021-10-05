@@ -1,9 +1,15 @@
 import Faker from 'faker';
 import logger from '../logger';
-import models from './index';
+import mongoose from 'mongoose';
+import { variantAnnotationSchema, VariantAnnotationDocument, VariantAnnotationModel } from './variantAnnotation';
 
-const createDummyVariantAnnotations = async () => {
-  const variants = Array(5000)
+/**
+ * @param model: Each Mongoose model is scoped to a single connection only. To use this function, a connection must be established beforehand.
+ * The function generates seed dummy data when the mongo service starts in Docker and no data has been found in the database.
+ */
+
+const createDummyVariantAnnotations = async (model: VariantAnnotationModel) => {
+  const variants = Array(10000)
     .fill(null)
     .map(() => {
       const bases = ['A', 'T', 'C', 'G'];
@@ -34,10 +40,24 @@ const createDummyVariantAnnotations = async () => {
       };
     });
   try {
-    await models.VariantAnnotation.create(variants);
+    await model.create(variants);
   } catch (err) {
     logger.error(err);
   }
 };
+
+const connection = mongoose.createConnection(process.env.MONGO_DATABASE_URL!);
+const model = connection.model<VariantAnnotationDocument, VariantAnnotationModel>(
+  'VariantAnnotation',
+  variantAnnotationSchema
+);
+console.log('hello')
+createDummyVariantAnnotations(model);
+model.createIndexes([{
+  assembly: 1,
+  alt: 1,
+  chr: 1,
+  ref: 1,
+}]);
 
 export default createDummyVariantAnnotations;
