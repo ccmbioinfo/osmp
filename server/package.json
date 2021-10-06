@@ -9,7 +9,7 @@
     "build": "tsc --build ./",
     "start-prod": "nodemon dist/server.js",
     "start-dev": "ts-node-dev src/server.ts",
-    "mongo-init": "ts-node-dev --require dotenv/config src/models/seedData.ts dotenv_config_path=../.env",
+    "mongo-init": "ts-node --require dotenv/config src/scripts/seedData.ts dotenv_config_path=../.env",
     "format": "prettier --check src/",
     "lint": "eslint --max-warnings=0 src/",
     "tsc": "tsc"

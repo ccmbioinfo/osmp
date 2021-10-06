@@ -1,13 +1,11 @@
 import mongoose, { Document, Model, model } from 'mongoose';
 
-export interface VariantAnnotationCoordinates {
-  assembly: number;
+export interface VariantAnnotation {
   alt: string;
-  chr: number;
   ref: string;
-}
-
-export interface Variant extends VariantAnnotationCoordinates {
+  chr: number;
+  pos: number;
+  assembly: number;
   aaChanges: string;
   cdna: string;
   geneName: string;
@@ -16,7 +14,12 @@ export interface Variant extends VariantAnnotationCoordinates {
   transcript: string;
 }
 
-export interface VariantAnnotationDocument extends Document, Variant {}
+export type VariantAnnotationId = Pick<
+  VariantAnnotation,
+  'alt' | 'assembly' | 'chr' | 'ref' | 'pos'
+>;
+
+interface VariantAnnotationDocument extends Document, VariantAnnotation {}
 
 const variantAnnotationSchema = new mongoose.Schema({
   alt: {
@@ -26,6 +29,9 @@ const variantAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   chr: {
+    type: String,
+  },
+  pos: {
     type: Number,
   },
   assembly: {
@@ -52,27 +58,28 @@ const variantAnnotationSchema = new mongoose.Schema({
 });
 
 // For model
-export interface VariantAnnotationModel extends Model<Variant> {
-  getAnnotations(id: VariantAnnotationCoordinates): Promise<VariantAnnotationCoordinates>;
+interface VariantAnnotationModelMethods extends Model<VariantAnnotation> {
+  getAnnotations(id: VariantAnnotationId): Promise<VariantAnnotation[]>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
   this: Model<VariantAnnotationDocument>,
-  annotation: VariantAnnotationCoordinates
+  annotation: VariantAnnotationId
 ) {
   const variant = await this.find({
     alt: annotation.alt,
     assembly: annotation.assembly,
     chr: annotation.chr,
+    pos: annotation.pos,
     ref: annotation.ref,
   });
+
   return variant;
 };
 
-const VariantAnnotation = model<VariantAnnotationDocument, VariantAnnotationModel>(
+const VariantAnnotationModel = model<VariantAnnotationDocument, VariantAnnotationModelMethods>(
   'VariantAnnotation',
   variantAnnotationSchema
 );
 
-export { variantAnnotationSchema };
-export default VariantAnnotation;
+export default VariantAnnotationModel;

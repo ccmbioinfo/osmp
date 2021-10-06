@@ -26,13 +26,14 @@ services:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      MONGO_DATABASE_URL: ${MONGO_DATABASE_URL}
       NODE_ENV: local
       TEST_NODE_URL: ${TEST_NODE_URL}
       TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
       TEST_NODE_SSMP_TOKEN_CLIENT_ID: ${TEST_NODE_SSMP_TOKEN_CLIENT_ID}
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
-      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}      
+      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
     user: "1000" #node
     working_dir: /usr/app
     ports:
@@ -82,7 +83,7 @@ services:
       - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
     networks:
       - ssmp
-  
+
   mongo:
     image: mongo
     container_name: mongo
@@ -94,12 +95,11 @@ services:
       MONGO_INITDB_PORT: ${MONGO_INITDB_PORT}
     ports:
       - ${MONGO_INITDB_PORT}:27017
-    volumes: 
+    volumes:
       - ./mongo/data:/data/db
-    networks: 
+    networks:
       - ssmp
 
 networks:
   ssmp:
     driver: bridge
-    
