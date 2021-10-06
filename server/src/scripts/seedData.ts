@@ -26,7 +26,7 @@ const generateRandomCoordinate = () => {
 const generateChromosomeDistribution = (max: number, thecount: number) => {
   const decimals = [];
   let currsum = 0;
-  let r = [];
+  const r = [];
   for (let i = 0; i < thecount; i++) {
     r.push(Math.random());
     currsum += r[i];
@@ -68,7 +68,7 @@ const createDummyVariantAnnotations = async (
   count: number,
   nonRandomCoordinate?: VariantAnnotationId
 ) => {
-  const chromosomeDist = generateChromosomeDistribution(24, count);
+  const chromosomeDist = generateChromosomeDistribution(count, 24);
   const sum = Object.values(chromosomeDist).reduce((partialSum, a) => partialSum + a, 0);
   const variants = Array(count)
     .fill(null)
