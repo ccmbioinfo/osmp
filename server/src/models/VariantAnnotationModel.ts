@@ -29,7 +29,7 @@ const variantAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   chr: {
-    type: String,
+    type: Number,
   },
   pos: {
     type: Number,

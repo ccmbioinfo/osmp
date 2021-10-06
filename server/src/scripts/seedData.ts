@@ -111,15 +111,29 @@ const createDummyVariantAnnotations = async (
           }
         : []
     );
+  console.log('VARIANTS', variants);
   return VariantAnnotationModel.create(variants);
 };
 
-const queryManyCoordinates = async (count: number, nonRandomCoordinate?: VariantAnnotationId) => {
+const queryManyCoordinates = async (
+  startPos: number,
+  endPos: number,
+  count: number,
+  nonRandomCoordinate?: VariantAnnotationId
+) => {
   const coordinates = Array(count)
     .fill(null)
     .map(() => generateRandomCoordinate())
     .concat(nonRandomCoordinate || []);
-  const stats = await VariantAnnotationModel.find({ $or: coordinates }).explain('executionStats');
+  console.log(coordinates);
+  const stats = await VariantAnnotationModel.aggregate([
+    { $match: { pos: { $gt: startPos, $lt: endPos } } },
+    {
+      $match: {
+        $or: coordinates,
+      },
+    },
+  ]).explain();
   console.log(stats);
 
   return VariantAnnotationModel.find({ $or: coordinates });
@@ -157,7 +171,7 @@ mongoose.connect(MONGO_URL).then(async () => {
 
   console.log(`querying annotations with ${queryCount.toLocaleString()} random coordinates`);
 
-  const results = await queryManyCoordinates(queryCount, NON_RANDOM_COORDINATE);
+  const results = await queryManyCoordinates(120000, 124000, queryCount, NON_RANDOM_COORDINATE);
 
   console.log(
     `query returned ${results.length.toLocaleString()} of ${newCount.toLocaleString()} annotations`
