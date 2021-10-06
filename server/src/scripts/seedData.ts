@@ -161,7 +161,10 @@ mongoose.connect(MONGO_URL).then(async () => {
   // insert our non-random coordinate as well, bringing the count to newAnnotationCount + 1
   await createDummyVariantAnnotations(newAnnotationCount, NON_RANDOM_COORDINATE);
 
-  await VariantAnnotationModel.createIndexes([{ alt: 1, assembly: 1, chr: 1, pos: 1, ref: 1 }]);
+  await VariantAnnotationModel.createIndexes([
+    { alt: 1, assembly: 1, chr: 1, pos: 1, ref: 1 },
+    { pos: 1 },
+  ]);
 
   const newCount = await VariantAnnotationModel.count();
 

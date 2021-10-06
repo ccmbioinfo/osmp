@@ -64,15 +64,18 @@ interface VariantAnnotationModelMethods extends Model<VariantAnnotation> {
 
 variantAnnotationSchema.statics.getAnnotations = async function (
   this: Model<VariantAnnotationDocument>,
-  annotation: VariantAnnotationId
+  coordinates: VariantAnnotationId[],
+  startPos: number,
+  endPos: number
 ) {
-  const variant = await this.find({
-    alt: annotation.alt,
-    assembly: annotation.assembly,
-    chr: annotation.chr,
-    pos: annotation.pos,
-    ref: annotation.ref,
-  });
+  const variant = await this.aggregate([
+    { $match: { pos: { $gt: startPos, $lt: endPos } } },
+    {
+      $match: {
+        $or: coordinates,
+      },
+    },
+  ]);
 
   return variant;
 };
