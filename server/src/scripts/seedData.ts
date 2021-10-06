@@ -18,14 +18,68 @@ const generateRandomCoordinate = () => {
   };
 };
 
+/**
+ * This function randomly generates the number of variant annotations we would have for each chromosome such that each chromosome has a non-equal probability of occuring.
+ * @param max The total number of variant annotations.
+ * @param thecount The number of chromosomes in all annotations (1-22 and X,Y)
+ */
+const generateChromosomeDistribution = (max: number, thecount: number) => {
+  const decimals = [];
+  let currsum = 0;
+  let r = [];
+  for (let i = 0; i < thecount; i++) {
+    r.push(Math.random());
+    currsum += r[i];
+  }
+
+  let remaining = max;
+  for (let i = 0; i < r.length; i++) {
+    const res = ((r[i] / currsum) * max) as number;
+    r[i] = Math.floor(res);
+    remaining -= r[i];
+    decimals.push(res - r[i]);
+  }
+
+  while (remaining > 0) {
+    let maxPos = 0;
+    let maxVal = 0;
+
+    for (let i = 0; i < decimals.length; i++) {
+      if (maxVal < decimals[i]) {
+        maxVal = decimals[i];
+        maxPos = i;
+      }
+    }
+
+    r[maxPos]++;
+    decimals[maxPos] = 0; // We set it to 0 so we don't give this position another one.
+    remaining--;
+  }
+  return r
+    .map((v, i) => {
+      return {
+        [i + 1]: v,
+      };
+    })
+    .reduce((r, c) => Object.assign(r, c), {});
+};
+
 const createDummyVariantAnnotations = async (
   count: number,
   nonRandomCoordinate?: VariantAnnotationId
 ) => {
+  const chromosomeDist = generateChromosomeDistribution(24, count);
+  const sum = Object.values(chromosomeDist).reduce((partialSum, a) => partialSum + a, 0);
   const variants = Array(count)
     .fill(null)
     .map(() => {
-      const { assembly, alt, ref, pos, chr } = generateRandomCoordinate();
+      let { assembly, alt, ref, pos, chr } = generateRandomCoordinate();
+      if (sum !== 0) {
+        while (chromosomeDist[chr] === 0) {
+          chr = generateRandomCoordinate().chr;
+        }
+        chromosomeDist[chr] -= 1;
+      }
       const cdna = Array(100)
         .fill(null)
         .map(() => Faker.helpers.randomize(['A', 'T', 'C', 'G']))
