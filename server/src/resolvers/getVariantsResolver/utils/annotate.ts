@@ -3,7 +3,7 @@ import { AssemblyId, VariantQueryResponse } from '../../../types';
 import { VariantAnnotation, VariantAnnotationId } from '../../../models/VariantAnnotationModel';
 
 enum Chromosome {
-  X = 22,
+  X = 23,
   Y,
 }
 
@@ -25,7 +25,7 @@ const annotate = async (result: VariantQueryResponse) => {
     coordinates.push({
       alt: variant.alt,
       assembly: findAssemblyVersion(variant.assemblyId),
-      chr: Number(variant.refSeqId) || Chromosome[variant.refSeqId as ChromosomeString],
+      chr: findChromosome(variant.refSeqId),
       pos: variant.start,
       ref: variant.ref,
     });
@@ -45,14 +45,16 @@ const annotate = async (result: VariantQueryResponse) => {
     positionsWithAnnotations.push(a.pos);
   });
 
-  console.log(annotationsDict);
-
   // Loop through result from different nodes
   for (let i = 0; i < result.data.length; i++) {
     for (let j = 0; j < result.data[i].data.length; j++) {
       const response = result.data[i].data[j].variant;
-      const key = `${response.alt}-${response.assemblyId}-${response.refSeqId}-${response.start}-${response.ref}`;
+      const key = `${response.alt}-${findAssemblyVersion(response.assemblyId)}-${findChromosome(
+        response.refSeqId
+      )}-${response.start}-${response.ref}`;
+      console.log(key);
       if (key in annotationsDict) {
+        console.log('hello');
         const annotation = annotationsDict[key];
         response.info = {
           aaChanges: annotation.aaChanges,
@@ -79,6 +81,8 @@ const findAssemblyVersion = (assembly: AssemblyId) => {
     }
   }
 };
+
+const findChromosome = (chr: string) => Number(chr) || Chromosome[chr as ChromosomeString];
 
 const findMinMax = (arr: Array<number>) => {
   let len = arr.length;

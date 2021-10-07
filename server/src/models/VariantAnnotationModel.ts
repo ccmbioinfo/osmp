@@ -80,16 +80,6 @@ variantAnnotationSchema.statics.getAnnotations = async function (
       },
     },
   ]);
-  console.log(
-    JSON.stringify([
-      { $match: { pos: { $gt: startPos, $lt: endPos } } },
-      {
-        $match: {
-          $or: coordinates,
-        },
-      },
-    ])
-  );
   return variant;
 };
 

@@ -20,8 +20,9 @@ const getVariants = async (
   info: any
 ): Promise<VariantQueryResponse> => {
   const result = await resolveVariantQuery(args, pubsub);
-  annotate(result);
-  return result;
+  const annotatedResult = await annotate(result);
+  console.log(annotatedResult.data.map(d => console.log(d.data)));
+  return annotatedResult;
 };
 
 /**
