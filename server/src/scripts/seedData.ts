@@ -115,16 +115,16 @@ const createDummyVariantAnnotations = async (
     .concat(
       nonRandomCoordinates
         ? nonRandomCoordinates.map(nonRandomCoordinate => {
-          return {
-            ...nonRandomCoordinate,
-            aa_changes: `Z[${nonRandomCoordinate.ref}GC] > Y[${nonRandomCoordinate.alt}GC]`,
-            cdna: 'ABC',
-            geneName: 'SOME_GENE_NAME',
-            gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
-            gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
-            transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
-          };
-        })
+            return {
+              ...nonRandomCoordinate,
+              aaChanges: `Z[${nonRandomCoordinate.ref}GC] > Y[${nonRandomCoordinate.alt}GC]`,
+              cdna: 'ABC',
+              geneName: 'SOME_GENE_NAME',
+              gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
+              gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
+              transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
+            };
+          })
         : []
     );
   console.log('VARIANTS', variants);
