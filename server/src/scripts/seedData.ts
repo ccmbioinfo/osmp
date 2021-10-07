@@ -18,6 +18,20 @@ const generateRandomCoordinate = () => {
   };
 };
 
+const generateNonRandomCoordinates = () => {
+  return Array(100)
+    .fill(null)
+    .map((v, i) => {
+      return {
+        alt: 'T',
+        ref: 'A',
+        assembly: 37,
+        chr: 1,
+        pos: 123456 + i,
+      };
+    });
+};
+
 /**
  * This function randomly generates the number of variant annotations we would have for each chromosome such that each chromosome has a non-equal probability of occuring.
  * @param max The total number of variant annotations.
@@ -66,7 +80,7 @@ const generateChromosomeDistribution = (max: number, thecount: number) => {
 
 const createDummyVariantAnnotations = async (
   count: number,
-  nonRandomCoordinate?: VariantAnnotationId
+  nonRandomCoordinates?: VariantAnnotationId[]
 ) => {
   const chromosomeDist = generateChromosomeDistribution(count, 24);
   const sum = Object.values(chromosomeDist).reduce((partialSum, a) => partialSum + a, 0);
@@ -99,16 +113,18 @@ const createDummyVariantAnnotations = async (
       };
     })
     .concat(
-      nonRandomCoordinate
-        ? {
-            ...nonRandomCoordinate,
-            aa_changes: `Z[${nonRandomCoordinate.ref}GC] > Y[${nonRandomCoordinate.alt}GC]`,
-            cdna: 'ABC',
-            gene_name: 'SOME_GENE_NAME',
-            gnomad_het: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
-            gnomad_hom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
-            transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
-          }
+      nonRandomCoordinates
+        ? nonRandomCoordinates.map(nonRandomCoordinate => {
+            return {
+              ...nonRandomCoordinate,
+              aa_changes: `Z[${nonRandomCoordinate.ref}GC] > Y[${nonRandomCoordinate.alt}GC]`,
+              cdna: 'ABC',
+              gene_name: 'SOME_GENE_NAME',
+              gnomad_het: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
+              gnomad_hom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
+              transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
+            };
+          })
         : []
     );
   console.log('VARIANTS', variants);
@@ -119,12 +135,12 @@ const queryManyCoordinates = async (
   startPos: number,
   endPos: number,
   count: number,
-  nonRandomCoordinate?: VariantAnnotationId
+  nonRandomCoordinates?: VariantAnnotationId[]
 ) => {
   const coordinates = Array(count)
     .fill(null)
     .map(() => generateRandomCoordinate())
-    .concat(nonRandomCoordinate || []);
+    .concat(nonRandomCoordinates || []);
   console.log(coordinates);
   const stats = await VariantAnnotationModel.aggregate([
     { $match: { pos: { $gt: startPos, $lt: endPos } } },
@@ -141,13 +157,7 @@ const queryManyCoordinates = async (
 
 const MONGO_URL = process.env.MONGO_DATABASE_URL!;
 
-const NON_RANDOM_COORDINATE: VariantAnnotationId = {
-  alt: 'T',
-  ref: 'A',
-  assembly: 19,
-  chr: 1,
-  pos: 123456,
-};
+const NON_RANDOM_COORDINATES: VariantAnnotationId[] = generateNonRandomCoordinates();
 
 mongoose.connect(MONGO_URL).then(async () => {
   const count = await VariantAnnotationModel.count();
@@ -159,7 +169,7 @@ mongoose.connect(MONGO_URL).then(async () => {
   console.log(`creating ${newAnnotationCount.toLocaleString()} annotations....`);
 
   // insert our non-random coordinate as well, bringing the count to newAnnotationCount + 1
-  await createDummyVariantAnnotations(newAnnotationCount, NON_RANDOM_COORDINATE);
+  await createDummyVariantAnnotations(newAnnotationCount, NON_RANDOM_COORDINATES);
 
   await VariantAnnotationModel.createIndexes([
     { alt: 1, assembly: 1, chr: 1, pos: 1, ref: 1 },
@@ -174,7 +184,7 @@ mongoose.connect(MONGO_URL).then(async () => {
 
   console.log(`querying annotations with ${queryCount.toLocaleString()} random coordinates`);
 
-  const results = await queryManyCoordinates(120000, 124000, queryCount, NON_RANDOM_COORDINATE);
+  const results = await queryManyCoordinates(120000, 124000, queryCount, NON_RANDOM_COORDINATES);
 
   console.log(
     `query returned ${results.length.toLocaleString()} of ${newCount.toLocaleString()} annotations`

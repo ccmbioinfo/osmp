@@ -21,6 +21,7 @@ import {
 import SOURCES from '../constants/sources';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
+import { AssemblyId } from '../types';
 import { formatErrorMessage } from '../utils';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
@@ -63,7 +64,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
 };
 
 interface QueryOptionsFormState {
-    assemblyId: string;
+    assemblyId: AssemblyId;
     ensemblId: string;
     gene: string;
     maxFrequency: number;

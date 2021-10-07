@@ -11,6 +11,7 @@ import {
 } from '../../types';
 import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
+import annotate from './utils/annotate';
 
 const getVariants = async (
   parent: any,
@@ -19,6 +20,7 @@ const getVariants = async (
   info: any
 ): Promise<VariantQueryResponse> => {
   const result = await resolveVariantQuery(args, pubsub);
+  annotate(result);
   return result;
 };
 

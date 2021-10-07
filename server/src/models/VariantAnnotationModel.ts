@@ -59,7 +59,11 @@ const variantAnnotationSchema = new mongoose.Schema({
 
 // For model
 interface VariantAnnotationModelMethods extends Model<VariantAnnotation> {
-  getAnnotations(id: VariantAnnotationId): Promise<VariantAnnotation[]>;
+  getAnnotations(
+    coordinates: VariantAnnotationId[],
+    startPos: number,
+    endPos: number
+  ): Promise<VariantAnnotation[]>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
@@ -76,7 +80,16 @@ variantAnnotationSchema.statics.getAnnotations = async function (
       },
     },
   ]);
-
+  console.log(
+    JSON.stringify([
+      { $match: { pos: { $gt: startPos, $lt: endPos } } },
+      {
+        $match: {
+          $or: coordinates,
+        },
+      },
+    ])
+  );
   return variant;
 };
 
