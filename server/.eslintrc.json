@@ -12,7 +12,9 @@
   "plugins": ["@typescript-eslint", "@graphql-eslint", "import", "node", "prettier", "promise"],
   "rules": {
     "comma-dangle": "off",
-    "semi": "off"
+    "semi": "off",
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": "error"
   },
   "overrides": [
     {
