@@ -19,9 +19,9 @@ const getVariants = async (
   { pubsub }: GqlContext,
   info: any
 ): Promise<VariantQueryResponse> => {
-  const result = await resolveVariantQuery(args, pubsub);
-  const annotatedResult = await annotate(result);
-  return annotatedResult;
+  const variants = await resolveVariantQuery(args, pubsub);
+  const { result } = await annotate(variants);
+  return result;
 };
 
 /**

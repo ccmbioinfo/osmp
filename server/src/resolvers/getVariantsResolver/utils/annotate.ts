@@ -10,6 +10,7 @@ enum Chromosome {
 type ChromosomeString = keyof typeof Chromosome;
 
 const annotate = async (result: VariantQueryResponse) => {
+  console.log(result.data[0].data);
   const coordinates = [] as VariantAnnotationId[];
 
   const variants = result.data
@@ -31,11 +32,19 @@ const annotate = async (result: VariantQueryResponse) => {
     });
   });
 
+  console.log('hello 2');
+
+  VariantAnnotationModel.getAnnotations(coordinates, startPos - 1, endPos + 1)
+    .then(d => console.log(d))
+    .catch(err => console.log('error', err));
+
   const annotations = await VariantAnnotationModel.getAnnotations(
     coordinates,
     startPos - 1,
     endPos + 1
   );
+
+  console.log('hello3');
 
   const annotationsDict: Record<string, VariantAnnotation> = {};
   const positionsWithAnnotations: Array<number> = [];
@@ -49,13 +58,15 @@ const annotate = async (result: VariantQueryResponse) => {
   for (let i = 0; i < result.data.length; i++) {
     for (let j = 0; j < result.data[i].data.length; j++) {
       const response = result.data[i].data[j].variant;
+
       const key = `${response.alt}-${findAssemblyVersion(response.assemblyId)}-${findChromosome(
         response.refSeqId
       )}-${response.start}-${response.ref}`;
       console.log(key);
+
       if (key in annotationsDict) {
-        console.log('hello');
         const annotation = annotationsDict[key];
+
         response.info = {
           aaChanges: annotation.aaChanges,
           cDna: annotation.cdna,
@@ -68,7 +79,10 @@ const annotate = async (result: VariantQueryResponse) => {
     }
   }
 
-  return result;
+  return {
+    result: result,
+    annotations: annotations,
+  };
 };
 
 const findAssemblyVersion = (assembly: AssemblyId) => {
