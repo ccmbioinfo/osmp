@@ -49,11 +49,9 @@ const annotate = async (result: VariantQueryResponse) => {
   }
 
   const annotationsDict: Record<string, VariantAnnotation> = {};
-  const positionsWithAnnotations: Array<number> = [];
 
   annotations.forEach(a => {
     annotationsDict[`${a.alt}-${a.assembly}-${a.chr}-${a.pos}-${a.ref}`] = a;
-    positionsWithAnnotations.push(a.pos);
   });
 
   // Loop through result from different nodes
