@@ -65,14 +65,15 @@ const annotate = async (result: VariantQueryResponse) => {
 
       if (key in annotationsDict) {
         const annotation = annotationsDict[key];
+        const { aaChanges, cdna, geneName, gnomadHet, gnomadHom, transcript } = annotation;
 
         response.info = {
-          aaChanges: annotation.aaChanges,
-          cDna: annotation.cdna,
-          geneName: annotation.geneName,
-          gnomadHet: annotation.gnomadHet,
-          gnomadHom: annotation.gnomadHom,
-          transcript: annotation.transcript,
+          aaChanges: aaChanges,
+          cDna: cdna,
+          geneName: geneName,
+          gnomadHet: gnomadHet,
+          gnomadHom: gnomadHom,
+          transcript: transcript,
         };
       }
     }
