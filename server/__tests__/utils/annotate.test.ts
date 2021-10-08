@@ -1,20 +1,27 @@
 import annotate from '../../src/resolvers/getVariantsResolver/utils/annotate';
 import { VariantQueryResponse } from '../../src/types';
-import mongoose from 'mongoose';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
 */
 describe('Test whether variants get annotated', () => {
-  beforeAll(() => {
-    mongoose.connect(process.env.MONGO_DATABASE_URL!);
-  });
+  const annotation = [
+    {
+      alt: 'T',
+      ref: 'A',
+      chr: 1,
+      pos: 123456,
+      assembly: 37,
+      aaChanges: 'Z[AGC] > Y[TGC]',
+      cdna: 'ABC',
+      geneName: 'SOME_GENE_NAME',
+      gnomadHet: 0,
+      gnomadHom: 0,
+      transcript: 'ENSTFAKE10000',
+    },
+  ];
 
-  afterAll(done => {
-    mongoose.disconnect().then(done);
-  });
-
-  it('finds the correct coordinates and returns a unique annotation', async () => {
+  it('finds the correct coordinates and returns a unique annotation', () => {
     const variants: VariantQueryResponse = {
       errors: [],
       data: [
@@ -40,23 +47,13 @@ describe('Test whether variants get annotated', () => {
       ],
       meta: 'some test meta',
     };
-    const { result, annotations } = await annotate(variants);
 
-    expect(annotations.length).toEqual(1);
-
-    const annotation = annotations[0];
-
-    // Check if annotation has the proper coordinates
-    expect(annotation).toHaveProperty('alt', 'T');
-    expect(annotation).toHaveProperty('ref', 'A');
-    expect(annotation).toHaveProperty('chr', 1);
-    expect(annotation).toHaveProperty('pos', 123456);
-    expect(annotation).toHaveProperty('assembly', 37);
+    const result = annotate(variants, annotation);
 
     // Check if the corresponding variant has info fields populated
-    result.data.forEach(d =>
-      d.data.forEach(d => {
-        expect(d.variant.info).toEqual({
+    result.data.forEach(nodeData =>
+      nodeData.data.forEach(data => {
+        expect(data.variant.info).toEqual({
           aaChanges: 'Z[AGC] > Y[TGC]',
           cDna: 'ABC',
           geneName: 'SOME_GENE_NAME',
@@ -66,7 +63,7 @@ describe('Test whether variants get annotated', () => {
         });
       })
     );
-  }, 100000);
+  });
 
   it('test empty variants data array', async () => {
     const variants: VariantQueryResponse = {
@@ -79,12 +76,12 @@ describe('Test whether variants get annotated', () => {
       ],
       meta: 'some test meta',
     };
-    const { annotations } = await annotate(variants);
+    const result = annotate(variants, annotation);
 
-    expect(annotations.length).toEqual(0);
+    expect(result).toEqual(variants);
   });
 
-  it('test coordinate that does not exist', async () => {
+  it('test coordinate that does not exist', () => {
     const variants: VariantQueryResponse = {
       errors: [],
       data: [
@@ -110,9 +107,8 @@ describe('Test whether variants get annotated', () => {
       ],
       meta: 'some test meta',
     };
-    const { annotations, result } = await annotate(variants);
+    const result = annotate(variants, annotation);
 
-    expect(annotations.length).toEqual(0);
     expect(result).toEqual(variants);
   });
 });

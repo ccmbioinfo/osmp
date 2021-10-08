@@ -145,3 +145,37 @@ export interface GqlContext {
 export type ResultTransformer<T> = (args: T | null) => VariantQueryResponseSchema[];
 
 export type ErrorTransformer<T> = (args: T | null) => VariantQueryErrorResponse | null;
+
+export enum Chromosome {
+  Chr1 = 1,
+  Chr2,
+  Chr3,
+  Chr4,
+  Chr5,
+  Chr6,
+  Chr7,
+  Chr8,
+  Chr9,
+  Chr10,
+  Chr11,
+  Chr12,
+  Chr13,
+  Chr14,
+  Chr15,
+  Chr16,
+  Chr17,
+  Chr18,
+  Chr19,
+  Chr20,
+  Chr21,
+  Chr22,
+  ChrX,
+  ChrY,
+}
+
+export enum Assembly {
+  GRCh37 = 37,
+  hg19 = 37,
+  GRCh38 = 38,
+  hg38 = 38,
+}

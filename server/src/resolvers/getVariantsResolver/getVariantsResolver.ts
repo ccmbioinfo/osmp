@@ -12,15 +12,21 @@ import {
 import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import annotate from './utils/annotate';
+import getCoordinates from './utils/getCoordinates';
+import { VariantAnnotation } from '../../models';
 
 const getVariants = async (
   parent: any,
   args: QueryInput,
-  { pubsub }: GqlContext,
-  info: any
+  { pubsub }: GqlContext
 ): Promise<VariantQueryResponse> => {
   const variants = await resolveVariantQuery(args, pubsub);
-  const { result } = await annotate(variants);
+
+  const { start, end, coordinates } = getCoordinates(variants);
+
+  const annotations = await VariantAnnotation.getAnnotations(coordinates, start, end);
+
+  const result = annotate(variants, annotations);
   return result;
 };
 
