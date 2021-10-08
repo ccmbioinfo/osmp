@@ -1,5 +1,5 @@
 import { VariantAnnotation as VariantAnnotationModel } from '../../../models';
-import { AssemblyId, VariantQueryResponse } from '../../../types';
+import { VariantQueryResponse } from '../../../types';
 import { VariantAnnotation, VariantAnnotationId } from '../../../models/VariantAnnotationModel';
 
 enum Chromosome {
@@ -7,10 +7,14 @@ enum Chromosome {
   Y,
 }
 
+enum Assembly {
+  GRCh37 = 37,
+  GRCh38,
+}
+
 type ChromosomeString = keyof typeof Chromosome;
 
 const annotate = async (result: VariantQueryResponse) => {
-  console.log(result.data[0].data);
   const coordinates = [] as VariantAnnotationId[];
 
   const variants = result.data
@@ -25,26 +29,24 @@ const annotate = async (result: VariantQueryResponse) => {
   variants.forEach(variant => {
     coordinates.push({
       alt: variant.alt,
-      assembly: findAssemblyVersion(variant.assemblyId),
+      assembly: Assembly[variant.assemblyId],
       chr: findChromosome(variant.refSeqId),
       pos: variant.start,
       ref: variant.ref,
     });
   });
 
-  console.log('hello 2');
-
-  VariantAnnotationModel.getAnnotations(coordinates, startPos - 1, endPos + 1)
-    .then(d => console.log(d))
-    .catch(err => console.log('error', err));
-
-  const annotations = await VariantAnnotationModel.getAnnotations(
-    coordinates,
-    startPos - 1,
-    endPos + 1
-  );
-
-  console.log('hello3');
+  let annotations: VariantAnnotation[];
+  try {
+    annotations = await VariantAnnotationModel.getAnnotations(
+      coordinates,
+      startPos - 1,
+      endPos + 1
+    );
+  } catch (err) {
+    console.log(err);
+    annotations = [];
+  }
 
   const annotationsDict: Record<string, VariantAnnotation> = {};
   const positionsWithAnnotations: Array<number> = [];
@@ -59,10 +61,9 @@ const annotate = async (result: VariantQueryResponse) => {
     for (let j = 0; j < result.data[i].data.length; j++) {
       const response = result.data[i].data[j].variant;
 
-      const key = `${response.alt}-${findAssemblyVersion(response.assemblyId)}-${findChromosome(
+      const key = `${response.alt}-${Assembly[response.assemblyId]}-${findChromosome(
         response.refSeqId
       )}-${response.start}-${response.ref}`;
-      console.log(key);
 
       if (key in annotationsDict) {
         const annotation = annotationsDict[key];
@@ -83,17 +84,6 @@ const annotate = async (result: VariantQueryResponse) => {
     result: result,
     annotations: annotations,
   };
-};
-
-const findAssemblyVersion = (assembly: AssemblyId) => {
-  switch (assembly) {
-    case 'GRCh37': {
-      return 37;
-    }
-    case 'GRCh38': {
-      return 38;
-    }
-  }
 };
 
 const findChromosome = (chr: string) => Number(chr) || Chromosome[chr as ChromosomeString];

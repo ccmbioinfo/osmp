@@ -1,10 +1,19 @@
 import annotate from '../../src/resolvers/getVariantsResolver/utils/annotate';
 import { VariantQueryResponse } from '../../src/types';
+import mongoose from 'mongoose';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
 */
 describe('Test whether variants get annotated', () => {
+  beforeAll(() => {
+    mongoose.connect(process.env.MONGO_DATABASE_URL!);
+  });
+
+  afterAll(done => {
+    mongoose.disconnect().then(done);
+  });
+
   it('finds the correct coordinates and returns a unique annotation', async () => {
     const variants: VariantQueryResponse = {
       errors: [],
@@ -49,7 +58,7 @@ describe('Test whether variants get annotated', () => {
       d.data.forEach(d => {
         expect(d.variant.info).toEqual({
           aaChanges: 'Z[AGC] > Y[TGC]',
-          cdna: 'ABC',
+          cDna: 'ABC',
           geneName: 'SOME_GENE_NAME',
           gnomadHet: 0,
           gnomadHom: 0,
@@ -58,4 +67,52 @@ describe('Test whether variants get annotated', () => {
       })
     );
   }, 100000);
+
+  it('test empty variants data array', async () => {
+    const variants: VariantQueryResponse = {
+      errors: [],
+      data: [
+        {
+          data: [],
+          source: 'local',
+        },
+      ],
+      meta: 'some test meta',
+    };
+    const { annotations } = await annotate(variants);
+
+    expect(annotations.length).toEqual(0);
+  });
+
+  it('test coordinate that does not exist', async () => {
+    const variants: VariantQueryResponse = {
+      errors: [],
+      data: [
+        {
+          data: [
+            {
+              individual: { individualId: 'testId1' },
+              variant: {
+                alt: 'T',
+                assemblyId: 'GRCh37',
+                callsets: [],
+                end: 999999999999,
+                info: {},
+                ref: 'A',
+                refSeqId: '1',
+                start: 999999999999,
+              },
+              contactInfo: 'DrExample@gmail.com',
+            },
+          ],
+          source: 'local',
+        },
+      ],
+      meta: 'some test meta',
+    };
+    const { annotations, result } = await annotate(variants);
+
+    expect(annotations.length).toEqual(0);
+    expect(result).toEqual(variants);
+  });
 });

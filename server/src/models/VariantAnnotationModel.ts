@@ -72,15 +72,19 @@ variantAnnotationSchema.statics.getAnnotations = async function (
   startPos: number,
   endPos: number
 ) {
-  const variant = await this.aggregate([
-    { $match: { pos: { $gt: startPos, $lt: endPos } } },
-    {
-      $match: {
-        $or: coordinates,
+  if (coordinates.length > 0) {
+    const variant = await this.aggregate([
+      { $match: { pos: { $gt: startPos, $lt: endPos } } },
+      {
+        $match: {
+          $or: coordinates,
+        },
       },
-    },
-  ]);
-  return variant;
+    ]);
+    return variant;
+  } else {
+    return [];
+  }
 };
 
 const VariantAnnotationModel = model<VariantAnnotationDocument, VariantAnnotationModelMethods>(
