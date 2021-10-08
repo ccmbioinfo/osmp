@@ -9,7 +9,9 @@ enum Chromosome {
 
 enum Assembly {
   GRCh37 = 37,
-  GRCh38,
+  hg19 = 37,
+  GRCh38 = 38,
+  hg38 = 38,
 }
 
 type ChromosomeString = keyof typeof Chromosome;
