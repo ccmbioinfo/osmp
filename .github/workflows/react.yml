@@ -7,17 +7,8 @@ on:
       - .github/workflows/react.yml
       - react/src/**/*
 
-
-# Testing with hardcoded values, will change these to environmental secrets
-env:
-  REACT_APP_GRAPHQL_URL: http://localhost:4777/graphql
-  REACT_APP_KEYCLOAK_AUTH_URL: http://localhost:9821/auth
-  REACT_APP_KEYCLOAK_REALM: ssmp
-  REACT_APP_KEYCLOAK_CLIENT_ID: ssmp-app
-
 jobs:
   build-react:
-    environment: SSMP_BUILD
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -51,12 +42,25 @@ jobs:
           yarn tsc
       - name: Generate build
         run: yarn build
-      - name: Upload to Minio bucket
-        # Uncomment during actual deploy to dev server
-        if: github.event_name == 'push'  
+        # Testing with hardcoded values, will change these to environmental secrets
         env:
-          MC_HOST_minio: ${{ secrets.MC_HOST }}
-        run: |
-          sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
-          sudo chmod +x /usr/local/bin/mc
-          ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
+          REACT_APP_GRAPHQL_URL: http://localhost:4777/graphql
+          REACT_APP_KEYCLOAK_AUTH_URL: http://localhost:9821/auth
+          REACT_APP_KEYCLOAK_REALM: ssmp
+          REACT_APP_KEYCLOAK_CLIENT_ID: ssmp-app
+
+  deploy: 
+    runs-on: ubuntu-latest
+    needs: build-react
+    environment: SSMP_BUILD
+    if: github.event_name == 'push'
+    steps:
+    - name: Upload to Minio bucket
+      # Uncomment during actual deploy to dev server
+      if: github.event_name == 'push'  
+      env:
+        MC_HOST_minio: ${{ secrets.MC_HOST }}
+      run: |
+        sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+        sudo chmod +x /usr/local/bin/mc
+        ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}

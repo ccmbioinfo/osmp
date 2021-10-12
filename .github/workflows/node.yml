@@ -50,6 +50,11 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           docker run --rm test-image yarn format
+
+      - name: Run tests
+        if: github.event_name == 'pull_request'
+        run: |
+          docker run --rm test-image yarn test
       
       - name: Meta action
         uses: docker/metadata-action@v3
