@@ -9,27 +9,84 @@ import { VariantQueryResponse } from '../../src/types';
  */
 describe('Test getVariants query', () => {
   const GetVariants = `
-    query GetVariants($input: VariantQueryInput) {
-      getVariants(input: $input) {
+  query GetVariants($input: QueryInput) {
+    getVariants(input: $input) {
         data {
-          data {
-            af
-            alt
-            ref
-            chromosome
-          }
-          source 
+            data {
+                variant {
+                    alt
+                    callsets {
+                        callSetId
+                        individualId
+                        info {
+                            ad
+                            dp
+                            gq
+                            qual
+                            zygosity
+                        }
+                    }
+                    end
+                    info {
+                        aaChanges
+                        cDna
+                        geneName
+                        gnomadHet
+                        gnomadHom
+                        transcript
+                    }
+                    ref
+                    refSeqId
+                    start
+                }
+                individual {
+                    datasetId
+                    diseases {
+                        ageOfOnset {
+                            age
+                            ageGroup
+                        }
+                        description
+                        diseaseId
+                        levelSeverity
+                        outcome
+                        stage
+                    }
+                    ethnicity
+                    geographicOrigin
+                    individualId
+                    info {
+                        diagnosis
+                        candidateGene
+                        classifications
+                    }
+                    phenotypicFeatures {
+                        ageOfOnset {
+                            age
+                            ageGroup
+                        }
+                        dateOfOnset
+                        levelSeverity
+                        onsetType
+                        phenotypeId
+                    }
+                    sex
+                }
+                contactInfo
+            }
+            source
         }
         errors {
-          source
-          error {
-            code
-            message
-          }
+            error {
+                id
+                code
+                message
+            }
+            source
         }
         meta
-      }
     }
+}
   `;
 
   it('issues a valid query', async () => {
@@ -54,7 +111,7 @@ describe('Test getVariants query', () => {
     const queryResponse = await testGraphQLQuery({
       schema: schemaWithMocks,
       source: GetVariants,
-      variableValues: { input: { start: 1, end: 2, chromosome: '1', sources: ['test'] } },
+      variableValues: { input: { variant: {}, gene: {}, sources: ['test'] } },
     });
 
     if (queryResponse.errors?.length) {
