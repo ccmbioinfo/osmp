@@ -1,7 +1,4 @@
-import {
-  transformLocalErrorResponse,
-  transformLocalQueryResponse,
-} from '../../src/resolvers/getVariantsResolver/adapters/localQueryAdapter';
+import { transformLocalQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/localQueryAdapter';
 
 /**
  * Confirm that our adapter is transforming the query and results as we would expect
@@ -18,12 +15,23 @@ describe('Test local query adapter', () => {
       { reference: 'A', alternative: 'T', chromosome: 'X', extraneous: 'foo' },
     ]);
 
-    expect(transformed).toEqual([{ ref: 'A', alt: 'T', chromosome: 'X' }]);
-  });
-
-  it('trasforms the errors', async () => {
-    const transformed = transformLocalErrorResponse({ errors: ['error1', 'error2'], code: 500 });
-
-    expect(transformed).toEqual({ code: 500, message: 'error1\nerror2' });
+    expect(transformed).toEqual([
+      {
+        individual: {
+          individualId: 'testId1',
+        },
+        variant: {
+          alt: 'T',
+          assemblyId: 'GRCh37',
+          callsets: [],
+          end: 1,
+          info: {},
+          ref: 'A',
+          refSeqId: 'Chr2',
+          start: 1,
+        },
+        contactInfo: 'DrExample@gmail.com',
+      },
+    ]);
   });
 });
