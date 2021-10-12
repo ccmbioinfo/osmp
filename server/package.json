@@ -61,5 +61,10 @@
   },
   "resolutions": {
     "ws": ">=7.4.6"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "debug": "1"
+    }
   }
 }
