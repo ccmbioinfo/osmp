@@ -17,7 +17,6 @@ env:
 
 jobs:
   build-react:
-    environment: SSMP_BUILD
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,7 +52,8 @@ jobs:
         run: yarn build
       - name: Upload to Minio bucket
         # Uncomment during actual deploy to dev server
-        if: github.event_name == 'push'  
+        if: github.event_name == 'push' 
+        environment: SSMP_BUILD 
         env:
           MC_HOST_minio: ${{ secrets.MC_HOST }}
         run: |
