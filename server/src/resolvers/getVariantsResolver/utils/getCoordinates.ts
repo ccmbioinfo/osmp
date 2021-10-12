@@ -28,8 +28,8 @@ const getCoordinates = (variants: VariantQueryResponse) => {
     });
 
   return {
-    start: start,
-    end: end,
+    start: start - 1,
+    end: end + 1,
     coordinates: coordinates,
   };
 };
