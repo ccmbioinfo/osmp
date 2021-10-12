@@ -27,11 +27,11 @@ const getLocalQuery = async (
   let localQueryResponse: LocalQueryResponse[] | null = null;
   let localQueryError: Error | null = null;
   try {
-    localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
+    localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve) => {
       resolve(
         Array(1)
           .fill(null)
-          .map((v, i) => {
+          .map(() => {
             return {
               alternative: 'T',
               reference: 'A',
