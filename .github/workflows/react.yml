@@ -56,12 +56,12 @@ jobs:
     if: github.event_name == 'push'
     steps:
     - name: Upload to Minio bucket
-        # Uncomment during actual deploy to dev server
-        if: github.event_name == 'push' 
-        environment: SSMP_BUILD 
-        env:
-          MC_HOST_minio: ${{ secrets.MC_HOST }}
-        run: |
-          sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
-          sudo chmod +x /usr/local/bin/mc
-          ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
+      # Uncomment during actual deploy to dev server
+      if: github.event_name == 'push' 
+      environment: SSMP_BUILD 
+      env:
+        MC_HOST_minio: ${{ secrets.MC_HOST }}
+      run: |
+        sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+        sudo chmod +x /usr/local/bin/mc
+        ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
