@@ -7,6 +7,17 @@ COPY . .
 
 RUN yarn && yarn run build
 
+# Download binary, extract and remove archive
+RUN wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-debian10-v4.2-latest.tgz \
+    && tar -zxvf mongodb-linux-x86_64-debian10-v4.2-latest.tgz \
+    && rm mongodb-linux-x86_64-debian10-v4.2-latest.tgz
+
+# Rename extracted
+RUN mv mongodb-* /etc/mongodb
+
+# Point env variable to binary
+ENV MONGOMS_SYSTEM_BINARY=/etc/mongodb/bin/mongod
+
 FROM node:16-alpine as DEPLOY_IMAGE
 
 WORKDIR /usr/app
