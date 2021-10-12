@@ -17,6 +17,7 @@ RUN mv mongodb-* /etc/mongodb
 
 # Point env variable to binary
 ENV MONGOMS_SYSTEM_BINARY=/etc/mongodb/bin/mongod
+ENV MONGOMS_VERSION=4.2.8
 
 FROM node:16-alpine as DEPLOY_IMAGE
 
