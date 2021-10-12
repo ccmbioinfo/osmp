@@ -8,9 +8,9 @@ COPY . .
 RUN yarn && yarn run build
 
 # Download binary, extract and remove archive
-RUN wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-debian10-v4.2-latest.tgz \
-    && tar -zxvf mongodb-linux-x86_64-debian10-v4.2-latest.tgz \
-    && rm mongodb-linux-x86_64-debian10-v4.2-latest.tgz
+RUN wget http://downloads.mongodb.org/linux/mongodb-linux-x86_64-debian10-v4.2.8.tgz \
+    && tar -zxvf mongodb-linux-x86_64-debian10-v4.2.8.tgz \
+    && rm mongodb-linux-x86_64-debian10-v4.2.8.tgz
 
 # Rename extracted
 RUN mv mongodb-* /etc/mongodb
