@@ -57,8 +57,7 @@ jobs:
     steps:
     - name: Upload to Minio bucket
       # Uncomment during actual deploy to dev server
-      if: github.event_name == 'push' 
-      environment: SSMP_BUILD 
+      if: github.event_name == 'push'  
       env:
         MC_HOST_minio: ${{ secrets.MC_HOST }}
       run: |
