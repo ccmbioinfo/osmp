@@ -27,7 +27,7 @@ const getLocalQuery = async (
   let localQueryResponse: LocalQueryResponse[] | null = null;
   let localQueryError: Error | null = null;
   try {
-    localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve) => {
+    localQueryResponse = await new Promise<LocalQueryResponse[]>(resolve => {
       resolve(
         Array(1)
           .fill(null)

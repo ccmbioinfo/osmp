@@ -114,16 +114,16 @@ export const createDummyVariantAnnotations = async (
     .concat(
       nonRandomCoordinates
         ? nonRandomCoordinates.map(nonRandomCoordinate => {
-          return {
-            ...nonRandomCoordinate,
-            aaChanges: `Z[${nonRandomCoordinate.ref}GC] > Y[${nonRandomCoordinate.alt}GC]`,
-            cdna: 'ABC',
-            geneName: 'SOME_GENE_NAME',
-            gnomadHet: 0,
-            gnomadHom: 0,
-            transcript: 'ENSTFAKE10000',
-          };
-        })
+            return {
+              ...nonRandomCoordinate,
+              aaChanges: `Z[${nonRandomCoordinate.ref}GC] > Y[${nonRandomCoordinate.alt}GC]`,
+              cdna: 'ABC',
+              geneName: 'SOME_GENE_NAME',
+              gnomadHet: 0,
+              gnomadHom: 0,
+              transcript: 'ENSTFAKE10000',
+            };
+          })
         : []
     );
   return VariantAnnotationModel.create(variants);
