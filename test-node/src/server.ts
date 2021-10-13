@@ -1,5 +1,6 @@
 import express, { Request } from 'express';
 import { createServer } from 'http';
+import mysql, { RowDataPacket } from 'mysql2/promise';
 import jwt from 'express-jwt';
 import jwks from 'jwks-rsa';
 import Faker from 'faker';
@@ -30,17 +31,82 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
+const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAGER_DB } =
+  process.env;
+
 app.get(
   '/data',
   async (
-    { body: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
+    { query: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
     res
   ) => {
-    res.json(createTestQueryResponse(geneName, ensemblId));
+    //res.json(createTestQueryResponse(geneName, ensemblId));
     //res.statusCode = 422;
     //res.json('invalid request');
+    const result = await getStagerData(geneName as string, ensemblId as string);
+    if (!result) {
+      res.statusCode = 404;
+      return res.json('NOT FOUND');
+    } else {
+      console.log(result);
+      return res.json(result);
+    }
   }
 );
+
+const getStagerData = async (geneName: string, ensemblId: string) => {
+  const connection = await mysql.createConnection({
+    host: STAGER_DB_HOST,
+    user: STAGER_DB_USER,
+    port: +(STAGER_DB_PORT as string),
+    password: STAGER_DB_PASSWORD,
+    database: STAGER_DB,
+  });
+
+  if (!ensemblId) {
+    try {
+      const [rows] = await connection.execute<RowDataPacket[][]>(
+        'select `ensembl_id` from `gene_alias` where `name` = ? and `kind` = "current_approved_symbol";',
+        [geneName]
+      );
+
+      if (rows.length) {
+        ensemblId = (rows[0] as any).ensembl_id;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      console.error(e);
+      connection.end();
+      return false;
+    }
+  } else if (ensemblId.startsWith('ENS')) {
+    ensemblId = ensemblId.replace(/ENSG0+/, '');
+  }
+
+  let result;
+
+  try {
+    const fetchVariantsSql = `select * from variant v inner join genotype ge 
+                              on ge.variant_id = v.variant_id 
+                                inner join gene g on 
+                                  v.position between g.start and g.end 
+                                  where g.ensembl_id = ?`;
+
+    result = await connection.execute(fetchVariantsSql, [ensemblId]);
+
+    if (!(result as any).length) {
+      connection.end();
+      return false;
+    }
+  } catch (e) {
+    console.error(e);
+    connection.end();
+    return false;
+  }
+
+  return result[0];
+};
 
 export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
   return Array(50)
