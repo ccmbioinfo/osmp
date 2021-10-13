@@ -50,7 +50,8 @@
     "graphql-subscriptions": "^1.2.1",
     "keycloak-connect": "14.0.0",
     "subscriptions-transport-ws": "^0.9.19",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "ws": ">=7.4.6"
   },
   "resolutions": {
     "ws": ">=7.4.6"

@@ -10,85 +10,9 @@ import {
 } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 
-type RemoteTestNodeQueryError = AxiosError;
+type RemoteTestNodeQueryError = AxiosError<string>;
 
-type StagerNodeQueryError = AxiosError;
-
-/**
- * @param args VariantQueryInput
- * @returns  Promise<ResolvedVariantQueryResult>
- * Return some dummy data for testing and design purposes --> Currently returning from a "STAGER-like datastore" rather than a dummy data source, though this can be toggled
- */
-const getRemoteTestNodeQuery = async (
-  args: QueryInput,
-  pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
-  /* eslint-disable camelcase */
-  let tokenResponse: AxiosResponse<{ access_token: string }>;
-
-  if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
-    try {
-      tokenResponse = await axios.post(
-        process.env.TEST_NODE_SSMP_TOKEN_ENDPOINT!,
-        {
-          client_id: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_ID,
-          client_secret: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_SECRET,
-          audience: process.env.TEST_NODE_TOKEN_AUDIENCE,
-          grant_type: 'client_credentials',
-        },
-        { headers: { 'content-type': 'application/json' } }
-      );
-    } catch (e) {
-      logger.error(e);
-      return {
-        data: [],
-        error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
-        source: 'remote-test',
-      };
-    }
-  } else {
-    tokenResponse = { data: { access_token: 'abc' } } as any;
-  }
-
-  let remoteTestNodeQueryResponse = null;
-  let remoteTestNodeQueryError: RemoteTestNodeQueryError | null = null;
-
-  try {
-    remoteTestNodeQueryResponse = await axios.get(
-      `${process.env.TEST_NODE_URL}?ensemblId=${args.input.gene.ensemblId}`,
-      {
-        headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
-      }
-    );
-  } catch (e) {
-    logger.error(e);
-    remoteTestNodeQueryError = e as AxiosError;
-  }
-
-  // todo: wrap and make type safe
-  pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
-
-  return {
-    data: transformStagerQueryResponse(remoteTestNodeQueryResponse?.data || []),
-    error: transformRemoteTestNodeErrorResponse(remoteTestNodeQueryError),
-    source: 'remote-test',
-  };
-};
-
-export const transformRemoteTestNodeErrorResponse: ErrorTransformer<AxiosError> = error => {
-  if (!error) {
-    return null;
-  } else {
-    return {
-      id: uuidv4(),
-      code: error.response?.status || 500,
-      message: error.response?.data,
-    };
-  }
-};
-
-export default getRemoteTestNodeQuery;
-
+/* eslint-disable camelcase */
 interface StagerVariantQueryPayload {
   aa_position: number;
   alt_allele: string;
@@ -152,6 +76,84 @@ interface StagerVariantQueryPayload {
   variation: string;
   vest3_score: string;
 }
+
+type StagerNodeQueryError = AxiosError;
+
+/**
+ * @param args VariantQueryInput
+ * @returns  Promise<ResolvedVariantQueryResult>
+ * Return some dummy data for testing and design purposes --> Currently returning from a "STAGER-like datastore" rather than a dummy data source, though this can be toggled
+ */
+const getRemoteTestNodeQuery = async (
+  args: QueryInput,
+  pubsub: PubSub
+): Promise<ResolvedVariantQueryResult> => {
+  /* eslint-disable camelcase */
+  let tokenResponse: AxiosResponse<{ access_token: string }>;
+
+  if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
+    try {
+      tokenResponse = await axios.post(
+        process.env.TEST_NODE_SSMP_TOKEN_ENDPOINT!,
+        {
+          client_id: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_ID,
+          client_secret: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_SECRET,
+          audience: process.env.TEST_NODE_TOKEN_AUDIENCE,
+          grant_type: 'client_credentials',
+        },
+        { headers: { 'content-type': 'application/json' } }
+      );
+    } catch (e) {
+      logger.error(e);
+      return {
+        data: [],
+        error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
+        source: 'remote-test',
+      };
+    }
+  } else {
+    tokenResponse = { data: { access_token: 'abc' } } as any;
+  }
+
+  let remoteTestNodeQueryResponse = null;
+  let remoteTestNodeQueryError: RemoteTestNodeQueryError | null = null;
+
+  try {
+    remoteTestNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
+      `${process.env.TEST_NODE_URL}?ensemblId=${args.input.gene.ensemblId}`,
+      {
+        headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
+      }
+    );
+  } catch (e) {
+    logger.error(e);
+    remoteTestNodeQueryError = e as RemoteTestNodeQueryError;
+  }
+
+  // todo: wrap and make type safe
+  pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
+
+  return {
+    data: transformStagerQueryResponse(remoteTestNodeQueryResponse?.data || []),
+    error: transformRemoteTestNodeErrorResponse(remoteTestNodeQueryError),
+    source: 'remote-test',
+  };
+};
+
+export const transformRemoteTestNodeErrorResponse: ErrorTransformer<RemoteTestNodeQueryError> =
+  error => {
+    if (!error) {
+      return null;
+    } else {
+      return {
+        id: uuidv4(),
+        code: error.response?.status || 500,
+        message: error.response?.data,
+      };
+    }
+  };
+
+export default getRemoteTestNodeQuery;
 
 const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[]> = response =>
   (response || []).map(r => ({
