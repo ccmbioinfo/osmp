@@ -40,7 +40,7 @@ app.get(
     { query: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
     res
   ) => {
-    //res.json(createTestQueryResponse(geneName, ensemblId));
+    //res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
     //res.statusCode = 422;
     //res.json('invalid request');
     const result = await getStagerData(geneName as string, ensemblId as string);
@@ -48,7 +48,6 @@ app.get(
       res.statusCode = 404;
       return res.json('NOT FOUND');
     } else {
-      console.log(result);
       return res.json(result);
     }
   }
@@ -81,33 +80,56 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
       return false;
     }
   } else if (ensemblId.startsWith('ENS')) {
+    // stager stores its ensids as integers
     ensemblId = ensemblId.replace(/ENSG0+/, '');
   }
 
   let result;
 
   try {
-    const fetchVariantsSql = `select * from variant v inner join genotype ge 
-                              on ge.variant_id = v.variant_id 
-                                inner join gene g on 
-                                  v.position between g.start and g.end 
-                                  where g.ensembl_id = ?`;
+    const fetchVariantsSql = `
+    select * from variant v 
+      inner join gene g 
+        on v.position between g.start and g.end 
+      where g.ensembl_id = ?`;
 
-    result = await connection.execute(fetchVariantsSql, [ensemblId]);
+    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [ensemblId]);
 
-    if (!(result as any).length) {
+    if (!variants.length) {
       connection.end();
       return false;
     }
+
+    const variantIds = variants.map(v => v.variant_id);
+
+    const genotypesSql = `select * from genotype g where g.variant_id in (${mysql.escape(
+      variantIds
+    )})`;
+
+    const [genotypes] = await connection.execute<RowDataPacket[]>(genotypesSql);
+
+    const genotypeDict = genotypes.reduce<Record<string, RowDataPacket[]>>(
+      (acc, curr) => ({
+        ...acc,
+        [curr.variant_id]: acc[curr.variant_id] ? acc[curr.variant_id].concat(curr) : [curr],
+      }),
+      {}
+    );
+
+    result = variants.map(v => ({
+      ...v,
+      genotypes: genotypeDict[v.variant_id] || [],
+    }));
   } catch (e) {
     console.error(e);
     connection.end();
     return false;
   }
 
-  return result[0];
+  return result;
 };
 
+/* create dummy data */
 export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
   return Array(50)
     .fill(null)

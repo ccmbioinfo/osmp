@@ -17,7 +17,7 @@ type StagerNodeQueryError = AxiosError;
 /**
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
- * Return some dummy data for testing and design purposes
+ * Return some dummy data for testing and design purposes --> Currently returning from a "STAGER-like datastore" rather than a dummy data source, though this can be toggled
  */
 const getRemoteTestNodeQuery = async (
   args: QueryInput,
@@ -69,7 +69,7 @@ const getRemoteTestNodeQuery = async (
   pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
 
   return {
-    data: remoteTestNodeQueryResponse?.data || [],
+    data: transformStagerQueryResponse(remoteTestNodeQueryResponse?.data || []),
     error: transformRemoteTestNodeErrorResponse(remoteTestNodeQueryError),
     source: 'remote-test',
   };
@@ -106,7 +106,7 @@ interface StagerVariantQueryPayload {
   exac_prec_score: number;
   exon: string;
   gene: string;
-  genotype: {
+  genotypes: {
     alt_depths: number;
     analysis_id: number;
     burden: number;
@@ -153,36 +153,32 @@ interface StagerVariantQueryPayload {
   vest3_score: string;
 }
 
-const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[]> = response => {
-  if (!response) {
-    return [];
-  } else {
-    return response.map(r => ({
-      individual: {
-        individualId: (r.genotype || [{}])[0].participant_codename,
-      },
-      variant: {
-        alt: r.alt_allele,
-        assemblyId: 'GRCh37',
-        callsets: r.genotype.map(g => ({
-          individualId: g.participant_codename,
-          datasetId: g.dataset_id,
-          callSetId: g.analysis_id.toString(),
-          info: {
-            ad: g.alt_depths,
-            zygosity: g.zygosity,
-          },
-        })),
-        end: r.end,
-        ref: r.reference_allele,
-        refSeqId: r.chromosome,
-        start: r.start,
-        variantType: r.variation,
-      },
-      contactInfo: 'DrExample@stager.ca',
-    }));
-  }
-};
+const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[]> = response =>
+  (response || []).map(r => ({
+    individual: {
+      individualId: (r.genotypes || [{ participant_codename: 'unknown' }])[0].participant_codename,
+      datasetId: (r.genotypes || [{ dataset_id: 'unknown' }])[0].dataset_id.toString(),
+    },
+    variant: {
+      alt: r.alt_allele,
+      assemblyId: 'GRCh37',
+      callsets: r.genotypes.map(g => ({
+        individualId: g.participant_codename,
+        callSetId: g.analysis_id.toString(),
+        info: {
+          ad: g.alt_depths,
+          burder: g.burden,
+          zygosity: g.zygosity,
+        },
+      })),
+      end: r.end,
+      ref: r.reference_allele,
+      refSeqId: r.chromosome,
+      start: r.start,
+      variantType: r.variation,
+    },
+    contactInfo: 'DrExample@stager.ca',
+  }));
 
 /**
  * @param args VariantQueryInput
@@ -223,13 +219,9 @@ export const getStagerNodeQuery = async (
   let stagerNodeQueryResponse = null;
   let stagerNodeQueryError: StagerNodeQueryError | null = null;
 
-  logger.debug(
-    `${process.env.STAGER_NODE_URL}/summary/variants?genes=${args.input.gene.ensemblId}`
-  );
-
   try {
     stagerNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
-      `${process.env.STAGER_NODE_URL}/summary/variants?genes=${args.input.gene.ensemblId}`,
+      `${process.env.STAGER_NODE_URL}/data?ensemblId=${args.input.gene.ensemblId}`,
       {
         headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
       }

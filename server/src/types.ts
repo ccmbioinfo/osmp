@@ -24,7 +24,7 @@ export interface CallsetInfoFields {
 
 export interface CallSet {
   callSetId: string;
-  individualId: String;
+  individualId: string;
   info: CallsetInfoFields;
 }
 
