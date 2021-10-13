@@ -517,7 +517,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {columns
                         .map(c => c.columns)
                         .flat()
-                        .filter(c => !dummyColumns.includes(c.id as string))
+                        .filter(c => !dummyColumns.includes(c.id as string) && c.id !== 'contact')
                         .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
