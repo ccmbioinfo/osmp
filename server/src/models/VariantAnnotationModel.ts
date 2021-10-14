@@ -1,4 +1,6 @@
 import mongoose, { Document, Model, model } from 'mongoose';
+import { VariantQueryResponse } from '../types';
+import getCoordinates from './utils/getCoordinates';
 
 export interface VariantAnnotation {
   alt: string;
@@ -59,22 +61,17 @@ const variantAnnotationSchema = new mongoose.Schema({
 
 // For model
 interface VariantAnnotationModelMethods extends Model<VariantAnnotation> {
-  getAnnotations(
-    coordinates: VariantAnnotationId[],
-    startPos: number,
-    endPos: number
-  ): Promise<VariantAnnotation[]>;
+  getAnnotations(variant: VariantQueryResponse): Promise<VariantAnnotation[]>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
   this: Model<VariantAnnotationDocument>,
-  coordinates: VariantAnnotationId[],
-  startPos: number,
-  endPos: number
+  variant: VariantQueryResponse
 ) {
+  const { start, end, coordinates } = getCoordinates(variant);
   if (coordinates.length > 0) {
     const variant = await this.aggregate([
-      { $match: { pos: { $gt: startPos, $lt: endPos } } },
+      { $match: { pos: { $gt: start, $lt: end } } },
       {
         $match: {
           $or: coordinates,

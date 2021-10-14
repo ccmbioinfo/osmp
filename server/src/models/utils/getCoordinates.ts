@@ -1,5 +1,5 @@
-import { Assembly, Chromosome, VariantQueryResponse } from '../../../types';
-import { VariantAnnotationId } from '../../../models/VariantAnnotationModel';
+import { Assembly, Chromosome, VariantQueryResponse } from '../../types';
+import { VariantAnnotationId } from '../VariantAnnotationModel';
 
 const getCoordinates = (variants: VariantQueryResponse) => {
   let start = +Infinity;
