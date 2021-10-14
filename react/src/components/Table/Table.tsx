@@ -50,7 +50,7 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
-type FlattenedQueryResponse = Omit<
+export type FlattenedQueryResponse = Omit<
     IndividualResponseFields,
     'info' | 'diseases' | 'phenotypicFeatures'
 > &
@@ -526,6 +526,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     {v.Header}
                                 </Typography>
                                 <ColumnFilter
+                                    preFilteredRows={preFilteredRows}
                                     filters={filters}
                                     setFilter={setFilter}
                                     columnId={v.id as string}
