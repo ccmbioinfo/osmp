@@ -122,8 +122,9 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
     }));
   } catch (e) {
     console.error(e);
-    connection.end();
     return false;
+  } finally {
+    connection.end();
   }
 
   return result;
