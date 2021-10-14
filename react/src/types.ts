@@ -24,9 +24,11 @@ export interface CallSet {
     info: CallsetInfoFields;
 }
 
+export type AssemblyId = 'GRCh37' | 'GRCh38';
+
 export interface VariantResponseFields {
     alt: string;
-    assemblyId: Maybe<string>;
+    assemblyId: AssemblyId;
     callsets: CallSet[];
     end: number;
     info?: Maybe<VariantResponseInfoFields>;
@@ -106,7 +108,7 @@ export interface VariantQueryResponse {
 }
 
 export interface VariantQueryInput {
-    assemblyId?: string;
+    assemblyId: AssemblyId;
     maxFrequency?: number;
 }
 

@@ -12,10 +12,13 @@ import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
+import mongoose from 'mongoose';
 
 const app = express();
 
 const memoryStore = new session.MemoryStore();
+
+mongoose.connect(process.env.MONGO_DATABASE_URL!);
 
 app.use(
   session({
@@ -69,7 +72,7 @@ const startServer = async () => {
   const pubsub = new PubSub();
   const apolloServer = new ApolloServer({
     schema,
-    context: ({ req, res, connection }: any) => ({ req, res, pubsub }),
+    context: ({ req, res }: any) => ({ req, res, pubsub }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
   await apolloServer.start();
@@ -80,7 +83,7 @@ const startServer = async () => {
       schema,
       execute,
       subscribe,
-      onOperation: (message: any, params: any, websocket: any) => {
+      onOperation: (message: any, params: any) => {
         params.schema = schema;
         params.context.pubsub = pubsub;
         return params;
@@ -91,7 +94,7 @@ const startServer = async () => {
       path: apolloServer.graphqlPath,
     }
   );
-  ['SIGINT', 'SIGTERM'].forEach(signal => {
+  ['SIGINT', 'SIGTERM'].forEach(() => {
     // this will interfere with hot-reloading without additional handling
     // process.on(signal, () => subscriptionServer.close());
   });
