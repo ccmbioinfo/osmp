@@ -3,10 +3,7 @@ LABEL org.opencontainers.image.source https://github.com/ccmbioinfo/ssmp
 
 WORKDIR /usr/app
 
-COPY . . 
-
-RUN yarn && yarn run build
-
+# Set up mongo in-memory instance for testing
 # Download binary, extract and remove archive
 RUN wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-4.2.8.tgz \
     && tar -zxvf mongodb-linux-x86_64-ubuntu1804-4.2.8.tgz \
@@ -18,6 +15,10 @@ RUN mv mongodb-* /etc/mongodb
 # Point env variable to binary
 ENV MONGOMS_SYSTEM_BINARY=/etc/mongodb/bin/mongod
 ENV MONGOMS_VERSION=4.2.8
+
+COPY . . 
+
+RUN yarn && yarn run build
 
 FROM node:16-alpine as DEPLOY_IMAGE
 
