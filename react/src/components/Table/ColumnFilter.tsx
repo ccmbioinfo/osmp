@@ -1,4 +1,5 @@
 import { Flex, Input } from '..';
+import CHROMOSOMES from '../../constants/chromosomes';
 import SOURCES from '../../constants/sources';
 import ComboBox from '../ComboBox';
 
@@ -12,6 +13,8 @@ interface ColumnFilterProps {
 }
 
 export const ColumnFilter: React.FC<ColumnFilterProps> = ({ filters, setFilter, columnId }) => {
+    // store state (greater/ less than)
+
     const filter = filters.find(f => f.id === columnId);
 
     const placeholder = 'Search';
@@ -26,6 +29,19 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({ filters, setFilter, 
                         label: n,
                     })).concat({ id: 3, label: 'all', value: '' })}
                     onSelect={val => setFilter('source', val)}
+                    placeholder="Select"
+                    value={filter ? filter.value.toString() : ''}
+                />
+            );
+        } else if (columnId === 'chromosome') {
+            return (
+                <ComboBox
+                    options={CHROMOSOMES.map((n, id) => ({
+                        id,
+                        value: n,
+                        label: n,
+                    }))}
+                    onSelect={val => setFilter('chromosome', val)}
                     placeholder="Select"
                     value={filter ? filter.value.toString() : ''}
                 />

@@ -7,9 +7,14 @@ export interface InputProps {
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;
     value?: number | string;
+    InputAdornmentStart?: React.ReactNode;
 }
 
-const Component = styled.input<InputProps>`
+const Container = styled.div<InputProps>`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
     background-color: ${props => props.theme.background.main};
     border-color: ${props =>
         props.error ? props.theme.colors.error : props.theme.colors.muted} !important;
@@ -23,6 +28,18 @@ const Component = styled.input<InputProps>`
     min-height: 46px;
 `;
 
-const Input: React.FC<InputProps> = props => <Component {...props} />;
+const TextInput = styled.input`
+    border: none;
+    &:focus {
+        outline: none;
+    }
+`;
+
+const Input: React.FC<InputProps> = props => (
+    <Container {...props}>
+        {props.InputAdornmentStart && props.InputAdornmentStart}
+        <TextInput />
+    </Container>
+);
 
 export default Input;

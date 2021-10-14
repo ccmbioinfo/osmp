@@ -186,7 +186,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
-                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
+                        width: getColumnWidth(tableData, 'ref', 'Ref'),
                     },
                     {
                         accessor: 'start',
@@ -389,12 +389,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setAllFilters,
         setGlobalFilter,
         prepareRow,
+        preFilteredRows,
         toggleHideColumn,
         visibleColumns,
         rows,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
+    console.log('PREFILTERED ROWS', preFilteredRows);
 
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
