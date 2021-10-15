@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Row } from 'react-table';
-import { Flex, Input } from '..';
+import { Flex, Input, SelectableList } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
 import SOURCES from '../../constants/sources';
 import ComboBox from '../ComboBox';
@@ -50,7 +50,6 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
     filterComparison,
     setFilterComparison,
 }) => {
-    const [sign, setSign] = useState<keyof ComparisonType>('equal');
 
     const COMPARISON_OPTIONS: ComparisonOption[] = [
         {
@@ -71,21 +70,16 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
     ];
 
     return (
-        <ComboBox
+        <SelectableList
             options={COMPARISON_OPTIONS}
             onSelect={value => {
-                setSign(value);
-                if (columnId in filterComparison && value in filterComparison[columnId]) {
-                    const newComparison = filterComparison;
-                    Object.keys(newComparison[columnId]).forEach(v => {
-                        newComparison[columnId][v as keyof ComparisonType] =
-                            v === value ? true : false;
-                    });
-                    setFilterComparison(newComparison);
-                }
+                const newComparison = filterComparison;
+                Object.keys(newComparison[columnId]).forEach(v => {
+                    newComparison[columnId][v as keyof ComparisonType] =
+                        v === value ? true : false;
+                });
+                setFilterComparison(newComparison);
             }}
-            placeholder="Search"
-            value={sign}
         />
     );
 };
