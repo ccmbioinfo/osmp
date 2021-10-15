@@ -77,8 +77,6 @@ interface StagerVariantQueryPayload {
   vest3_score: string;
 }
 
-type StagerNodeQueryError = AxiosError;
-
 /**
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
@@ -181,74 +179,3 @@ const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[
     },
     contactInfo: 'DrExample@stager.ca',
   }));
-
-/**
- * @param args VariantQueryInput
- * @returns  Promise<ResolvedVariantQueryResult>
- * Return some dummy data for testing and design purposes
- */
-export const getStagerNodeQuery = async (
-  args: QueryInput,
-  pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
-  /* eslint-disable camelcase */
-  let tokenResponse: AxiosResponse<{ access_token: string }>;
-
-  if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
-    try {
-      tokenResponse = await axios.post(
-        process.env.TEST_NODE_SSMP_TOKEN_ENDPOINT!,
-        {
-          client_id: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_ID,
-          client_secret: process.env.TEST_NODE_SSMP_TOKEN_CLIENT_SECRET,
-          audience: process.env.TEST_NODE_TOKEN_AUDIENCE,
-          grant_type: 'client_credentials',
-        },
-        { headers: { 'content-type': 'application/json' } }
-      );
-    } catch (e) {
-      logger.error(e);
-      return {
-        data: [],
-        error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
-        source: 'remote-test',
-      };
-    }
-  } else {
-    tokenResponse = { data: { access_token: 'abc' } } as any;
-  }
-
-  let stagerNodeQueryResponse = null;
-  let stagerNodeQueryError: StagerNodeQueryError | null = null;
-
-  try {
-    stagerNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
-      `${process.env.STAGER_NODE_URL}/data?ensemblId=${args.input.gene.ensemblId}`,
-      {
-        headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
-      }
-    );
-  } catch (e) {
-    logger.error(e);
-    stagerNodeQueryError = e as AxiosError;
-  }
-
-  return {
-    data: transformStagerQueryResponse(stagerNodeQueryResponse?.data || []),
-    error: transformStagerNodeErrorResponse(stagerNodeQueryError),
-    source: 'stager',
-  };
-};
-
-export const transformStagerNodeErrorResponse: ErrorTransformer<AxiosError> = error => {
-  if (!error) {
-    return null;
-  } else {
-    logger.error(error);
-    return {
-      id: uuidv4(),
-      code: error.response?.status || 500,
-      message: error.message,
-    };
-  }
-};
