@@ -20,8 +20,8 @@ const getCoordinates = (variants: VariantQueryResponse) => {
 
       coordinates.push({
         alt: variant.alt,
-        assembly: Assembly[variant.assemblyId],
-        chr: Chromosome[`Chr${variant.refSeqId}` as keyof typeof Chromosome],
+        assembly: Assembly[variant.assemblyId].toString(),
+        chr: Chromosome[`Chr${variant.refSeqId}` as keyof typeof Chromosome].toString(),
         pos: variant.start,
         ref: variant.ref,
       });

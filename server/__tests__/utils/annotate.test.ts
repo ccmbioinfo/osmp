@@ -9,9 +9,9 @@ describe('Test whether variants get annotated', () => {
     {
       alt: 'T',
       ref: 'A',
-      chr: 1,
+      chr: '1',
       pos: 123456,
-      assembly: 37,
+      assembly: '37',
       aaChanges: 'Z[AGC] > Y[TGC]',
       cdna: 'ABC',
       geneName: 'SOME_GENE_NAME',

@@ -1,13 +1,13 @@
 import Faker from 'faker';
 import VariantAnnotationModel, { VariantAnnotationId } from '../models/VariantAnnotationModel';
 
-export const generateRandomCoordinate = () => {
+export const generateRandomCoordinate: () => VariantAnnotationId = () => {
   const bases = ['A', 'T', 'C', 'G'];
   const ref = Faker.helpers.randomize(bases);
   const alt = Faker.helpers.randomize(bases.filter(b => b !== ref));
-  const chr = Faker.helpers.randomize([...Array(24).keys()].map(x => x + 1));
+  const chr = Faker.helpers.randomize([...Array(24).keys()].map(x => x + 1)).toString();
   const pos = Faker.datatype.number({ min: 0, max: 5000000 });
-  const assembly = Faker.helpers.randomize([37, 38]);
+  const assembly = Faker.helpers.randomize([37, 38]).toString();
   return {
     alt,
     assembly,
@@ -24,8 +24,8 @@ export const generateNonRandomCoordinates = (count: number) => {
       return {
         alt: 'T',
         ref: 'A',
-        assembly: 37,
-        chr: 1,
+        assembly: '37',
+        chr: '1',
         pos: 123456 + i,
       };
     });
@@ -71,7 +71,7 @@ export const generateChromosomeDistribution = (max: number, thecount: number) =>
   return r
     .map((v, i) => {
       return {
-        [i + 1]: v,
+        [`${i + 1}`]: v,
       };
     })
     .reduce((r, c) => Object.assign(r, c), {});
