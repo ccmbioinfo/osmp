@@ -1,11 +1,10 @@
-import { Assembly, Chromosome, VariantQueryResponse } from '../../../types';
+import { Chromosome, VariantQueryResponse } from '../../../types';
 import { VariantAnnotation } from '../../../models/VariantAnnotationModel';
 
 const annotate = (queryResponse: VariantQueryResponse, annotations: VariantAnnotation[]) => {
   const annotationsMap: Record<string, VariantAnnotation> = {};
-
   annotations.forEach(a => {
-    annotationsMap[`${a.alt}-${a.assembly}-${a.chr}-${a.pos}-${a.ref}`] = a;
+    annotationsMap[`${a.alt}-${a.assembly}-${a.chrom}-${a.pos}-${a.ref}`] = a;
   });
 
   // Loop through queryResponse from different nodes
@@ -15,7 +14,7 @@ const annotate = (queryResponse: VariantQueryResponse, annotations: VariantAnnot
     for (let j = 0; j < nodeData.data.length; j++) {
       const response = nodeData.data[j].variant;
 
-      const key = `${response.alt}-${Assembly[response.assemblyId]}-${
+      const key = `${response.alt}-${response.assemblyId}-${
         Chromosome[`Chr${response.refSeqId}` as keyof typeof Chromosome]
       }-${response.start}-${response.ref}`;
 

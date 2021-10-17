@@ -28,7 +28,7 @@ export interface CallSet {
   info: CallsetInfoFields;
 }
 
-export type AssemblyId = 'GRCh37' | 'GRCh38';
+export type AssemblyId = 'gnomAD_GRCh37' | '38' | '';
 
 export interface VariantResponseFields {
   alt: string;

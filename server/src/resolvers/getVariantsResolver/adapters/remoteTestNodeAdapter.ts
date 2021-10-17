@@ -9,6 +9,7 @@ import {
   ResultTransformer,
 } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
+import resolveAssembly from '../utils/resolveAssembly';
 
 type RemoteTestNodeQueryError = AxiosError<string>;
 
@@ -161,7 +162,7 @@ const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[
     },
     variant: {
       alt: r.alt_allele,
-      assemblyId: 'GRCh37',
+      assemblyId: resolveAssembly('GRCh37'),
       callsets: r.genotypes.map(g => ({
         individualId: g.participant_codename,
         callSetId: g.analysis_id.toString(),
@@ -171,10 +172,10 @@ const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[
           zygosity: g.zygosity,
         },
       })),
-      end: r.end,
+      end: r.position,
       ref: r.reference_allele,
       refSeqId: r.chromosome,
-      start: r.start,
+      start: r.position,
       variantType: r.variation,
     },
     contactInfo: 'DrExample@stager.ca',

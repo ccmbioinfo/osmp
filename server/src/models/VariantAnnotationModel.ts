@@ -5,7 +5,7 @@ import getCoordinates from './utils/getCoordinates';
 export interface VariantAnnotation {
   alt: string;
   ref: string;
-  chr: string;
+  chrom: string;
   pos: number;
   assembly: string;
   aaChanges: string;
@@ -18,7 +18,7 @@ export interface VariantAnnotation {
 
 export type VariantAnnotationId = Pick<
   VariantAnnotation,
-  'alt' | 'assembly' | 'chr' | 'ref' | 'pos'
+  'alt' | 'assembly' | 'chrom' | 'ref' | 'pos'
 >;
 
 interface VariantAnnotationDocument extends Document, VariantAnnotation {}
@@ -30,7 +30,7 @@ const variantAnnotationSchema = new mongoose.Schema({
   ref: {
     type: String,
   },
-  chr: {
+  chrom: {
     type: String,
   },
   pos: {
