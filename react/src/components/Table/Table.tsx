@@ -193,12 +193,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'start',
                         Header: 'Start',
                         width: getColumnWidth(tableData, 'start', 'Start'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'end',
                         id: 'end',
                         Header: 'End',
                         width: getColumnWidth(tableData, 'end', 'End'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'source',
@@ -396,7 +398,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
-    console.log('PREFILTERED ROWS', preFilteredRows);
+    console.log('FILTERS', filters);
 
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);

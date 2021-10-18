@@ -1,88 +1,23 @@
 import React, { useState } from 'react';
 import { Row } from 'react-table';
-import { Flex, Input, SelectableList } from '..';
+import { Flex, Input } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
 import SOURCES from '../../constants/sources';
 import ComboBox from '../ComboBox';
 import { FlattenedQueryResponse } from './Table';
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
-type ComparisonType = {
-    less: boolean;
-    greater: boolean;
-    equal: boolean;
-};
-
-type ComparisonOption = {
-    id: number;
-    value: keyof ComparisonType;
-    label: string;
-};
+import { InputComparisonDropdown, FilterComparison } from './InputComparisonDropdown';
 
 type DefaultFilter = {
     id: string;
-    value: string | number;
+    value: string | number | Array<number>;
 };
 
-type FilterWithComparison = Array<number>;
-
-interface FilterComparison {
-    start: ComparisonType;
-    end: ComparisonType;
-}
-
 interface ColumnFilterProps {
-    filters: DefaultFilter[] | FilterWithComparison;
+    filters: DefaultFilter[];
     preFilteredRows: Row<FlattenedQueryResponse>[];
     setFilter: (columnId: string, filterValue: any) => void;
     columnId: string;
 }
-
-interface InputComparisonDropdownProps {
-    columnId: keyof FilterComparison;
-    filterComparison: FilterComparison;
-    setFilterComparison: React.Dispatch<React.SetStateAction<FilterComparison>>;
-}
-
-export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = ({
-    columnId,
-    filterComparison,
-    setFilterComparison,
-}) => {
-
-    const COMPARISON_OPTIONS: ComparisonOption[] = [
-        {
-            id: 1,
-            value: 'less',
-            label: '<',
-        },
-        {
-            id: 2,
-            value: 'greater',
-            label: '>',
-        },
-        {
-            id: 3,
-            value: 'equal',
-            label: '=',
-        },
-    ];
-
-    return (
-        <SelectableList
-            options={COMPARISON_OPTIONS}
-            onSelect={value => {
-                const newComparison = filterComparison;
-                Object.keys(newComparison[columnId]).forEach(v => {
-                    newComparison[columnId][v as keyof ComparisonType] =
-                        v === value ? true : false;
-                });
-                setFilterComparison(newComparison);
-            }}
-        />
-    );
-};
 
 export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     filters,
@@ -113,7 +48,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
         return [min, max];
     }, [columnId, preFilteredRows]);
 
-    const filter = (filters as DefaultFilter[]).find(f => f.id === columnId);
+    const filter = filters.find(f => f.id === columnId);
 
     const placeholder = 'Search';
 
@@ -145,17 +80,19 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {
-            const filterValue = filters as FilterWithComparison;
+            console.log('HELLO FILTERS', filters);
+            const filterValue = filters.filter(f => f.id === columnId)[0]?.value as Array<number>;
+            console.log(filterValue);
             const comparison = filterComparison[columnId];
-            console.log('comparison', comparison);
             if (comparison.less) {
                 return (
                     <Input
-                        value={filterValue[1] || ''}
+                        value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
+                            console.log(val, filterValue);
                             setFilter(columnId, (old = []) => [
-                                old[0],
+                                min,
                                 val ? parseInt(val, 10) : undefined,
                             ]);
                         }}
@@ -172,12 +109,12 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             } else if (comparison.greater) {
                 return (
                     <Input
-                        value={filterValue[1] || ''}
+                        value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
                             setFilter(columnId, (old = []) => [
                                 val ? parseInt(val, 10) : undefined,
-                                old[1],
+                                max,
                             ]);
                         }}
                         placeholder={`Min (${min})`}
@@ -193,7 +130,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             } else {
                 return (
                     <Input
-                        value={filterValue[1] || ''}
+                        value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
                             const filter = val ? parseInt(val, 10) : undefined;
@@ -211,6 +148,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 );
             }
         } else {
+            console.log('hello', columnId, filter);
             return (
                 <Input
                     value={filter ? filter.value.toString() : ''}

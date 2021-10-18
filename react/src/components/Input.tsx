@@ -14,6 +14,7 @@ const Container = styled.div<InputProps>`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
 
     background-color: ${props => props.theme.background.main};
     border-color: ${props =>

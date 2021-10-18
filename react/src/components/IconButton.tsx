@@ -3,6 +3,7 @@ import { Button } from './index';
 
 const IconButton = styled(props => <Button {...props} />)`
     border-radius: ${props => props.theme.radii.round};
+    height: inherit;
     padding: 0.75rem;
     &:hover:not(:disabled) {
         outline: 0;
