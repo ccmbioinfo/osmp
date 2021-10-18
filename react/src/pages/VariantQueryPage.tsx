@@ -82,7 +82,7 @@ const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
-                assemblyId: 'GRCh38',
+                assemblyId: 'gnomAD_GRCh37',
                 ensemblId: 'ENSG00000130203',
                 gene: '',
                 maxFrequency: 1,

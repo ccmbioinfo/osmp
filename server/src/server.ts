@@ -18,7 +18,7 @@ const app = express();
 
 const memoryStore = new session.MemoryStore();
 
-mongoose.connect(process.env.MONGO_DATABASE_URL!);
+mongoose.connect('mongodb://admin:pass@mongo:27017');
 
 app.use(
   session({
