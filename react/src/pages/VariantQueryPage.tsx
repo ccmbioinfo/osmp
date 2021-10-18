@@ -19,7 +19,7 @@ import {
     Typography,
 } from '../components';
 import SOURCES from '../constants/sources';
-import { useErrorContext, useFormReducer } from '../hooks';
+import { resolveAssembly, useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage } from '../utils';
@@ -188,7 +188,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onSelect={val => updateQueryOptionsForm('assemblyId')(val)}
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
-                                value: a,
+                                value: resolveAssembly(a),
                                 label: a,
                             }))}
                             placeholder="Select"
