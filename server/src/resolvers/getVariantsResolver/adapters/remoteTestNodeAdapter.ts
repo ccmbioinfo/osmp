@@ -67,11 +67,7 @@ const getRemoteTestNodeQuery = async (
   pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
 
   return {
-<<<<<<< HEAD
-    data: remoteTestNodeQueryResponse?.data as VariantQueryResponseSchema[] || [],
-=======
     data: (remoteTestNodeQueryResponse?.data as VariantQueryResponseSchema[]) || [],
->>>>>>> develop
     error: transformRemoteTestNodeErrorResponse(remoteTestNodeQueryError),
     source: 'remote-test',
   };

@@ -87,11 +87,7 @@ export default function ComboBox<T extends {}>({
                     </>
                 ) : (
                     <>
-                        <StyledInput
-                            disabled
-                            value={value}
-                            placeholder={placeholder}
-                        />
+                        <StyledInput disabled value={value} placeholder={placeholder} />
                         <FaCaretDown />
                     </>
                 )}
