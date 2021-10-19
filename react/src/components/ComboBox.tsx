@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { FaCaretDown } from 'react-icons/fa';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { useClickAway } from '../hooks';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
@@ -19,6 +19,7 @@ interface ComboBoxProps<T> {
 }
 
 export const Wrapper = styled(Flex)`
+    position: relative
     min-height: 38px;
     flex-wrap: wrap;
     flex-grow: 0;
@@ -28,8 +29,8 @@ export const Wrapper = styled(Flex)`
 `;
 
 export const StyledInput = styled(Input)<InputProps>`
-    border: none;
-    box-shadow: transparent 0px 0px !important;
+    // border: none;
+    // box-shadow: transparent 0px 0px !important;
     cursor: ${props => (props.disabled ? 'pointer' : 'inherit')};
     outline: none;
     position: relative;
@@ -80,6 +81,7 @@ export default function ComboBox<T extends {}>({
                 {searchable ? (
                     <>
                         <StyledInput
+                            variant="transparent"
                             value={value}
                             placeholder={placeholder}
                             onChange={getSuggestions}
@@ -88,7 +90,12 @@ export default function ComboBox<T extends {}>({
                     </>
                 ) : (
                     <>
-                        <StyledInput disabled value={value} placeholder={placeholder} />
+                        <StyledInput
+                            variant="transparent"
+                            disabled
+                            value={value}
+                            placeholder={placeholder}
+                        />
                         <FaCaretDown />
                     </>
                 )}

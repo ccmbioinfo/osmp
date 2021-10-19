@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAsyncDebounce } from 'react-table';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { Flex, Input } from '../index';
 
 interface GlobalFilterProps {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaClipboard, FaClipboardCheck } from 'react-icons/fa';
 import { IoIosClose } from 'react-icons/io';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { Background, Flex, IconButton, Popover, Snackbar, Typography } from '../index';
 
 interface ContactPopoverProps {

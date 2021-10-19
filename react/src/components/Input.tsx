@@ -1,9 +1,10 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 export interface InputProps {
     disabled?: boolean;
     error?: boolean;
+    variant?: 'outlined' | 'transparent';
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;
     value?: number | string;
@@ -16,13 +17,28 @@ const Container = styled.div<InputProps>`
     justify-content: space-between;
     position: relative;
 
+    ${props => {
+        console.log(props.variant);
+        switch (props.variant) {
+            case 'transparent':
+                return '';
+            case 'outlined':
+                return `
+                border-radius: ${props.theme.radii.base};
+                border: ${props.theme.borders.thin};
+                box-shadow: ${props.theme.boxShadow};
+                border-color: ${
+                    props.error ? props.theme.colors.error : props.theme.colors.muted
+                } !important;
+                `;
+            default:
+                return '';
+        }
+    }}
+
     background-color: ${props => props.theme.background.main};
-    border-color: ${props =>
-        props.error ? props.theme.colors.error : props.theme.colors.muted} !important;
     color: ${props => props.theme.colors.text};
-    border-radius: ${props => props.theme.radii.base};
-    border: ${props => props.theme.borders.thin};
-    box-shadow: ${props => props.theme.boxShadow};
+
     padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     font-family: ${props => props.theme.fontFamily.body};
     font-size: ${props => props.theme.fontSizes.s};
@@ -39,7 +55,7 @@ const TextInput = styled.input`
 const Input: React.FC<InputProps> = props => (
     <Container {...props}>
         {props.InputAdornmentStart && props.InputAdornmentStart}
-        <TextInput />
+        <TextInput {...props} />
     </Container>
 );
 

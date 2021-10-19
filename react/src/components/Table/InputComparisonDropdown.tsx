@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
-import { Row } from 'react-table';
 import { SelectableList } from '..';
 import { useClickAway } from '../../hooks';
 import { IconButton } from '../index';

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};

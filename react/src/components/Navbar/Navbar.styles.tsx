@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { Container, Flex } from '../index';
 
 export const Nav = styled(Flex)`

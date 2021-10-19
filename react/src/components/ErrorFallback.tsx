@@ -1,6 +1,6 @@
 import React from 'react';
 import { FallbackProps } from 'react-error-boundary';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import error from '../assets/error.svg';
 import { Body, Button, Typography } from '../components';
 

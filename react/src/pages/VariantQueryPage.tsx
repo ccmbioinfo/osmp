@@ -159,6 +159,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Ensembl ID
                         </Typography>
                         <Input
+                            variant="outlined"
                             onChange={e => {
                                 updateQueryOptionsForm('ensemblId')(e.currentTarget.value);
                                 updateQueryOptionsForm('gene')('');
@@ -172,6 +173,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Max Frequency
                         </Typography>
                         <Input
+                            variant="outlined"
                             onChange={e =>
                                 updateQueryOptionsForm('maxFrequency')(e.currentTarget.value)
                             }

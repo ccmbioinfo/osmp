@@ -4,8 +4,8 @@ import { Flex, Input } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
 import SOURCES from '../../constants/sources';
 import ComboBox from '../ComboBox';
+import { FilterComparison, InputComparisonDropdown } from './InputComparisonDropdown';
 import { FlattenedQueryResponse } from './Table';
-import { InputComparisonDropdown, FilterComparison } from './InputComparisonDropdown';
 
 type DefaultFilter = {
     id: string;
@@ -53,6 +53,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     const placeholder = 'Search';
 
     const resolveComponent = () => {
+        console.log(filter, columnId);
         if (columnId === 'source') {
             return (
                 <ComboBox
@@ -80,17 +81,15 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {
-            console.log('HELLO FILTERS', filters);
             const filterValue = filters.filter(f => f.id === columnId)[0]?.value as Array<number>;
-            console.log(filterValue);
             const comparison = filterComparison[columnId];
             if (comparison.less) {
                 return (
                     <Input
+                        variant="outlined"
                         value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
-                            console.log(val, filterValue);
                             setFilter(columnId, (old = []) => [
                                 min,
                                 val ? parseInt(val, 10) : undefined,
@@ -109,6 +108,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             } else if (comparison.greater) {
                 return (
                     <Input
+                        variant="outlined"
                         value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
@@ -130,6 +130,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             } else {
                 return (
                     <Input
+                        variant="outlined"
                         value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
@@ -148,9 +149,9 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 );
             }
         } else {
-            console.log('hello', columnId, filter);
             return (
                 <Input
+                    variant="outlined"
                     value={filter ? filter.value.toString() : ''}
                     placeholder={placeholder}
                     onChange={e => setFilter(columnId, e.target.value)}
