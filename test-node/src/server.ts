@@ -93,7 +93,6 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
         on v.position between g.start and g.end and v.chromosome = g.chromosome
       where g.ensembl_id = ?`;
 
-    console.log('this is ensembl id', ensemblId);
     const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [ensemblId]);
 
     if (!variants.length) {
@@ -105,9 +104,6 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
 
     const ensemblIds = variants.map(v => v.ensembl_id);
     const pos = variants.map(v => v.chromosome);
-
-    console.log(variants, variantIds, pos, ensemblIds);
-    console.log(variants.map(v => v.gnomad_link));
 
     const genotypesSql = `select * from genotype g where g.variant_id in (${mysql.escape(
       variantIds
