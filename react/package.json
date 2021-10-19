@@ -2,7 +2,7 @@
     "name": "client",
     "version": "0.1.0",
     "private": true,
-    "proxy": "http://localhost:5862",
+    "proxy": "http://ssmp-server:3000",
     "dependencies": {
         "@apollo/react-hooks": "^4.0.0",
         "@react-keycloak/web": "^3.4.0",
@@ -56,7 +56,7 @@
         "babel-loader": "8.1.0"
     },
     "scripts": {
-        "start": "PORT=6845 REACT_APP_GRAPHQL_URL=http://localhost:6845/graphql REACT_APP_KEYCLOAK_AUTH_URL=http://localhost:9821/auth REACT_APP_KEYCLOAK_REALM=ssmp REACT_APP_KEYCLOAK_CLIENT_ID=ssmp-app react-scripts start",
+        "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
         "eject": "react-scripts eject",

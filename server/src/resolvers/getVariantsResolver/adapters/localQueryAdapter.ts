@@ -27,15 +27,19 @@ const getLocalQuery = async (
   let localQueryResponse: LocalQueryResponse[] | null = null;
   let localQueryError: Error | null = null;
   try {
-    localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
-      resolve([
-        {
-          alternative: 'A',
-          reference: 'T',
-          chromosome: '1',
-          extraneous: 'extr',
-        },
-      ]);
+    localQueryResponse = await new Promise<LocalQueryResponse[]>(resolve => {
+      resolve(
+        Array(1)
+          .fill(null)
+          .map(() => {
+            return {
+              alternative: 'T',
+              reference: 'A',
+              chromosome: '1',
+              extraneous: 'extr',
+            };
+          })
+      );
       // reject(new Error('test!'));
     });
   } catch (e) {
@@ -56,7 +60,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
   if (!response) {
     return [];
   } else {
-    return response.map(r => ({
+    return response.map((r, i) => ({
       individual: {
         individualId: 'testId1',
       },
@@ -64,11 +68,11 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
         alt: r.alternative,
         assemblyId: 'GRCh37',
         callsets: [],
-        end: 1,
+        end: 123456 + i,
         info: {},
         ref: r.reference,
-        refSeqId: 'Chr2',
-        start: 1,
+        refSeqId: '1',
+        start: 123456 + i,
       },
       contactInfo: 'DrExample@gmail.com',
     }));

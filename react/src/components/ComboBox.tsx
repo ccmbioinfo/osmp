@@ -79,7 +79,6 @@ export default function ComboBox<T extends {}>({
                 {searchable ? (
                     <>
                         <StyledInput
-                            variant="transparent"
                             value={value}
                             placeholder={placeholder}
                             onChange={getSuggestions}
@@ -89,7 +88,6 @@ export default function ComboBox<T extends {}>({
                 ) : (
                     <>
                         <StyledInput
-                            variant="transparent"
                             disabled
                             value={value}
                             placeholder={placeholder}

@@ -2,7 +2,12 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { PubSub } from 'graphql-subscriptions';
 import { QUERY_RESOLVED } from '../..';
 import logger from '../../../logger';
-import { ErrorTransformer, QueryInput, ResolvedVariantQueryResult, VariantQueryResponseSchema } from '../../../types';
+import {
+  ErrorTransformer,
+  QueryInput,
+  ResolvedVariantQueryResult,
+  VariantQueryResponseSchema,
+} from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 
 type RemoteTestNodeQueryError = AxiosError;
@@ -62,7 +67,11 @@ const getRemoteTestNodeQuery = async (
   pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
 
   return {
+<<<<<<< HEAD
     data: remoteTestNodeQueryResponse?.data as VariantQueryResponseSchema[] || [],
+=======
+    data: (remoteTestNodeQueryResponse?.data as VariantQueryResponseSchema[]) || [],
+>>>>>>> develop
     error: transformRemoteTestNodeErrorResponse(remoteTestNodeQueryError),
     source: 'remote-test',
   };

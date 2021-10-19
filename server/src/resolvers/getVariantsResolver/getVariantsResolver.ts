@@ -11,14 +11,17 @@ import {
 } from '../../types';
 import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
+import annotate from './utils/annotate';
+import { VariantAnnotation } from '../../models';
 
 const getVariants = async (
   parent: any,
   args: QueryInput,
-  { pubsub }: GqlContext,
-  info: any
+  { pubsub }: GqlContext
 ): Promise<VariantQueryResponse> => {
-  const result = await resolveVariantQuery(args, pubsub);
+  const variants = await resolveVariantQuery(args, pubsub);
+  const annotations = await VariantAnnotation.getAnnotations(variants);
+  const result = annotate(variants, annotations);
   return result;
 };
 

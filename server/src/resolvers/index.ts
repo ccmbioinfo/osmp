@@ -7,7 +7,7 @@ const resolvers = {
   },
   Subscription: {
     queryResolved: {
-      subscribe: (parent: any, args: null, ctx: GqlContext, info: any) =>
+      subscribe: (parent: any, args: null, ctx: GqlContext) =>
         ctx.pubsub.asyncIterator([QUERY_RESOLVED]),
     },
   },
