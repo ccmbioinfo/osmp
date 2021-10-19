@@ -18,7 +18,6 @@ const Container = styled.div<InputProps>`
     position: relative;
 
     ${props => {
-        console.log(props.variant);
         switch (props.variant) {
             case 'transparent':
                 return '';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row } from 'react-table';
 import { Flex, Input } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
@@ -53,7 +53,6 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     const placeholder = 'Search';
 
     const resolveComponent = () => {
-        console.log(filter, columnId);
         if (columnId === 'source') {
             return (
                 <ComboBox
@@ -90,10 +89,8 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                         value={filterValue ? filterValue[1] : ''}
                         onChange={e => {
                             const val = e.target.value;
-                            setFilter(columnId, (old = []) => [
-                                min,
-                                val ? parseInt(val, 10) : undefined,
-                            ]);
+                            setFilter(columnId, [-Infinity, val ? parseInt(val, 10) : undefined]);
+                            // [-inf, 10]
                         }}
                         placeholder={`Max (${max})`}
                         InputAdornmentStart={
@@ -101,6 +98,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                                 columnId={columnId}
                                 filterComparison={filterComparison}
                                 setFilterComparison={setFilterComparison}
+                                setFilter={setFilter}
                             />
                         }
                     />
@@ -109,13 +107,10 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 return (
                     <Input
                         variant="outlined"
-                        value={filterValue ? filterValue[1] : ''}
+                        value={filterValue ? filterValue[0] : ''}
                         onChange={e => {
                             const val = e.target.value;
-                            setFilter(columnId, (old = []) => [
-                                val ? parseInt(val, 10) : undefined,
-                                max,
-                            ]);
+                            setFilter(columnId, [val ? parseInt(val, 10) : undefined, +Infinity]);
                         }}
                         placeholder={`Min (${min})`}
                         InputAdornmentStart={
@@ -123,11 +118,12 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                                 columnId={columnId}
                                 filterComparison={filterComparison}
                                 setFilterComparison={setFilterComparison}
+                                setFilter={setFilter}
                             />
                         }
                     />
                 );
-            } else {
+            } else if (comparison.equal) {
                 return (
                     <Input
                         variant="outlined"
@@ -143,6 +139,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                                 columnId={columnId}
                                 filterComparison={filterComparison}
                                 setFilterComparison={setFilterComparison}
+                                setFilter={setFilter}
                             />
                         }
                     />

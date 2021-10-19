@@ -25,6 +25,7 @@ interface InputComparisonDropdownProps {
     columnId: keyof FilterComparison;
     filterComparison: FilterComparison;
     setFilterComparison: React.Dispatch<React.SetStateAction<FilterComparison>>;
+    setFilter: (columnId: string, filterValue: any) => void;
 }
 
 const Icons = Object.freeze({
@@ -37,6 +38,7 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
     columnId,
     filterComparison,
     setFilterComparison,
+    setFilter,
 }) => {
     const [open, setOpen] = useState(false);
     const [sign, setSign] = useState<keyof ComparisonType>('equal');
@@ -78,9 +80,21 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
                             newComparison[columnId][v as keyof ComparisonType] =
                                 v === value ? true : false;
                         });
-                        console.log(value);
-                        console.log(newComparison);
                         setFilterComparison(newComparison);
+
+                        setFilter(columnId, (old = []) => {
+                            const min = old[0] ? parseInt(old[0]) : old[0];
+                            const max = old[1] ? parseInt(old[1]) : old[1];
+                            const n = min || max;
+                            switch (value) {
+                                case 'equal':
+                                    return [n, n];
+                                case 'less':
+                                    return [-Infinity, n];
+                                case 'greater':
+                                    return [n, +Infinity];
+                            }
+                        });
                     }}
                 />
             )}

@@ -20,6 +20,7 @@ export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter })
     return (
         <Flex>
             <SearchInput
+                variant="outlined"
                 value={filter || ''}
                 placeholder="Search All Columns..."
                 onChange={e => handleChange(e.target.value)}
