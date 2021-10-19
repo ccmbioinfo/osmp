@@ -29,8 +29,6 @@ export const Wrapper = styled(Flex)`
 `;
 
 export const StyledInput = styled(Input)<InputProps>`
-    // border: none;
-    // box-shadow: transparent 0px 0px !important;
     cursor: ${props => (props.disabled ? 'pointer' : 'inherit')};
     outline: none;
     position: relative;

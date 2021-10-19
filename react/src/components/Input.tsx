@@ -4,7 +4,7 @@ import styled from 'styled-components/macro';
 export interface InputProps {
     disabled?: boolean;
     error?: boolean;
-    variant?: 'outlined' | 'transparent';
+    variant?: 'outlined';
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;
     value?: number | string;
@@ -19,8 +19,6 @@ const Container = styled.div<InputProps>`
 
     ${props => {
         switch (props.variant) {
-            case 'transparent':
-                return '';
             case 'outlined':
                 return `
                 border-radius: ${props.theme.radii.base};
