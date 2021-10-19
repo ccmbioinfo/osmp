@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Row } from 'react-table';
 import { Flex, Input } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
