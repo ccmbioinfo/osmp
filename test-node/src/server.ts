@@ -102,9 +102,6 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
 
     const variantIds = variants.map(v => v.variant_id);
 
-    const ensemblIds = variants.map(v => v.ensembl_id);
-    const pos = variants.map(v => v.chromosome);
-
     const genotypesSql = `select * from genotype g where g.variant_id in (${mysql.escape(
       variantIds
     )})`;
