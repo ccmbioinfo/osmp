@@ -5,9 +5,9 @@ import getCoordinates from './utils/getCoordinates';
 export interface VariantAnnotation {
   alt: string;
   ref: string;
-  chr: number;
+  chrom: string;
   pos: number;
-  assembly: number;
+  assembly: string;
   aaChanges: string;
   cdna: string;
   geneName: string;
@@ -18,7 +18,7 @@ export interface VariantAnnotation {
 
 export type VariantAnnotationId = Pick<
   VariantAnnotation,
-  'alt' | 'assembly' | 'chr' | 'ref' | 'pos'
+  'alt' | 'assembly' | 'chrom' | 'ref' | 'pos'
 >;
 
 interface VariantAnnotationDocument extends Document, VariantAnnotation {}
@@ -30,14 +30,14 @@ const variantAnnotationSchema = new mongoose.Schema({
   ref: {
     type: String,
   },
-  chr: {
-    type: Number,
+  chrom: {
+    type: String,
   },
   pos: {
     type: Number,
   },
   assembly: {
-    type: Number, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
+    type: String, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
   },
   aaChanges: {
     type: String,

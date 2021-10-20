@@ -1,4 +1,4 @@
-import { Assembly, Chromosome, VariantQueryResponse } from '../../types';
+import { Chromosome, VariantQueryResponse } from '../../types';
 import { VariantAnnotationId } from '../VariantAnnotationModel';
 
 const getCoordinates = (variants: VariantQueryResponse) => {
@@ -20,8 +20,8 @@ const getCoordinates = (variants: VariantQueryResponse) => {
 
       coordinates.push({
         alt: variant.alt,
-        assembly: Assembly[variant.assemblyId],
-        chr: Chromosome[`Chr${variant.refSeqId}` as keyof typeof Chromosome],
+        assembly: variant.assemblyId,
+        chrom: Chromosome[`Chr${variant.refSeqId}` as keyof typeof Chromosome].toString(),
         pos: variant.start,
         ref: variant.ref,
       });

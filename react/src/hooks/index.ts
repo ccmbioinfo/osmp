@@ -1,4 +1,5 @@
 import downloadCsv from './downloadCsv';
+import resolveAssembly from './resolveAssembly';
 import useClickAway from './useClickAway';
 import useErrorContext from './useErrorContext';
 import useFormReducer from './useFormReducer';
@@ -8,8 +9,9 @@ import useUserInfo from './useUserInfo';
 import useWindowSize from './useWindowSize';
 
 export {
-    useClickAway,
     downloadCsv,
+    resolveAssembly,
+    useClickAway,
     useErrorContext,
     useFormReducer,
     useOverflow,

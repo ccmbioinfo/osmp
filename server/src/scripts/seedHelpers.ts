@@ -1,17 +1,17 @@
 import Faker from 'faker';
 import VariantAnnotationModel, { VariantAnnotationId } from '../models/VariantAnnotationModel';
 
-export const generateRandomCoordinate = () => {
+export const generateRandomCoordinate: () => VariantAnnotationId = () => {
   const bases = ['A', 'T', 'C', 'G'];
   const ref = Faker.helpers.randomize(bases);
   const alt = Faker.helpers.randomize(bases.filter(b => b !== ref));
-  const chr = Faker.helpers.randomize([...Array(24).keys()].map(x => x + 1));
+  const chrom = Faker.helpers.randomize([...Array(24).keys()].map(x => x + 1)).toString();
   const pos = Faker.datatype.number({ min: 0, max: 5000000 });
-  const assembly = Faker.helpers.randomize([37, 38]);
+  const assembly = Faker.helpers.randomize([37, 38]).toString();
   return {
     alt,
     assembly,
-    chr,
+    chrom,
     pos,
     ref,
   };
@@ -24,8 +24,8 @@ export const generateNonRandomCoordinates = (count: number) => {
       return {
         alt: 'T',
         ref: 'A',
-        assembly: 37,
-        chr: 1,
+        assembly: '37',
+        chrom: '1',
         pos: 123456 + i,
       };
     });
@@ -71,7 +71,7 @@ export const generateChromosomeDistribution = (max: number, thecount: number) =>
   return r
     .map((v, i) => {
       return {
-        [i + 1]: v,
+        [`${i + 1}`]: v,
       };
     })
     .reduce((r, c) => Object.assign(r, c), {});
@@ -86,12 +86,12 @@ export const createDummyVariantAnnotations = async (
   const variants = Array(count)
     .fill(null)
     .map(() => {
-      let { assembly, alt, ref, pos, chr } = generateRandomCoordinate();
+      let { assembly, alt, ref, pos, chrom } = generateRandomCoordinate();
       if (sum !== 0) {
-        while (chromosomeDist[chr] === 0) {
-          chr = generateRandomCoordinate().chr;
+        while (chromosomeDist[chrom] === 0) {
+          chrom = generateRandomCoordinate().chrom;
         }
-        chromosomeDist[chr] -= 1;
+        chromosomeDist[chrom] -= 1;
       }
       const cdna = Array(100)
         .fill(null)
@@ -100,7 +100,7 @@ export const createDummyVariantAnnotations = async (
       return {
         alt,
         assembly,
-        chr,
+        chrom,
         pos,
         ref,
         aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,

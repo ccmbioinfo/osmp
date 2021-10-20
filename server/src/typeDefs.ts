@@ -26,6 +26,7 @@ export default gql`
 
   type CallSet {
     callSetId: String
+    datasetId: String
     individualId: String
     info: CallSetInfoFields
   }

@@ -20,11 +20,11 @@ export interface CallsetInfoFields {
 
 export interface CallSet {
     callSetId: string;
-    individualId: String;
+    individualId: string;
     info: CallsetInfoFields;
 }
 
-export type AssemblyId = 'GRCh37' | 'GRCh38';
+export type AssemblyId = 'gnomAD_GRCh37' | '38' | '';
 
 export interface VariantResponseFields {
     alt: string;

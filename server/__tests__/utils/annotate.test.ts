@@ -9,9 +9,9 @@ describe('Test whether variants get annotated', () => {
     {
       alt: 'T',
       ref: 'A',
-      chr: 1,
+      chrom: '1',
       pos: 123456,
-      assembly: 37,
+      assembly: 'gnomAD_GRCh37',
       aaChanges: 'Z[AGC] > Y[TGC]',
       cdna: 'ABC',
       geneName: 'SOME_GENE_NAME',
@@ -31,7 +31,7 @@ describe('Test whether variants get annotated', () => {
               individual: { individualId: 'testId1' },
               variant: {
                 alt: 'T',
-                assemblyId: 'GRCh37',
+                assemblyId: 'gnomAD_GRCh37',
                 callsets: [],
                 end: 123456,
                 info: {},
@@ -91,7 +91,7 @@ describe('Test whether variants get annotated', () => {
               individual: { individualId: 'testId1' },
               variant: {
                 alt: 'T',
-                assemblyId: 'GRCh37',
+                assemblyId: 'gnomAD_GRCh37',
                 callsets: [],
                 end: 999999999999,
                 info: {},

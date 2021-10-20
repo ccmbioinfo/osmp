@@ -7,6 +7,7 @@ import {
   ResolvedVariantQueryResult,
   ResultTransformer,
 } from '../../../types';
+import resolveAssembly from '../utils/resolveAssembly';
 
 interface LocalQueryResponse {
   reference: string;
@@ -34,7 +35,7 @@ const getLocalQuery = async (
           .map(() => {
             return {
               alternative: 'T',
-              reference: 'A',
+              reference: 'C',
               chromosome: '1',
               extraneous: 'extr',
             };
@@ -66,13 +67,13 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
       },
       variant: {
         alt: r.alternative,
-        assemblyId: 'GRCh37',
+        assemblyId: resolveAssembly('GRCh37'),
         callsets: [],
-        end: 123456 + i,
+        end: 50162978 + i,
         info: {},
         ref: r.reference,
         refSeqId: '1',
-        start: 123456 + i,
+        start: 50162978 + i,
       },
       contactInfo: 'DrExample@gmail.com',
     }));

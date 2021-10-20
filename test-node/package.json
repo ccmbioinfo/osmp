@@ -31,6 +31,7 @@
     "express": "^4.17.1",
     "express-jwt": "^6.1.0",
     "faker": "^5.5.3",
-    "jwks-rsa": "^2.0.4"
+    "jwks-rsa": "^2.0.4",
+    "mysql2": "^2.3.0"
   }
 }
