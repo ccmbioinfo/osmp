@@ -76,8 +76,10 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
                     onSelect={value => {
                         setSign(value);
 
+                        const getKeys = Object.keys as <T extends object>(obj: T) => Array<keyof T>
+
                         const newComparison = filterComparison;
-                        Object.typedKeys(newComparison[columnId]).forEach(v => {
+                        getKeys(newComparison[columnId]).forEach(v => {
                             newComparison[columnId][v] = v === value;
                         });
                         setFilterComparison(newComparison);

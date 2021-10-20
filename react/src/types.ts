@@ -139,10 +139,3 @@ export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
 export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponseSchema {
     source: string;
 }
-
-declare global {
-    interface ObjectConstructor {
-        typedKeys<T>(obj: T): Array<keyof T>;
-    }
-}
-Object.typedKeys = Object.keys as any;
