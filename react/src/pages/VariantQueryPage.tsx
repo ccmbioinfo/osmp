@@ -68,6 +68,7 @@ interface QueryOptionsFormState {
     ensemblId: string;
     gene: string;
     maxFrequency: number;
+    position: number;
     sources: string[];
 }
 
@@ -82,11 +83,12 @@ const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
-                assemblyId: 'gnomAD_GRCh37',
-                ensemblId: 'ENSG00000130203',
+                assemblyId: 'GRCh37',
+                ensemblId: '',
                 gene: '',
                 maxFrequency: 1,
                 sources: [],
+                position: 0,
             },
             queryOptionsFormValidator
         );
@@ -100,6 +102,7 @@ const VariantQueryPage: React.FC<{}> = () => {
             gene: {
                 ensemblId: queryOptionsForm.ensemblId.value,
                 geneName: queryOptionsForm.gene.value,
+                position: queryOptionsForm.position.value.toString(), //for now
             },
             sources: queryOptionsForm.sources.value,
         },
@@ -151,6 +154,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onSelect={val => {
                                 updateQueryOptionsForm('gene')(val.name);
                                 updateQueryOptionsForm('ensemblId')(val.ensemblId);
+                                updateQueryOptionsForm('position')(val.position);
                             }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />

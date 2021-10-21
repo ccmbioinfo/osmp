@@ -12,13 +12,10 @@ import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
-import mongoose from 'mongoose';
 
 const app = express();
 
 const memoryStore = new session.MemoryStore();
-
-mongoose.connect('mongodb://admin:pass@mongo:27017');
 
 app.use(
   session({
@@ -44,6 +41,7 @@ const keycloak = new Keycloak(
 );
 
 // monkeypatch token validator in local and (currently) dev environments
+// todo: look into how necessary this really is
 if (process.env.NODE_ENV !== 'production') {
   keycloak.grantManager.validateToken = validateToken;
 }

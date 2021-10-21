@@ -22,8 +22,11 @@ const fetchVariantsQuery = gql`
                         }
                         end
                         info {
-                            aaChanges
-                            cDna
+                            aaAlt
+                            aaPos
+                            aaRef
+                            cdna
+                            consequence
                             geneName
                             gnomadHet
                             gnomadHom

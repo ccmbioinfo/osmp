@@ -1,12 +1,15 @@
 import { Maybe } from 'graphql/jsutils/Maybe';
 
-/* typescript types that map to graphql types, should be updated whenever schema is updated */
+/* typescript types that map to graphql types, should be updated whenever schema is updated -- note that these are coming from our own server now */
 export interface VariantResponseInfoFields {
-    aaChanges?: Maybe<string>;
-    cDna?: Maybe<string>;
+    aaAlt?: Maybe<string>;
+    aaPos?: Maybe<string>;
+    aaRef?: Maybe<string>;
+    cdna?: Maybe<string>;
+    consequence?: Maybe<string>;
     geneName?: Maybe<string>;
-    gnomadHet?: Maybe<number>;
-    gnomadHom?: Maybe<number>;
+    gnomadHet?: Maybe<string>;
+    gnomadHom?: Maybe<string>;
     transcript?: Maybe<string>;
 }
 
@@ -24,7 +27,7 @@ export interface CallSet {
     info: CallsetInfoFields;
 }
 
-export type AssemblyId = 'gnomAD_GRCh37' | '38' | '';
+export type AssemblyId = 'gnomAD_GRCh37' | '38' | 'GRCh37' | 'GRCh38' | '37' | 'hg19' | 'hg38';
 
 export interface VariantResponseFields {
     alt: string;
@@ -113,8 +116,9 @@ export interface VariantQueryInput {
 }
 
 export interface GeneQueryInput {
-    geneName?: string;
-    ensemblId?: string;
+    geneName: string;
+    ensemblId: string;
+    position: string;
 }
 
 export interface QueryInput {

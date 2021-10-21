@@ -8,8 +8,12 @@ export default gql`
   }
 
   type VariantResponseInfoFields {
-    aaChanges: String
-    cDna: String
+    aaAlt: String
+    aaPos: String
+    aaRef: String
+    assembly: String
+    cdna: String
+    consequence: String
     geneName: String
     gnomadHet: Int
     gnomadHom: Int
@@ -112,6 +116,7 @@ export default gql`
   input GeneQueryInput {
     geneName: String
     ensemblId: String
+    position: String
   }
 
   input QueryInput {

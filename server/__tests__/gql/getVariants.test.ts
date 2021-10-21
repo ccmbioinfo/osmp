@@ -28,12 +28,19 @@ describe('Test getVariants query', () => {
                     }
                     end
                     info {
-                        aaChanges
-                        cDna
-                        geneName
-                        gnomadHet
-                        gnomadHom
-                        transcript
+                      aaAlt
+                      aaPos
+                      aaRef
+                      assembly
+                      cdna
+                      chrom
+                      consequence
+                      geneName
+                      gnomadHet
+                      gnomadHom
+                      pos
+                      ref
+                      transcript
                     }
                     ref
                     refSeqId

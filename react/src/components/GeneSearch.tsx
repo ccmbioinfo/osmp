@@ -7,6 +7,7 @@ import { SelectableListItem } from './SelectableList';
 interface SelectionValue {
     ensemblId: string;
     name: string;
+    position: string;
 }
 
 interface GeneSearchProps {
@@ -36,13 +37,15 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect })
 
     useEffect(() => {
         if (autocompleteResults) {
+            console.log(autocompleteResults);
             setOptions(
                 (autocompleteResults.autocompleteResults.hits || [])
-                    .filter(hit => !!hit.ensembl?.gene)
+                    .filter(hit => !!hit.ensembl?.gene && !!hit.genomic_pos)
                     .map((hit, i) => ({
                         value: {
                             name: hit.symbol.toUpperCase(),
                             ensemblId: hit.ensembl?.gene,
+                            position: `${hit.genomic_pos.chr}:${hit.genomic_pos.start}-${hit.genomic_pos.end}`,
                         },
                         id: i,
                         label: hit.symbol.toUpperCase(),

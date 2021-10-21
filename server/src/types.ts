@@ -2,18 +2,30 @@ import { Request, Response } from 'express';
 import { PubSub } from 'graphql-subscriptions';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
-/* typescript types that map to graphql types, should be updated whenever schema is updated */
-/* todo: these should be moved to a static file in the root so they are shared between back and front-end */
-/* volume mounts will need to be adjusted (will need to mount within the named mount, though of course this won't work locally anymore) */
+/* these will be returned by our annotation source */
+
 export interface VariantResponseInfoFields {
-  aaChanges?: Maybe<string>;
-  cDna?: Maybe<string>;
+  aaAlt?: Maybe<string>;
+  aaPos?: Maybe<string>;
+  aaRef?: Maybe<string>;
+  assembly?: Maybe<string>;
+  cdna?: Maybe<string>;
+  consequence?: Maybe<string>;
   geneName?: Maybe<string>;
-  gnomadHet?: Maybe<number>;
-  gnomadHom?: Maybe<number>;
+  gnomadHet?: Maybe<string>;
+  gnomadHom?: Maybe<string>;
   transcript?: Maybe<string>;
 }
 
+// these *might* be in the response)
+export interface VariantAnnotation extends VariantResponseInfoFields {
+  ref: string;
+  pos: number;
+  chrom: string;
+  alt: string;
+}
+
+export type VariantAnnotationId = Pick<VariantAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
 export interface CallsetInfoFields {
   ad?: Maybe<number>;
   dp?: Maybe<number>;
@@ -28,7 +40,7 @@ export interface CallSet {
   info: CallsetInfoFields;
 }
 
-export type AssemblyId = 'gnomAD_GRCh37' | '38' | '';
+export type AssemblyId = 'gnomAD_GRCh37' | '38' | 'GRCh37' | 'GRCh38' | '37' | 'hg19' | 'hg38' | '';
 
 export interface VariantResponseFields {
   alt: string;
@@ -116,8 +128,9 @@ export interface VariantQueryInput {
 }
 
 export interface GeneQueryInput {
-  geneName?: string;
-  ensemblId?: string;
+  geneName: string;
+  ensemblId: string;
+  position: string;
 }
 
 export interface QueryInput {
@@ -145,33 +158,6 @@ export interface GqlContext {
 export type ResultTransformer<T> = (args: T | null) => VariantQueryResponseSchema[];
 
 export type ErrorTransformer<T> = (args: T | null) => VariantQueryErrorResponse | null;
-
-export enum Chromosome {
-  Chr1 = 1,
-  Chr2,
-  Chr3,
-  Chr4,
-  Chr5,
-  Chr6,
-  Chr7,
-  Chr8,
-  Chr9,
-  Chr10,
-  Chr11,
-  Chr12,
-  Chr13,
-  Chr14,
-  Chr15,
-  Chr16,
-  Chr17,
-  Chr18,
-  Chr19,
-  Chr20,
-  Chr21,
-  Chr22,
-  ChrX,
-  ChrY,
-}
 
 export enum Assembly {
   GRCh37 = 37,

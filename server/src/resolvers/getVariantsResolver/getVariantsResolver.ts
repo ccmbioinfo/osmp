@@ -11,8 +11,9 @@ import {
 } from '../../types';
 import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
+import fetchAnnotations from './utils/fetchAnnotations';
 import annotate from './utils/annotate';
-import { VariantAnnotation } from '../../models';
+// import annotate from './utils/annotate';
 
 const getVariants = async (
   parent: any,
@@ -20,9 +21,10 @@ const getVariants = async (
   { pubsub }: GqlContext
 ): Promise<VariantQueryResponse> => {
   const variants = await resolveVariantQuery(args, pubsub);
-  const annotations = await VariantAnnotation.getAnnotations(variants);
-  const result = annotate(variants, annotations);
-  return result;
+  // const annotations = await VariantAnnotation.getAnnotations(variants);
+  // const result = annotate(variants, annotations);
+  // return result;
+  return variants;
 };
 
 /**
@@ -38,8 +40,17 @@ const resolveVariantQuery = async (
   pubsub: PubSub
 ): Promise<VariantQueryResponse> => {
   const {
-    input: { sources },
+    input: {
+      sources,
+      variant: { assemblyId },
+      gene: { position },
+    },
   } = args;
+
+  // todo: this should go into the promise pile, and i think we'll have to fetch in chunks into a buffer and resolve that way
+  // spawn still needs work but is timing out -- if we promisify exec and then chunk the region maybe we'll have better results?
+  // would be nice if tabix would let us filter
+  const annotations = await fetchAnnotations(position, assemblyId);
 
   const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
 
@@ -49,7 +60,7 @@ const resolveVariantQuery = async (
     (a, c) => {
       if (c.status === 'fulfilled' && isResolvedVariantQueryResult(c.value)) {
         const { data, source } = c.value;
-        a.data.push({ data, source });
+        a.data.push({ data: annotate(data, annotations), source });
       } else if (c.status === 'fulfilled') {
         console.log(c.value.error);
         a.errors.push({
