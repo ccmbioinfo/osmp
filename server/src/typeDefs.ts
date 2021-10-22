@@ -42,7 +42,7 @@ export default gql`
     end: Int!
     info: VariantResponseInfoFields
     ref: String!
-    refSeqId: String
+    referenceName: String
     start: Int!
     variantType: String
   }

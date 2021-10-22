@@ -10,7 +10,7 @@ const annotate = (
   });
 
   queryResponse.forEach(response => {
-    const key = `${response.variant.alt}-${response.variant.refSeqId.replace(/chr/i, '')}-${
+    const key = `${response.variant.alt}-${response.variant.referenceName.replace(/chr/i, '')}-${
       response.variant.start
     }-${response.variant.ref}`;
 

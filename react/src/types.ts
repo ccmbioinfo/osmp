@@ -36,7 +36,7 @@ export interface VariantResponseFields {
     end: number;
     info?: Maybe<VariantResponseInfoFields>;
     ref: string;
-    refSeqId: string;
+    referenceName: string;
     start: number;
     variantType?: Maybe<string>;
 }

@@ -72,7 +72,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
         end: 50162978 + i,
         info: {},
         ref: r.reference,
-        refSeqId: '1', // this should be referenceName
+        referenceName: '1', // this should be referenceName
         start: 50162978 + i,
       },
       contactInfo: 'DrExample@gmail.com',
