@@ -62,7 +62,7 @@
         "eject": "react-scripts eject",
         "storybook": "start-storybook -p 6001 -s public",
         "build-storybook": "build-storybook -s public",
-        "format": "prettier --check src/",
+        "format": "prettier --write src/",
         "lint": "eslint --max-warnings=0 src/",
         "tsc": "tsc"
     },

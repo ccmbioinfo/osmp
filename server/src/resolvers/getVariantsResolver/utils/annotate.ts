@@ -5,11 +5,11 @@ const annotate = (
   annotations: VariantAnnotation[]
 ): VariantQueryResponseSchema[] => {
   const annotationsMap: Record<string, VariantAnnotation> = {};
-  annotations.forEach((a, i) => {
+  annotations.forEach(a => {
     annotationsMap[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
   });
 
-  queryResponse.forEach((response, i) => {
+  queryResponse.forEach(response => {
     const key = `${response.variant.alt}-${response.variant.refSeqId.replace(/chr/i, '')}-${
       response.variant.start
     }-${response.variant.ref}`;

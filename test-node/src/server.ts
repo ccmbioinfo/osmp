@@ -54,6 +54,7 @@ app.get(
 );
 
 const getStagerData = async (geneName: string, ensemblId: string) => {
+  console.log('this is host', STAGER_DB_HOST)
   const connection = await mysql.createConnection({
     host: STAGER_DB_HOST,
     user: STAGER_DB_USER,
