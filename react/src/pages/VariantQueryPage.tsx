@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
+import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Background,
@@ -43,7 +44,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 3,
-                error: 'Gene must be at least three characters long.',
+                error: 'Too few characters.',
             },
         ],
     },
@@ -72,12 +73,18 @@ interface QueryOptionsFormState {
     sources: string[];
 }
 
-const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
-    error ? (
+/* ensure consistent height regardless of error visibility */
+const ErrorWrapper = styled.div`
+    min-height: 2.5rem;
+`;
+
+const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
+    <ErrorWrapper>
         <Typography error variant="subtitle" bold>
             {error}
         </Typography>
-    ) : null;
+    </ErrorWrapper>
+);
 
 const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
@@ -138,12 +145,12 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 onClick={toggleSource.bind(null, source)}
                             />
                         ))}
+                        <ErrorText error={queryOptionsForm.sources.error} />
                     </Flex>
-                    <ErrorText error={queryOptionsForm.sources.error} />
                 </Column>
             </Flex>
             <Background variant="light">
-                <Flex alignItems="flex-end">
+                <Flex alignItems="center">
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
                             Gene Name
@@ -170,8 +177,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                             value={queryOptionsForm.ensemblId.value}
                         />
-                        <ErrorText error={queryOptionsForm.ensemblId.error} />
+                        <ErrorText error={queryOptionsForm.ensemblId.error || ''} />
                     </Column>
+
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
                             Max Frequency
