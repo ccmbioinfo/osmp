@@ -5,7 +5,7 @@ const annotate = (
   annotations: VariantAnnotation[]
 ): VariantQueryResponseSchema[] => {
   const annotationsMap: Record<string, VariantAnnotation> = {};
-  annotations.forEach((a, i) => {
+  annotations.forEach(a => {
     annotationsMap[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
   });
 

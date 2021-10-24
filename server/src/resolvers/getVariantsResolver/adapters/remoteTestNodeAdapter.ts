@@ -5,8 +5,8 @@ import logger from '../../../logger';
 import {
   ErrorTransformer,
   QueryInput,
-  ResolvedVariantQueryResult,
   ResultTransformer,
+  VariantQueryResponse,
 } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 import resolveAssembly from '../utils/resolveAssembly';
@@ -86,7 +86,7 @@ interface StagerVariantQueryPayload {
 const getRemoteTestNodeQuery = async (
   args: QueryInput,
   pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
+): Promise<VariantQueryResponse> => {
   /* eslint-disable camelcase */
   let tokenResponse: AxiosResponse<{ access_token: string }>;
 
@@ -142,7 +142,7 @@ const getRemoteTestNodeQuery = async (
 export const transformRemoteTestNodeErrorResponse: ErrorTransformer<RemoteTestNodeQueryError> =
   error => {
     if (!error) {
-      return null;
+      return undefined;
     } else {
       return {
         id: uuidv4(),

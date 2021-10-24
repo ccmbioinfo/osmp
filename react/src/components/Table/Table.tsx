@@ -26,7 +26,7 @@ import {
     CallsetInfoFields,
     IndividualInfoFields,
     IndividualResponseFields,
-    VariantQueryDataResult,
+    VariantQueryResponse,
     VariantQueryResponseSchema,
     VariantResponseFields,
     VariantResponseInfoFields,
@@ -47,7 +47,7 @@ import {
 } from './Table.styles';
 
 interface TableProps {
-    variantData: VariantQueryDataResult[];
+    variantData: VariantQueryResponse[];
 }
 
 type FlattenedQueryResponse = Omit<
@@ -96,7 +96,7 @@ const flattenBaseResults = (
 };
 
 /* flatten data */
-const prepareData = (queryResult: VariantQueryDataResult[]) => {
+const prepareData = (queryResult: VariantQueryResponse[]) => {
     const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(r => {
         const source = r.source;

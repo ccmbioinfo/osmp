@@ -8,7 +8,6 @@ export interface VariantResponseInfoFields {
   aaAlt?: Maybe<string>;
   aaPos?: Maybe<string>;
   aaRef?: Maybe<string>;
-  assembly?: Maybe<string>;
   cdna?: Maybe<string>;
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
@@ -98,30 +97,6 @@ export interface VariantQueryResponseSchema {
   contactInfo: string;
 }
 
-export interface VariantQueryErrorResponse {
-  id: string;
-  code: number | string;
-  message?: string | null;
-}
-
-export interface VariantQueryBaseResult {
-  source: string;
-}
-
-export interface VariantQueryDataResult extends VariantQueryBaseResult {
-  data: VariantQueryResponseSchema[];
-}
-
-export interface VariantQueryErrorResult extends VariantQueryBaseResult {
-  error: VariantQueryErrorResponse;
-}
-
-export interface VariantQueryResponse {
-  data: VariantQueryDataResult[];
-  errors: VariantQueryErrorResult[];
-  meta?: string;
-}
-
 export interface VariantQueryInput {
   assemblyId: AssemblyId;
   maxFrequency?: number;
@@ -143,10 +118,24 @@ export interface QueryInput {
 
 /* end graphql schema types */
 
-export interface ResolvedVariantQueryResult {
-  data: VariantQueryResponseSchema[];
-  error: VariantQueryErrorResponse | null;
+export interface ErrorResponse {
+  id: string;
+  code: number | string;
+  message?: string | null;
+}
+
+export interface QueryResult<T> {
   source: string;
+  data: T;
+  error?: ErrorResponse;
+}
+
+export type VariantQueryResponse = QueryResult<VariantQueryResponseSchema[]>;
+export type AnnotationQueryResponse = QueryResult<VariantAnnotation[]>;
+
+export interface CombinedVariantQueryResponse {
+  data: { source: string; data: VariantQueryResponseSchema[] }[];
+  errors: { source: string; error: ErrorResponse }[];
 }
 
 export interface GqlContext {
@@ -157,7 +146,7 @@ export interface GqlContext {
 
 export type ResultTransformer<T> = (args: T | null) => VariantQueryResponseSchema[];
 
-export type ErrorTransformer<T> = (args: T | null) => VariantQueryErrorResponse | null;
+export type ErrorTransformer<T> = (args: T | null) => ErrorResponse | undefined;
 
 export enum Assembly {
   GRCh37 = 37,

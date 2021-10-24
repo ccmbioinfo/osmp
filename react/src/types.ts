@@ -86,30 +86,6 @@ export interface VariantQueryResponseSchema {
     contactInfo: string;
 }
 
-export interface VariantQueryErrorResponse {
-    id: string;
-    code: number | string;
-    message?: string | null;
-}
-
-export interface VariantQueryBaseResult {
-    source: string;
-}
-
-export interface VariantQueryDataResult extends VariantQueryBaseResult {
-    data: VariantQueryResponseSchema[];
-}
-
-export interface VariantQueryErrorResult extends VariantQueryBaseResult {
-    error: VariantQueryErrorResponse;
-}
-
-export interface VariantQueryResponse {
-    data: VariantQueryDataResult[];
-    errors: VariantQueryErrorResult[];
-    meta?: string;
-}
-
 export interface VariantQueryInput {
     assemblyId: AssemblyId;
     maxFrequency?: number;
@@ -130,16 +106,27 @@ export interface QueryInput {
 }
 
 /* end graphql schema types */
-
-export interface ResolvedVariantQueryResult {
-    data: VariantQueryResponseSchema[];
-    error: VariantQueryErrorResponse | null;
+export interface ErrorResponse {
+    id: string;
+    code: number | string;
+    message?: string | null;
     source: string;
 }
+
+export interface QueryResult<T> {
+    source: string;
+    data: T;
+    error?: ErrorResponse;
+}
+
+export type VariantQueryResponseError = { source: string; error: ErrorResponse };
+
+export interface CombinedVariantQueryResponse {
+    data: VariantQueryResponse[];
+    errors: VariantQueryResponseError[];
+}
+
+export type VariantQueryResponse = QueryResult<VariantQueryResponseSchema[]>;
 
 export type TableRowIndividual = IndividualResponseFields & CallsetInfoFields & { source: string };
 export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;
-
-export interface VariantQueryResponseSchemaTableRow extends VariantQueryResponseSchema {
-    source: string;
-}

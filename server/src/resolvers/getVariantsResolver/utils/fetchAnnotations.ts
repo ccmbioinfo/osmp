@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { exec } from 'child_process';
 import resolveAssembly from './resolveAssembly';
+import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
-import { VariantAnnotation } from '../../../types';
+import { VariantAnnotation, AnnotationQueryResponse } from '../../../types';
+import logger from '../../../logger';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -65,7 +67,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   try {
     response = await execPromise(query, { maxBuffer: 1024 * 10000 });
   } catch (err) {
-    console.log(err);
+    logger.error(err);
     throw err;
   }
   return response;
@@ -121,9 +123,22 @@ const _buildQuery = async (position: string, assemblyId: string) => {
   return `tabix -h  ${annotationUrl} ${indexPath} ${resolvedPosition} | sed "1d;" | awk -v OFS='\t' '{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
 };
 
-const fetchAnnotations = async (position: string, assemblyId: string) => {
-  const annotations = await _getAnnotations(position, assemblyId);
-  return _formatAnnotations(annotations.stdout);
+const fetchAnnotations = (
+  position: string,
+  assemblyId: string
+): Promise<AnnotationQueryResponse> => {
+  const source = 'annotations';
+  return _getAnnotations(position, assemblyId)
+    .then(result => ({ source, data: _formatAnnotations(result.stdout) }))
+    .catch(error => ({
+      error: {
+        id: uuidv4(),
+        code: 500,
+        message: `Error fetching annotations: ${error}`,
+      },
+      source,
+      data: [],
+    }));
 };
 
 export default fetchAnnotations;

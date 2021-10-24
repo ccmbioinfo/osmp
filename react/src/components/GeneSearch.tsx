@@ -37,7 +37,6 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect })
 
     useEffect(() => {
         if (autocompleteResults) {
-            console.log(autocompleteResults);
             setOptions(
                 (autocompleteResults.autocompleteResults.hits || [])
                     .filter(hit => !!hit.ensembl?.gene && !!hit.genomic_pos)

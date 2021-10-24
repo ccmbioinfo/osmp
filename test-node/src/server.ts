@@ -40,9 +40,9 @@ app.get(
     { query: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
     res
   ) => {
-    //res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
-    //res.statusCode = 422;
-    //res.json('invalid request');
+    // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
+    // res.statusCode = 422;
+    /// return res.json('invalid request');
     const result = await getStagerData(geneName as string, ensemblId as string);
     if (!result) {
       res.statusCode = 404;
@@ -129,7 +129,7 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
   return result;
 };
 
-/* create dummy data */
+/* create dummy data -- currently unused */
 export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
   return Array(50)
     .fill(null)

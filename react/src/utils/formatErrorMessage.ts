@@ -1,7 +1,7 @@
 const formatErrorMessage = (
     code: string,
     message: string | null | undefined,
-    source: string[] | null | undefined
+    source: string | null | undefined
 ) => {
     let serverMessage;
     if (code.startsWith('5') && !message) {
@@ -45,7 +45,7 @@ const formatErrorMessage = (
     } else {
         serverMessage = message;
     }
-    const sourceMessage = source && !!source.length ? `(Source: ${source.join(', ')})` : '';
+    const sourceMessage = source && !!source.length ? `(Source: ${source})` : '';
     return `Error: ${code} - ${serverMessage} ${sourceMessage}`;
 };
 
