@@ -49,7 +49,14 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         ],
     },
     maxFrequency: {
-        required: false,
+        required: true,
+        rules: [
+            {
+                valid: (state: FormState<QueryOptionsFormState>) =>
+                    state.maxFrequency.value <= 0.02,
+                error: 'Value must be <= .02.',
+            },
+        ],
     },
 
     sources: {
@@ -93,7 +100,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 assemblyId: 'GRCh37',
                 ensemblId: '',
                 gene: '',
-                maxFrequency: 1,
+                maxFrequency: 0.01,
                 sources: [],
                 position: 0,
             },
