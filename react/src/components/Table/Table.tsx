@@ -140,7 +140,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * The workaround for this is to keep some columns with fixed visibility.
      */
     const fixedColumns = React.useMemo(
-        () => ['core', 'chromosome', 'refseqId', 'alt', 'ref', 'start', 'end', 'source'],
+        () => ['core', 'chromosome', 'referenceName', 'alt', 'ref', 'start', 'end', 'source'],
         []
     );
 
@@ -171,10 +171,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: state => state.refSeqId,
+                        accessor: state => state.referenceName,
                         id: 'chromosome',
                         Header: 'Chromosome',
-                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
+                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
                         accessor: 'alt',
@@ -186,7 +186,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
-                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
+                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
                         accessor: 'start',

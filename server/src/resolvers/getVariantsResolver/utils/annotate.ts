@@ -9,8 +9,8 @@ const annotate = (
     annotationsMap[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
   });
 
-  queryResponse.forEach((response, i) => {
-    const key = `${response.variant.alt}-${response.variant.refSeqId.replace(/chr/i, '')}-${
+  queryResponse.forEach(response => {
+    const key = `${response.variant.alt}-${response.variant.referenceName.replace(/chr/i, '')}-${
       response.variant.start
     }-${response.variant.ref}`;
 

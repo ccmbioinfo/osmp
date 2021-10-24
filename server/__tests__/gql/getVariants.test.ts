@@ -43,7 +43,7 @@ describe('Test getVariants query', () => {
                       transcript
                     }
                     ref
-                    refSeqId
+                    referenceName
                     start
                 }
                 individual {

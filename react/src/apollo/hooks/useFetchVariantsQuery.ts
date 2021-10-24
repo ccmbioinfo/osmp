@@ -33,7 +33,7 @@ const fetchVariantsQuery = gql`
                             transcript
                         }
                         ref
-                        refSeqId
+                        referenceName
                         start
                     }
                     individual {

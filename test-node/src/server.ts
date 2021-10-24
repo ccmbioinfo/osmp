@@ -166,7 +166,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
             transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
           },
           ref,
-          refSeqId: '19',
+          referenceName: '19',
           start: end - 1,
         },
         individual: {
