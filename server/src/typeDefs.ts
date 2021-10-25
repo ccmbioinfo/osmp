@@ -4,7 +4,6 @@ export default gql`
   type VariantQueryResponse {
     data: [VariantQueryDataResult!]!
     errors: [VariantQueryErrorResult]!
-    meta: String
   }
 
   type VariantResponseInfoFields {

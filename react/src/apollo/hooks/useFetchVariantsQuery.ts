@@ -81,7 +81,6 @@ const fetchVariantsQuery = gql`
                 }
                 source
             }
-            meta
         }
     }
 `;

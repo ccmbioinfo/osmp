@@ -22,7 +22,7 @@ describe('Test local query adapter', () => {
         },
         variant: {
           alt: 'T',
-          assemblyId: 'gnomAD_GRCh37',
+          assemblyId: '37',
           callsets: [],
           end: 50162978,
           info: {},
