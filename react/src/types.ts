@@ -29,7 +29,7 @@ export interface CallSet {
 
 export type AssemblyId = 'gnomAD_GRCh37' | '38' | 'GRCh37' | 'GRCh38' | '37' | 'hg19' | 'hg38';
 
-export interface VaritResponseFields {
+export interface VariantResponseFields {
     alt: string;
     assemblyId: AssemblyId;
     callsets: CallSet[];
