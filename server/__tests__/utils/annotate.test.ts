@@ -1,113 +1,84 @@
 import annotate from '../../src/resolvers/getVariantsResolver/utils/annotate';
-import { VariantQueryResponse } from '../../src/types';
+import { VariantAnnotation, VariantQueryResponseSchema } from '../../src/types';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
 */
 describe('Test whether variants get annotated', () => {
-  const annotation = [
+  const annotations: VariantAnnotation[] = [
     {
       alt: 'T',
       ref: 'A',
-      chr: 1,
+      chrom: '1',
       pos: 123456,
-      assembly: 37,
-      aaChanges: 'Z[AGC] > Y[TGC]',
+      aaAlt: 'Z',
       cdna: 'ABC',
-      geneName: 'SOME_GENE_NAME',
-      gnomadHet: 0,
-      gnomadHom: 0,
       transcript: 'ENSTFAKE10000',
     },
   ];
 
   it('finds the correct coordinates and returns a unique annotation', () => {
-    const variants: VariantQueryResponse = {
-      errors: [],
-      data: [
-        {
-          data: [
-            {
-              individual: { individualId: 'testId1' },
-              variant: {
-                alt: 'T',
-                assemblyId: 'GRCh37',
-                callsets: [],
-                end: 123456,
-                info: {},
-                ref: 'A',
-                refSeqId: '1',
-                start: 123456,
-              },
-              contactInfo: 'DrExample@gmail.com',
-            },
-          ],
-          source: 'local',
+    const variants: VariantQueryResponseSchema[] = [
+      {
+        individual: { individualId: 'testId1' },
+        variant: {
+          alt: 'T',
+          assemblyId: 'gnomAD_GRCh37',
+          callsets: [],
+          end: 123456,
+          info: {},
+          ref: 'A',
+          referenceName: '1',
+          start: 123456,
         },
-      ],
-      meta: 'some test meta',
-    };
+        contactInfo: 'DrExample@gmail.com',
+      },
+    ];
 
-    const result = annotate(variants, annotation);
+    const result = annotate(variants, annotations);
+
+    console.log(result);
 
     // Check if the corresponding variant has info fields populated
-    result.data.forEach(nodeData =>
-      nodeData.data.forEach(data => {
-        expect(data.variant.info).toEqual({
-          aaChanges: 'Z[AGC] > Y[TGC]',
-          cDna: 'ABC',
-          geneName: 'SOME_GENE_NAME',
-          gnomadHet: 0,
-          gnomadHom: 0,
-          transcript: 'ENSTFAKE10000',
-        });
+    result.forEach(nodeData =>
+      expect(nodeData.variant.info).toEqual({
+        alt: 'T',
+        ref: 'A',
+        chrom: '1',
+        pos: 123456,
+        aaAlt: annotations[0].aaAlt,
+        cdna: annotations[0].cdna,
+        transcript: annotations[0].transcript,
       })
     );
   });
 
   it('test empty variants data array', async () => {
-    const variants: VariantQueryResponse = {
-      errors: [],
-      data: [
-        {
-          data: [],
-          source: 'local',
-        },
-      ],
-      meta: 'some test meta',
-    };
-    const result = annotate(variants, annotation);
+    const variants: VariantQueryResponseSchema[] = [];
+    const result = annotate(variants, annotations);
 
     expect(result).toEqual(variants);
   });
 
   it('test coordinate that does not exist', () => {
-    const variants: VariantQueryResponse = {
-      errors: [],
-      data: [
-        {
-          data: [
-            {
-              individual: { individualId: 'testId1' },
-              variant: {
-                alt: 'T',
-                assemblyId: 'GRCh37',
-                callsets: [],
-                end: 999999999999,
-                info: {},
-                ref: 'A',
-                refSeqId: '1',
-                start: 999999999999,
-              },
-              contactInfo: 'DrExample@gmail.com',
-            },
-          ],
-          source: 'local',
+    const variants: VariantQueryResponseSchema[] = [
+      {
+        individual: { individualId: 'testId1' },
+        variant: {
+          alt: 'T',
+          assemblyId: 'gnomAD_GRCh37',
+          callsets: [],
+          end: 999999999999,
+          info: {},
+          ref: 'A',
+          referenceName: '1',
+          start: 999999999999,
         },
-      ],
-      meta: 'some test meta',
-    };
-    const result = annotate(variants, annotation);
+        contactInfo: 'DrExample@gmail.com',
+      },
+    ];
+
+    const result = annotate(variants, annotations);
 
     expect(result).toEqual(variants);
   });

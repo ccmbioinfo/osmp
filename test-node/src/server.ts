@@ -1,5 +1,6 @@
 import express, { Request } from 'express';
 import { createServer } from 'http';
+import mysql, { RowDataPacket } from 'mysql2/promise';
 import jwt from 'express-jwt';
 import jwks from 'jwks-rsa';
 import Faker from 'faker';
@@ -30,18 +31,120 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
+const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAGER_DB } =
+  process.env;
+
 app.get(
   '/data',
   async (
-    { body: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
+    {
+      query: { assemblyId, ensemblId, geneName },
+    }: Request<{ assemblyId: string; ensemblId: string; geneName: string }>,
     res
   ) => {
-    res.json(createTestQueryResponse(geneName, ensemblId));
-    //res.statusCode = 422;
-    //res.json('invalid request');
+    // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
+    // res.statusCode = 422;
+    /// return res.json('invalid request');
+    if (!assemblyId || !ensemblId) {
+      res.statusCode = 422;
+      return res.json('invalid request');
+    } else if (!(assemblyId as string).includes('37')) {
+      res.statusCode = 422;
+      return res.json('Test node does not have hg38 variants!');
+    }
+
+    const result = await getStagerData(
+      geneName as string,
+      ensemblId as string,
+      assemblyId as string
+    );
+
+    if (!result) {
+      res.statusCode = 404;
+      return res.json('NOT FOUND');
+    } else {
+      return res.json(result);
+    }
   }
 );
 
+const getStagerData = async (geneName: string, ensemblId: string, assemblyId: string) => {
+  const connection = await mysql.createConnection({
+    host: STAGER_DB_HOST,
+    user: STAGER_DB_USER,
+    port: +(STAGER_DB_PORT as string),
+    password: STAGER_DB_PASSWORD,
+    database: STAGER_DB,
+  });
+
+  if (!ensemblId) {
+    try {
+      const [rows] = await connection.execute<RowDataPacket[][]>(
+        'select `ensembl_id` from `gene_alias` where `name` = ? and `kind` = "current_approved_symbol";',
+        [geneName]
+      );
+
+      if (rows.length) {
+        ensemblId = (rows[0] as any).ensembl_id;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      console.error(e);
+      connection.end();
+      return false;
+    }
+  } else if (ensemblId.startsWith('ENS')) {
+    // stager stores its ensids as integers
+    ensemblId = ensemblId.replace(/ENSG0+/, '');
+  }
+
+  let result;
+
+  try {
+    const fetchVariantsSql = `
+    select * from variant v 
+      inner join gene g
+        on v.position between g.start and g.end and v.chromosome = g.chromosome
+      where g.ensembl_id = ?`;
+
+    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [ensemblId]);
+
+    if (!variants.length) {
+      connection.end();
+      return false;
+    }
+
+    const variantIds = variants.map(v => v.variant_id);
+
+    const genotypesSql = `select * from genotype g where g.variant_id in (${mysql.escape(
+      variantIds
+    )})`;
+
+    const [genotypes] = await connection.execute<RowDataPacket[]>(genotypesSql);
+
+    const genotypeDict = genotypes.reduce<Record<string, RowDataPacket[]>>(
+      (acc, curr) => ({
+        ...acc,
+        [curr.variant_id]: acc[curr.variant_id] ? acc[curr.variant_id].concat(curr) : [curr],
+      }),
+      {}
+    );
+
+    result = variants.map(v => ({
+      ...v,
+      genotypes: genotypeDict[v.variant_id] || [],
+    }));
+  } catch (e) {
+    console.error(e);
+    return false;
+  } finally {
+    connection.end();
+  }
+  return result;
+};
+
+/* create dummy data -- currently unused */
 export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
   return Array(50)
     .fill(null)
@@ -78,7 +181,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
             transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
           },
           ref,
-          refSeqId: '19',
+          referenceName: '19',
           start: end - 1,
         },
         individual: {

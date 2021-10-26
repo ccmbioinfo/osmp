@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
+import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Background,
@@ -19,7 +20,7 @@ import {
     Typography,
 } from '../components';
 import SOURCES from '../constants/sources';
-import { useErrorContext, useFormReducer } from '../hooks';
+import { resolveAssembly, useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage } from '../utils';
@@ -43,12 +44,19 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 3,
-                error: 'Gene must be at least three characters long.',
+                error: 'Too few characters.',
             },
         ],
     },
     maxFrequency: {
-        required: false,
+        required: true,
+        rules: [
+            {
+                valid: (state: FormState<QueryOptionsFormState>) =>
+                    state.maxFrequency.value <= 0.02,
+                error: 'Value must be <= .02.',
+            },
+        ],
     },
 
     sources: {
@@ -68,25 +76,33 @@ interface QueryOptionsFormState {
     ensemblId: string;
     gene: string;
     maxFrequency: number;
+    position: number;
     sources: string[];
 }
 
-const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
-    error ? (
+/* ensure consistent height regardless of error visibility */
+const ErrorWrapper = styled.div`
+    min-height: 2.5rem;
+`;
+
+const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
+    <ErrorWrapper>
         <Typography error variant="subtitle" bold>
             {error}
         </Typography>
-    ) : null;
+    </ErrorWrapper>
+);
 
 const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
-                assemblyId: 'GRCh38',
-                ensemblId: 'ENSG00000130203',
+                assemblyId: 'GRCh37',
+                ensemblId: '',
                 gene: '',
-                maxFrequency: 1,
+                maxFrequency: 0.01,
                 sources: [],
+                position: 0,
             },
             queryOptionsFormValidator
         );
@@ -100,6 +116,7 @@ const VariantQueryPage: React.FC<{}> = () => {
             gene: {
                 ensemblId: queryOptionsForm.ensemblId.value,
                 geneName: queryOptionsForm.gene.value,
+                position: queryOptionsForm.position.value.toString(), //for now
             },
             sources: queryOptionsForm.sources.value,
         },
@@ -135,12 +152,12 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 onClick={toggleSource.bind(null, source)}
                             />
                         ))}
+                        <ErrorText error={queryOptionsForm.sources.error} />
                     </Flex>
-                    <ErrorText error={queryOptionsForm.sources.error} />
                 </Column>
             </Flex>
             <Background variant="light">
-                <Flex alignItems="flex-end">
+                <Flex alignItems="center">
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
                             Gene Name
@@ -151,6 +168,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onSelect={val => {
                                 updateQueryOptionsForm('gene')(val.name);
                                 updateQueryOptionsForm('ensemblId')(val.ensemblId);
+                                updateQueryOptionsForm('position')(val.position);
                             }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
@@ -167,8 +185,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                             value={queryOptionsForm.ensemblId.value}
                         />
-                        <ErrorText error={queryOptionsForm.ensemblId.error} />
+                        <ErrorText error={queryOptionsForm.ensemblId.error || ''} />
                     </Column>
+
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
                             Max Frequency
@@ -190,7 +209,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onSelect={val => updateQueryOptionsForm('assemblyId')(val)}
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
-                                value: a,
+                                value: resolveAssembly(a),
                                 label: a,
                             }))}
                             placeholder="Select"

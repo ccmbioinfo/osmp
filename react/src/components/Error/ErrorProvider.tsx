@@ -3,26 +3,26 @@ import { ServerError, ServerParseError } from '@apollo/client';
 import { GraphQLError } from 'graphql';
 import { Maybe } from 'graphql/jsutils/Maybe';
 import { v4 as uuidv4 } from 'uuid';
-import { VariantQueryErrorResult } from '../../types';
+import { ErrorResponse, VariantQueryResponseError } from '../../types';
 
 interface FetchError {
     uid: string;
     code: string;
     message: Maybe<string>;
-    source?: string[];
-    data: [] | {} | undefined; // Actual response from the API
+    source?: string;
 }
 
+/* TODO: narrow this down */
 interface ErrorAction {
     type: string;
     payload:
-        | GraphQLError
         | Error
-        | ServerParseError
+        | ErrorResponse
+        | GraphQLError
+        | FetchError
         | ServerError
-        | Response
-        | string
-        | VariantQueryErrorResult;
+        | ServerParseError
+        | string;
 }
 
 interface ErrorContextState {
@@ -47,26 +47,18 @@ const isGraphQLErrorDuplicate = (incoming: GraphQLError, state: ErrorContextStat
         e => e.message === incoming.message && e.code === incoming.extensions?.code
     ) !== undefined;
 
-const responseErrorTransformer = (error: GraphQLError) => ({
+const responseErrorTransformer = (error: GraphQLError): FetchError => ({
     uid: uuidv4(),
     code: error.extensions?.code,
     message: error.message,
-    data: error,
 });
 
-const transformNodeError = (result: VariantQueryErrorResult) => ({
-    uid: result.error.id,
-    code: String(result.error.code),
-    message: result.error.message,
-    data: result,
-    source: [result.source],
-});
-
-const networkErrorTransformer = (error: ServerError | ServerParseError | Error | undefined) => ({
+const networkErrorTransformer = (
+    error: ServerError | ServerParseError | Error | undefined
+): FetchError => ({
     uid: uuidv4(),
     code: error && 'statusCode' in error ? error.statusCode.toString() : '500',
     message: error?.message,
-    data: error,
 });
 
 const errorReducer = (state = initialState, action: ErrorAction) => {
@@ -89,8 +81,7 @@ const errorReducer = (state = initialState, action: ErrorAction) => {
             return state;
 
         case 'ADD_NODE_ERROR':
-            const nodeError = action.payload as VariantQueryErrorResult;
-            state.nodeErrors.push(transformNodeError(nodeError));
+            state.nodeErrors.push(action.payload as FetchError);
             return state;
 
         case 'REMOVE_ERROR':
@@ -121,9 +112,16 @@ export const makeNetworkError = (payload: ServerError | ServerParseError | Error
     payload,
 });
 
-export const makeNodeError = (payload: VariantQueryErrorResult) => ({
+export const makeNodeError = (
+    response: VariantQueryResponseError
+): { type: string; payload: FetchError } => ({
     type: 'ADD_NODE_ERROR',
-    payload,
+    payload: {
+        uid: response.error?.id || uuidv4(),
+        code: response.error?.code.toString() || '500',
+        message: response.error?.message || '',
+        source: response.source,
+    },
 });
 
 // @param string is uuid of error

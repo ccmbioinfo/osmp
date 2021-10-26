@@ -4,12 +4,15 @@ export default gql`
   type VariantQueryResponse {
     data: [VariantQueryDataResult!]!
     errors: [VariantQueryErrorResult]!
-    meta: String
   }
 
   type VariantResponseInfoFields {
-    aaChanges: String
-    cDna: String
+    aaAlt: String
+    aaPos: String
+    aaRef: String
+    assembly: String
+    cdna: String
+    consequence: String
     geneName: String
     gnomadHet: Int
     gnomadHom: Int
@@ -26,6 +29,7 @@ export default gql`
 
   type CallSet {
     callSetId: String
+    datasetId: String
     individualId: String
     info: CallSetInfoFields
   }
@@ -37,7 +41,7 @@ export default gql`
     end: Int!
     info: VariantResponseInfoFields
     ref: String!
-    refSeqId: String
+    referenceName: String
     start: Int!
     variantType: String
   }
@@ -111,6 +115,7 @@ export default gql`
   input GeneQueryInput {
     geneName: String
     ensemblId: String
+    position: String
   }
 
   input QueryInput {

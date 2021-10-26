@@ -1,5 +1,5 @@
 import { gql } from '@apollo/react-hooks';
-import { QueryInput, VariantQueryResponse } from '../../types';
+import { CombinedVariantQueryResponse, QueryInput } from '../../types';
 import { useLazyApolloQuery } from '../client';
 
 const fetchVariantsQuery = gql`
@@ -22,15 +22,18 @@ const fetchVariantsQuery = gql`
                         }
                         end
                         info {
-                            aaChanges
-                            cDna
+                            aaAlt
+                            aaPos
+                            aaRef
+                            cdna
+                            consequence
                             geneName
                             gnomadHet
                             gnomadHom
                             transcript
                         }
                         ref
-                        refSeqId
+                        referenceName
                         start
                     }
                     individual {
@@ -78,13 +81,12 @@ const fetchVariantsQuery = gql`
                 }
                 source
             }
-            meta
         }
     }
 `;
 
 const useFetchVariantsQuery = () => {
-    return useLazyApolloQuery<{ getVariants: VariantQueryResponse }, QueryInput>(
+    return useLazyApolloQuery<{ getVariants: CombinedVariantQueryResponse }, QueryInput>(
         fetchVariantsQuery
     );
 };

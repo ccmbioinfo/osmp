@@ -13,7 +13,7 @@ import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
 import { makeGraphQLError, makeNetworkError, makeNodeError } from '../components';
 import { useErrorContext } from '../hooks';
-import { VariantQueryErrorResult } from '../types';
+import { VariantQueryResponseError } from '../types';
 
 const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_URL;
 
@@ -32,9 +32,11 @@ export const buildLink = (token?: string) => {
             const dispatcherContext = operation.getContext();
             const sub = forward(operation).subscribe({
                 next: response => {
-                    if (response && operation.operationName === 'GetVariants') {
-                        response?.data?.getVariants.errors.map((e: VariantQueryErrorResult) =>
-                            dispatcherContext.dispatch(makeNodeError(e))
+                    if (!!response?.data?.getVariants.errors.length) {
+                        response?.data?.getVariants.errors.forEach(
+                            (e: VariantQueryResponseError) => {
+                                dispatcherContext.dispatch(makeNodeError(e));
+                            }
                         );
                     }
                     observer.next(response);

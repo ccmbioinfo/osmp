@@ -50,6 +50,14 @@ services:
       TEST_NODE_TOKEN_ISSUER: ${TEST_NODE_TOKEN_ISSUER}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
       TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
+      STAGER_DB: ${STAGER_DB}
+      STAGER_DB_PORT: ${STAGER_DB_PORT}
+      STAGER_DB_HOST: ${STAGER_DB_HOST}
+      STAGER_DB_USER: ${STAGER_DB_USER}
+      STAGER_DB_PASSWORD: ${STAGER_DB_PASSWORD}
+      STAGER_DB_ROOT_PASSWORD: ${STAGER_DB_ROOT_PASSWORD}
+      STAGER_DATA_VOLUME: ${STAGER_DATA_VOLUME}
+
     user: "1000" #node
     working_dir: /usr/app
     ports:
@@ -57,6 +65,19 @@ services:
     volumes:
       - ./test-node:/usr/app
     entrypoint: "yarn start-dev"
+    networks:
+      - ssmp
+
+  stager-mysql:
+    image: mysql:8.0
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: "${STAGER_DB}"
+      MYSQL_USER: "${STAGER_DB_USER}"
+      MYSQL_PASSWORD: "${STAGER_DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${STAGER_DB_ROOT_PASSWORD}"
+    volumes:
+      - ${STAGER_DATA_VOLUME}:/var/lib/mysql
     networks:
       - ssmp
 
@@ -81,22 +102,6 @@ services:
       - ./keycloak/scripts:/usr/scripts
       - ./keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli
       - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
-    networks:
-      - ssmp
-
-  mongo:
-    image: mongo
-    container_name: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_DATABASE_URL: ${MONGO_DATABASE_URL}
-      MONGO_INITDB_PORT: ${MONGO_INITDB_PORT}
-    ports:
-      - ${MONGO_INITDB_PORT}:27017
-    volumes:
-      - ./mongo/data:/data/db
     networks:
       - ssmp
 

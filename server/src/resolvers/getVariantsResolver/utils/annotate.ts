@@ -1,40 +1,25 @@
-import { Assembly, Chromosome, VariantQueryResponse } from '../../../types';
-import { VariantAnnotation } from '../../../models/VariantAnnotationModel';
+import { VariantAnnotation, VariantQueryResponseSchema } from '../../../types';
 
-const annotate = (queryResponse: VariantQueryResponse, annotations: VariantAnnotation[]) => {
+const annotate = (
+  queryResponse: VariantQueryResponseSchema[],
+  annotations: VariantAnnotation[]
+): VariantQueryResponseSchema[] => {
   const annotationsMap: Record<string, VariantAnnotation> = {};
-
   annotations.forEach(a => {
-    annotationsMap[`${a.alt}-${a.assembly}-${a.chr}-${a.pos}-${a.ref}`] = a;
+    annotationsMap[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
   });
 
-  // Loop through queryResponse from different nodes
-  for (let i = 0; i < queryResponse.data.length; i++) {
-    const nodeData = queryResponse.data[i];
+  queryResponse.forEach(response => {
+    const key = `${response.variant.alt}-${response.variant.referenceName.replace(/chr/i, '')}-${
+      response.variant.start
+    }-${response.variant.ref}`;
 
-    for (let j = 0; j < nodeData.data.length; j++) {
-      const response = nodeData.data[j].variant;
+    if (key in annotationsMap) {
+      const annotation = annotationsMap[key];
 
-      const key = `${response.alt}-${Assembly[response.assemblyId]}-${
-        Chromosome[`Chr${response.refSeqId}` as keyof typeof Chromosome]
-      }-${response.start}-${response.ref}`;
-
-      if (key in annotationsMap) {
-        const annotation = annotationsMap[key];
-
-        const { aaChanges, cdna, geneName, gnomadHet, gnomadHom, transcript } = annotation;
-
-        response.info = {
-          aaChanges: aaChanges,
-          cDna: cdna,
-          geneName: geneName,
-          gnomadHet: gnomadHet,
-          gnomadHom: gnomadHom,
-          transcript: transcript,
-        };
-      }
+      response.variant.info = annotation;
     }
-  }
+  });
 
   return queryResponse;
 };
