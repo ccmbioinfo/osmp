@@ -26,7 +26,7 @@ import {
     CallsetInfoFields,
     IndividualInfoFields,
     IndividualResponseFields,
-    VariantQueryDataResult,
+    VariantQueryResponse,
     VariantQueryResponseSchema,
     VariantResponseFields,
     VariantResponseInfoFields,
@@ -47,7 +47,7 @@ import {
 } from './Table.styles';
 
 interface TableProps {
-    variantData: VariantQueryDataResult[];
+    variantData: VariantQueryResponse[];
 }
 
 type FlattenedQueryResponse = Omit<
@@ -96,7 +96,7 @@ const flattenBaseResults = (
 };
 
 /* flatten data */
-const prepareData = (queryResult: VariantQueryDataResult[]) => {
+const prepareData = (queryResult: VariantQueryResponse[]) => {
     const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(r => {
         const source = r.source;
@@ -140,7 +140,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * The workaround for this is to keep some columns with fixed visibility.
      */
     const fixedColumns = React.useMemo(
-        () => ['core', 'chromosome', 'refseqId', 'alt', 'ref', 'start', 'end', 'source'],
+        () => ['core', 'chromosome', 'referenceName', 'alt', 'ref', 'start', 'end', 'source'],
         []
     );
 
@@ -171,10 +171,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'core',
                 columns: [
                     {
-                        accessor: state => state.refSeqId,
+                        accessor: state => state.referenceName,
                         id: 'chromosome',
                         Header: 'Chromosome',
-                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
+                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
                         accessor: 'alt',
@@ -186,7 +186,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
-                        width: getColumnWidth(tableData, 'refseqId', 'Chromosome'),
+                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
                         accessor: 'start',
@@ -218,11 +218,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableSortBy: true,
                         width: 79,
                     },
-                    { accessor: 'aaChanges', id: 'aaChanges', Header: 'AA Changes', width: 105 },
-                    { accessor: 'cDna', id: 'cDna', Header: 'cDNA', width: 105 },
-                    { accessor: 'geneName', id: 'geneName', Header: 'Gene Name', width: 105 },
-                    { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomAD Het', width: 105 },
-                    { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomAD Hom', width: 105 },
+                    { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
+                    { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
+                    { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 },
+                    { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
+                    {
+                        accessor: 'consequence',
+                        id: 'consequence',
+                        Header: 'consequence',
+                        width: 105,
+                    },
+                    { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
+                    { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomadHom', width: 105 },
                     { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 105 },
                 ],
             },

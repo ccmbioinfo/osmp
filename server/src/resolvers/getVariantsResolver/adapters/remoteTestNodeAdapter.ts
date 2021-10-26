@@ -5,8 +5,8 @@ import logger from '../../../logger';
 import {
   ErrorTransformer,
   QueryInput,
-  ResolvedVariantQueryResult,
   ResultTransformer,
+  VariantQueryResponse,
 } from '../../../types';
 import { v4 as uuidv4 } from 'uuid';
 import resolveAssembly from '../utils/resolveAssembly';
@@ -86,7 +86,7 @@ interface StagerVariantQueryPayload {
 const getRemoteTestNodeQuery = async (
   args: QueryInput,
   pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
+): Promise<VariantQueryResponse> => {
   /* eslint-disable camelcase */
   let tokenResponse: AxiosResponse<{ access_token: string }>;
 
@@ -119,7 +119,7 @@ const getRemoteTestNodeQuery = async (
 
   try {
     remoteTestNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
-      `${process.env.TEST_NODE_URL}?ensemblId=${args.input.gene.ensemblId}`,
+      `${process.env.TEST_NODE_URL}?ensemblId=${args.input.gene.ensemblId}&assemblyId=${args.input.variant.assemblyId}`,
       {
         headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
       }
@@ -142,7 +142,7 @@ const getRemoteTestNodeQuery = async (
 export const transformRemoteTestNodeErrorResponse: ErrorTransformer<RemoteTestNodeQueryError> =
   error => {
     if (!error) {
-      return null;
+      return undefined;
     } else {
       return {
         id: uuidv4(),
@@ -174,7 +174,7 @@ const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[
       })),
       end: r.position,
       ref: r.reference_allele,
-      refSeqId: r.chromosome,
+      referenceName: r.chromosome,
       start: r.position,
       variantType: r.variation,
     },

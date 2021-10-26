@@ -10,7 +10,7 @@
     "start-prod": "nodemon dist/server.js",
     "start-dev": "ts-node-dev src/server.ts",
     "mongo-init": "ts-node --require dotenv/config src/scripts/seedData.ts dotenv_config_path=../.env",
-    "format": "prettier --check src/",
+    "format": "prettier --write src/",
     "lint": "eslint --max-warnings=0 src/",
     "tsc": "tsc"
   },

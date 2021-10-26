@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   ErrorTransformer,
   QueryInput,
-  ResolvedVariantQueryResult,
   ResultTransformer,
+  VariantQueryResponse,
 } from '../../../types';
 import resolveAssembly from '../utils/resolveAssembly';
 
@@ -21,10 +21,7 @@ interface LocalQueryResponse {
  * @returns  Promise<ResolvedVariantQueryResult>
  * Return some dummy data for testing and design purposes
  */
-const getLocalQuery = async (
-  args: QueryInput,
-  pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
+const getLocalQuery = async (args: QueryInput, pubsub: PubSub): Promise<VariantQueryResponse> => {
   let localQueryResponse: LocalQueryResponse[] | null = null;
   let localQueryError: Error | null = null;
   try {
@@ -72,7 +69,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
         end: 50162978 + i,
         info: {},
         ref: r.reference,
-        refSeqId: '1',
+        referenceName: '1', // this should be referenceName
         start: 50162978 + i,
       },
       contactInfo: 'DrExample@gmail.com',
@@ -82,7 +79,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
 
 export const transformLocalErrorResponse: ErrorTransformer<Error> = error => {
   if (!error) {
-    return null;
+    return undefined;
   } else {
     return { code: 424, message: error.message || '', id: uuidv4() };
   }

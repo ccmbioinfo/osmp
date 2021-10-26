@@ -37,13 +37,28 @@ const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAG
 app.get(
   '/data',
   async (
-    { query: { ensemblId, geneName } }: Request<{ ensemblId: string; geneName: string }>,
+    {
+      query: { assemblyId, ensemblId, geneName },
+    }: Request<{ assemblyId: string; ensemblId: string; geneName: string }>,
     res
   ) => {
-    //res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
-    //res.statusCode = 422;
-    //res.json('invalid request');
-    const result = await getStagerData(geneName as string, ensemblId as string);
+    // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
+    // res.statusCode = 422;
+    /// return res.json('invalid request');
+    if (!assemblyId || !ensemblId) {
+      res.statusCode = 422;
+      return res.json('invalid request');
+    } else if (!(assemblyId as string).includes('37')) {
+      res.statusCode = 422;
+      return res.json('Test node does not have hg38 variants!');
+    }
+
+    const result = await getStagerData(
+      geneName as string,
+      ensemblId as string,
+      assemblyId as string
+    );
+
     if (!result) {
       res.statusCode = 404;
       return res.json('NOT FOUND');
@@ -53,7 +68,7 @@ app.get(
   }
 );
 
-const getStagerData = async (geneName: string, ensemblId: string) => {
+const getStagerData = async (geneName: string, ensemblId: string, assemblyId: string) => {
   const connection = await mysql.createConnection({
     host: STAGER_DB_HOST,
     user: STAGER_DB_USER,
@@ -129,7 +144,7 @@ const getStagerData = async (geneName: string, ensemblId: string) => {
   return result;
 };
 
-/* create dummy data */
+/* create dummy data -- currently unused */
 export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
   return Array(50)
     .fill(null)
@@ -166,7 +181,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
             transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
           },
           ref,
-          refSeqId: '19',
+          referenceName: '19',
           start: end - 1,
         },
         individual: {

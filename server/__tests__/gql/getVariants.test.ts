@@ -2,7 +2,7 @@ import { addMocksToSchema } from '@graphql-tools/mock';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import typeDefs from '../../src/typeDefs';
 import { testGraphQLQuery } from '../testGraphQLQuery';
-import { VariantQueryResponse } from '../../src/types';
+import { CombinedVariantQueryResponse } from '../../src/types';
 
 /**
  * Confirm that variant query schema performs and validates as expected
@@ -28,15 +28,18 @@ describe('Test getVariants query', () => {
                     }
                     end
                     info {
-                        aaChanges
-                        cDna
-                        geneName
-                        gnomadHet
-                        gnomadHom
-                        transcript
+                      aaAlt
+                      aaPos
+                      aaRef
+                      cdna
+                      consequence
+                      geneName
+                      gnomadHet
+                      gnomadHom
+                      transcript
                     }
                     ref
-                    refSeqId
+                    referenceName
                     start
                 }
                 individual {
@@ -84,7 +87,6 @@ describe('Test getVariants query', () => {
             }
             source
         }
-        meta
     }
 }
   `;
@@ -92,10 +94,9 @@ describe('Test getVariants query', () => {
   it('issues a valid query', async () => {
     const schema = makeExecutableSchema({ typeDefs });
     // the bare minimum acceptable response object
-    const mockResponse: VariantQueryResponse = {
+    const mockResponse: CombinedVariantQueryResponse = {
       data: [{ data: [], source: 'test' }],
       errors: [],
-      meta: 'test-meta',
     };
 
     const mocks = {
