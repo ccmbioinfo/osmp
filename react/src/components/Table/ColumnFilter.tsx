@@ -4,6 +4,7 @@ import { Column, Flex, Input, Typography } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
 import SOURCES from '../../constants/sources';
 import ComboBox from '../ComboBox';
+import SelectionFilter from './SelectionFilter';
 import {
     ComparisonType,
     FilterComparison,
@@ -11,7 +12,7 @@ import {
 } from './InputComparisonDropdown';
 import { FlattenedQueryResponse } from './Table';
 
-type DefaultFilter = {
+export type DefaultFilter = {
     id: string;
     value: string | number | Array<number>;
 };
@@ -87,28 +88,20 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     const resolveComponent = () => {
         if (columnId === 'source') {
             return (
-                <ComboBox
-                    options={SOURCES.map((n, id) => ({
-                        id,
-                        value: n,
-                        label: n,
-                    })).concat({ id: 3, label: 'all', value: '' })}
-                    onSelect={val => setFilter('source', val)}
-                    placeholder="Select"
-                    value={filter ? filter.value.toString() : ''}
+                <SelectionFilter
+                    setFilter={setFilter}
+                    columnId={columnId}
+                    options={SOURCES}
+                    filter={filter}
                 />
             );
         } else if (columnId === 'chromosome') {
             return (
-                <ComboBox
-                    options={CHROMOSOMES.map((n, id) => ({
-                        id,
-                        value: n,
-                        label: n,
-                    }))}
-                    onSelect={val => setFilter('chromosome', val)}
-                    placeholder="Select"
-                    value={filter ? filter.value.toString() : ''}
+                <SelectionFilter
+                    setFilter={setFilter}
+                    columnId={columnId}
+                    options={CHROMOSOMES}
+                    filter={filter}
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {
