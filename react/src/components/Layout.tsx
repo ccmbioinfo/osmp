@@ -52,7 +52,7 @@ export const Body = styled.div`
 
 export const Column = styled(Flex)<FlexProps>`
     flex-direction: column;
-    margin: ${props => props.theme.space[2]} ${props => props.theme.space[3]};
+    margin: ${props => props.theme.space[2]} ${props => props.theme.space[2]};
 `;
 
 export const ButtonWrapper = styled(Flex)`
