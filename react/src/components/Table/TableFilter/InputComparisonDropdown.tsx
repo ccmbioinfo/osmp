@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
-import { SelectableList } from '..';
-import { useClickAway } from '../../hooks';
-import { IconButton } from '../index';
+import { SelectableList } from '../..';
+import { useClickAway } from '../../../hooks';
+import { IconButton } from '../../index';
 
 export type ComparisonType = {
     less: boolean;

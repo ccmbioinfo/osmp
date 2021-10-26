@@ -1,11 +1,11 @@
 import React from 'react';
 import { Row } from 'react-table';
-import { Column, Input } from '..';
-import CHROMOSOMES from '../../constants/chromosomes';
-import SOURCES from '../../constants/sources';
+import { Column, Input } from '../..';
+import CHROMOSOMES from '../../../constants/chromosomes';
+import SOURCES from '../../../constants/sources';
+import { FlattenedQueryResponse } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
-import { FlattenedQueryResponse } from './Table';
 
 export type DefaultFilter = {
     id: string;

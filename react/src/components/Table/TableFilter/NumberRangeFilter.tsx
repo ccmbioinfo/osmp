@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Row } from 'react-table';
-import { Column, Input, Typography } from '..';
+import { Column, Input, Typography } from '../..';
+import { FlattenedQueryResponse } from '../Table';
 import { DefaultFilter } from './ColumnFilter';
 import {
     ComparisonType,
     FilterComparison,
     InputComparisonDropdown,
 } from './InputComparisonDropdown';
-import { FlattenedQueryResponse } from './Table';
 
 interface NumberRangeFilterProps {
     setFilter: (columnId: string, filterValue: any) => void;

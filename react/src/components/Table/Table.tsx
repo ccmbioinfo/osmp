@@ -32,9 +32,7 @@ import {
     VariantResponseInfoFields,
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
-import { ColumnFilter } from './ColumnFilter';
 import { ContactPopover } from './ContactPopover';
-import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
     IconPadder,
@@ -45,6 +43,8 @@ import {
     TH,
     THead,
 } from './Table.styles';
+import { ColumnFilter } from './TableFilter/ColumnFilter';
+import { GlobalFilter } from './TableFilter/GlobalFilters';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];

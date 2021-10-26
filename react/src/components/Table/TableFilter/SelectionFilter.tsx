@@ -1,5 +1,5 @@
 import React from 'react';
-import { ComboBox, Input } from '..';
+import { ComboBox } from '../..';
 import { DefaultFilter } from './ColumnFilter';
 
 interface SelectionFilterProps {
