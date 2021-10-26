@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Row } from 'react-table';
-import { Flex, Input } from '..';
+import { Column, Flex, Input, Typography } from '..';
 import CHROMOSOMES from '../../constants/chromosomes';
 import SOURCES from '../../constants/sources';
 import ComboBox from '../ComboBox';
-import { FilterComparison, InputComparisonDropdown } from './InputComparisonDropdown';
+import {
+    ComparisonType,
+    FilterComparison,
+    InputComparisonDropdown,
+} from './InputComparisonDropdown';
 import { FlattenedQueryResponse } from './Table';
 
 type DefaultFilter = {
@@ -25,6 +29,10 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     columnId,
     preFilteredRows,
 }) => {
+    const [error, setError] = useState<boolean>(false);
+    const [text, setText] = useState<string>('');
+    console.log(text);
+
     const [filterComparison, setFilterComparison] = useState<FilterComparison>({
         start: {
             less: false,
@@ -51,6 +59,30 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     const filter = filters.find(f => f.id === columnId);
 
     const placeholder = 'Search';
+
+    const handleComparisonValue = (
+        columnId: string,
+        e: React.ChangeEvent<HTMLInputElement>,
+        comparison: ComparisonType
+    ) => {
+        const val = e.target.value;
+        console.log('this is val', val, isNaN(parseInt(val)));
+        if (isNaN(parseInt(val)) && val !== '') {
+            console.log('wrong val', val);
+            setError(true);
+            setText(val);
+        } else {
+            const num = val === '' ? undefined : parseInt(val, 10);
+            if (comparison.less) {
+                setFilter(columnId, [-Infinity, num]);
+            } else if (comparison.greater) {
+                setFilter(columnId, [num, +Infinity]);
+            } else {
+                console.log('hello', columnId, filter, val);
+                setFilter(columnId, [num, num]);
+            }
+        }
+    };
 
     const resolveComponent = () => {
         if (columnId === 'source') {
@@ -81,17 +113,14 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             );
         } else if (columnId === 'start' || columnId === 'end') {
             const filterValue = filters.filter(f => f.id === columnId)[0]?.value as Array<number>;
+            console.log('filter value', filterValue);
             const comparison = filterComparison[columnId];
             if (comparison.less) {
                 return (
                     <Input
                         variant="outlined"
-                        value={filterValue ? filterValue[1] : ''}
-                        onChange={e => {
-                            const val = e.target.value;
-                            setFilter(columnId, [-Infinity, val ? parseInt(val, 10) : undefined]);
-                            // [-inf, 10]
-                        }}
+                        value={filterValue ? filterValue[1] : text}
+                        onChange={e => handleComparisonValue(columnId, e, comparison)}
                         placeholder={`Max (${max})`}
                         InputAdornmentStart={
                             <InputComparisonDropdown
@@ -107,11 +136,8 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 return (
                     <Input
                         variant="outlined"
-                        value={filterValue ? filterValue[0] : ''}
-                        onChange={e => {
-                            const val = e.target.value;
-                            setFilter(columnId, [val ? parseInt(val, 10) : undefined, +Infinity]);
-                        }}
+                        value={filterValue ? filterValue[0] : text}
+                        onChange={e => handleComparisonValue(columnId, e, comparison)}
                         placeholder={`Min (${min})`}
                         InputAdornmentStart={
                             <InputComparisonDropdown
@@ -127,12 +153,8 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 return (
                     <Input
                         variant="outlined"
-                        value={filterValue ? filterValue[1] : ''}
-                        onChange={e => {
-                            const val = e.target.value;
-                            const filter = val ? parseInt(val, 10) : undefined;
-                            setFilter(columnId, () => [filter, filter]);
-                        }}
+                        value={filterValue ? filterValue[1] : text}
+                        onChange={e => handleComparisonValue(columnId, e, comparison)}
                         placeholder={placeholder}
                         InputAdornmentStart={
                             <InputComparisonDropdown
@@ -157,5 +179,16 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
         }
     };
 
-    return <Flex>{resolveComponent()}</Flex>;
+    return (
+        <Flex>
+            <Column>
+                {resolveComponent()}
+                {error && (
+                    <Typography variant="subtitle" error>
+                        Please enter a valid value.
+                    </Typography>
+                )}
+            </Column>
+        </Flex>
+    );
 };
