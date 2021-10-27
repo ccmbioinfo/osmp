@@ -53,8 +53,9 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             if (val === '') {
                 setText(val);
                 num = undefined;
+            } else {
+                num = parseInt(val);
             }
-            num = parseInt(val);
             if (comparison.less) {
                 setFilter(columnId, [-Infinity, num]);
             } else if (comparison.greater) {
@@ -91,7 +92,11 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
                     />
                 }
             />
-            {error && <Typography variant="subtitle">Please enter a valid number.</Typography>}
+            {error && (
+                <Typography variant="subtitle" bold error>
+                    Please enter a valid number.
+                </Typography>
+            )}
         </Column>
     );
 };
