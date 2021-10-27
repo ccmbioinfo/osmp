@@ -90,7 +90,6 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
                         setFilter(columnId, (old = []) => {
                             const min = old[0] ? parseFloat(old[0]) : old[0];
                             const max = old[1] ? parseFloat(old[1]) : old[1];
-                            console.log('this is min max', min, max);
                             const n = getFiniteNumber(min) || getFiniteNumber(max);
                             switch (value) {
                                 case 'equal':

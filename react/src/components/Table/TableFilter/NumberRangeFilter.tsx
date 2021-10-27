@@ -49,10 +49,12 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             setText(val);
         } else {
             setError(false);
-            const num = val === '' ? undefined : parseInt(val, 10);
+            let num;
             if (val === '') {
                 setText(val);
+                num = undefined;
             }
+            num = parseInt(val);
             if (comparison.less) {
                 setFilter(columnId, [-Infinity, num]);
             } else if (comparison.greater) {
