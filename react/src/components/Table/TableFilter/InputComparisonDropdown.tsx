@@ -65,6 +65,9 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
 
     useClickAway(ref, () => setOpen(false));
 
+    // Ensure value returned is a number and not +/-Infinity
+    const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
+
     return (
         <div ref={ref}>
             <IconButton variant="light" onClick={() => setOpen(true)}>
@@ -85,9 +88,10 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
                         setFilterComparison(newComparison);
 
                         setFilter(columnId, (old = []) => {
-                            const min = old[0] ? parseInt(old[0]) : old[0];
-                            const max = old[1] ? parseInt(old[1]) : old[1];
-                            const n = min || max;
+                            const min = old[0] ? parseFloat(old[0]) : old[0];
+                            const max = old[1] ? parseFloat(old[1]) : old[1];
+                            console.log('this is min max', min, max);
+                            const n = getFiniteNumber(min) || getFiniteNumber(max);
                             switch (value) {
                                 case 'equal':
                                     return [n, n];
