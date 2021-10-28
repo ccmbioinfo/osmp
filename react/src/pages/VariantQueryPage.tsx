@@ -165,16 +165,16 @@ const VariantQueryPage: React.FC<{}> = () => {
                         ))}
                         <ErrorText error={queryOptionsForm.sources.error} />
                         {queryOptionsForm.sources.value.length > 0 && (
-                                        <Flex>
-                                            {queryOptionsForm.sources.value.map((source, i) => (
-                                                <Chip
-                                                    key={i}
-                                                    title={source}
-                                                    onDelete={() => removeSource(source)}
-                                                />
-                                            ))}
-                                        </Flex>
-                                    )}
+                            <Flex>
+                                {queryOptionsForm.sources.value.map((source, i) => (
+                                    <Chip
+                                        key={i}
+                                        title={source}
+                                        onDelete={() => removeSource(source)}
+                                    />
+                                ))}
+                            </Flex>
+                        )}
                     </Flex>
                 </Column>
             </Flex>
