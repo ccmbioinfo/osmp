@@ -1,7 +1,7 @@
 openapi: "3.0.2"
 info:
   title: Single-Sided Matching Portal API
-  version: "0.4"
+  version: "0.5"
 
 paths:
   /variants:
@@ -164,29 +164,6 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Callset"
-        - type: object
-          properties:
-            info:
-              $ref: "#/components/schemas/VariantInfo"
-    VariantInfo:
-      description: |
-        Additional metadata about the variant
-      type: object
-      example: "TBD"
-      properties:
-        geneName:
-          type: string
-          example: APOE
-        cDNA:
-          type: string
-        AAChanges:
-          type: string
-        transcript:
-          type: string
-        gnomadHet:
-          type: number
-        gnomadHom:
-          type: number
     VariantFilters:
       description: |
         All the required fields to query any kind of variant (e.g. SNP, DUP,
