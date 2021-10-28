@@ -1,7 +1,6 @@
 import React from 'react';
 import { Row } from 'react-table';
 import { Column, Input } from '../..';
-import CHROMOSOMES from '../../../constants/chromosomes';
 import SOURCES from '../../../constants/sources';
 import { FlattenedQueryResponse } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
@@ -36,15 +35,6 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                     setFilter={setFilter}
                     columnId={columnId}
                     options={SOURCES}
-                    filter={filter}
-                />
-            );
-        } else if (columnId === 'chromosome') {
-            return (
-                <SelectionFilter
-                    setFilter={setFilter}
-                    columnId={columnId}
-                    options={CHROMOSOMES}
                     filter={filter}
                 />
             );
