@@ -23,7 +23,7 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
                     value: n,
                     label: n,
                 }))
-                .concat({ id: options.length, label: 'all', value: '' })}
+                .concat({ id: options.length, label: 'All', value: '' })}
             onSelect={val => setFilter(columnId, val)}
             placeholder="Select"
             value={filter ? filter.value.toString() : ''}

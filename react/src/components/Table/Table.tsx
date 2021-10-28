@@ -146,6 +146,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
 
+    const columnsWithoutFilters = React.useMemo(() => ['contact', 'chromosome'], []);
+
     type Accessor = string | (() => JSX.Element) | ((state: any) => any);
     // Dynamically adjust column width based on cell's longest text.
     const getColumnWidth = React.useCallback(
@@ -527,7 +529,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {columns
                         .map(c => c.columns)
                         .flat()
-                        .filter(c => !dummyColumns.includes(c.id as string) && c.id !== 'contact')
+                        .filter(
+                            c =>
+                                !dummyColumns.concat(columnsWithoutFilters).includes(c.id as string)
+                        )
                         .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
