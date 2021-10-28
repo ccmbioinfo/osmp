@@ -45,7 +45,6 @@ export const Header = styled(Flex)`
     box-shadow: ${props => props.theme.boxShadow};
     color: ${props => props.theme.colors.muted};
     justify-content: space-between;
-    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     width: inherit;
 `;
 

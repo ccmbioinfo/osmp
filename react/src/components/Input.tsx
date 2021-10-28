@@ -11,7 +11,7 @@ export interface InputProps {
     InputAdornmentStart?: React.ReactNode;
 }
 
-const Container = styled.div<InputProps>`
+const Container = styled.div<Pick<InputProps, 'variant' | 'error'>>`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -50,7 +50,7 @@ const TextInput = styled.input<InputProps>`
 `;
 
 const Input: React.FC<InputProps> = props => (
-    <Container {...props}>
+    <Container variant={props.variant} error={props.error}>
         {props.InputAdornmentStart && props.InputAdornmentStart}
         <TextInput {...props} />
     </Container>

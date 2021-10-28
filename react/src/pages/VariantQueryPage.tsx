@@ -180,7 +180,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Input
                             variant="outlined"
                             onChange={e => {
-                                updateQueryOptionsForm('ensemblId')(e.target.value);
+                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value);
                                 updateQueryOptionsForm('gene')('');
                             }}
                             value={queryOptionsForm.ensemblId.value}
@@ -194,7 +194,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Input
                             variant="outlined"
-                            onChange={e => updateQueryOptionsForm('maxFrequency')(e.target.value)}
+                            onChange={e => {
+                                updateQueryOptionsForm('maxFrequency')(e.currentTarget.value);
+                            }}
                             value={queryOptionsForm.maxFrequency.value}
                         />
                         <ErrorText error={queryOptionsForm.maxFrequency.error} />
