@@ -36,6 +36,16 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                     columnId={columnId}
                     options={SOURCES}
                     filter={filter}
+                    preFilteredRows={preFilteredRows}
+                />
+            );
+        } else if (['sex', 'zygosity', 'consequence'].includes(columnId)) {
+            return (
+                <SelectionFilter
+                    setFilter={setFilter}
+                    columnId={columnId}
+                    filter={filter}
+                    preFilteredRows={preFilteredRows}
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {
