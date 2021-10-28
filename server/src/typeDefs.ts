@@ -2,35 +2,103 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   type VariantQueryResponse {
-    data: [VariantQueryDataResult]!
+    data: [VariantQueryDataResult!]!
     errors: [VariantQueryErrorResult]!
-    meta: String
+  }
+
+  type VariantResponseInfoFields {
+    aaAlt: String
+    aaPos: String
+    aaRef: String
+    assembly: String
+    cdna: String
+    consequence: String
+    geneName: String
+    gnomadHet: Int
+    gnomadHom: Int
+    transcript: String
+  }
+
+  type CallSetInfoFields {
+    ad: Float
+    dp: Int
+    gq: Float
+    qual: Float
+    zygosity: String
+  }
+
+  type CallSet {
+    callSetId: String
+    datasetId: String
+    individualId: String
+    info: CallSetInfoFields
+  }
+
+  type VariantResponseFields {
+    alt: String!
+    assemblyId: String!
+    callsets: [CallSet]
+    end: Int!
+    info: VariantResponseInfoFields
+    ref: String!
+    referenceName: String
+    start: Int!
+    variantType: String
+  }
+
+  type AgeOfOnsetFields {
+    age: Float
+    ageGroup: String
+  }
+
+  type PhenotypicFeaturesFields {
+    ageOfOnset: AgeOfOnsetFields
+    dateOfOnset: String
+    levelSeverity: String
+    onsetType: String
+    phenotypeId: String
+  }
+
+  type IndividualResponseFields {
+    datasetId: String
+    diseases: [DiseaseFields]
+    ethnicity: String
+    geographicOrigin: String
+    individualId: String
+    info: IndividualInfoFields
+    phenotypicFeatures: [PhenotypicFeaturesFields]
+    sex: String
+  }
+
+  type IndividualInfoFields {
+    candidateGene: String
+    classifications: String
+    diagnosis: String
+  }
+
+  type DiseaseFields {
+    ageOfOnset: AgeOfOnsetFields
+    description: String
+    diseaseId: String
+    levelSeverity: String
+    outcome: String
+    stage: String
   }
 
   type VariantQueryResponseSchema {
-    af: Float
-    alt: String
-    chromosome: String
-    datasetId: String
-    dp: Int
-    end: Int
-    ethnicity: String
-    phenotypes: String
-    ref: String
-    rsId: String
-    sex: String
-    someFakeScore: Float
-    start: Int
-    zygosity: String
+    variant: VariantResponseFields!
+    individual: IndividualResponseFields!
+    contactInfo: String!
   }
 
   type VariantQueryDataResult {
     source: String!
-    data: [VariantQueryResponseSchema]!
+    data: [VariantQueryResponseSchema!]!
   }
 
   type VariantQueryErrorResponse {
-    code: Int!
+    id: String
+    code: String
     message: String
   }
 
@@ -40,10 +108,20 @@ export default gql`
   }
 
   input VariantQueryInput {
-    chromosome: String!
-    start: Int!
-    end: Int!
+    assemblyId: String
+    maxFrequency: Float
+  }
+
+  input GeneQueryInput {
+    geneName: String
+    ensemblId: String
+    position: String
+  }
+
+  input QueryInput {
     sources: [String!]!
+    gene: GeneQueryInput
+    variant: VariantQueryInput
   }
 
   type ResolutionMessage {
@@ -55,6 +133,6 @@ export default gql`
   }
 
   type Query {
-    getVariants(input: VariantQueryInput): VariantQueryResponse
+    getVariants(input: QueryInput): VariantQueryResponse!
   }
 `;

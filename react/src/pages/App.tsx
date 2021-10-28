@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
+import { ApolloProvider } from '@apollo/client';
 import { useKeycloak } from '@react-keycloak/web';
+import { ErrorBoundary } from 'react-error-boundary';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
-import { VariantQueryPage } from '.';
-import { Navbar } from '../components';
-import theme from '../constants/theme';
+import { AboutPage, VariantQueryPage } from '.';
+import { client } from '../../src/apollo/client';
+import { ErrorFallback, ErrorProvider, Flex, Navbar, Spinner } from '../components';
 
 const App: React.FC<{}> = () => {
     const {
@@ -19,20 +20,37 @@ const App: React.FC<{}> = () => {
     }, [initialized, authenticated, login]);
 
     return !initialized ? (
-        <span>Loading...</span>
+        <Flex justifyContent="center" alignItems="center">
+            <Spinner />
+        </Flex>
     ) : authenticated ? (
-        <ThemeProvider theme={theme}>
-            <div>
-                <Router>
-                    <Navbar />
-                    <Switch>
-                        <Route path="*">
-                            <VariantQueryPage />
-                        </Route>
-                    </Switch>
-                </Router>
-            </div>
-        </ThemeProvider>
+        <div>
+            <ApolloProvider client={client}>
+                <ErrorProvider>
+                    <Router>
+                        <Navbar />
+                        <ErrorBoundary
+                            FallbackComponent={({ error, resetErrorBoundary }) => (
+                                <ErrorFallback
+                                    error={error}
+                                    variant="normal"
+                                    resetErrorBoundary={resetErrorBoundary}
+                                />
+                            )}
+                        >
+                            <Switch>
+                                <Route path="/about">
+                                    <AboutPage />
+                                </Route>
+                                <Route path="/">
+                                    <VariantQueryPage />
+                                </Route>
+                            </Switch>
+                        </ErrorBoundary>
+                    </Router>
+                </ErrorProvider>
+            </ApolloProvider>
+        </div>
     ) : null;
 };
 

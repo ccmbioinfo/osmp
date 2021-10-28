@@ -1,12 +1,18 @@
 import styled from 'styled-components';
 
 interface BackgroundProps {
-    variant?: 'success' | 'main' | 'light';
+    variant?: 'success' | 'error' | 'main' | 'light';
 }
 
-interface FlexProps {
+export interface FlexProps {
     alignItems?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
-    justifyContent?: 'flex-start' | 'baseline' | 'flex-end' | 'center';
+    justifyContent?:
+        | 'flex-start'
+        | 'baseline'
+        | 'flex-end'
+        | 'center'
+        | 'space-between'
+        | 'space-around';
     variant?: 'success' | 'main' | 'light';
 }
 
@@ -15,12 +21,17 @@ export const Background = styled.div<BackgroundProps>`
         switch (props.variant) {
             case 'success':
                 return props.theme.background.success;
+            case 'error':
+                return props.theme.background.error;
             case 'light':
                 return props.theme.background.light;
             default:
                 return 'inherit';
         }
     }};
+    margin: ${props => props.theme.space[4]} 0;
+    padding: ${props => props.theme.space[4]};
+    border-radius: ${props => props.theme.radii.base};
 `;
 
 export const Flex = styled.div<FlexProps>`
@@ -28,8 +39,6 @@ export const Flex = styled.div<FlexProps>`
     display: flex;
     flex-wrap: wrap;
     justify-content: ${props => props.justifyContent ?? 'inherit'};
-    margin: ${props => props.theme.space[3]} 0;
-    padding: ${props => props.theme.space[3]};
 `;
 
 export const InlineFlex = styled.div`
@@ -38,18 +47,17 @@ export const InlineFlex = styled.div`
 `;
 
 export const Body = styled.div`
-    padding: ${props => props.theme.space[4]};
+    padding: ${props => props.theme.space[5]};
 `;
 
 export const Column = styled(Flex)<FlexProps>`
     flex-direction: column;
-    margin-right: ${props => props.theme.space[3]};
-    margin-bottom: 0px;
+    margin: ${props => props.theme.space[2]} ${props => props.theme.space[3]};
 `;
 
 export const ButtonWrapper = styled(Flex)`
     display: inline-flex;
-    margin-top: 1.5rem;
+    align-items: center;
 `;
 
 export const Container = styled.div`

@@ -5,11 +5,10 @@ services:
     volumes:
       - ./react:/usr/app
     environment:
-      REACT_APP_API_HOST: ${REACT_APP_API_HOST}
-      REACT_APP_API_PORT: ${REACT_APP_API_PORT}
+      REACT_APP_GRAPHQL_URL: ${REACT_APP_GRAPHQL_URL}
       REACT_APP_KEYCLOAK_AUTH_URL: ${REACT_APP_KEYCLOAK_FRONT_END_AUTH_URL}
       REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
     ports:
       - ${STORYBOOK_PORT:-6006}:6001
       - ${REACT_PORT}:3000
@@ -18,34 +17,91 @@ services:
     entrypoint: "yarn start"
     networks:
       - ssmp
-
   ssmp-server:
-    image: node:16.3-buster
+    build:
+      context: server
+      target: BUILD_IMAGE
+    image: ghcr.io/ccmbioinfo/ssmp:dev
     environment:
-      SERVER_PORT: ${SSMP_SERVER_PORT}
+      KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      MONGO_DATABASE_URL: ${MONGO_DATABASE_URL}
+      NODE_ENV: local
+      TEST_NODE_URL: ${TEST_NODE_URL}
+      TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
+      TEST_NODE_SSMP_TOKEN_CLIENT_ID: ${TEST_NODE_SSMP_TOKEN_CLIENT_ID}
+      TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
+      TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
+      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
     user: "1000" #node
     working_dir: /usr/app
     ports:
-      - ${SSMP_SERVER_PORT}:${SSMP_SERVER_PORT}
+      - ${SSMP_SERVER_PORT}:3000
     volumes:
       - ./server:/usr/app
     entrypoint: "yarn start-dev"
     networks:
       - ssmp
 
+  test-node-1:
+    image: node:16.3-buster
+    environment:
+      TEST_NODE_TOKEN_ISSUER: ${TEST_NODE_TOKEN_ISSUER}
+      TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
+      TEST_NODE_OAUTH_ACTIVE: ${TEST_NODE_OAUTH_ACTIVE}
+      STAGER_DB: ${STAGER_DB}
+      STAGER_DB_PORT: ${STAGER_DB_PORT}
+      STAGER_DB_HOST: ${STAGER_DB_HOST}
+      STAGER_DB_USER: ${STAGER_DB_USER}
+      STAGER_DB_PASSWORD: ${STAGER_DB_PASSWORD}
+      STAGER_DB_ROOT_PASSWORD: ${STAGER_DB_ROOT_PASSWORD}
+      STAGER_DATA_VOLUME: ${STAGER_DATA_VOLUME}
+
+    user: "1000" #node
+    working_dir: /usr/app
+    ports:
+      - ${TEST_NODE_PORT}:3000
+    volumes:
+      - ./test-node:/usr/app
+    entrypoint: "yarn start-dev"
+    networks:
+      - ssmp
+
+  stager-mysql:
+    image: mysql:8.0
+    restart: on-failure
+    environment:
+      MYSQL_DATABASE: "${STAGER_DB}"
+      MYSQL_USER: "${STAGER_DB_USER}"
+      MYSQL_PASSWORD: "${STAGER_DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${STAGER_DB_ROOT_PASSWORD}"
+    volumes:
+      - ${STAGER_DATA_VOLUME}:/var/lib/mysql
+    networks:
+      - ssmp
+
   keycloak:
     image: quay.io/keycloak/keycloak:14.0.0
     environment:
-      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
+      KEYCLOAK_SERVER_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      KEYCLOAK_REACT_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
       KEYCLOAK_PORT: ${KEYCLOAK_PORT}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
-      KEYCLOAK_USER: ${KEYCLOAK_USER}
-      REACT_PORT: ${REACT_PORT}
+      REACT_URL: ${REACT_URL}
+      AUTH0_BROKER_AUTH_URL: ${TEST_NODE_TOKEN_ISSUER}authorize
+      AUTH0_BROKER_TOKEN_URL: ${TEST_NODE_TOKEN_ISSUER}oauth/token
+      AUTH0_BROKER_CLIENT_ID: ${KEYCLOAK_AUTH0_CLIENT_ID}
+      AUTH0_BROKER_CLIENT_SECRET: ${KEYCLOAK_AUTH0_CLIENT_SECRET}
     ports:
       - ${KEYCLOAK_PORT}:8080
     volumes:
       - ./keycloak/scripts:/usr/scripts
+      - ./keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli
+      - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
     networks:
       - ssmp
 

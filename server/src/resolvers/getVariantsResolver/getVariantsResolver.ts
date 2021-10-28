@@ -1,79 +1,100 @@
 import { PubSub } from 'graphql-subscriptions';
+import logger from '../../logger';
+// import { v4 as uuidv4 } from 'uuid';
 import {
+  AnnotationQueryResponse,
+  CombinedVariantQueryResponse,
   GqlContext,
-  ResolvedVariantQueryResult,
-  VariantQueryDataResult,
-  VariantQueryErrorResult,
-  VariantQueryInput,
+  QueryInput,
+  VariantAnnotation,
   VariantQueryResponse,
 } from '../../types';
-import getEnsemblQuery from './adapters/ensemblQueryAdapter';
 import getLocalQuery from './adapters/localQueryAdapter';
+import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
+import fetchAnnotations from './utils/fetchAnnotations';
+import annotate from './utils/annotate';
 
 const getVariants = async (
   parent: any,
-  args: VariantQueryInput,
-  { pubsub }: GqlContext,
-  info: any
-): Promise<VariantQueryResponse> => {
-  const result = await resolveVariantQuery(args, pubsub);
-  return result;
-};
+  args: QueryInput,
+  { pubsub }: GqlContext
+): Promise<CombinedVariantQueryResponse> => await resolveVariantQuery(args, pubsub);
 
 /**
- *  typeguard
+ *  typeguard: is this a variant query or an annotation query
  */
-const isResolvedVariantQueryResult = (
-  arg: ResolvedVariantQueryResult | VariantQueryErrorResult
-): arg is ResolvedVariantQueryResult => !!(arg as ResolvedVariantQueryResult).data.length;
+const isVariantQuery = (
+  arg: VariantQueryResponse | AnnotationQueryResponse
+): arg is VariantQueryResponse => arg.source !== 'annotations';
 
 const resolveVariantQuery = async (
-  args: VariantQueryInput,
+  args: QueryInput,
   pubsub: PubSub
-): Promise<VariantQueryResponse> => {
+): Promise<CombinedVariantQueryResponse> => {
   const {
-    input: { sources },
+    input: {
+      sources,
+      variant: { assemblyId },
+      gene: { position },
+    },
   } = args;
+
+  const annotationsPromise = fetchAnnotations(position, assemblyId);
 
   const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
 
-  const resolved = await Promise.all(queries);
+  const settled = await Promise.allSettled([annotationsPromise, ...queries]);
 
-  const mapped = resolved.reduce(
+  const annotations = settled.find(
+    res => res.status === 'fulfilled' && !isVariantQuery(res.value)
+  ) as PromiseFulfilledResult<AnnotationQueryResponse>;
+
+  return settled.reduce<CombinedVariantQueryResponse>(
     (a, c) => {
-      if (isResolvedVariantQueryResult(c)) {
-        const { data, source } = c;
-        a.data.push({ data, source });
-      } else {
+      if (c.status === 'fulfilled' && isVariantQuery(c.value) && !c.value.error) {
+        const { data, source } = c.value;
+        if (annotations) {
+          a.data.push({
+            data: annotate(data, annotations.value.data as VariantAnnotation[]),
+            source,
+          });
+        } else {
+          a.data.push({ data, source });
+        }
+      } else if (c.status === 'fulfilled' && !!c.value.error) {
+        const message =
+          process.env.NODE_ENV === 'production' && c.value.error.code === 500
+            ? 'Something went wrong!'
+            : c.value.error.message;
+
         a.errors.push({
-          source: (c as VariantQueryErrorResult).source,
-          error: (c as VariantQueryErrorResult).error,
+          source: c.value.source,
+          error: { ...c.value.error!, message },
         });
+      } else if (c.status === 'rejected') {
+        logger.error('UNHANDLED REJECTION!');
+        logger.error(c.reason);
+        throw new Error(c.reason);
       }
       return a;
     },
     {
-      errors: [] as VariantQueryErrorResult[],
-      data: [] as VariantQueryDataResult[],
+      errors: [],
+      data: [],
     }
   );
-
-  return {
-    ...mapped,
-    meta: 'some test meta',
-  };
 };
 
 const buildSourceQuery = (
   source: string,
-  args: VariantQueryInput,
+  args: QueryInput,
   pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
+): Promise<VariantQueryResponse> => {
   switch (source) {
     case 'local':
       return getLocalQuery(args, pubsub);
-    case 'ensembl':
-      return getEnsemblQuery(args, pubsub);
+    case 'remote-test':
+      return getRemoteTestNodeQuery(args, pubsub);
     default:
       throw new Error(`source ${source} not found!`);
   }

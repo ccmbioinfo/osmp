@@ -14,8 +14,9 @@ interface TypographyProps extends TypographyOverrides {
 }
 
 const Component = styled.p<TypographyProps>`
-    margin: ${props => props.theme.space[2]};
-    color: ${props => (props.error ? props.theme.colors.error : props.theme.colors.text)};
+    margin-inline-start: ${props => props.theme.space[2]};
+    margin-inline-end: ${props => props.theme.space[2]};
+    color: ${props => (props.error ? props.theme.colors.error : 'inherit')};
     font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
     font-size: ${props => {
         switch (props.variant) {
@@ -33,7 +34,9 @@ const Component = styled.p<TypographyProps>`
         switch (props.variant) {
             case 'subtitle' || 'p':
                 return props.theme.fontFamily.body;
-            case 'h4' || 'h3':
+            case 'h4':
+                return props.theme.fontFamily.heading;
+            case 'h3':
                 return props.theme.fontFamily.heading;
         }
     }};

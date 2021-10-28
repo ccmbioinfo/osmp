@@ -1,44 +1,109 @@
-import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
+import {
+    ApolloClient,
+    createHttpLink,
+    from,
+    InMemoryCache,
+    Observable,
+    useLazyQuery,
+} from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import { QueryHookOptions, useQuery } from '@apollo/react-hooks';
+import { ApolloLink, QueryHookOptions, useQuery } from '@apollo/react-hooks';
 import { RestLink } from 'apollo-link-rest';
+import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
+import { makeGraphQLError, makeNetworkError, makeNodeError } from '../components';
+import { useErrorContext } from '../hooks';
+import { VariantQueryResponseError } from '../types';
 
-const port = process.env.REACT_APP_API_PORT,
-    host = process.env.REACT_APP_API_HOST;
+const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_URL;
 
-const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
-    if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, locations, path }) =>
-            console.error(
-                `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-            )
-        );
-    }
+export const buildLink = (token?: string) => {
+    const timeoutLink = new ApolloLinkTimeout(30000); // 30 second timeout
+    const mygeneRestLink = new RestLink({
+        uri: 'https://mygene.info/v3/',
+    });
+    const httpLink = createHttpLink({
+        uri: GRAPHQL_URL,
+        headers: { accept: 'application/json' },
+    });
 
-    if (networkError) {
-        console.error(`[Network error]: ${networkError}`);
-    }
+    const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
+        return new Observable(observer => {
+            const dispatcherContext = operation.getContext();
+            const sub = forward(operation).subscribe({
+                next: response => {
+                    if (!!response?.data?.getVariants.errors.length) {
+                        response?.data?.getVariants.errors.forEach(
+                            (e: VariantQueryResponseError) => {
+                                dispatcherContext.dispatch(makeNodeError(e));
+                            }
+                        );
+                    }
+                    observer.next(response);
+                },
+            });
 
-    return forward(operation);
-});
+            return () => {
+                if (sub) sub.unsubscribe();
+            };
+        });
+    });
 
-const httpLink = createHttpLink({
-    uri: `http://${host}:${port}/graphql`,
-    headers: { Authorization: 'placeholder', accept: 'application/json' },
-});
+    const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
+        const { dispatch } = operation.getContext();
+        const sources = operation.variables.input.sources;
 
-const restLink = new RestLink({ uri: 'https://www.ebi.ac.uk/ebisearch/ws/rest/' });
+        if (graphQLErrors) {
+            graphQLErrors.forEach(graphQLError => {
+                const { message, locations, path } = graphQLError;
+                console.error(
+                    `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+                );
+                graphQLError.message = `${message} (Source: ${sources.join(', ')})`;
+                dispatch(makeGraphQLError(graphQLError));
+            });
+        }
+
+        if (networkError) {
+            console.error(`[Network error]: ${networkError}`);
+            networkError.message = `${networkError.message} (Source: ${sources.join(', ')})`;
+            dispatch(makeNetworkError(networkError));
+        }
+
+        return forward(operation);
+    });
+
+    const authLink = new ApolloLink((operation, forward) => {
+        operation.setContext(({ headers = {} }) => ({
+            headers: {
+                ...headers,
+                authorization: `Bearer ${token}`,
+            },
+        }));
+
+        return forward(operation);
+    });
+
+    return from([mygeneRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, httpLink]);
+};
 
 export const client = new ApolloClient<any>({
-    link: from([restLink, errorLink, httpLink]),
+    link: buildLink(),
     cache: new InMemoryCache(),
+    defaultOptions: {
+        watchQuery: {
+            nextFetchPolicy: 'cache-only',
+        },
+    },
 });
 
 export const useApolloQuery = <T, V>(query: DocumentNode, options: QueryHookOptions<T, V> = {}) => {
+    const { dispatch } = useErrorContext();
     return useQuery<T, V>(query, {
         client,
+        context: { dispatch },
         fetchPolicy: 'cache-first',
+        errorPolicy: 'all',
         ...options,
     });
 };
@@ -47,9 +112,13 @@ export const useLazyApolloQuery = <T, V>(
     query: DocumentNode,
     options: QueryHookOptions<T, V> = {}
 ) => {
+    const { dispatch } = useErrorContext();
+
     return useLazyQuery<T, V>(query, {
         client,
+        context: { dispatch },
         fetchPolicy: 'cache-first',
+        errorPolicy: 'all',
         ...options,
     });
 };

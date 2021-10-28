@@ -15,6 +15,7 @@ const buildDevLogger = () => {
       logFormat
     ),
     transports: [new transports.Console()],
+    level: 'debug',
     /* One can customize the error files outputted by using the configuration below
     transports: [
         transports.File({

@@ -2,24 +2,31 @@ import { Reducer, useReducer } from 'react';
 
 export type FormState<S> = { [K in keyof S]: { value: S[K]; error: string } };
 
+interface RuleFunc<S> {
+    (state: FormState<S>, value: any): boolean;
+}
+
+interface RequiredFunc<S> {
+    (state: FormState<S>): boolean;
+}
 interface Rule<S> {
-    valid: (state: FormState<S>, value: any) => boolean;
+    valid: RuleFunc<S>;
     error: string;
 }
 
 export type Validator<S> = {
     [K in keyof S]?: {
-        required?: boolean;
+        required?: boolean | RequiredFunc<S>;
         rules?: Rule<S>[];
     };
 };
 
-const makeFreshState = <S,>(state: S): FormState<S> =>
+const makeFreshState = <S>(state: S): FormState<S> =>
     Object.entries(state)
-        .map(([k, v]: [any, any]) => ({ [k]: { value: v, error: '' } }))
+        .map(([k, v]: [string, keyof S]) => ({ [k]: { value: v, error: '' } }))
         .reduce((a, c) => ({ ...a, ...c }), {} as FormState<S>);
 
-const useFormReducer = <S,>(initialState: S, Validator?: Validator<S>) => {
+const useFormReducer = <S>(initialState: S, Validator?: Validator<S>) => {
     const stateWithErrorFields = makeFreshState(initialState);
 
     const [state, dispatch] = useReducer<Reducer<FormState<S>, any>>(
@@ -36,7 +43,7 @@ const useFormReducer = <S,>(initialState: S, Validator?: Validator<S>) => {
 };
 
 const makeReducer =
-    <S,>(validator?: Validator<S>) =>
+    <S>(validator?: Validator<S>) =>
     <R extends FormState<S>, A extends { type: string; payload: unknown }>(state: R, action: A) => {
         switch (action.type) {
             case 'update':
@@ -50,17 +57,40 @@ const makeReducer =
         }
     };
 
-const validateField = <S,>(
+const getFieldRequired = <S extends {}>(
+    state: FormState<S>,
+    fieldName: keyof S,
+    validator: Validator<S>
+) => {
+    const required = validator[fieldName]?.required!;
+    let isRequired = false;
+    if (typeof required === 'function' && required(state)) {
+        isRequired = true;
+    }
+    if (typeof required === 'boolean' && required) {
+        isRequired = true;
+    }
+    return isRequired;
+};
+
+const validateField = <S>(
     state: FormState<S>,
     validator: Validator<S> | undefined,
     field: keyof S,
     value: S[keyof S] | undefined
 ) => {
-    if (!validator || !validator[field]) return '';
-    if (!value && validator[field]?.required) return `${field} is required!`;
+    if (!validator || !validator[field]) {
+        return '';
+    }
+    if (!!validator[field]?.required) {
+        const required = getFieldRequired(state, field, validator);
+        if (required && !value) {
+            return `${field} is required!`;
+        }
+    }
     let error = '';
     validator[field]?.rules?.forEach(rule => {
-        if (!rule.valid(state, value)) {
+        if (!rule.valid(state, value) && getFieldRequired(state, field, validator)) {
             error = rule.error;
             return;
         }
@@ -68,18 +98,18 @@ const validateField = <S,>(
     return error;
 };
 
-export const setErrors = <S,>(form: FormState<S>, validator: Validator<S>) => {
+export const setErrors = <S>(form: FormState<S>, validator: Validator<S>) => {
     for (let field in form) {
         form[field]['error'] = validateField(form, validator, field, form[field].value);
     }
     return form;
 };
 
-export const formIsValid = <S,>(form: FormState<S>, validator: Validator<S>) => {
+export const formIsValid = <S>(form: FormState<S>, validator: Validator<S>) => {
     let error;
     for (let field in form) {
         error = validateField(form, validator, field, form[field].value);
-        if (error) return;
+        if (error) break;
     }
     return !!error ? false : true;
 };

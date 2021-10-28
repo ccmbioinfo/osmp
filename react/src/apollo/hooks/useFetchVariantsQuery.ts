@@ -1,43 +1,94 @@
 import { gql } from '@apollo/react-hooks';
-import { VariantQueryInput, VariantQueryResponse } from '../../types';
+import { CombinedVariantQueryResponse, QueryInput } from '../../types';
 import { useLazyApolloQuery } from '../client';
 
 const fetchVariantsQuery = gql`
-    query GetVariants($input: VariantQueryInput) {
+    query GetVariants($input: QueryInput) {
         getVariants(input: $input) {
             data {
                 data {
-                    af
-                    alt
-                    chromosome
-                    datasetId
-                    dp
-                    end
-                    ethnicity
-                    phenotypes
-                    ref
-                    rsId
-                    sex
-                    someFakeScore
-                    start
-                    zygosity
+                    variant {
+                        alt
+                        callsets {
+                            callSetId
+                            individualId
+                            info {
+                                ad
+                                dp
+                                gq
+                                qual
+                                zygosity
+                            }
+                        }
+                        end
+                        info {
+                            aaAlt
+                            aaPos
+                            aaRef
+                            cdna
+                            consequence
+                            geneName
+                            gnomadHet
+                            gnomadHom
+                            transcript
+                        }
+                        ref
+                        referenceName
+                        start
+                    }
+                    individual {
+                        datasetId
+                        diseases {
+                            ageOfOnset {
+                                age
+                                ageGroup
+                            }
+                            description
+                            diseaseId
+                            levelSeverity
+                            outcome
+                            stage
+                        }
+                        ethnicity
+                        geographicOrigin
+                        individualId
+                        info {
+                            diagnosis
+                            candidateGene
+                            classifications
+                        }
+                        phenotypicFeatures {
+                            ageOfOnset {
+                                age
+                                ageGroup
+                            }
+                            dateOfOnset
+                            levelSeverity
+                            onsetType
+                            phenotypeId
+                        }
+                        sex
+                    }
+                    contactInfo
                 }
                 source
             }
             errors {
                 error {
+                    id
                     code
                     message
                 }
+                source
             }
-            meta
         }
     }
 `;
 
-const useFetchVariantsQuery = () =>
-    useLazyApolloQuery<{ getVariants: VariantQueryResponse }, VariantQueryInput>(
+const useFetchVariantsQuery = () => {
+    return useLazyApolloQuery<{ getVariants: CombinedVariantQueryResponse }, QueryInput>(
         fetchVariantsQuery
     );
+};
 
 export default useFetchVariantsQuery;

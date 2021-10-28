@@ -1,11 +1,13 @@
 import { PubSub } from 'graphql-subscriptions';
 import { QUERY_RESOLVED } from '../..';
+import { v4 as uuidv4 } from 'uuid';
 import {
   ErrorTransformer,
-  ResolvedVariantQueryResult,
+  QueryInput,
   ResultTransformer,
-  VariantQueryInput,
+  VariantQueryResponse,
 } from '../../../types';
+import resolveAssembly from '../utils/resolveAssembly';
 
 interface LocalQueryResponse {
   reference: string;
@@ -14,36 +16,32 @@ interface LocalQueryResponse {
   extraneous: string;
 }
 
-interface LocalQueryError {
-  errors: string[];
-  code: number;
-  meta?: string;
-}
-
 /**
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
  * Return some dummy data for testing and design purposes
  */
-const getLocalQuery = async (
-  args: VariantQueryInput,
-  pubsub: PubSub
-): Promise<ResolvedVariantQueryResult> => {
+const getLocalQuery = async (args: QueryInput, pubsub: PubSub): Promise<VariantQueryResponse> => {
   let localQueryResponse: LocalQueryResponse[] | null = null;
-  let localQueryError: LocalQueryError | null = null;
+  let localQueryError: Error | null = null;
   try {
-    localQueryResponse = await new Promise<LocalQueryResponse[]>((resolve, reject) => {
-      return resolve([
-        {
-          alternative: 'A',
-          reference: 'T',
-          chromosome: args.input.chromosome || '1',
-          extraneous: 'extr',
-        },
-      ]);
+    localQueryResponse = await new Promise<LocalQueryResponse[]>(resolve => {
+      resolve(
+        Array(1)
+          .fill(null)
+          .map(() => {
+            return {
+              alternative: 'T',
+              reference: 'C',
+              chromosome: '1',
+              extraneous: 'extr',
+            };
+          })
+      );
+      // reject(new Error('test!'));
     });
   } catch (e) {
-    localQueryError = e;
+    localQueryError = e as Error;
   }
 
   // todo: wrap and make type safe
@@ -60,30 +58,30 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
   if (!response) {
     return [];
   } else {
-    return response.map(r => ({
-      af: undefined,
-      alt: r.alternative,
-      chromosome: r.chromosome,
-      datasetId: undefined,
-      dp: undefined,
-      end: undefined,
-      ethnicity: undefined,
-      phenotypes: undefined,
-      ref: r.reference,
-      start: undefined,
-      sex: undefined,
-      someFakeScore: undefined,
-      rsId: undefined,
-      zygosity: undefined,
+    return response.map((r, i) => ({
+      individual: {
+        individualId: 'testId1',
+      },
+      variant: {
+        alt: r.alternative,
+        assemblyId: resolveAssembly('GRCh37'),
+        callsets: [],
+        end: 50162978 + i,
+        info: {},
+        ref: r.reference,
+        referenceName: '1', // this should be referenceName
+        start: 50162978 + i,
+      },
+      contactInfo: 'DrExample@gmail.com',
     }));
   }
 };
 
-export const transformLocalErrorResponse: ErrorTransformer<LocalQueryError> = error => {
+export const transformLocalErrorResponse: ErrorTransformer<Error> = error => {
   if (!error) {
-    return null;
+    return undefined;
   } else {
-    return { code: error.code, message: error.errors.join('\n') };
+    return { code: 424, message: error.message || '', id: uuidv4() };
   }
 };
 
