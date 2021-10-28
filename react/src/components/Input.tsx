@@ -42,7 +42,7 @@ const Container = styled.div<InputProps>`
     min-height: 46px;
 `;
 
-const TextInput = styled.input`
+const TextInput = styled.input<InputProps>`
     border: none;
     &:focus {
         outline: none;
