@@ -3,9 +3,11 @@ import { FaClipboard, FaClipboardCheck } from 'react-icons/fa';
 import { IoIosClose } from 'react-icons/io';
 import styled from 'styled-components';
 import { Background, Column, Flex, IconButton, Popover, Snackbar, Typography } from '../index';
+import { FlattenedQueryResponse } from './Table';
 
-interface ContactPopoverProps {
-    state: any;
+interface CellPopoverProps<T> {
+    state: T;
+    id: keyof T;
 }
 
 const Container = styled(props => <Background {...props} />)`
@@ -13,7 +15,9 @@ const Container = styled(props => <Background {...props} />)`
     width: 300px;
 `;
 
-export const ContactPopover: React.FC<ContactPopoverProps> = ({ state }) => {
+export const CellPopover: React.FC<CellPopoverProps<FlattenedQueryResponse>> = ({ state, id }) => {
+    console.log(state);
+
     const [copied, setCopied] = useState(false); // Whether text is copied
     const [openContact, setOpenContact] = useState(false);
     const [snackbarActive, setSnackbarActive] = useState(false);
@@ -26,7 +30,7 @@ export const ContactPopover: React.FC<ContactPopoverProps> = ({ state }) => {
 
     return (
         <Popover
-            content="Contact"
+            content={state[id]?.toString() || ''}
             isOpen={openContact}
             onClick={() => setOpenContact(true)}
             onOutsideClick={handleClosePopover}
@@ -35,25 +39,27 @@ export const ContactPopover: React.FC<ContactPopoverProps> = ({ state }) => {
                 <Snackbar
                     isActive={snackbarActive}
                     variant="success"
-                    message={`${state.contactInfo} copied to clipboard successfully.`}
+                    message={`${state[id]} copied to clipboard successfully.`}
                     handleCloseSnackbar={handleClosePopover}
                 />
                 <Container variant="light">
                     <Flex alignItems="center" justifyContent="space-between">
-                        <Typography variant="p">{state.contactInfo}</Typography>
-                        <IconButton
-                            variant="light"
-                            onClick={() => {
-                                navigator.clipboard.writeText(state.contactInfo);
-                                setCopied(true);
-                                setSnackbarActive(true);
-                            }}
-                        >
-                            {copied ? <FaClipboardCheck /> : <FaClipboard />}
-                        </IconButton>
-                        <IconButton variant="light" onClick={handleClosePopover}>
-                            <IoIosClose />
-                        </IconButton>
+                        <Typography variant="p">{state[id]}</Typography>
+                        <Flex>
+                            <IconButton
+                                variant="light"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(state[id] as string);
+                                    setCopied(true);
+                                    setSnackbarActive(true);
+                                }}
+                            >
+                                {copied ? <FaClipboardCheck /> : <FaClipboard />}
+                            </IconButton>
+                            <IconButton variant="light" onClick={handleClosePopover}>
+                                <IoIosClose />
+                            </IconButton>
+                        </Flex>
                     </Flex>
                 </Container>
             </Column>

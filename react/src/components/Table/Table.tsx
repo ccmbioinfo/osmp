@@ -32,10 +32,11 @@ import {
     VariantResponseInfoFields,
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
+import { CellPopover } from './CellPopover';
 import { ColumnFilter } from './ColumnFilter';
-import { ContactPopover } from './ContactPopover';
 import { GlobalFilter } from './GlobalFilters';
 import {
+    CellText,
     Footer,
     IconPadder,
     SkipToBeginning,
@@ -50,7 +51,7 @@ interface TableProps {
     variantData: VariantQueryResponse[];
 }
 
-type FlattenedQueryResponse = Omit<
+export type FlattenedQueryResponse = Omit<
     IndividualResponseFields,
     'info' | 'diseases' | 'phenotypicFeatures'
 > &
@@ -177,13 +178,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
-                        accessor: state => <ContactPopover state={state} />,
+                        accessor: state => <CellPopover state={state} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
                         width: getColumnWidth(tableData, 'alt', 'Alt'),
                     },
                     {
-                        accessor: state => <ContactPopover state={state} />,
+                        accessor: state => <CellPopover state={state} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
@@ -329,7 +330,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: state => <ContactPopover state={state} />,
+                        accessor: state => <CellPopover state={state} id="contactInfo" />,
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
@@ -649,9 +650,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                     cell.getCellProps();
                                                 return (
                                                     <td key={key} {...restCellProps}>
-                                                        <Typography variant="subtitle">
-                                                            {cell.render('Cell')}
-                                                        </Typography>
+                                                        <CellText>
+                                                            <Typography variant="subtitle">
+                                                                {cell.render('Cell')}
+                                                            </Typography>
+                                                        </CellText>
                                                     </td>
                                                 );
                                             })}

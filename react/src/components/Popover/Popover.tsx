@@ -2,7 +2,7 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLayer } from 'react-laag';
 import styled from 'styled-components';
-import { Button } from '../index';
+import { CellText } from '../index';
 
 interface Props {
     content: string;
@@ -34,9 +34,9 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
 
     return (
         <>
-            <Button variant="primary" {...triggerProps} onClick={onClick}>
+            <CellText {...triggerProps} onClick={onClick}>
                 {content}
-            </Button>
+            </CellText>
             {renderLayer(
                 <AnimatePresence>
                     <Wrapper>

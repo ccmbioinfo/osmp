@@ -2,6 +2,14 @@ import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
 import styled from 'styled-components';
 import { Flex } from '../index';
 
+export const CellText = styled.span`
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    text-overflow: ellipsis;
+    cursor: pointer;
+`;
+
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin: 0;
