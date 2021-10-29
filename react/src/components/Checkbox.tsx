@@ -9,7 +9,7 @@ interface CheckboxStyledProps {
 interface CheckboxProps extends CheckboxStyledProps {
     checked: boolean;
     label?: string;
-    onClick: () => void;
+    onClick?: () => void;
 }
 
 const Component = styled.span<CheckboxStyledProps>`
@@ -25,8 +25,9 @@ const CheckboxIcon = styled.span`
 `;
 
 const Checkbox: React.FC<CheckboxProps> = ({ checked, disabled, label, onClick }) => {
+    console.log(disabled);
     return (
-        <Component disabled={disabled} onClick={() => !disabled && onClick()}>
+        <Component disabled={disabled} onClick={onClick}>
             <CheckboxIcon>{checked ? <ImCheckboxChecked /> : <ImCheckboxUnchecked />}</CheckboxIcon>
             <Typography variant="p">{label}</Typography>
         </Component>

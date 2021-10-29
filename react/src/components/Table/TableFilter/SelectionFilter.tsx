@@ -32,6 +32,8 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
 
     const selections = options || dynamicOptions;
 
+    console.log(filter);
+
     const handleSelectionFilter = (val: string) => {
         if (isMulti) {
             if (filter) {
