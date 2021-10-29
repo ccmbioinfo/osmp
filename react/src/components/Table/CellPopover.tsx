@@ -16,8 +16,6 @@ const Container = styled(props => <Background {...props} />)`
 `;
 
 export const CellPopover: React.FC<CellPopoverProps<FlattenedQueryResponse>> = ({ state, id }) => {
-    console.log(state);
-
     const [copied, setCopied] = useState(false); // Whether text is copied
     const [openContact, setOpenContact] = useState(false);
     const [snackbarActive, setSnackbarActive] = useState(false);
