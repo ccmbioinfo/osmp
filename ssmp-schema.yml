@@ -4,7 +4,7 @@ info:
   version: "0.5"
 
 paths:
-  /variants:
+  /variants/match:
     post:
       description: |
         Get variants and related patient information that match a query.
@@ -177,7 +177,7 @@ components:
           example: GRCh38
         maxFrequency:
           description: |
-            Maximum Frequency of this allele
+            Maximum Frequency of this allele (must not be larger than 0.05)
           type: number
     VariantResponseResults:
       description: |
