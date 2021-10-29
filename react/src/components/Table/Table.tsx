@@ -218,7 +218,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableSortBy: true,
                         width: 79,
                     },
-                    { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105,  },
+                    { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
                     { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
                     { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
