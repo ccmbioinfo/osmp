@@ -25,7 +25,6 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     preFilteredRows,
 }) => {
     const filter = filters.find(f => f.id === columnId);
-    console.log(filter);
 
     const placeholder = 'Search';
 

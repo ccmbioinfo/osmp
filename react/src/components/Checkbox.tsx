@@ -25,7 +25,6 @@ const CheckboxIcon = styled.span`
 `;
 
 const Checkbox: React.FC<CheckboxProps> = ({ checked, disabled, label, onClick }) => {
-    console.log(disabled);
     return (
         <Component disabled={disabled} onClick={onClick}>
             <CheckboxIcon>{checked ? <ImCheckboxChecked /> : <ImCheckboxUnchecked />}</CheckboxIcon>

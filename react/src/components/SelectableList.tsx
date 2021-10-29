@@ -65,7 +65,6 @@ interface ListProps<T> {
 }
 
 function SelectableList<T>({ onSelect, options, isMulti, selection }: ListProps<T>) {
-    console.log('ismulti', isMulti);
     return (
         <StyledList>
             {options.map(item => {
@@ -78,7 +77,6 @@ function SelectableList<T>({ onSelect, options, isMulti, selection }: ListProps<
                         </StyledListItem>
                     );
                 } else {
-                    console.log('thisis filter', selection, item.value);
                     return (
                         <StyledListItem key={item.id}>
                             <button type="button" onClick={() => onSelect(item.value)}>

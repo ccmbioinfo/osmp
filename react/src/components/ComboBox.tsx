@@ -9,7 +9,7 @@ import SelectableList, { SelectableListItem } from './SelectableList';
 import Spinner from './Spinner';
 
 interface ComboBoxProps<T> {
-    options: SelectableListItem<T>[];
+    options: SelectableListItem<T | T[]>[];
     loading?: boolean;
     onSelect: (item: T) => void;
     onChange?: (searchTerm: string) => void;

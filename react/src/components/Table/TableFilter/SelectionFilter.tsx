@@ -32,8 +32,6 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
 
     const selections = options || dynamicOptions;
 
-    console.log(filter);
-
     const handleSelectionFilter = (val: string) => {
         if (isMulti) {
             if (filter) {
@@ -50,14 +48,11 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
 
     return (
         <ComboBox
-            options={selections
-                .sort()
-                .map((n, id) => ({
-                    id,
-                    value: n,
-                    label: n,
-                }))
-                .concat({ id: selections.length, label: 'All', value: '' })}
+            options={selections.sort().map((n, id) => ({
+                id,
+                value: n,
+                label: n,
+            }))}
             onSelect={handleSelectionFilter}
             placeholder="Select"
             value={filter ? filter.value.toString() : ''}
