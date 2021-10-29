@@ -12,18 +12,24 @@ interface Props {
     children?: React.ReactNode;
 }
 
+const Wrapper = styled.div`
+    position: relative;
+`
+
 const Container = styled(motion.div)`
     display: flex;
     align-items: flex-end;
     flex-direction: column;
-    position: fixed;
-    right: 10px;
+    position: absolute;
 `;
+
+//Todo: need to make a wrapper around Container so it can attach to the right position
 
 const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsideClick }) => {
     const { renderLayer, triggerProps, layerProps } = useLayer({
         isOpen,
         onOutsideClick: onOutsideClick,
+        auto: true,
     });
 
     return (
@@ -33,6 +39,7 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
             </Button>
             {renderLayer(
                 <AnimatePresence>
+                    <Wrapper>
                     {isOpen && (
                         <Container
                             {...layerProps}
@@ -48,6 +55,7 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
                             {children}
                         </Container>
                     )}
+                    </Wrapper>
                 </AnimatePresence>
             )}
         </>
