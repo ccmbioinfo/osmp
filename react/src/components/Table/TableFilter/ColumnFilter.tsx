@@ -6,13 +6,13 @@ import { FlattenedQueryResponse } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
 
-export type DefaultFilter = {
+export type DefaultFilter<T> = {
     id: string;
-    value: string | number | Array<number>;
+    value: T;
 };
 
 interface ColumnFilterProps {
-    filters: DefaultFilter[];
+    filters: DefaultFilter<string | string[] | number | number[]>[];
     preFilteredRows: Row<FlattenedQueryResponse>[];
     setFilter: (columnId: string, filterValue: any) => void;
     columnId: string;
@@ -25,6 +25,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     preFilteredRows,
 }) => {
     const filter = filters.find(f => f.id === columnId);
+    console.log(filter);
 
     const placeholder = 'Search';
 
@@ -35,7 +36,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                     setFilter={setFilter}
                     columnId={columnId}
                     options={SOURCES}
-                    filter={filter}
+                    filter={filter as DefaultFilter<string>}
                     preFilteredRows={preFilteredRows}
                 />
             );
@@ -44,15 +45,16 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 <SelectionFilter
                     setFilter={setFilter}
                     columnId={columnId}
-                    filter={filter}
+                    filter={filter as DefaultFilter<string[]>}
                     preFilteredRows={preFilteredRows}
+                    isMulti
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {
             return (
                 <NumberRangeFilter
                     setFilter={setFilter}
-                    filters={filters}
+                    filters={filters as DefaultFilter<number[]>[]}
                     columnId={columnId}
                     preFilteredRows={preFilteredRows}
                 />

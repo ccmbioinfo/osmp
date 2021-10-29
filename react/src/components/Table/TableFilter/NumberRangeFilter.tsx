@@ -11,7 +11,7 @@ import {
 
 interface NumberRangeFilterProps {
     setFilter: (columnId: string, filterValue: any) => void;
-    filters: DefaultFilter[];
+    filters: DefaultFilter<number[]>[];
     columnId: keyof FilterComparison;
     preFilteredRows: Row<FlattenedQueryResponse>[];
 }

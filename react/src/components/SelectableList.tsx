@@ -1,4 +1,5 @@
 import styled from 'styled-components/macro';
+import { Checkbox, Flex } from './index';
 
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
@@ -56,20 +57,42 @@ export interface SelectableListItem<T> {
 }
 
 interface ListProps<T> {
+    isMulti?: boolean;
     onSelect: (val: T) => void;
+    selection?: T[];
     options: SelectableListItem<T>[];
 }
 
-function SelectableList<T>({ onSelect, options }: ListProps<T>) {
+function SelectableList<T>({ onSelect, options, isMulti, selection }: ListProps<T>) {
+    console.log('ismulti', isMulti);
     return (
         <StyledList>
-            {options.map(item => (
-                <StyledListItem key={item.id}>
-                    <button type="button" onClick={() => onSelect(item.value)}>
-                        <span>{item.label}</span>
-                    </button>
-                </StyledListItem>
-            ))}
+            {options.map(item => {
+                if (!isMulti) {
+                    return (
+                        <StyledListItem key={item.id}>
+                            <button type="button" onClick={() => onSelect(item.value)}>
+                                <span>{item.label}</span>
+                            </button>
+                        </StyledListItem>
+                    );
+                } else {
+                    console.log('thisis filter', selection, item.value);
+                    return (
+                        <Flex>
+                            <Checkbox
+                                onClick={() => onSelect(item.value)}
+                                checked={(selection || []).includes(item.value)}
+                            />
+                            <StyledListItem key={item.id}>
+                                <button type="button" onClick={() => onSelect(item.value)}>
+                                    <span>{item.label}</span>
+                                </button>
+                            </StyledListItem>
+                        </Flex>
+                    );
+                }
+            })}
         </StyledList>
     );
 }

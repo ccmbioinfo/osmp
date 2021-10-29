@@ -231,6 +231,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'consequence',
                         Header: 'consequence',
                         width: 105,
+                        filter: 'includesSome',
                     },
                     { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
                     { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomadHom', width: 105 },
@@ -295,12 +296,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'sex',
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
+                        filter: 'includesSome',
                     },
                     {
                         accessor: 'zygosity',
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
+                        filter: 'includesSome',
                     },
                     {
                         accessor: 'geographicOrigin',

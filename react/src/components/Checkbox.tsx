@@ -8,7 +8,7 @@ interface CheckboxStyledProps {
 }
 interface CheckboxProps extends CheckboxStyledProps {
     checked: boolean;
-    label: string;
+    label?: string;
     onClick: () => void;
 }
 

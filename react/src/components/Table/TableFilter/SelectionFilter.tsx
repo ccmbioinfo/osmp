@@ -8,7 +8,8 @@ interface SelectionFilterProps {
     setFilter: (columnId: string, filterValue: any) => void;
     columnId: string;
     options?: string[];
-    filter?: DefaultFilter;
+    filter?: DefaultFilter<string | string[]>;
+    isMulti?: boolean;
     preFilteredRows: Row<FlattenedQueryResponse>[];
 }
 
@@ -17,6 +18,7 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
     columnId,
     options,
     filter,
+    isMulti,
     preFilteredRows,
 }) => {
     // If no explicit list of options is provided, we dynamically calculate the options from the table query results.
@@ -30,6 +32,20 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
 
     const selections = options || dynamicOptions;
 
+    const handleSelectionFilter = (val: string) => {
+        if (isMulti) {
+            if (filter) {
+                setFilter(columnId, (filter: string[]) => {
+                    return filter.includes(val) ? filter.filter(v => v !== val) : [...filter, val];
+                });
+            } else {
+                setFilter(columnId, [val]);
+            }
+        } else {
+            setFilter(columnId, val);
+        }
+    };
+
     return (
         <ComboBox
             options={selections
@@ -40,9 +56,11 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
                     label: n,
                 }))
                 .concat({ id: selections.length, label: 'All', value: '' })}
-            onSelect={val => setFilter(columnId, val)}
+            onSelect={handleSelectionFilter}
             placeholder="Select"
             value={filter ? filter.value.toString() : ''}
+            selection={(filter?.value as string[]) || []}
+            isMulti={isMulti}
         />
     );
 };

@@ -15,6 +15,8 @@ interface ComboBoxProps<T> {
     onChange?: (searchTerm: string) => void;
     placeholder: string;
     searchable?: boolean;
+    isMulti?: boolean;
+    selection?: T[];
     value: string;
 }
 
@@ -46,6 +48,7 @@ export const Header = styled(Flex)`
     color: ${props => props.theme.colors.muted};
     justify-content: space-between;
     width: inherit;
+    padding: 0 ${props => props.theme.space[3]};
 `;
 
 export default function ComboBox<T extends {}>({
@@ -56,6 +59,8 @@ export default function ComboBox<T extends {}>({
     placeholder,
     searchable,
     value,
+    isMulti,
+    selection,
 }: ComboBoxProps<T>) {
     const [open, setOpen] = useState<Boolean>(false);
 
@@ -93,6 +98,8 @@ export default function ComboBox<T extends {}>({
             </Header>
             {open && (
                 <SelectableList
+                    isMulti={isMulti}
+                    selection={selection}
                     options={options}
                     onSelect={item => {
                         onSelect(item as T);
