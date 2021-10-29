@@ -7,7 +7,6 @@ export const CellText = styled.span`
     white-space: nowrap;
     display: block;
     text-overflow: ellipsis;
-    cursor: pointer;
 `;
 
 export const TableFilters = styled(props => <Flex {...props} />)`

@@ -23,6 +23,13 @@ const Container = styled(motion.div)`
     position: absolute;
 `;
 
+const ClickableText = styled(props => <CellText {...props} />)`
+    cursor: pointer;
+    &:hover {
+        text-decoration: underline dotted;
+    }
+`
+
 //Todo: need to make a wrapper around Container so it can attach to the right position
 
 const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsideClick }) => {
@@ -34,9 +41,9 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
 
     return (
         <>
-            <CellText {...triggerProps} onClick={onClick}>
+            <ClickableText {...triggerProps} onClick={onClick}>
                 {content}
-            </CellText>
+            </ClickableText>
             {renderLayer(
                 <AnimatePresence>
                     <Wrapper>
