@@ -31,6 +31,7 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
+import { formatNullValues } from '../../utils';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { ContactPopover } from './ContactPopover';
 import {
@@ -116,7 +117,7 @@ const prepareData = (queryResult: VariantQueryResponse[]) => {
             }
         });
     });
-    return results;
+    return results.map(result => formatNullValues(result));
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
@@ -297,6 +298,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
                         filter: 'includesSome',
+                        Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
                     {
                         accessor: 'zygosity',
