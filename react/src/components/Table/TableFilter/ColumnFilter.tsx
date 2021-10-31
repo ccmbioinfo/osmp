@@ -37,7 +37,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 <SelectionFilter
                     setFilter={setFilter}
                     columnId={columnId}
-                    options={singleSelect.includes(columnId) ? SOURCES : undefined}
+                    options={singleSelect.includes(columnId) ? SOURCES : []}
                     filter={
                         singleSelect.includes(columnId)
                             ? (filter as DefaultFilter<string>)
