@@ -25,6 +25,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState<string>('');
 
+    // If we have more columns we want to add number comparison too, they would be added to this list.
     const [filterComparison, setFilterComparison] = useState<FilterComparison>({
         start: {
             less: false,

@@ -28,25 +28,23 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
 
     const placeholder = 'Search';
 
+    const singleSelect = ['source'];
+    const multiSelect = ['sex', 'zygosity', 'consequence'];
+
     const resolveComponent = () => {
-        if (columnId === 'source') {
+        if (singleSelect.concat(multiSelect).includes(columnId)) {
             return (
                 <SelectionFilter
                     setFilter={setFilter}
                     columnId={columnId}
                     options={SOURCES}
-                    filter={filter as DefaultFilter<string>}
+                    filter={
+                        singleSelect.includes(columnId)
+                            ? (filter as DefaultFilter<string>)
+                            : (filter as DefaultFilter<string[]>)
+                    }
                     preFilteredRows={preFilteredRows}
-                />
-            );
-        } else if (['sex', 'zygosity', 'consequence'].includes(columnId)) {
-            return (
-                <SelectionFilter
-                    setFilter={setFilter}
-                    columnId={columnId}
-                    filter={filter as DefaultFilter<string[]>}
-                    preFilteredRows={preFilteredRows}
-                    isMulti
+                    isMulti={multiSelect.includes(columnId)}
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {
