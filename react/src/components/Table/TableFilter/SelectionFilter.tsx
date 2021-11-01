@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row } from 'react-table';
 import { ComboBox } from '../..';
 import { FlattenedQueryResponse } from '../Table';
@@ -24,7 +24,6 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
     preFilteredRows,
 }) => {
     const [searchTerm, setSearchTerm] = useState<string>('');
-    console.log(searchTerm);
 
     // If no explicit list of options is provided, we dynamically calculate the options from the table query results.
     const dynamicOptions = React.useMemo(() => {
@@ -37,9 +36,8 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
 
     const selections = options && !!options.length ? options : dynamicOptions;
 
-    console.log(selections);
-
     const handleSelectionFilter = (val: string) => {
+        setSearchTerm('');
         if (isMulti) {
             if (filter) {
                 setFilter(columnId, (filter: string[]) => {
