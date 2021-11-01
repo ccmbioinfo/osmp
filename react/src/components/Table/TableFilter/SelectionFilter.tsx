@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Row } from 'react-table';
 import { ComboBox } from '../..';
 import { FlattenedQueryResponse } from '../Table';

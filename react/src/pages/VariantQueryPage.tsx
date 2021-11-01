@@ -8,7 +8,6 @@ import {
     Button,
     ButtonWrapper,
     Checkbox,
-    Chip,
     clearError,
     Column,
     ComboBox,
@@ -141,12 +140,6 @@ const VariantQueryPage: React.FC<{}> = () => {
             update(queryOptionsForm.sources.value.concat(source));
     };
 
-    const removeSource = (source: string) => {
-        const update = updateQueryOptionsForm('sources');
-        if (queryOptionsForm.sources.value.includes(source))
-            update(queryOptionsForm.sources.value.filter(s => s !== source));
-    };
-
     return (
         <Body>
             <Flex alignItems="center">
@@ -164,17 +157,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                             />
                         ))}
                         <ErrorText error={queryOptionsForm.sources.error} />
-                        {queryOptionsForm.sources.value.length > 0 && (
-                            <Flex>
-                                {queryOptionsForm.sources.value.map((source, i) => (
-                                    <Chip
-                                        key={i}
-                                        title={source}
-                                        onDelete={() => removeSource(source)}
-                                    />
-                                ))}
-                            </Flex>
-                        )}
                     </Flex>
                 </Column>
             </Flex>
