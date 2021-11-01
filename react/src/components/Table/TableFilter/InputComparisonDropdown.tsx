@@ -77,7 +77,7 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
                 <SelectableList
                     options={COMPARISON_OPTIONS}
                     onSelect={value => {
-                        setSign(value);
+                        setSign(value as (prevState: keyof ComparisonType) => keyof ComparisonType);
 
                         const getKeys = Object.keys as <T extends object>(obj: T) => Array<keyof T>;
 

@@ -45,6 +45,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                     }
                     preFilteredRows={preFilteredRows}
                     isMulti={multiSelect.includes(columnId)}
+                    searchable={multiSelect.includes(columnId)}
                 />
             );
         } else if (columnId === 'start' || columnId === 'end') {

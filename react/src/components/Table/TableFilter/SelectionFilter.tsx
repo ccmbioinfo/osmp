@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Row } from 'react-table';
 import { ComboBox } from '../..';
 import { FlattenedQueryResponse } from '../Table';
@@ -10,6 +10,7 @@ interface SelectionFilterProps {
     options?: string[];
     filter?: DefaultFilter<string | string[]>;
     isMulti?: boolean;
+    searchable?: boolean;
     preFilteredRows: Row<FlattenedQueryResponse>[];
 }
 
@@ -19,8 +20,12 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
     options,
     filter,
     isMulti,
+    searchable,
     preFilteredRows,
 }) => {
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    console.log(searchTerm);
+
     // If no explicit list of options is provided, we dynamically calculate the options from the table query results.
     const dynamicOptions = React.useMemo(() => {
         const options: Set<string> = new Set();
@@ -48,18 +53,31 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
         }
     };
 
+    const resolveValue = () => {
+        if (searchable) {
+            return searchTerm;
+        } else {
+            return filter ? filter.value.toString() : '';
+        }
+    };
+
     return (
         <ComboBox
-            options={selections.sort().map((n, id) => ({
-                id,
-                value: n,
-                label: n,
-            }))}
+            options={selections
+                .filter(s => s && s.toLowerCase().includes(searchTerm.toLowerCase()))
+                .sort()
+                .map((n, id) => ({
+                    id,
+                    value: n,
+                    label: n,
+                }))}
             onSelect={handleSelectionFilter}
             placeholder="Select"
-            value={filter ? filter.value.toString() : ''}
+            value={resolveValue()}
             selection={(filter?.value as string[]) || []}
             isMulti={isMulti}
+            searchable={searchable}
+            onChange={val => setSearchTerm(val || '')}
         />
     );
 };

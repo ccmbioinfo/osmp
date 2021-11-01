@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components/macro';
 import { Checkbox } from './index';
 
@@ -64,9 +65,10 @@ interface ListProps<T> {
     options: SelectableListItem<T>[];
 }
 
-function SelectableList<T>({ onSelect, options, isMulti, selection }: ListProps<T>) {
+function SelectableListInner<T>(props: ListProps<T>, ref: React.ForwardedRef<HTMLUListElement>) {
+    const { onSelect, options, isMulti, selection } = props;
     return (
-        <StyledList>
+        <StyledList ref={ref}>
             {options.map(item => {
                 if (!isMulti) {
                     return (
@@ -90,5 +92,7 @@ function SelectableList<T>({ onSelect, options, isMulti, selection }: ListProps<
         </StyledList>
     );
 }
+
+const SelectableList = React.forwardRef(SelectableListInner);
 
 export default SelectableList;
