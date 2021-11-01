@@ -1,18 +1,23 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
-const useClickAway = <T extends HTMLElement>(
+const useClickAway = <T extends HTMLElement, I extends HTMLElement>(
     containerRef: React.MutableRefObject<T>,
-    onAwayClick: () => void
+    onAwayClick: () => void,
+    ignoreRef?: React.MutableRefObject<I>
 ) => {
     return useEffect(() => {
         const listener = (e: Event) => {
-            if (!containerRef.current?.contains(e.target as Node)) {
+            if (
+                !containerRef.current?.contains(e.target as Node) &&
+                !ignoreRef?.current?.contains(e.target as Node)
+            ) {
+                console.log(console.log(containerRef, e.target));
                 onAwayClick();
             }
         };
         window.document.addEventListener('click', listener);
         return () => window.document.removeEventListener('onclick', listener);
-    }, [containerRef, onAwayClick]);
+    }, [ignoreRef, containerRef, onAwayClick]);
 };
 
 export default useClickAway;

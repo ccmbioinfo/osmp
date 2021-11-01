@@ -69,9 +69,10 @@ export default function ComboBox<T extends {}>({
         console.error('An onChange function is required for searchable comboboxes!');
     }
 
-    const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
+    const ignoreRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
+    const ref = React.useRef() as React.MutableRefObject<HTMLUListElement>;
 
-    useClickAway(ref, () => setOpen(false));
+    useClickAway(ref, () => setOpen(false), ignoreRef);
 
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         setOpen(true);
@@ -79,7 +80,7 @@ export default function ComboBox<T extends {}>({
     };
 
     return (
-        <Wrapper ref={ref}>
+        <Wrapper ref={ignoreRef}>
             <Header tabIndex={0} role="button" onClick={() => setOpen(true)}>
                 {searchable ? (
                     <>
@@ -99,12 +100,12 @@ export default function ComboBox<T extends {}>({
             </Header>
             {open && (
                 <SelectableList
+                    ref={ref}
                     isMulti={isMulti}
                     selection={selection}
                     options={options}
                     onSelect={item => {
                         onSelect(item as T);
-                        setOpen(false);
                     }}
                 />
             )}
