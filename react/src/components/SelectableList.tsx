@@ -69,7 +69,7 @@ function SelectableListInner<T>(props: ListProps<T>, ref: React.ForwardedRef<HTM
     const { onSelect, options, isMulti, selection } = props;
     return (
         <StyledList ref={ref}>
-            {options.map(item => {
+            {options.map((item, index) => {
                 if (!isMulti) {
                     return (
                         <StyledListItem key={item.id}>
@@ -82,7 +82,10 @@ function SelectableListInner<T>(props: ListProps<T>, ref: React.ForwardedRef<HTM
                     return (
                         <StyledListItem key={item.id}>
                             <button type="button" onClick={() => onSelect(item.value)}>
-                                <Checkbox checked={(selection || []).includes(item.value)} />
+                                <Checkbox
+                                    key={index}
+                                    checked={(selection || []).includes(item.value)}
+                                />
                                 <span>{item.label}</span>
                             </button>
                         </StyledListItem>

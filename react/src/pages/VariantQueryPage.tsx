@@ -131,13 +131,13 @@ const VariantQueryPage: React.FC<{}> = () => {
     const toggleSource = (source: string) => {
         const update = updateQueryOptionsForm('sources');
 
+        queryOptionsForm.sources.value.includes(source)
+            ? update(queryOptionsForm.sources.value.filter(s => s !== source))
+            : update(queryOptionsForm.sources.value.concat(source));
         // This code toggles off the selection when you click it again, which is a bit unintuitive for the current combobox set up
         // queryOptionsForm.sources.value.includes(source)
         //     ? update(queryOptionsForm.sources.value.filter(s => s !== source))
         //     : update(queryOptionsForm.sources.value.concat(source));
-
-        if (!queryOptionsForm.sources.value.includes(source))
-            update(queryOptionsForm.sources.value.concat(source));
     };
 
     return (
