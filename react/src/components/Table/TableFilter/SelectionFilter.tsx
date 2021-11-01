@@ -30,7 +30,9 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
         return [...options.values()];
     }, [columnId, preFilteredRows]);
 
-    const selections = options && !options.length ? options : dynamicOptions;
+    const selections = options && !!options.length ? options : dynamicOptions;
+
+    console.log(selections);
 
     const handleSelectionFilter = (val: string) => {
         if (isMulti) {
