@@ -8,6 +8,7 @@ import {
     Button,
     ButtonWrapper,
     Checkbox,
+    Chip,
     clearError,
     Column,
     ComboBox,
@@ -131,9 +132,19 @@ const VariantQueryPage: React.FC<{}> = () => {
     const toggleSource = (source: string) => {
         const update = updateQueryOptionsForm('sources');
 
-        queryOptionsForm.sources.value.includes(source)
-            ? update(queryOptionsForm.sources.value.filter(s => s !== source))
-            : update(queryOptionsForm.sources.value.concat(source));
+        // This code toggles off the selection when you click it again, which is a bit unintuitive for the current combobox set up
+        // queryOptionsForm.sources.value.includes(source)
+        //     ? update(queryOptionsForm.sources.value.filter(s => s !== source))
+        //     : update(queryOptionsForm.sources.value.concat(source));
+
+        if (!queryOptionsForm.sources.value.includes(source))
+            update(queryOptionsForm.sources.value.concat(source));
+    };
+
+    const removeSource = (source: string) => {
+        const update = updateQueryOptionsForm('sources');
+        if (queryOptionsForm.sources.value.includes(source))
+            update(queryOptionsForm.sources.value.filter(s => s !== source));
     };
 
     return (
@@ -153,6 +164,17 @@ const VariantQueryPage: React.FC<{}> = () => {
                             />
                         ))}
                         <ErrorText error={queryOptionsForm.sources.error} />
+                        {queryOptionsForm.sources.value.length > 0 && (
+                            <Flex>
+                                {queryOptionsForm.sources.value.map((source, i) => (
+                                    <Chip
+                                        key={i}
+                                        title={source}
+                                        onDelete={() => removeSource(source)}
+                                    />
+                                ))}
+                            </Flex>
+                        )}
                     </Flex>
                 </Column>
             </Flex>
