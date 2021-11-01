@@ -1,10 +1,8 @@
-import { PubSub } from 'graphql-subscriptions';
 import logger from '../../logger';
 // import { v4 as uuidv4 } from 'uuid';
 import {
   AnnotationQueryResponse,
   CombinedVariantQueryResponse,
-  GqlContext,
   QueryInput,
   VariantAnnotation,
   VariantQueryResponse,
@@ -14,11 +12,8 @@ import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchAnnotations from './utils/fetchAnnotations';
 import annotate from './utils/annotate';
 
-const getVariants = async (
-  parent: any,
-  args: QueryInput,
-  { pubsub }: GqlContext
-): Promise<CombinedVariantQueryResponse> => await resolveVariantQuery(args, pubsub);
+const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
+  await resolveVariantQuery(args);
 
 /**
  *  typeguard: is this a variant query or an annotation query
@@ -27,10 +22,7 @@ const isVariantQuery = (
   arg: VariantQueryResponse | AnnotationQueryResponse
 ): arg is VariantQueryResponse => arg.source !== 'annotations';
 
-const resolveVariantQuery = async (
-  args: QueryInput,
-  pubsub: PubSub
-): Promise<CombinedVariantQueryResponse> => {
+const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQueryResponse> => {
   const {
     input: {
       sources,
@@ -41,7 +33,7 @@ const resolveVariantQuery = async (
 
   const annotationsPromise = fetchAnnotations(position, assemblyId);
 
-  const queries = sources.map(source => buildSourceQuery(source, args, pubsub));
+  const queries = sources.map(source => buildSourceQuery(source, args));
 
   const settled = await Promise.allSettled([annotationsPromise, ...queries]);
 
@@ -85,16 +77,12 @@ const resolveVariantQuery = async (
   );
 };
 
-const buildSourceQuery = (
-  source: string,
-  args: QueryInput,
-  pubsub: PubSub
-): Promise<VariantQueryResponse> => {
+const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
   switch (source) {
     case 'local':
-      return getLocalQuery(args, pubsub);
+      return getLocalQuery(args);
     case 'remote-test':
-      return getRemoteTestNodeQuery(args, pubsub);
+      return getRemoteTestNodeQuery(args);
     default:
       throw new Error(`source ${source} not found!`);
   }

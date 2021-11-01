@@ -148,7 +148,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Typography variant="h4" bold>
                             Select Sources:
                         </Typography>
-                        {SOURCES.map(source => (
+                        {SOURCES.filter(Boolean).map(source => (
                             <Checkbox
                                 key={source}
                                 checked={queryOptionsForm.sources.value.includes(source)}

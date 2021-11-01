@@ -141,7 +141,6 @@ export interface CombinedVariantQueryResponse {
 export interface GqlContext {
   req: Request;
   res: Response;
-  pubsub: PubSub;
 }
 
 export type ResultTransformer<T> = (args: T | null) => VariantQueryResponseSchema[];

@@ -1,5 +1,3 @@
-import { PubSub } from 'graphql-subscriptions';
-import { QUERY_RESOLVED } from '../..';
 import { v4 as uuidv4 } from 'uuid';
 import {
   ErrorTransformer,
@@ -21,7 +19,7 @@ interface LocalQueryResponse {
  * @returns  Promise<ResolvedVariantQueryResult>
  * Return some dummy data for testing and design purposes
  */
-const getLocalQuery = async (args: QueryInput, pubsub: PubSub): Promise<VariantQueryResponse> => {
+const getLocalQuery = async (args: QueryInput): Promise<VariantQueryResponse> => {
   let localQueryResponse: LocalQueryResponse[] | null = null;
   let localQueryError: Error | null = null;
   try {
@@ -43,9 +41,6 @@ const getLocalQuery = async (args: QueryInput, pubsub: PubSub): Promise<VariantQ
   } catch (e) {
     localQueryError = e as Error;
   }
-
-  // todo: wrap and make type safe
-  pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'local' } });
 
   return {
     data: transformLocalQueryResponse(localQueryResponse),
