@@ -48,7 +48,8 @@ export const Header = styled(Flex)`
     color: ${props => props.theme.colors.muted};
     justify-content: space-between;
     width: inherit;
-    padding: 0 ${props => props.theme.space[3]};
+    padding: 0 ${props => props.theme.space[4]};
+    flex-wrap: nowrap;
 `;
 
 export default function ComboBox<T extends {}>({
