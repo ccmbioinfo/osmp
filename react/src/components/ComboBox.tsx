@@ -106,6 +106,9 @@ export default function ComboBox<T extends {}>({
                     options={options}
                     onSelect={item => {
                         onSelect(item as T);
+                        if (!isMulti) {
+                            setOpen(false);
+                        }
                     }}
                 />
             )}
