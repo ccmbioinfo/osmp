@@ -11,7 +11,6 @@ const useClickAway = <T extends HTMLElement, I extends HTMLElement>(
                 !containerRef.current?.contains(e.target as Node) &&
                 !ignoreRef?.current?.contains(e.target as Node)
             ) {
-                console.log(console.log(containerRef, e.target));
                 onAwayClick();
             }
         };
