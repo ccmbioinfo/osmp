@@ -15,8 +15,6 @@ const useUserInfo = <T extends UserInfo>() => {
 
     const [userInfo, setUserInfo] = useState<{}>();
 
-    console.log(userInfo);
-
     useEffect(() => {
         (async () => {
             if (initialized && !Object.keys(userInfo || {}).length) {
