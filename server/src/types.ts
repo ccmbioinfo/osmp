@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { PubSub } from 'graphql-subscriptions';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 /* these will be returned by our annotation source */
@@ -141,7 +140,6 @@ export interface CombinedVariantQueryResponse {
 export interface GqlContext {
   req: Request;
   res: Response;
-  pubsub: PubSub;
 }
 
 export type ResultTransformer<T> = (args: T | null) => VariantQueryResponseSchema[];

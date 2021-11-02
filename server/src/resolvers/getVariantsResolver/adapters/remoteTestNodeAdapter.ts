@@ -1,6 +1,4 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { PubSub } from 'graphql-subscriptions';
-import { QUERY_RESOLVED } from '../..';
 import logger from '../../../logger';
 import {
   ErrorTransformer,
@@ -83,10 +81,7 @@ interface StagerVariantQueryPayload {
  * @returns  Promise<ResolvedVariantQueryResult>
  * Return some dummy data for testing and design purposes --> Currently returning from a "STAGER-like datastore" rather than a dummy data source, though this can be toggled
  */
-const getRemoteTestNodeQuery = async (
-  args: QueryInput,
-  pubsub: PubSub
-): Promise<VariantQueryResponse> => {
+const getRemoteTestNodeQuery = async (args: QueryInput): Promise<VariantQueryResponse> => {
   /* eslint-disable camelcase */
   let tokenResponse: AxiosResponse<{ access_token: string }>;
 
@@ -128,9 +123,6 @@ const getRemoteTestNodeQuery = async (
     logger.error(e);
     remoteTestNodeQueryError = e as RemoteTestNodeQueryError;
   }
-
-  // todo: wrap and make type safe
-  pubsub.publish(QUERY_RESOLVED, { queryResolved: { node: 'remote-test' } });
 
   return {
     data: transformStagerQueryResponse(remoteTestNodeQueryResponse?.data || []),
