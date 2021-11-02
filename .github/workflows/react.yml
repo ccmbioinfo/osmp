@@ -1,5 +1,11 @@
 name: "Build react app and upload to Minio"
 on:
+  push:
+    branches:
+      - develop
+    paths:
+      - .github/workflows/react.yml
+      - react/src/**/*
   pull_request:
     branches:
       - develop
@@ -40,14 +46,6 @@ jobs:
       - name: compile typescript
         run: |
           yarn tsc
-      - name: Generate build
-        run: yarn build
-        # Hard coded values for local development
-        env:
-          REACT_APP_GRAPHQL_URL: http://localhost:4777/graphql
-          REACT_APP_KEYCLOAK_AUTH_URL: http://localhost:9821/auth
-          REACT_APP_KEYCLOAK_REALM: ssmp
-          REACT_APP_KEYCLOAK_CLIENT_ID: ssmp-app
 
   deploy: 
     runs-on: ubuntu-latest
