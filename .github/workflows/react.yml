@@ -45,11 +45,11 @@ jobs:
         run: yarn build
         # Testing with hardcoded values, will change these to environmental secrets
         env:
-          REACT_APP_GRAPHQL_URL: {{ secrets.REACT_APP_GRAPHQL_URL }}
-          REACT_APP_KEYCLOAK_AUTH_URL: {{ secrets.REACT_APP_KEYCLOAK_AUTH_URL }}
-          REACT_APP_KEYCLOAK_REALM: {{ secrets.REACT_APP_KEYCLOAK_REALM }}
-          REACT_APP_KEYCLOAK_CLIENT_ID: {{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
-          REACT_APP_SOURCE_LIST: {{ secrets.REACT_APP_SOURCE_LIST }}
+          REACT_APP_GRAPHQL_URL: ${{ secrets.REACT_APP_GRAPHQL_URL }}
+          REACT_APP_KEYCLOAK_AUTH_URL: ${{ secrets.REACT_APP_KEYCLOAK_AUTH_URL }}
+          REACT_APP_KEYCLOAK_REALM: ${{ secrets.REACT_APP_KEYCLOAK_REALM }}
+          REACT_APP_KEYCLOAK_CLIENT_ID: ${{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
+          REACT_APP_SOURCE_LIST: ${{ secrets.REACT_APP_SOURCE_LIST }}
 
   deploy: 
     runs-on: ubuntu-latest
