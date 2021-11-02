@@ -5,13 +5,13 @@ on:
       - develop
     paths:
       - .github/workflows/react.yml
-      - react/src/**/*
+      - react/**/*
   pull_request:
     branches:
       - develop
     paths:
       - .github/workflows/react.yml
-      - react/src/**/*
+      - react/**/*
 
 jobs:
   build-react:
