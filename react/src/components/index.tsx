@@ -1,7 +1,6 @@
 import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
-import Chip from './Chip';
 import ComboBox from './ComboBox';
 import ErrorProvider, {
     clearError,
@@ -31,7 +30,6 @@ export {
     Button,
     ButtonWrapper,
     Body,
-    Chip,
     clearError,
     Checkbox,
     Column,

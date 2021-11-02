@@ -11,7 +11,4 @@ yarn-error.log*
 .vscode/
 
 */mysql
-mongo
-data
 server/whole_genome_SNVs_inclAnno.tsv.gz.tbi
-.vscode/

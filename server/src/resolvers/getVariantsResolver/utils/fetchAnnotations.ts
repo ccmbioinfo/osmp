@@ -60,6 +60,7 @@ interface PositionMapperResponse {
 }
 
 const _getAnnotations = async (position: string, assemblyId: string) => {
+
   const query = await _buildQuery(position, assemblyId);
   const execPromise = promisify(exec);
 
