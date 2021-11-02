@@ -49,6 +49,10 @@ jobs:
 
   deploy: 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: react
     needs: build-react
     environment: SSMP_BUILD
     if: github.event_name == 'push'
