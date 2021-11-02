@@ -1,10 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import {
-  ErrorTransformer,
-  QueryInput,
-  ResultTransformer,
-  VariantQueryResponse,
-} from '../../../types';
+import { ErrorTransformer, ResultTransformer, VariantQueryResponse } from '../../../types';
 import resolveAssembly from '../utils/resolveAssembly';
 
 interface LocalQueryResponse {
@@ -19,7 +14,7 @@ interface LocalQueryResponse {
  * @returns  Promise<ResolvedVariantQueryResult>
  * Return some dummy data for testing and design purposes
  */
-const getLocalQuery = async (args: QueryInput): Promise<VariantQueryResponse> => {
+const getLocalQuery = async (): Promise<VariantQueryResponse> => {
   let localQueryResponse: LocalQueryResponse[] | null = null;
   let localQueryError: Error | null = null;
   try {
