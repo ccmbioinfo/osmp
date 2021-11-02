@@ -80,7 +80,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
   switch (source) {
     case 'local':
-      return getLocalQuery(args);
+      return getLocalQuery();
     case 'remote-test':
       return getRemoteTestNodeQuery(args);
     default:
