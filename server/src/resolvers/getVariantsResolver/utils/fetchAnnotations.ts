@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { exec } from 'child_process';
+import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import { v4 as uuidv4 } from 'uuid';
-import { promisify } from 'util';
 import { VariantAnnotation, AnnotationQueryResponse } from '../../../types';
 import logger from '../../../logger';
 
@@ -60,13 +60,12 @@ interface PositionMapperResponse {
 }
 
 const _getAnnotations = async (position: string, assemblyId: string) => {
-
   const query = await _buildQuery(position, assemblyId);
   const execPromise = promisify(exec);
 
   let response;
   try {
-    response = await execPromise(query, { maxBuffer: 1024 * 10000 });
+    response = execPromise(query, { maxBuffer: 10e7 }); // 100mb
   } catch (err) {
     logger.error(err);
     throw err;
@@ -85,12 +84,13 @@ const _formatAnnotations = (annotations: string) => {
   const headers = headerRow
     .split(/\W+/)
     .filter(Boolean)
-    .reduce<Record<number, keyof VariantAnnotation>>((acc, curr, i) => {
-      return {
+    .reduce<Record<number, keyof VariantAnnotation>>(
+      (acc, curr, i) => ({
         ...acc,
         [i]: NAME_MAP[curr],
-      };
-    }, {});
+      }),
+      {}
+    );
 
   return annotationsArray.map(annotation =>
     annotation
@@ -107,7 +107,7 @@ const _buildQuery = async (position: string, assemblyId: string) => {
 
   let mappedPosition;
 
-  /* if assembly target is 37, map to 37, since FE will return only 38 coordinates */
+  /* if assembly target is 37, map to 37, since FE will return only 38 coordinates -- todo: in new flow we'll just liftover ourselves and not fetch in advance */
   if (resolvedAssemblyId !== '38') {
     const mappedPositionResponse = await axios.get<PositionMapperResponse>(
       `http://rest.ensembl.org/map/homo_sapiens/GRCh38/${position}/GRCh37`
@@ -121,7 +121,7 @@ const _buildQuery = async (position: string, assemblyId: string) => {
   const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
   const indexPath = resolvedAssemblyId === '38' ? INDEX_38_PATH : INDEX_37_PATH;
 
-  return `tabix -h  ${annotationUrl} ${indexPath} ${resolvedPosition} | sed "1d;" | awk -v OFS='\t' '{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
+  return `tabix -h  ${annotationUrl} ${indexPath} ${resolvedPosition} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
 };
 
 const fetchAnnotations = (
