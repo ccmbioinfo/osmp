@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { FaCaretDown } from 'react-icons/fa';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { useClickAway } from '../hooks';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
@@ -9,16 +9,19 @@ import SelectableList, { SelectableListItem } from './SelectableList';
 import Spinner from './Spinner';
 
 interface ComboBoxProps<T> {
-    options: SelectableListItem<T>[];
+    options: SelectableListItem<T | T[]>[];
     loading?: boolean;
     onSelect: (item: T) => void;
     onChange?: (searchTerm: string) => void;
     placeholder: string;
     searchable?: boolean;
+    isMulti?: boolean;
+    selection?: T[];
     value: string;
 }
 
 export const Wrapper = styled(Flex)`
+    position: relative
     min-height: 38px;
     flex-wrap: wrap;
     flex-grow: 0;
@@ -28,8 +31,6 @@ export const Wrapper = styled(Flex)`
 `;
 
 export const StyledInput = styled(Input)<InputProps>`
-    border: none;
-    box-shadow: transparent 0px 0px !important;
     cursor: ${props => (props.disabled ? 'pointer' : 'inherit')};
     outline: none;
     position: relative;
@@ -46,8 +47,9 @@ export const Header = styled(Flex)`
     box-shadow: ${props => props.theme.boxShadow};
     color: ${props => props.theme.colors.muted};
     justify-content: space-between;
-    padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     width: inherit;
+    padding: 0 ${props => props.theme.space[4]};
+    flex-wrap: nowrap;
 `;
 
 export default function ComboBox<T extends {}>({
@@ -58,6 +60,8 @@ export default function ComboBox<T extends {}>({
     placeholder,
     searchable,
     value,
+    isMulti,
+    selection,
 }: ComboBoxProps<T>) {
     const [open, setOpen] = useState<Boolean>(false);
 
@@ -65,9 +69,10 @@ export default function ComboBox<T extends {}>({
         console.error('An onChange function is required for searchable comboboxes!');
     }
 
-    const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
+    const ignoreRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
+    const ref = React.useRef() as React.MutableRefObject<HTMLUListElement>;
 
-    useClickAway(ref, () => setOpen(false));
+    useClickAway(ref, () => setOpen(false), ignoreRef);
 
     const getSuggestions = (e: ChangeEvent<HTMLInputElement>) => {
         setOpen(true);
@@ -75,7 +80,7 @@ export default function ComboBox<T extends {}>({
     };
 
     return (
-        <Wrapper ref={ref}>
+        <Wrapper ref={ignoreRef}>
             <Header tabIndex={0} role="button" onClick={() => setOpen(true)}>
                 {searchable ? (
                     <>
@@ -95,10 +100,15 @@ export default function ComboBox<T extends {}>({
             </Header>
             {open && (
                 <SelectableList
+                    ref={ref}
+                    isMulti={isMulti}
+                    selection={selection}
                     options={options}
                     onSelect={item => {
                         onSelect(item as T);
-                        setOpen(false);
+                        if (!isMulti) {
+                            setOpen(false);
+                        }
                     }}
                 />
             )}

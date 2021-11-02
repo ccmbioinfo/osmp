@@ -31,10 +31,9 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
+import { formatNullValues } from '../../utils';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
-import { ColumnFilter } from './ColumnFilter';
 import { ContactPopover } from './ContactPopover';
-import { GlobalFilter } from './GlobalFilters';
 import {
     Footer,
     IconPadder,
@@ -45,12 +44,14 @@ import {
     TH,
     THead,
 } from './Table.styles';
+import { ColumnFilter } from './TableFilter/ColumnFilter';
+import { GlobalFilter } from './TableFilter/GlobalFilters';
 
 interface TableProps {
     variantData: VariantQueryResponse[];
 }
 
-type FlattenedQueryResponse = Omit<
+export type FlattenedQueryResponse = Omit<
     IndividualResponseFields,
     'info' | 'diseases' | 'phenotypicFeatures'
 > &
@@ -116,7 +117,7 @@ const prepareData = (queryResult: VariantQueryResponse[]) => {
             }
         });
     });
-    return results;
+    return results.map(result => formatNullValues(result));
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
@@ -145,6 +146,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
+
+    const columnsWithoutFilters = React.useMemo(() => ['contact', 'chromosome'], []);
 
     type Accessor = string | (() => JSX.Element) | ((state: any) => any);
     // Dynamically adjust column width based on cell's longest text.
@@ -193,12 +196,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'start',
                         Header: 'Start',
                         width: getColumnWidth(tableData, 'start', 'Start'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'end',
                         id: 'end',
                         Header: 'End',
                         width: getColumnWidth(tableData, 'end', 'End'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'source',
@@ -227,6 +232,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'consequence',
                         Header: 'consequence',
                         width: 105,
+                        filter: 'includesSome',
                     },
                     { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
                     { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomadHom', width: 105 },
@@ -291,12 +297,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'sex',
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
+                        filter: 'includesSome',
+                        Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
                     {
                         accessor: 'zygosity',
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
+                        filter: 'includesSome',
                     },
                     {
                         accessor: 'geographicOrigin',
@@ -396,6 +405,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         setAllFilters,
         setGlobalFilter,
         prepareRow,
+        preFilteredRows,
         toggleHideColumn,
         visibleColumns,
         rows,
@@ -524,13 +534,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {columns
                         .map(c => c.columns)
                         .flat()
-                        .filter(c => !dummyColumns.includes(c.id as string))
+                        .filter(
+                            c =>
+                                !dummyColumns.concat(columnsWithoutFilters).includes(c.id as string)
+                        )
                         .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
                                     {v.Header}
                                 </Typography>
                                 <ColumnFilter
+                                    preFilteredRows={preFilteredRows}
                                     filters={filters}
                                     setFilter={setFilter}
                                     columnId={v.id as string}

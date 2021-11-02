@@ -8,7 +8,7 @@ yarn-debug.log*
 yarn-error.log*
 
 .devcontainer
+.vscode/
 
 */mysql
-data
 server/whole_genome_SNVs_inclAnno.tsv.gz.tbi

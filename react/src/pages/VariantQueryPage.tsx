@@ -134,6 +134,10 @@ const VariantQueryPage: React.FC<{}> = () => {
         queryOptionsForm.sources.value.includes(source)
             ? update(queryOptionsForm.sources.value.filter(s => s !== source))
             : update(queryOptionsForm.sources.value.concat(source));
+        // This code toggles off the selection when you click it again, which is a bit unintuitive for the current combobox set up
+        // queryOptionsForm.sources.value.includes(source)
+        //     ? update(queryOptionsForm.sources.value.filter(s => s !== source))
+        //     : update(queryOptionsForm.sources.value.concat(source));
     };
 
     return (
@@ -178,6 +182,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Ensembl ID
                         </Typography>
                         <Input
+                            variant="outlined"
                             onChange={e => {
                                 updateQueryOptionsForm('ensemblId')(e.currentTarget.value);
                                 updateQueryOptionsForm('gene')('');
@@ -192,9 +197,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Max Frequency
                         </Typography>
                         <Input
-                            onChange={e =>
-                                updateQueryOptionsForm('maxFrequency')(e.currentTarget.value)
-                            }
+                            variant="outlined"
+                            onChange={e => {
+                                updateQueryOptionsForm('maxFrequency')(e.currentTarget.value);
+                            }}
                             value={queryOptionsForm.maxFrequency.value}
                         />
                         <ErrorText error={queryOptionsForm.maxFrequency.error} />

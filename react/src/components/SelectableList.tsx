@@ -1,4 +1,6 @@
-import styled from 'styled-components';
+import React from 'react';
+import styled from 'styled-components/macro';
+import { Checkbox } from './index';
 
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
@@ -28,7 +30,8 @@ const StyledListItem = styled.li`
         }
         button {
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            justify-content: flex-start;
             background-color: ${props => props.theme.colors.background};
             font-size: ${props => props.theme.fontSizes.s};
             padding: 15px 20px 15px 20px;
@@ -56,22 +59,43 @@ export interface SelectableListItem<T> {
 }
 
 interface ListProps<T> {
+    isMulti?: boolean;
     onSelect: (val: T) => void;
+    selection?: T[];
     options: SelectableListItem<T>[];
 }
 
-function SelectableList<T>({ onSelect, options }: ListProps<T>) {
+function SelectableListInner<T>(props: ListProps<T>, ref: React.ForwardedRef<HTMLUListElement>) {
+    const { onSelect, options, isMulti, selection } = props;
     return (
-        <StyledList>
-            {options.map(item => (
-                <StyledListItem key={item.id}>
-                    <button type="button" onClick={() => onSelect(item.value)}>
-                        <span>{item.label}</span>
-                    </button>
-                </StyledListItem>
-            ))}
+        <StyledList ref={ref}>
+            {options.map((item, index) => {
+                if (!isMulti) {
+                    return (
+                        <StyledListItem key={item.id}>
+                            <button type="button" onClick={() => onSelect(item.value)}>
+                                <span>{item.label}</span>
+                            </button>
+                        </StyledListItem>
+                    );
+                } else {
+                    return (
+                        <StyledListItem key={item.id}>
+                            <button type="button" onClick={() => onSelect(item.value)}>
+                                <Checkbox
+                                    key={index}
+                                    checked={(selection || []).includes(item.value)}
+                                />
+                                <span>{item.label}</span>
+                            </button>
+                        </StyledListItem>
+                    );
+                }
+            })}
         </StyledList>
     );
 }
+
+const SelectableList = React.forwardRef(SelectableListInner);
 
 export default SelectableList;
