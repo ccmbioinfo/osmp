@@ -15,6 +15,10 @@ const Container = styled(props => <Background {...props} />)`
     width: 300px;
 `;
 
+const FlexContainer = styled(props => <Flex {...props} />)`
+    flex-wrap: nowrap;
+`;
+
 export const CellPopover: React.FC<CellPopoverProps<FlattenedQueryResponse>> = ({ state, id }) => {
     const [copied, setCopied] = useState(false); // Whether text is copied
     const [openContact, setOpenContact] = useState(false);
@@ -41,9 +45,9 @@ export const CellPopover: React.FC<CellPopoverProps<FlattenedQueryResponse>> = (
                     handleCloseSnackbar={handleClosePopover}
                 />
                 <Container variant="light">
-                    <Flex alignItems="center" justifyContent="space-between">
-                        <Typography variant="p">{state[id]}</Typography>
-                        <Flex>
+                    <FlexContainer alignItems="center" justifyContent="space-between">
+                        <Typography variant="subtitle">{state[id]}</Typography>
+                        <FlexContainer>
                             <IconButton
                                 variant="light"
                                 onClick={() => {
@@ -57,8 +61,8 @@ export const CellPopover: React.FC<CellPopoverProps<FlattenedQueryResponse>> = (
                             <IconButton variant="light" onClick={handleClosePopover}>
                                 <IoIosClose />
                             </IconButton>
-                        </Flex>
-                    </Flex>
+                        </FlexContainer>
+                    </FlexContainer>
                 </Container>
             </Column>
         </Popover>
