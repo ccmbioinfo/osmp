@@ -1,28 +1,59 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 export interface InputProps {
     disabled?: boolean;
     error?: boolean;
+    variant?: 'outlined';
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;
     value?: number | string;
+    InputAdornmentStart?: React.ReactNode;
 }
 
-const Component = styled.input<InputProps>`
+const Container = styled.div<Pick<InputProps, 'variant' | 'error'>>`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+
+    ${props => {
+        switch (props.variant) {
+            case 'outlined':
+                return `
+                border-radius: ${props.theme.radii.base};
+                border: ${props.theme.borders.thin};
+                box-shadow: ${props.theme.boxShadow};
+                border-color: ${
+                    props.error ? props.theme.colors.error : props.theme.colors.muted
+                } !important;
+                `;
+            default:
+                return '';
+        }
+    }}
+
     background-color: ${props => props.theme.background.main};
-    border-color: ${props =>
-        props.error ? props.theme.colors.error : props.theme.colors.muted} !important;
     color: ${props => props.theme.colors.text};
-    border-radius: ${props => props.theme.radii.base};
-    border: ${props => props.theme.borders.thin};
-    box-shadow: ${props => props.theme.boxShadow};
+
     padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     font-family: ${props => props.theme.fontFamily.body};
     font-size: ${props => props.theme.fontSizes.s};
     min-height: 46px;
 `;
 
-const Input: React.FC<InputProps> = props => <Component {...props} />;
+const TextInput = styled.input<InputProps>`
+    border: none;
+    &:focus {
+        outline: none;
+    }
+`;
+
+const Input: React.FC<InputProps> = props => (
+    <Container variant={props.variant} error={props.error}>
+        {props.InputAdornmentStart && props.InputAdornmentStart}
+        <TextInput {...props} />
+    </Container>
+);
 
 export default Input;

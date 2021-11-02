@@ -4,7 +4,6 @@ import Keycloak from 'keycloak-connect';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { PubSub } from 'graphql-subscriptions';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -19,7 +18,7 @@ const memoryStore = new session.MemoryStore();
 
 app.use(
   session({
-    secret: 'ssm',
+    secret: 'ssmp',
     resave: false,
     saveUninitialized: true,
     store: memoryStore,
@@ -34,15 +33,14 @@ const keycloak = new Keycloak(
     realm: process.env.KEYCLOAK_REALM!,
     'auth-server-url': process.env.KEYCLOAK_AUTH_URL!,
     resource: process.env.KEYCLOAK_CLIENT_ID!,
-    'ssl-required': 'external',
-    'confidential-port': 8443,
+    'ssl-required': process.env.NODE_ENV === 'local' ? 'external' : 'all',
+    'confidential-port': 443,
     'bearer-only': true,
   }
 );
 
-// monkeypatch token validator in local and (currently) dev environments
-// todo: look into how necessary this really is
-if (process.env.NODE_ENV !== 'production') {
+// monkeypatch token validator in local environments where keycloak host is localhost
+if (process.env.NODE_ENV === 'local') {
   keycloak.grantManager.validateToken = validateToken;
 }
 
@@ -67,10 +65,9 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const httpServer = createServer(app);
 
 const startServer = async () => {
-  const pubsub = new PubSub();
   const apolloServer = new ApolloServer({
     schema,
-    context: ({ req, res }: any) => ({ req, res, pubsub }),
+    context: ({ req, res }: any) => ({ req, res }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
   await apolloServer.start();
@@ -83,7 +80,6 @@ const startServer = async () => {
       subscribe,
       onOperation: (message: any, params: any) => {
         params.schema = schema;
-        params.context.pubsub = pubsub;
         return params;
       },
     },

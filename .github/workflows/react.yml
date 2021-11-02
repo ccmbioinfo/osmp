@@ -10,6 +10,7 @@ on:
 jobs:
   build-react:
     runs-on: ubuntu-latest
+    environment: SSMP_BUILD
     defaults:
       run:
         shell: bash
@@ -44,10 +45,11 @@ jobs:
         run: yarn build
         # Testing with hardcoded values, will change these to environmental secrets
         env:
-          REACT_APP_GRAPHQL_URL: http://localhost:4777/graphql
-          REACT_APP_KEYCLOAK_AUTH_URL: http://localhost:9821/auth
-          REACT_APP_KEYCLOAK_REALM: ssmp
-          REACT_APP_KEYCLOAK_CLIENT_ID: ssmp-app
+          REACT_APP_GRAPHQL_URL: ${{ secrets.REACT_APP_GRAPHQL_URL }}
+          REACT_APP_KEYCLOAK_AUTH_URL: ${{ secrets.REACT_APP_KEYCLOAK_AUTH_URL }}
+          REACT_APP_KEYCLOAK_REALM: ${{ secrets.REACT_APP_KEYCLOAK_REALM }}
+          REACT_APP_KEYCLOAK_CLIENT_ID: ${{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
+          REACT_APP_SOURCE_LIST: ${{ secrets.REACT_APP_SOURCE_LIST }}
 
   deploy: 
     runs-on: ubuntu-latest

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLayer } from 'react-laag';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { CellText } from '../index';
 
 interface Props {
