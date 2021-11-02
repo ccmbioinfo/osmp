@@ -10,7 +10,6 @@ on:
 jobs:
   build-react:
     runs-on: ubuntu-latest
-    environment: SSMP_BUILD
     defaults:
       run:
         shell: bash
@@ -43,13 +42,12 @@ jobs:
           yarn tsc
       - name: Generate build
         run: yarn build
-        # Testing with hardcoded values, will change these to environmental secrets
+        # Hard coded values for local development
         env:
-          REACT_APP_GRAPHQL_URL: ${{ secrets.REACT_APP_GRAPHQL_URL }}
-          REACT_APP_KEYCLOAK_AUTH_URL: ${{ secrets.REACT_APP_KEYCLOAK_AUTH_URL }}
-          REACT_APP_KEYCLOAK_REALM: ${{ secrets.REACT_APP_KEYCLOAK_REALM }}
-          REACT_APP_KEYCLOAK_CLIENT_ID: ${{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
-          REACT_APP_SOURCE_LIST: ${{ secrets.REACT_APP_SOURCE_LIST }}
+          REACT_APP_GRAPHQL_URL: http://localhost:4777/graphql
+          REACT_APP_KEYCLOAK_AUTH_URL: http://localhost:9821/auth
+          REACT_APP_KEYCLOAK_REALM: ssmp
+          REACT_APP_KEYCLOAK_CLIENT_ID: ssmp-app
 
   deploy: 
     runs-on: ubuntu-latest
@@ -57,12 +55,38 @@ jobs:
     environment: SSMP_BUILD
     if: github.event_name == 'push'
     steps:
-    - name: Upload to Minio bucket
-      # Uncomment during actual deploy to dev server
-      if: github.event_name == 'push'  
-      env:
-        MC_HOST_minio: ${{ secrets.MC_HOST }}
-      run: |
-        sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
-        sudo chmod +x /usr/local/bin/mc
-        ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Get yarn cache path
+        id: yarn-cache-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: restore
+        with:
+          path: |
+            ${{ steps.yarn-cache-path.outputs.dir }}
+            react/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('react/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn install # should never happen due to build job
+        if: steps.restore.outputs.cache-hit != 'true'
+      # End setup
+      - run: yarn build
+        env:
+          REACT_APP_GRAPHQL_URL: {{ secrets.REACT_APP_GRAPHQL_URL }}
+          REACT_APP_KEYCLOAK_AUTH_URL: {{ secrets.REACT_APP_KEYCLOAK_AUTH_URL }}
+          REACT_APP_KEYCLOAK_REALM: {{ secrets.REACT_APP_KEYCLOAK_REALM }}
+          REACT_APP_KEYCLOAK_CLIENT_ID: {{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
+          REACT_APP_SOURCE_LIST: {{ secrets.REACT_APP_SOURCE_LIST }}
+      - name: Upload to Minio bucket
+        # Uncomment during actual deploy to dev server
+        if: github.event_name == 'push'  
+        env:
+          MC_HOST_minio: ${{ secrets.MC_HOST }}
+        run: |
+          sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+          sudo chmod +x /usr/local/bin/mc
+          ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
