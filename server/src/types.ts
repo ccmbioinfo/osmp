@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { PubSub } from 'graphql-subscriptions';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
 /* these will be returned by our annotation source */
