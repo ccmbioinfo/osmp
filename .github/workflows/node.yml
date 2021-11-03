@@ -124,7 +124,7 @@ jobs:
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           NODE_ENV: development
-          PT_AUTH0_CLIENT_ID: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_ID }}
+          PT_AUTH0_TOKEN_CLIENT_ID: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_ID }}
           PT_AUTH0_TOKEN_CLIENT_SECRET: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_SECRET }}
           PT_AUTH0_TOKEN_ENDPOINT: ${{ secrets.PT_AUTH0_TOKEN_ENDPOINT }}
           PT_ENDPOINT: ${{ secrets.PT_ENDPOINT }}
