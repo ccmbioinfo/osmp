@@ -20,7 +20,7 @@ const Snackbar: React.FC<SnackbarProps> = ({ isActive, variant, message, handleC
     return isActive ? (
         <Container variant={variant} isActive={isActive}>
             {Icons[variant]}
-            <Typography variant="p" bold>
+            <Typography variant="subtitle" bold>
                 {message}
             </Typography>
             <Button onClick={handleCloseSnackbar}>

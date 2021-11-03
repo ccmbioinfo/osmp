@@ -112,7 +112,7 @@ const _buildQuery = async (position: string, assemblyId: string) => {
     const mappedPositionResponse = await axios.get<PositionMapperResponse>(
       `http://rest.ensembl.org/map/homo_sapiens/GRCh38/${position}/GRCh37`
     );
-    const { seq_region_name: chrom, start, end } = mappedPositionResponse.data.mappings[0].mapped;
+    const { seq_region_name: chrom, start, end } = mappedPositionResponse.data.mappings[0]?.mapped;
     mappedPosition = `${chrom}:${start}-${end}`;
   }
 

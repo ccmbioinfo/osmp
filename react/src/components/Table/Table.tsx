@@ -33,8 +33,9 @@ import {
 } from '../../types';
 import { formatNullValues } from '../../utils';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
-import { ContactPopover } from './ContactPopover';
+import { CellPopover } from './CellPopover';
 import {
+    CellText,
     Footer,
     IconPadder,
     SkipToBeginning,
@@ -180,13 +181,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
-                        accessor: 'alt',
+                        accessor: state => <CellPopover state={state} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
                         width: getColumnWidth(tableData, 'alt', 'Alt'),
                     },
                     {
-                        accessor: 'ref',
+                        accessor: state => <CellPopover state={state} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
@@ -338,7 +339,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: state => <ContactPopover state={state} />,
+                        accessor: state => <CellPopover state={state} id="contactInfo" />,
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
@@ -663,9 +664,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                     cell.getCellProps();
                                                 return (
                                                     <td key={key} {...restCellProps}>
-                                                        <Typography variant="subtitle">
-                                                            {cell.render('Cell')}
-                                                        </Typography>
+                                                        <CellText>
+                                                            <Typography variant="subtitle">
+                                                                {cell.render('Cell')}
+                                                            </Typography>
+                                                        </CellText>
                                                     </td>
                                                 );
                                             })}

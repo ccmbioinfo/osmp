@@ -22,6 +22,7 @@ import SelectableList from './SelectableList';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
 import Table from './Table/Table';
+import { CellText } from './Table/Table.styles';
 import Typography from './Typography';
 
 export {
@@ -30,6 +31,7 @@ export {
     Button,
     ButtonWrapper,
     Body,
+    CellText,
     clearError,
     Checkbox,
     Column,
