@@ -87,8 +87,8 @@ jobs:
     runs-on: [cheo-ri]
     needs: build
     if: github.event_name == 'push'
-    environment: SSMP_DEV_SERVER
-    concurrency: SSMP_DEV_SERVER
+    environment: SSMP_SERVER_DEV
+    concurrency: SSMP_SERVER_DEV
     steps:
       - uses: actions/checkout@v2
       - uses: docker/login-action@v1
