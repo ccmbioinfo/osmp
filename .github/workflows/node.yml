@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      tags: ${{ steps.meta.outputs.tags }} 
+      tags: ${{ steps.meta.outputs.tags }}
     steps:
       - uses: actions/checkout@v2
       - uses: docker/setup-buildx-action@v1
@@ -55,7 +55,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           docker run --rm test-image yarn test
-      
+
       - name: Meta action
         uses: docker/metadata-action@v3
         id: meta
@@ -72,7 +72,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ github.token }} 
+          password: ${{ github.token }}
 
       - name: Build and push development image
         if: github.event_name == 'push'
@@ -128,15 +128,6 @@ jobs:
           PT_AUTH0_TOKEN_CLIENT_SECRET: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_SECRET }}
           PT_AUTH0_TOKEN_ENDPOINT: ${{ secrets.PT_AUTH0_TOKEN_ENDPOINT }}
           PT_ENDPOINT: ${{ secrets.PT_ENDPOINT }}
-          KEYCLOAK_USER: ${{ secrets.KEYCLOAK_USER }}
-          KEYCLOAK_PASSWORD: ${{ secrets.KEYCLOAK_PASSWORD }}
-          DB_VENDOR: mysql
-          DB_ADDR: ${{ secrets.KEYCLOAK_DB_ADDR }}
-          DB_DATABASE: ${{ secrets.KEYCLOAK_DB }}
-          DB_USER: ${{ secrets.KEYCLOAK_DB_USER }}
-          DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
-          PROXY_ADDRESS_FORWARDING: true
-          KEYCLOAK_FRONTENT_URL: https://keycloak.ccmdev.ca/auth
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
