@@ -124,19 +124,19 @@ jobs:
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           NODE_ENV: development
-          PT_AUTH0_CLIENT_ID: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_ID }}
+          PT_AUTH0_TOKEN_CLIENT_ID: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_ID }}
           PT_AUTH0_TOKEN_CLIENT_SECRET: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_SECRET }}
           PT_AUTH0_TOKEN_ENDPOINT: ${{ secrets.PT_AUTH0_TOKEN_ENDPOINT }}
           PT_ENDPOINT: ${{ secrets.PT_ENDPOINT }}
           KEYCLOAK_USER: ${{ secrets.KEYCLOAK_USER }}
           KEYCLOAK_PASSWORD: ${{ secrets.KEYCLOAK_PASSWORD }}
           DB_VENDOR: mysql
-          DB_ADDR: ${{ secrets.KEYCLOAK_DB_ADDR }}
-          DB_DATABASE: ${{ secrets.KEYCLOAK_DB }}
-          DB_USER: ${{ secrets.KEYCLOAK_DB_USER }}
-          DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
+          KEYCLOAK_DB_ADDR: ${{ secrets.KEYCLOAK_DB_ADDR }}
+          KEYCLOAK_DB: ${{ secrets.KEYCLOAK_DB }}
+          KEYCLOAK_DB_USER: ${{ secrets.KEYCLOAK_DB_USER }}
+          KEYCLOAK_DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
           PROXY_ADDRESS_FORWARDING: true
-          KEYCLOAK_FRONTENT_URL: ${{ secrets.KEYCLOAK_FRONTEND_URL }}
+          KEYCLOAK_FRONTEND_URL: ${{ secrets.KEYCLOAK_FRONTEND_URL }}
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
