@@ -136,7 +136,7 @@ jobs:
           DB_USER: ${{ secrets.KEYCLOAK_DB_USER }}
           DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
           PROXY_ADDRESS_FORWARDING: true
-          KEYCLOAK_FRONTENT_URL: https://keycloak.ccmdev.ca/auth
+          KEYCLOAK_FRONTENT_URL: ${{ secrets.KEYCLOAK_FRONTEND_URL }}
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
