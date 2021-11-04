@@ -1,25 +1,7 @@
 import mongoose, { Document, Model, model } from 'mongoose';
-import { VariantQueryResponse } from '../types';
-import getCoordinates from './utils/getCoordinates';
+import { VariantAnnotation } from '../types';
 
-export interface VariantAnnotation {
-  alt: string;
-  ref: string;
-  chrom: string;
-  pos: number;
-  assembly: string;
-  aaChanges: string;
-  cdna: string;
-  geneName: string;
-  gnomadHet: number;
-  gnomadHom: number;
-  transcript: string;
-}
-
-export type VariantAnnotationId = Pick<
-  VariantAnnotation,
-  'alt' | 'assembly' | 'chrom' | 'ref' | 'pos'
->;
+export type VariantAnnotationId = Pick<VariantAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
 
 interface VariantAnnotationDocument extends Document, VariantAnnotation {}
 
@@ -61,24 +43,28 @@ const variantAnnotationSchema = new mongoose.Schema({
 
 // For model
 interface VariantAnnotationModelMethods extends Model<VariantAnnotation> {
-  getAnnotations(variant: VariantQueryResponse): Promise<VariantAnnotation[]>;
+  getAnnotations(coordinates: string, assemblyId: string): Promise<VariantAnnotation[]>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
   this: Model<VariantAnnotationDocument>,
-  variant: VariantQueryResponse
+  coordinates: string,
+  assemblyId: string
 ) {
-  const { start, end, coordinates } = getCoordinates(variant);
-  if (coordinates.length > 0) {
-    const variant = await this.aggregate([
-      { $match: { pos: { $gt: start, $lt: end } } },
-      {
-        $match: {
-          $or: coordinates,
-        },
-      },
-    ]);
-    return variant;
+  // Format from remote node aka stager: position: '19:44905791-44909393', assemblyId: 'GRCh37'
+
+  if (coordinates && assemblyId) {
+    const position = coordinates.split(':')[1].split('-');
+    const start = Number(position[0]);
+    const end = Number(position[1]);
+    const chromosome = coordinates.split(':')[0];
+
+    const annotation = await this.find({
+      pos: { $gte: start, $lte: end },
+      chrom: chromosome,
+      assembly: assemblyId,
+    });
+    return annotation;
   } else {
     return [];
   }

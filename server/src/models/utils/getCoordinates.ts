@@ -1,11 +1,11 @@
-import { VariantQueryResponse } from '../../types';
+import { VariantQueryResponseSchema } from '../../types';
 import { VariantAnnotationId } from '../VariantAnnotationModel';
 
-const getCoordinates = (variants: VariantQueryResponse) => {
+const getCoordinates = (variants: VariantQueryResponseSchema[]) => {
   let start = +Infinity;
   let end = -Infinity;
   const coordinates: VariantAnnotationId[] = [];
-  variants.data
+  variants
     .map(d => d.variant)
     .forEach(variant => {
       if (variant.start < start) {
@@ -18,7 +18,6 @@ const getCoordinates = (variants: VariantQueryResponse) => {
 
       coordinates.push({
         alt: variant.alt,
-        assembly: variant.assemblyId,
         chrom: variant.referenceName,
         pos: variant.start,
         ref: variant.ref,

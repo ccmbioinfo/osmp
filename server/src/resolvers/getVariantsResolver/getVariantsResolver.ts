@@ -11,6 +11,7 @@ import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchAnnotations from './utils/fetchAnnotations';
 import annotate from './utils/annotate';
+import { VariantAnnotation as VariantAnnotationModel } from '../../models';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -31,7 +32,13 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     },
   } = args;
 
+  console.log(args);
+
   const annotationsPromise = fetchAnnotations(position, assemblyId);
+
+  const gnomadAnnotations = await VariantAnnotationModel.getAnnotations(position, 'gnomAD_GRCh37');
+
+  console.log('gnomad', gnomadAnnotations, position);
 
   const queries = sources.map(source => buildSourceQuery(source, args));
 
@@ -45,6 +52,14 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     (a, c) => {
       if (c.status === 'fulfilled' && isVariantQuery(c.value) && !c.value.error) {
         const { data, source } = c.value;
+
+        if (gnomadAnnotations) {
+          a.data.push({
+            data: annotate(data, gnomadAnnotations),
+            source,
+          });
+        }
+
         if (annotations) {
           a.data.push({
             data: annotate(data, annotations.value.data as VariantAnnotation[]),
