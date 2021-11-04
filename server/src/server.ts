@@ -11,10 +11,13 @@ import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
+import mongoose from 'mongoose';
 
 const app = express();
 
 const memoryStore = new session.MemoryStore();
+
+mongoose.connect('mongodb://admin:pass@mongo:27017');
 
 app.use(
   session({
