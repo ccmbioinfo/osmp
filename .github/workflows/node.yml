@@ -128,6 +128,7 @@ jobs:
           PT_AUTH0_TOKEN_CLIENT_SECRET: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_SECRET }}
           PT_AUTH0_TOKEN_ENDPOINT: ${{ secrets.PT_AUTH0_TOKEN_ENDPOINT }}
           PT_ENDPOINT: ${{ secrets.PT_ENDPOINT }}
+          TEST_NODE_UR: ${{ secrets.TEST_NODE_URL }}
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
