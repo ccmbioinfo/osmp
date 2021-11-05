@@ -1,30 +1,49 @@
-import { VariantAnnotation, VariantQueryDataResult } from '../../../types';
+import { AnnotationQueryResponse, VariantAnnotation, VariantQueryDataResult } from '../../../types';
+
+const isCADDQuery = (arg: AnnotationQueryResponse): arg is AnnotationQueryResponse =>
+  arg.source === 'CADD annotations';
+
+const isGnomadQuery = (arg: AnnotationQueryResponse): arg is AnnotationQueryResponse =>
+  arg.source === 'gnomAD annotations';
 
 const annotate = (
   queryResponse: VariantQueryDataResult[],
-  annotations: VariantAnnotation[]
+  annotationResponse: AnnotationQueryResponse[]
 ): VariantQueryDataResult[] => {
-  const annotationsMap: Record<string, VariantAnnotation> = {};
+  const gnomad: Record<string, VariantAnnotation> = {};
 
-  annotations.forEach(a => {
-    annotationsMap[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
+  const cadd: Record<string, VariantAnnotation> = {};
+
+  annotationResponse.forEach(a => {
+    if (isGnomadQuery(a))
+      a.data.forEach(d => (gnomad[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
+    if (isCADDQuery(a))
+      a.data.forEach(d => {
+        cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d;
+      });
   });
 
-  let count = 0;
   queryResponse.forEach(response => {
     const key = `${response.variant.alt}-${response.variant.referenceName.replace(/chr/i, '')}-${
       response.variant.start
     }-${response.variant.ref}`;
 
-    if (key in annotationsMap) {
-      count = count + 1;
-      const annotation = annotationsMap[key];
+    let gnomadAnnotation;
+    let caddAnnotation;
 
-      response.variant.info = annotation;
+    if (key in gnomad) {
+      const { af, gnomadHet, gnomadHom } = gnomad[key];
+      gnomadAnnotation = { af, gnomadHet, gnomadHom };
     }
+
+    if (key in cadd) {
+      caddAnnotation = cadd[key];
+    }
+
+    response.variant.info = { ...gnomadAnnotation, ...caddAnnotation };
   });
 
-  console.log('% variants annotated', count, (count / queryResponse.length) * 100);
+  console.log(queryResponse.map(q => q.variant.info));
   return queryResponse;
 };
 

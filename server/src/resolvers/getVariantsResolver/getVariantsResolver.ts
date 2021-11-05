@@ -27,6 +27,13 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     },
   } = args;
 
+  /**
+   *  typeguard: is this a variant query or CADD/ gnomAD annotation query
+   */
+  // const isVariantQuery = (
+  //   arg: VariantQueryResponse | AnnotationQueryResponse
+  // ): arg is VariantQueryResponse => arg.source !== 'annotations';
+
   const queries = sources.map(source => buildSourceQuery(source, args));
 
   const settledVariants = await Promise.allSettled(queries);
@@ -35,6 +42,8 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const combinedResults: VariantQueryDataResult[] = [];
 
   /* for now, this will inspect all promises and pass on errors, including annotation promise, will probably want to change soon */
+
+  // Inspect promises and errors for getVariants query
   settledVariants.forEach(response => {
     if (response.status === 'fulfilled' && !response.value.error) {
       combinedResults.push(...response.value.data);
@@ -66,17 +75,17 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     annotationsPromise,
   ]);
 
-  const annotations = settledAnnotations.find(
-    res => res.status === 'fulfilled'
-  ) as PromiseFulfilledResult<AnnotationQueryResponse>;
+  const annotations = (
+    settledAnnotations.filter(
+      res => res.status === 'fulfilled'
+    ) as PromiseFulfilledResult<AnnotationQueryResponse>[]
+  ).map(a => a.value);
 
   // todo: this should be a pipeline each call of which returns [data, errors]
   let annotatedData;
 
-  console.log('ANNOTATED DATA', annotatedData);
-
-  if (!annotations.value.error) {
-    annotatedData = annotate(combinedResults, annotations.value.data);
+  if (!annotations.find(a => a.error)) {
+    annotatedData = annotate(combinedResults, annotations);
   }
 
   return { errors, data: annotatedData ?? combinedResults };

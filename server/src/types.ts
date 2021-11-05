@@ -35,7 +35,7 @@ export interface VariantResponseFields {
   assemblyId: AssemblyId;
   callsets: CallSet[];
   end: number;
-  info?: Maybe<VariantResponseInfoFields>;
+  info?: VariantResponseInfoFields;
   ref: string;
   referenceName: string;
   start: number;

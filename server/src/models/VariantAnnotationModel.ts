@@ -16,7 +16,7 @@ const variantAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   alt: {
-    type: Number,
+    type: String,
   },
   nhomalt: {
     type: String, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
@@ -72,15 +72,6 @@ variantAnnotationSchema.statics.getAnnotations = async function (
       chrom: chromosome,
       assembly: assemblyId,
     });
-
-    console.log(
-      {
-        pos: { $gte: start, $lte: end },
-        chrom: chromosome,
-        assembly: assemblyId,
-      },
-      annotation
-    );
 
     return annotation;
   } else {
