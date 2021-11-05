@@ -32,13 +32,9 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     },
   } = args;
 
-  console.log(args);
-
   const annotationsPromise = fetchAnnotations(position, assemblyId);
 
   const gnomadAnnotations = await VariantAnnotationModel.getAnnotations(position, 'gnomAD_GRCh37');
-
-  console.log('gnomad', gnomadAnnotations, position);
 
   const queries = sources.map(source => buildSourceQuery(source, args));
 

@@ -64,6 +64,7 @@ variantAnnotationSchema.statics.getAnnotations = async function (
       chrom: chromosome,
       assembly: assemblyId,
     });
+
     return annotation;
   } else {
     return [];
