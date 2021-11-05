@@ -3,6 +3,7 @@ services:
   ssmp-server:
     image: ghcr.io/ccmbioinfo/ssmp:dev
     environment:
+      TEST_NODE_URL: ${TEST_NODE_URL}
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID}
@@ -17,26 +18,6 @@ services:
       driver: journald
     networks:
       - ssmp-dev
-
-  keycloak:
-    image: quay.io/keycloak/keycloak:14.0.0
-    environment:
-      KEYCLOAK_USER: "${KEYCLOAK_USER}"
-      KEYCLOAK_PASSWORD: "${KEYCLOAK_PASSWORD}"
-      DB_VENDOR: mysql
-      DB_ADDR: "${KEYCLOAK_DB_ADDR}"
-      DB_DATABASE: "${KEYCLOAK_DB}"
-      DB_USER: "${KEYCLOAK_DB_USER}"
-      DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
-      PROXY_ADDRESS_FORWARDING: "true"
-      KEYCLOAK_FRONTEND_URL: "${KEYCLOAK_FRONTEND_URL}"
-    ports:
-      - 8080:8080
-    logging:
-      driver: journald
-    networks:
-      - ssmp-dev
-
 networks:
   ssmp-dev:
     driver: bridge

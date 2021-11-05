@@ -49,6 +49,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
     return [];
   } else {
     return response.map((r, i) => ({
+      source: 'local',
       individual: {
         individualId: 'testId1',
       },

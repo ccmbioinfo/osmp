@@ -112,6 +112,8 @@ const getRemoteTestNodeQuery = async (args: QueryInput): Promise<VariantQueryRes
   let remoteTestNodeQueryResponse = null;
   let remoteTestNodeQueryError: RemoteTestNodeQueryError | null = null;
 
+  console.log(process.env.TEST_NODE_URL);
+
   try {
     remoteTestNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
       `${process.env.TEST_NODE_URL}?ensemblId=${args.input.gene.ensemblId}&assemblyId=${args.input.variant.assemblyId}`,
@@ -148,6 +150,7 @@ export default getRemoteTestNodeQuery;
 
 const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[]> = response =>
   (response || []).map(r => ({
+    source: 'remote-test',
     individual: {
       individualId: (r.genotypes || [{ participant_codename: 'unknown' }])[0].participant_codename,
       datasetId: (r.genotypes || [{ dataset_id: 'unknown' }])[0].dataset_id.toString(),

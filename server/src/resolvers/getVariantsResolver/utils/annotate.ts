@@ -1,9 +1,9 @@
-import { VariantAnnotation, VariantQueryResponseSchema } from '../../../types';
+import { VariantAnnotation, VariantQueryDataResult } from '../../../types';
 
 const annotate = (
-  queryResponse: VariantQueryResponseSchema[],
+  queryResponse: VariantQueryDataResult[],
   annotations: VariantAnnotation[]
-): VariantQueryResponseSchema[] => {
+): VariantQueryDataResult[] => {
   const annotationsMap: Record<string, VariantAnnotation> = {};
 
   annotations.forEach(a => {
@@ -16,8 +16,6 @@ const annotate = (
       response.variant.start
     }-${response.variant.ref}`;
 
-    console.log(key)
-
     if (key in annotationsMap) {
       count = count + 1;
       const annotation = annotationsMap[key];
@@ -26,7 +24,6 @@ const annotate = (
     }
   });
 
-  console.log(annotationsMap)
   console.log('% variants annotated', count, (count / queryResponse.length) * 100);
   return queryResponse;
 };

@@ -9,93 +9,91 @@ import { CombinedVariantQueryResponse } from '../../src/types';
  */
 describe('Test getVariants query', () => {
   const GetVariants = `
-  query GetVariants($input: QueryInput) {
-    getVariants(input: $input) {
+    query GetVariants($input: QueryInput) {
+      getVariants(input: $input) {
         data {
-            data {
-                variant {
-                    alt
-                    callsets {
-                        callSetId
-                        individualId
-                        info {
-                            ad
-                            dp
-                            gq
-                            qual
-                            zygosity
-                        }
-                    }
-                    end
-                    info {
-                      aaAlt
-                      aaPos
-                      aaRef
-                      cdna
-                      consequence
-                      geneName
-                      gnomadHet
-                      gnomadHom
-                      transcript
-                    }
-                    ref
-                    referenceName
-                    start
-                }
-                individual {
-                    datasetId
-                    diseases {
-                        ageOfOnset {
-                            age
-                            ageGroup
-                        }
-                        description
-                        diseaseId
-                        levelSeverity
-                        outcome
-                        stage
-                    }
-                    ethnicity
-                    geographicOrigin
-                    individualId
-                    info {
-                        diagnosis
-                        candidateGene
-                        classifications
-                    }
-                    phenotypicFeatures {
-                        ageOfOnset {
-                            age
-                            ageGroup
-                        }
-                        dateOfOnset
-                        levelSeverity
-                        onsetType
-                        phenotypeId
-                    }
-                    sex
-                }
-                contactInfo
+          variant {
+            alt
+            callsets {
+              callSetId
+              individualId
+              info {
+                ad
+                dp
+                gq
+                qual
+                zygosity
+              }
             }
-            source
+            end
+            info {
+              aaAlt
+              aaPos
+              aaRef
+              cdna
+              consequence
+              geneName
+              gnomadHet
+              gnomadHom
+              transcript
+            }
+            ref
+            referenceName
+            start
+          }
+          individual {
+            datasetId
+            diseases {
+              ageOfOnset {
+                age
+                ageGroup
+              }
+              description
+              diseaseId
+              levelSeverity
+              outcome
+              stage
+            }
+            ethnicity
+            geographicOrigin
+            individualId
+            info {
+              diagnosis
+              candidateGene
+              classifications
+            }
+            phenotypicFeatures {
+              ageOfOnset {
+                age
+                ageGroup
+              }
+              dateOfOnset
+              levelSeverity
+              onsetType
+              phenotypeId
+            }
+            sex
+          }
+          contactInfo
+          source
         }
         errors {
-            error {
-                id
-                code
-                message
-            }
-            source
+          error {
+            id
+            code
+            message
+          }
+          source
         }
+      }
     }
-}
   `;
 
   it('issues a valid query', async () => {
     const schema = makeExecutableSchema({ typeDefs });
     // the bare minimum acceptable response object
     const mockResponse: CombinedVariantQueryResponse = {
-      data: [{ data: [], source: 'test' }],
+      data: [],
       errors: [],
     };
 

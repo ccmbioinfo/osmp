@@ -26,8 +26,7 @@ import {
     CallsetInfoFields,
     IndividualInfoFields,
     IndividualResponseFields,
-    VariantQueryResponse,
-    VariantQueryResponseSchema,
+    VariantQueryDataResult,
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
@@ -49,7 +48,7 @@ import { ColumnFilter } from './TableFilter/ColumnFilter';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
 
 interface TableProps {
-    variantData: VariantQueryResponse[];
+    variantData: VariantQueryDataResult[];
 }
 
 export type FlattenedQueryResponse = Omit<
@@ -64,11 +63,8 @@ export type FlattenedQueryResponse = Omit<
     VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
 
 /* flatten all but callsets field */
-const flattenBaseResults = (
-    result: VariantQueryResponseSchema,
-    source: string
-): FlattenedQueryResponse => {
-    const contactInfo = result.contactInfo;
+const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
+    const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
     const {
         diseases,
@@ -88,35 +84,32 @@ const flattenBaseResults = (
     return {
         contactInfo,
         diseases: flattenedDiseases,
-        phenotypes: flattenedPhenotypes,
-        ...restVariant,
-        ...restIndividual,
         ...individualInfo,
+        phenotypes: flattenedPhenotypes,
+        ...restIndividual,
+        ...restVariant,
         source,
         ...variantInfo,
     };
 };
 
 /* flatten data */
-const prepareData = (queryResult: VariantQueryResponse[]) => {
+const prepareData = (queryResult: VariantQueryDataResult[]) => {
     const results: FlattenedQueryResponse[] = [];
-    queryResult.forEach(r => {
-        const source = r.source;
-        r.data.forEach(d => {
-            if (d.variant.callsets.length) {
-                //one row per individual per callset
-                d.variant.callsets
-                    .filter(cs => cs.individualId === d.individual.individualId)
-                    .forEach(cs => {
-                        results.push({
-                            ...cs.info,
-                            ...flattenBaseResults(d, source),
-                        });
+    queryResult.forEach(d => {
+        if (d.variant.callsets.length) {
+            //one row per individual per callset
+            d.variant.callsets
+                .filter(cs => cs.individualId === d.individual.individualId)
+                .forEach(cs => {
+                    results.push({
+                        ...cs.info,
+                        ...flattenBaseResults(d),
                     });
-            } else {
-                results.push(flattenBaseResults(d, source));
-            }
-        });
+                });
+        } else {
+            results.push(flattenBaseResults(d));
+        }
     });
     return results.map(result => formatNullValues(result));
 };

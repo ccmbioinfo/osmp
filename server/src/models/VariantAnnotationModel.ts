@@ -1,59 +1,65 @@
 import mongoose, { Document, Model, model } from 'mongoose';
-import { VariantAnnotation } from '../types';
+import { GnomadAnnotation } from '../types';
 
-export type VariantAnnotationId = Pick<VariantAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
+export type GnomadAnnotationId = Pick<GnomadAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
 
-interface VariantAnnotationDocument extends Document, VariantAnnotation {}
+interface GnomadAnnotationDocument extends Document, GnomadAnnotation {}
 
 const variantAnnotationSchema = new mongoose.Schema({
-  alt: {
-    type: String,
-  },
-  ref: {
-    type: String,
-  },
   chrom: {
     type: String,
   },
   pos: {
     type: Number,
   },
-  assembly: {
+  ref: {
+    type: String,
+  },
+  alt: {
+    type: Number,
+  },
+  nhomalt: {
     type: String, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
   },
-  aaChanges: {
+  an: {
+    type: Number,
+  },
+  af: {
+    type: Number,
+  },
+  filter: {
+    type: String,
+  },
+  gene: {
+    type: String,
+  },
+  transcript: {
     type: String,
   },
   cdna: {
     type: String,
   },
-  geneName: {
+  assembly: {
     type: String,
   },
-  gnomadHet: {
-    type: Number,
-  },
-  gnomadHom: {
-    type: Number,
-  },
-  transcript: {
+  type: {
     type: String,
   },
 });
 
 // For model
-interface VariantAnnotationModelMethods extends Model<VariantAnnotation> {
-  getAnnotations(coordinates: string, assemblyId: string): Promise<VariantAnnotation[]>;
+interface GnomadAnnotationModelMethods extends Model<GnomadAnnotation> {
+  getAnnotations(coordinates: string, assemblyId: string): Promise<GnomadAnnotation[]>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
-  this: Model<VariantAnnotationDocument>,
+  this: Model<GnomadAnnotationDocument>,
   coordinates: string,
   assemblyId: string
 ) {
   // Format from remote node aka stager: position: '19:44905791-44909393', assemblyId: 'GRCh37'
 
-  console.log(coordinates, assemblyId)
+  console.log(coordinates, assemblyId);
 
   if (coordinates && assemblyId) {
     const position = coordinates.split(':')[1].split('-');
@@ -67,11 +73,14 @@ variantAnnotationSchema.statics.getAnnotations = async function (
       assembly: assemblyId,
     });
 
-    console.log({
-      pos: { $gte: start, $lte: end },
-      chrom: chromosome,
-      assembly: assemblyId,
-    }, annotation)
+    console.log(
+      {
+        pos: { $gte: start, $lte: end },
+        chrom: chromosome,
+        assembly: assemblyId,
+      },
+      annotation
+    );
 
     return annotation;
   } else {
@@ -79,9 +88,9 @@ variantAnnotationSchema.statics.getAnnotations = async function (
   }
 };
 
-const VariantAnnotationModel = model<VariantAnnotationDocument, VariantAnnotationModelMethods>(
-  'VariantAnnotation',
+const GnomadAnnotationModel = model<GnomadAnnotationDocument, GnomadAnnotationModelMethods>(
+  'GnomadAnnotation',
   variantAnnotationSchema
 );
 
-export default VariantAnnotationModel;
+export default GnomadAnnotationModel;

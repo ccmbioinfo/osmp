@@ -1,3 +1,3 @@
-import VariantAnnotation from './VariantAnnotationModel';
+import GnomadAnnotation from './VariantAnnotationModel';
 
-export { VariantAnnotation };
+export { GnomadAnnotation };
