@@ -48,11 +48,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       isVariantQuery(response.value) &&
       !response.value.error
     ) {
-      if (annotations) {
-        combinedResults.push(...annotate(response.value.data, annotations.value.data));
-      } else {
-        combinedResults.push(...response.value.data);
-      }
+      combinedResults.push(...response.value.data);
     } else if (response.status === 'fulfilled' && !!response.value.error) {
       const message =
         process.env.NODE_ENV === 'production' && response.value.error.code === 500
