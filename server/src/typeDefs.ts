@@ -85,15 +85,11 @@ export default gql`
     stage: String
   }
 
-  type VariantQueryResponseSchema {
+  type VariantQueryDataResult {
     variant: VariantResponseFields!
     individual: IndividualResponseFields!
     contactInfo: String!
-  }
-
-  type VariantQueryDataResult {
     source: String!
-    data: [VariantQueryResponseSchema!]!
   }
 
   type VariantQueryErrorResponse {
@@ -126,10 +122,6 @@ export default gql`
 
   type ResolutionMessage {
     node: String!
-  }
-
-  type Subscription {
-    queryResolved: ResolutionMessage!
   }
 
   type Query {

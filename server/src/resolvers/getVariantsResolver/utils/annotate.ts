@@ -1,9 +1,9 @@
-import { VariantAnnotation, VariantQueryResponseSchema } from '../../../types';
+import { VariantAnnotation, VariantQueryDataResult } from '../../../types';
 
 const annotate = (
-  queryResponse: VariantQueryResponseSchema[],
+  queryResponse: VariantQueryDataResult[],
   annotations: VariantAnnotation[]
-): VariantQueryResponseSchema[] => {
+): VariantQueryDataResult[] => {
   const annotationsMap: Record<string, VariantAnnotation> = {};
   annotations.forEach(a => {
     annotationsMap[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;

@@ -1,5 +1,5 @@
 import annotate from '../../src/resolvers/getVariantsResolver/utils/annotate';
-import { VariantAnnotation, VariantQueryResponseSchema } from '../../src/types';
+import { VariantAnnotation, VariantQueryDataResult } from '../../src/types';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
@@ -18,8 +18,9 @@ describe('Test whether variants get annotated', () => {
   ];
 
   it('finds the correct coordinates and returns a unique annotation', () => {
-    const variants: VariantQueryResponseSchema[] = [
+    const variants: VariantQueryDataResult[] = [
       {
+        source: 'foo',
         individual: { individualId: 'testId1' },
         variant: {
           alt: 'T',
@@ -54,15 +55,16 @@ describe('Test whether variants get annotated', () => {
   });
 
   it('test empty variants data array', async () => {
-    const variants: VariantQueryResponseSchema[] = [];
+    const variants: VariantQueryDataResult[] = [];
     const result = annotate(variants, annotations);
 
     expect(result).toEqual(variants);
   });
 
   it('test coordinate that does not exist', () => {
-    const variants: VariantQueryResponseSchema[] = [
+    const variants: VariantQueryDataResult[] = [
       {
+        source: 'foo',
         individual: { individualId: 'testId1' },
         variant: {
           alt: 'T',

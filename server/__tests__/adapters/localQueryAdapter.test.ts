@@ -17,6 +17,7 @@ describe('Test local query adapter', () => {
 
     expect(transformed).toEqual([
       {
+        source: 'local',
         individual: {
           individualId: 'testId1',
         },

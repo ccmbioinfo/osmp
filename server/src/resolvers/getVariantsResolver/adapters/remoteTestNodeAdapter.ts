@@ -150,6 +150,7 @@ export default getRemoteTestNodeQuery;
 
 const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[]> = response =>
   (response || []).map(r => ({
+    source: 'remote-test',
     individual: {
       individualId: (r.genotypes || [{ participant_codename: 'unknown' }])[0].participant_codename,
       datasetId: (r.genotypes || [{ dataset_id: 'unknown' }])[0].dataset_id.toString(),

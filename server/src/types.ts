@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
 
-/* these will be returned by our annotation source */
-
 export interface VariantResponseInfoFields {
   aaAlt?: Maybe<string>;
   aaPos?: Maybe<string>;
@@ -15,15 +13,6 @@ export interface VariantResponseInfoFields {
   transcript?: Maybe<string>;
 }
 
-// these *might* be in the response)
-export interface VariantAnnotation extends VariantResponseInfoFields {
-  ref: string;
-  pos: number;
-  chrom: string;
-  alt: string;
-}
-
-export type VariantAnnotationId = Pick<VariantAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
 export interface CallsetInfoFields {
   ad?: Maybe<number>;
   dp?: Maybe<number>;
@@ -79,6 +68,7 @@ export interface IndividualInfoFields {
   classifications?: Maybe<string>;
   diagnosis?: Maybe<string>;
 }
+
 export interface IndividualResponseFields {
   datasetId?: Maybe<string>;
   diseases?: Maybe<DiseaseFields[]>;
@@ -90,10 +80,11 @@ export interface IndividualResponseFields {
   sex?: Maybe<string>;
 }
 
-export interface VariantQueryResponseSchema {
-  variant: VariantResponseFields;
-  individual: IndividualResponseFields;
+export interface VariantQueryDataResult {
   contactInfo: string;
+  individual: IndividualResponseFields;
+  source: string;
+  variant: VariantResponseFields;
 }
 
 export interface VariantQueryInput {
@@ -117,6 +108,15 @@ export interface QueryInput {
 
 /* end graphql schema types */
 
+export interface VariantAnnotation extends VariantResponseInfoFields {
+  ref: string;
+  pos: number;
+  chrom: string;
+  alt: string;
+}
+
+export type VariantAnnotationId = Pick<VariantAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
+
 export interface ErrorResponse {
   id: string;
   code: number | string;
@@ -129,12 +129,17 @@ export interface QueryResult<T> {
   error?: ErrorResponse;
 }
 
-export type VariantQueryResponse = QueryResult<VariantQueryResponseSchema[]>;
+export type VariantQueryResponse = QueryResult<VariantQueryDataResult[]>;
 export type AnnotationQueryResponse = QueryResult<VariantAnnotation[]>;
 
+export interface SourceError {
+  source: string;
+  error: ErrorResponse;
+}
+
 export interface CombinedVariantQueryResponse {
-  data: { source: string; data: VariantQueryResponseSchema[] }[];
-  errors: { source: string; error: ErrorResponse }[];
+  data: VariantQueryDataResult[];
+  errors: SourceError[];
 }
 
 export interface GqlContext {
@@ -142,7 +147,7 @@ export interface GqlContext {
   res: Response;
 }
 
-export type ResultTransformer<T> = (args: T | null) => VariantQueryResponseSchema[];
+export type ResultTransformer<T> = (args: T | null) => VariantQueryDataResult[];
 
 export type ErrorTransformer<T> = (args: T | null) => ErrorResponse | undefined;
 
