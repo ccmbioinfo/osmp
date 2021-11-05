@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import logger from '../../logger';
 // import { v4 as uuidv4 } from 'uuid';
 import {
   AnnotationQueryResponse,
   CombinedVariantQueryResponse,
   QueryInput,
-  VariantAnnotation,
   VariantQueryResponse,
 } from '../../types';
 import getLocalQuery from './adapters/localQueryAdapter';
@@ -40,28 +40,27 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   const settled = await Promise.allSettled([annotationsPromise, ...queries]);
 
-  const annotations = settled.find(
-    res => res.status === 'fulfilled' && !isVariantQuery(res.value)
-  ) as PromiseFulfilledResult<AnnotationQueryResponse>;
+  // const annotations = settled.find(
+  //   res => res.status === 'fulfilled' && !isVariantQuery(res.value)
+  // ) as PromiseFulfilledResult<AnnotationQueryResponse>;
 
   return settled.reduce<CombinedVariantQueryResponse>(
     (a, c) => {
       if (c.status === 'fulfilled' && isVariantQuery(c.value) && !c.value.error) {
         const { data, source } = c.value;
 
-        if (gnomadAnnotations) {
+        if (gnomadAnnotations.length > 0) {
           a.data.push({
             data: annotate(data, gnomadAnnotations),
             source,
           });
-        }
-
-        if (annotations) {
-          a.data.push({
-            data: annotate(data, annotations.value.data as VariantAnnotation[]),
-            source,
-          });
         } else {
+        // if (annotations) {
+        //   a.data.push({
+        //     data: annotate(data, annotations.value.data as VariantAnnotation[]),
+        //     source,
+        //   });
+        // } else {
           a.data.push({ data, source });
         }
       } else if (c.status === 'fulfilled' && !!c.value.error) {

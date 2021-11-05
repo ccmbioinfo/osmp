@@ -53,6 +53,8 @@ variantAnnotationSchema.statics.getAnnotations = async function (
 ) {
   // Format from remote node aka stager: position: '19:44905791-44909393', assemblyId: 'GRCh37'
 
+  console.log(coordinates, assemblyId)
+
   if (coordinates && assemblyId) {
     const position = coordinates.split(':')[1].split('-');
     const start = Number(position[0]);
@@ -64,6 +66,12 @@ variantAnnotationSchema.statics.getAnnotations = async function (
       chrom: chromosome,
       assembly: assemblyId,
     });
+
+    console.log({
+      pos: { $gte: start, $lte: end },
+      chrom: chromosome,
+      assembly: assemblyId,
+    }, annotation)
 
     return annotation;
   } else {
