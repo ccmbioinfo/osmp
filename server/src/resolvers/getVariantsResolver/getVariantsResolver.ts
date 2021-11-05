@@ -1,10 +1,11 @@
 import logger from '../../logger';
-// import { v4 as uuidv4 } from 'uuid';
 import {
   AnnotationQueryResponse,
   CombinedVariantQueryResponse,
   QueryInput,
-  VariantAnnotation,
+  SourceError,
+  // VariantAnnotation,
+  VariantQueryDataResult,
   VariantQueryResponse,
 } from '../../types';
 import getLocalQuery from './adapters/localQueryAdapter';
@@ -37,44 +38,46 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   const settled = await Promise.allSettled([annotationsPromise, ...queries]);
 
+  const errors: SourceError[] = [];
+  const combinedResults: VariantQueryDataResult[] = [];
+
+  /* for now, this will inspect all promises and pass on errors, including annotation promise, will probably want to change soon */
+  settled.forEach(response => {
+    if (
+      response.status === 'fulfilled' &&
+      isVariantQuery(response.value) &&
+      !response.value.error
+    ) {
+      combinedResults.push(...response.value.data);
+    } else if (response.status === 'fulfilled' && !!response.value.error) {
+      const message =
+        process.env.NODE_ENV === 'production' && response.value.error.code === 500
+          ? 'Something went wrong!'
+          : response.value.error.message;
+
+      errors.push({
+        source: response.value.source,
+        error: { ...response.value.error!, message },
+      });
+    } else if (response.status === 'rejected') {
+      logger.error('UNHANDLED REJECTION!');
+      logger.error(response.reason);
+      throw new Error(response.reason);
+    }
+  });
+
   const annotations = settled.find(
     res => res.status === 'fulfilled' && !isVariantQuery(res.value)
   ) as PromiseFulfilledResult<AnnotationQueryResponse>;
 
-  return settled.reduce<CombinedVariantQueryResponse>(
-    (a, c) => {
-      if (c.status === 'fulfilled' && isVariantQuery(c.value) && !c.value.error) {
-        const { data, source } = c.value;
-        if (annotations) {
-          a.data.push({
-            data: annotate(data, annotations.value.data as VariantAnnotation[]),
-            source,
-          });
-        } else {
-          a.data.push({ data, source });
-        }
-      } else if (c.status === 'fulfilled' && !!c.value.error) {
-        const message =
-          process.env.NODE_ENV === 'production' && c.value.error.code === 500
-            ? 'Something went wrong!'
-            : c.value.error.message;
+  // todo: this should be a pipeline each call of which returns [data, errors]
+  let annotatedData;
 
-        a.errors.push({
-          source: c.value.source,
-          error: { ...c.value.error!, message },
-        });
-      } else if (c.status === 'rejected') {
-        logger.error('UNHANDLED REJECTION!');
-        logger.error(c.reason);
-        throw new Error(c.reason);
-      }
-      return a;
-    },
-    {
-      errors: [],
-      data: [],
-    }
-  );
+  if (!annotations.value.error) {
+    annotatedData = annotate(combinedResults, annotations.value.data);
+  }
+
+  return { errors, data: annotatedData ?? combinedResults };
 };
 
 const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {

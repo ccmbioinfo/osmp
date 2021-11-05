@@ -54,6 +54,21 @@ export interface PhenotypicFeaturesFields {
     phenotypeId?: Maybe<string>;
 }
 
+export interface DiseaseFields {
+    ageOfOnset?: Maybe<AgeOfOnsetFields>;
+    description?: Maybe<string>;
+    diseaseId: string;
+    levelSeverity?: Maybe<string>;
+    outcome?: Maybe<string>;
+    stage?: Maybe<string>;
+}
+
+export interface IndividualInfoFields {
+    candidateGene?: Maybe<string>;
+    classifications?: Maybe<string>;
+    diagnosis?: Maybe<string>;
+}
+
 export interface IndividualResponseFields {
     datasetId?: Maybe<string>;
     diseases?: Maybe<DiseaseFields[]>;
@@ -65,25 +80,11 @@ export interface IndividualResponseFields {
     sex?: Maybe<string>;
 }
 
-export interface IndividualInfoFields {
-    candidateGene?: Maybe<string>;
-    classifications?: Maybe<string>;
-    diagnosis?: Maybe<string>;
-}
-
-export interface DiseaseFields {
-    ageOfOnset?: Maybe<AgeOfOnsetFields>;
-    description?: Maybe<string>;
-    diseaseId: string;
-    levelSeverity?: Maybe<string>;
-    outcome?: Maybe<string>;
-    stage?: Maybe<string>;
-}
-
-export interface VariantQueryResponseSchema {
-    variant: VariantResponseFields;
-    individual: IndividualResponseFields;
+export interface VariantQueryDataResult {
     contactInfo: string;
+    individual: IndividualResponseFields;
+    source: string;
+    variant: VariantResponseFields;
 }
 
 export interface VariantQueryInput {
@@ -122,11 +123,11 @@ export interface QueryResult<T> {
 export type VariantQueryResponseError = { source: string; error: ErrorResponse };
 
 export interface CombinedVariantQueryResponse {
-    data: VariantQueryResponse[];
-    errors: VariantQueryResponseError[];
+    data: VariantQueryDataResult[];
+    errors: { source: string; error: ErrorResponse }[];
 }
 
-export type VariantQueryResponse = QueryResult<VariantQueryResponseSchema[]>;
+export type VariantQueryResponse = QueryResult<VariantQueryDataResult[]>;
 
 export type TableRowIndividual = IndividualResponseFields & CallsetInfoFields & { source: string };
 export type TableRowVariant = Omit<VariantResponseFields, 'callsets'>;

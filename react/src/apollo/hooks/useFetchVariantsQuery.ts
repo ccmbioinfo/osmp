@@ -6,71 +6,69 @@ const fetchVariantsQuery = gql`
     query GetVariants($input: QueryInput) {
         getVariants(input: $input) {
             data {
-                data {
-                    variant {
-                        alt
-                        callsets {
-                            callSetId
-                            individualId
-                            info {
-                                ad
-                                dp
-                                gq
-                                qual
-                                zygosity
-                            }
-                        }
-                        end
-                        info {
-                            aaAlt
-                            aaPos
-                            aaRef
-                            cdna
-                            consequence
-                            geneName
-                            gnomadHet
-                            gnomadHom
-                            transcript
-                        }
-                        ref
-                        referenceName
-                        start
-                    }
-                    individual {
-                        datasetId
-                        diseases {
-                            ageOfOnset {
-                                age
-                                ageGroup
-                            }
-                            description
-                            diseaseId
-                            levelSeverity
-                            outcome
-                            stage
-                        }
-                        ethnicity
-                        geographicOrigin
+                variant {
+                    alt
+                    callsets {
+                        callSetId
                         individualId
                         info {
-                            diagnosis
-                            candidateGene
-                            classifications
+                            ad
+                            dp
+                            gq
+                            qual
+                            zygosity
                         }
-                        phenotypicFeatures {
-                            ageOfOnset {
-                                age
-                                ageGroup
-                            }
-                            dateOfOnset
-                            levelSeverity
-                            onsetType
-                            phenotypeId
-                        }
-                        sex
                     }
-                    contactInfo
+                    end
+                    info {
+                        aaAlt
+                        aaPos
+                        aaRef
+                        cdna
+                        consequence
+                        geneName
+                        gnomadHet
+                        gnomadHom
+                        transcript
+                    }
+                    ref
+                    referenceName
+                    start
                 }
+                individual {
+                    datasetId
+                    diseases {
+                        ageOfOnset {
+                            age
+                            ageGroup
+                        }
+                        description
+                        diseaseId
+                        levelSeverity
+                        outcome
+                        stage
+                    }
+                    ethnicity
+                    geographicOrigin
+                    individualId
+                    info {
+                        diagnosis
+                        candidateGene
+                        classifications
+                    }
+                    phenotypicFeatures {
+                        ageOfOnset {
+                            age
+                            ageGroup
+                        }
+                        dateOfOnset
+                        levelSeverity
+                        onsetType
+                        phenotypeId
+                    }
+                    sex
+                }
+                contactInfo
                 source
             }
             errors {
@@ -79,7 +77,6 @@ const fetchVariantsQuery = gql`
                     code
                     message
                 }
-                source
             }
         }
     }
