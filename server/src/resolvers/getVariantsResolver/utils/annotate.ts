@@ -17,10 +17,7 @@ const annotate = (
   annotationResponse.forEach(a => {
     if (isGnomadQuery(a))
       a.data.forEach(d => (gnomad[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
-    if (isCADDQuery(a))
-      a.data.forEach(d => {
-        cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d;
-      });
+    if (isCADDQuery(a)) a.data.forEach(d => (cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
   });
 
   queryResponse.forEach(response => {
@@ -37,10 +34,12 @@ const annotate = (
     }
 
     if (key in cadd) {
+      console.log('hello found key in cadd');
+      console.log(cadd[key]);
       caddAnnotation = cadd[key];
     }
 
-    response.variant.info = { ...gnomadAnnotation, ...caddAnnotation };
+    response.variant.info = { ...caddAnnotation, ...gnomadAnnotation };
   });
 
   console.log(queryResponse.map(q => q.variant.info));

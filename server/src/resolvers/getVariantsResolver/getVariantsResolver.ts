@@ -15,6 +15,7 @@ import fetchAnnotations from './utils/fetchAnnotations';
 import fetchGnomadAnnotations from './utils/fetchGnomadAnnotations';
 import annotate from './utils/annotate';
 import getPosition from './utils/getPosition';
+import getCoordinates from '../../models/utils/getCoordinates';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -44,6 +45,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   /* for now, this will inspect all promises and pass on errors, including annotation promise, will probably want to change soon */
 
   // Inspect promises and errors for getVariants query
+
   settledVariants.forEach(response => {
     if (response.status === 'fulfilled' && !response.value.error) {
       combinedResults.push(...response.value.data);
@@ -65,10 +67,11 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   });
 
   const position = getPosition(combinedResults);
+  const gnomadCoordinates = getCoordinates(combinedResults);
 
   const annotationsPromise = fetchAnnotations(position, assemblyId);
 
-  const gnomadAnnotationsPromise = fetchGnomadAnnotations(position, assemblyId);
+  const gnomadAnnotationsPromise = fetchGnomadAnnotations(gnomadCoordinates, 'gnomAD_GRCh37');
 
   const settledAnnotations = await Promise.allSettled([
     gnomadAnnotationsPromise,
@@ -81,10 +84,12 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     ) as PromiseFulfilledResult<AnnotationQueryResponse>[]
   ).map(a => a.value);
 
+  console.log(annotations);
+
   // todo: this should be a pipeline each call of which returns [data, errors]
   let annotatedData;
 
-  if (!annotations.find(a => a.error)) {
+  if (annotations.find(a => !a.error)) {
     annotatedData = annotate(combinedResults, annotations);
   }
 

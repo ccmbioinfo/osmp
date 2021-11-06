@@ -47,32 +47,36 @@ const variantAnnotationSchema = new mongoose.Schema({
   },
 });
 
+type AnnotationInput = {
+  start: number;
+  end: number;
+  coordinates: GnomadAnnotationId[];
+};
+
 // For model
 interface GnomadAnnotationModelMethods extends Model<GnomadAnnotation> {
-  getAnnotations(coordinates: string, assemblyId: string): Promise<GnomadAnnotation[]>;
+  getAnnotations(ids: AnnotationInput, assemblyId: string): Promise<GnomadAnnotation[]>;
 }
 
 variantAnnotationSchema.statics.getAnnotations = async function (
   this: Model<GnomadAnnotationDocument>,
-  coordinates: string,
+  ids: AnnotationInput,
   assemblyId: string
 ) {
   // Format from remote node aka stager: position: '19:44905791-44909393', assemblyId: 'GRCh37'
 
-  console.log(coordinates, assemblyId);
+  const { start, end, coordinates } = ids;
 
-  if (coordinates && assemblyId) {
-    const position = coordinates.split(':')[1].split('-');
-    const start = Number(position[0]);
-    const end = Number(position[1]);
-    const chromosome = coordinates.split(':')[0];
-
-    const annotation = await this.find({
-      pos: { $gte: start, $lte: end },
-      chrom: chromosome,
-      assembly: assemblyId,
-    });
-
+  if (coordinates.length > 0 && assemblyId) {
+    const annotation = await this.aggregate([
+      { $match: { assembly: { $eq: assemblyId } } },
+      { $match: { pos: { $gte: start, $lte: end } } },
+      {
+        $match: {
+          $or: coordinates,
+        },
+      },
+    ]);
     return annotation;
   } else {
     return [];

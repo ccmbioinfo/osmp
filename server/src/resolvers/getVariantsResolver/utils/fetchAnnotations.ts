@@ -130,7 +130,7 @@ const fetchAnnotations = (
 ): Promise<AnnotationQueryResponse> => {
   const source = 'CADD annotations';
   return _getAnnotations(position, assemblyId)
-    .then(result => ({ source, data: _formatAnnotations(result.stdout) }))
+    .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
     .catch(error => ({
       error: {
         id: uuidv4(),
