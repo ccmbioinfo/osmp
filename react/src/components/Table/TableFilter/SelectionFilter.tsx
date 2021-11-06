@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from 'util';
 import React, { useState } from 'react';
 import { Row } from 'react-table';
 import { ComboBox } from '../..';
@@ -67,7 +68,7 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
                 .map((n, id) => ({
                     id,
                     value: n,
-                    label: n,
+                    label: isNullOrUndefined(n) || !n.trim().length ? 'Not Available' : n,
                 }))}
             onSelect={handleSelectionFilter}
             placeholder="Select"
