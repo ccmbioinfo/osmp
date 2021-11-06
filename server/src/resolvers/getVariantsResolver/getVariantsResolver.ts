@@ -5,7 +5,6 @@ import {
   CombinedVariantQueryResponse,
   QueryInput,
   SourceError,
-  // VariantAnnotation,
   VariantQueryDataResult,
   VariantQueryResponse,
 } from '../../types';
@@ -16,6 +15,7 @@ import fetchGnomadAnnotations from './utils/fetchGnomadAnnotations';
 import annotate from './utils/annotate';
 import getPosition from './utils/getPosition';
 import getCoordinates from '../../models/utils/getCoordinates';
+import { getKMeansCluster, getClusterPosition } from './utils/kMeans';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -31,9 +31,9 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   /**
    *  typeguard: is this a variant query or CADD/ gnomAD annotation query
    */
-  // const isVariantQuery = (
-  //   arg: VariantQueryResponse | AnnotationQueryResponse
-  // ): arg is VariantQueryResponse => arg.source !== 'annotations';
+  const isVariantQuery = (
+    arg: VariantQueryResponse | AnnotationQueryResponse
+  ): arg is VariantQueryResponse => arg.source !== 'annotations';
 
   const queries = sources.map(source => buildSourceQuery(source, args));
 
@@ -42,14 +42,37 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const errors: SourceError[] = [];
   const combinedResults: VariantQueryDataResult[] = [];
 
-  /* for now, this will inspect all promises and pass on errors, including annotation promise, will probably want to change soon */
-
-  // Inspect promises and errors for getVariants query
-
   settledVariants.forEach(response => {
-    if (response.status === 'fulfilled' && !response.value.error) {
+    if (
+      response.status === 'fulfilled' &&
+      !response.value.error &&
+      isVariantQuery(response.value)
+    ) {
       combinedResults.push(...response.value.data);
-    } else if (response.status === 'fulfilled' && !!response.value.error) {
+    }
+  });
+
+  const position = getPosition(combinedResults);
+  const gnomadCoordinates = getCoordinates(combinedResults);
+
+  // To-do: We can modify the number of clusters based on the sie of the gene - max ~10 otherwise we have "429: Too many requests error"
+  const numberOfClusters =
+    Math.sqrt(position.length / 2) > 10 ? Math.sqrt(position.length / 2) : 10;
+  const cluster = getKMeansCluster(position, numberOfClusters);
+  const clusteredPosition = getClusterPosition(cluster);
+
+  const annotationsPromise = clusteredPosition.map(p => buildCADDAnnotationQuery(p, assemblyId));
+
+  const gnomadAnnotationsPromise = fetchGnomadAnnotations(gnomadCoordinates, 'gnomAD_GRCh37');
+
+  const settledAnnotations = await Promise.allSettled([
+    gnomadAnnotationsPromise,
+    ...annotationsPromise,
+  ]);
+
+  // Add errors
+  [...settledAnnotations, ...settledVariants].forEach(response => {
+    if (response.status === 'fulfilled' && !!response.value.error) {
       const message =
         process.env.NODE_ENV === 'production' && response.value.error.code === 500
           ? 'Something went wrong!'
@@ -66,25 +89,11 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
-  const position = getPosition(combinedResults);
-  const gnomadCoordinates = getCoordinates(combinedResults);
-
-  const annotationsPromise = fetchAnnotations(position, assemblyId);
-
-  const gnomadAnnotationsPromise = fetchGnomadAnnotations(gnomadCoordinates, 'gnomAD_GRCh37');
-
-  const settledAnnotations = await Promise.allSettled([
-    gnomadAnnotationsPromise,
-    annotationsPromise,
-  ]);
-
   const annotations = (
     settledAnnotations.filter(
       res => res.status === 'fulfilled'
     ) as PromiseFulfilledResult<AnnotationQueryResponse>[]
   ).map(a => a.value);
-
-  console.log(annotations);
 
   // todo: this should be a pipeline each call of which returns [data, errors]
   let annotatedData;
@@ -105,6 +114,13 @@ const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQuer
     default:
       throw new Error(`source ${source} not found!`);
   }
+};
+
+const buildCADDAnnotationQuery = (
+  position: string,
+  assembly: string
+): Promise<AnnotationQueryResponse> => {
+  return fetchAnnotations(position, assembly);
 };
 
 export default getVariants;

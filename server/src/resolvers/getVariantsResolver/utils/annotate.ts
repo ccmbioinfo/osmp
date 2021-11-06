@@ -34,15 +34,12 @@ const annotate = (
     }
 
     if (key in cadd) {
-      console.log('hello found key in cadd');
-      console.log(cadd[key]);
       caddAnnotation = cadd[key];
     }
 
     response.variant.info = { ...caddAnnotation, ...gnomadAnnotation };
   });
 
-  console.log(queryResponse.map(q => q.variant.info));
   return queryResponse;
 };
 
