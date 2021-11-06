@@ -19,6 +19,7 @@ export type ComparisonOption = {
 export interface FilterComparison {
     start: ComparisonType;
     end: ComparisonType;
+    af: ComparisonType;
 }
 
 interface InputComparisonDropdownProps {
