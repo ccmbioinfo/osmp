@@ -111,6 +111,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
             results.push(flattenBaseResults(d));
         }
     });
+    console.log(results);
     return results.map(result => formatNullValues(result));
 };
 
@@ -217,6 +218,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableSortBy: true,
                         width: 79,
                     },
+                    { accessor: 'af', id: 'af', Header: 'AF', width: 105 },
                     { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
                     { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
                     { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 },

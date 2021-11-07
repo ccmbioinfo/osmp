@@ -1,7 +1,7 @@
 import { AnnotationQueryResponse, GnomadAnnotation } from '../../../types';
+import { GnomadAnnotationId } from '../../../models/VariantAnnotationModel';
 import { GnomadAnnotation as GnomadAnnotationModel } from '../../../models/index';
 import { v4 as uuidv4 } from 'uuid';
-import resolveAssembly from './resolveAssembly';
 
 const formatAnnotations = (result: GnomadAnnotation[]) => {
   return result.map(r => {
@@ -19,11 +19,16 @@ const formatAnnotations = (result: GnomadAnnotation[]) => {
 };
 
 const fetchGnomadAnnotations = (
-  position: string,
+  coordinates: {
+    start: number;
+    end: number;
+    coordinates: GnomadAnnotationId[];
+  },
   assemblyId: string
 ): Promise<AnnotationQueryResponse> => {
   const source = 'gnomAD annotations';
-  return GnomadAnnotationModel.getAnnotations(position, resolveAssembly(assemblyId))
+
+  return GnomadAnnotationModel.getAnnotations(coordinates, assemblyId)
     .then(result => ({ source, data: formatAnnotations(result) }))
     .catch(error => ({
       error: {

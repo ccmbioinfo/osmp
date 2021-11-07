@@ -17,10 +17,7 @@ const annotate = (
   annotationResponse.forEach(a => {
     if (isGnomadQuery(a))
       a.data.forEach(d => (gnomad[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
-    if (isCADDQuery(a))
-      a.data.forEach(d => {
-        cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d;
-      });
+    if (isCADDQuery(a)) a.data.forEach(d => (cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
   });
 
   queryResponse.forEach(response => {
@@ -40,10 +37,9 @@ const annotate = (
       caddAnnotation = cadd[key];
     }
 
-    response.variant.info = { ...gnomadAnnotation, ...caddAnnotation };
+    response.variant.info = { ...caddAnnotation, ...gnomadAnnotation };
   });
 
-  console.log(queryResponse.map(q => q.variant.info));
   return queryResponse;
 };
 

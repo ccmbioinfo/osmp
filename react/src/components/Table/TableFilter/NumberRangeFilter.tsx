@@ -20,7 +20,6 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
     setFilter,
     filters,
     columnId,
-    preFilteredRows,
 }) => {
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState<string>('');
@@ -37,6 +36,11 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             greater: false,
             equal: true,
         },
+        af: {
+            less: false,
+            greater: false,
+            equal: true,
+        },
     });
 
     const handleComparisonValue = (
@@ -45,7 +49,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
         comparison: ComparisonType
     ) => {
         const val = e.target.value;
-        if (isNaN(parseInt(val)) && val !== '') {
+        if (isNaN(parseFloat(val)) && val !== '') {
             setError(true);
             setText(val);
         } else {
@@ -55,7 +59,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
                 setText(val);
                 num = undefined;
             } else {
-                num = parseInt(val);
+                num = parseFloat(val);
             }
             if (comparison.less) {
                 setFilter(columnId, [-Infinity, num]);
