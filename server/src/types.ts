@@ -127,7 +127,7 @@ export interface CaddAnnotation extends VariantCoordinate {
 export interface GnomadAnnotation extends VariantCoordinate {
   af: number;
   an: number;
-  nhomalt: string;
+  nhomalt: number;
   assembly: string;
   type: string;
 }

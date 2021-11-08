@@ -77,6 +77,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   if (!!caddAannotations && !caddAannotations.value.error) {
     annotatedData = annotateCadd(combinedResults, caddAannotations.value.data);
   }
+
   if (annotatedData) {
     annotatedData = await annotateGnomad(annotatedData);
   }

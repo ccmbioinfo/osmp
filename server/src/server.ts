@@ -21,7 +21,7 @@ console.log(process.env.MONGO_CONNECTION_STRING);
 
 mongoose
   .connect(process.env.MONGO_CONNECTION_STRING!)
-  .then(r => {
+  .then(() => {
     logger.info('successfully connected to mongo!');
   })
   .catch(e => {
