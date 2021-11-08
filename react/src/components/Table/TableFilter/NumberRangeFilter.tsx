@@ -16,15 +16,12 @@ interface NumberRangeFilterProps {
     preFilteredRows: Row<FlattenedQueryResponse>[];
 }
 
-const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
-    setFilter,
-    filters,
-    columnId,
-}) => {
+const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter, filters, columnId }) => {
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState<string>('');
 
     // If we have more columns we want to add number comparison too, they would be added to this list.
+    // todo: move to a declarative model on the Column def
     const [filterComparison, setFilterComparison] = useState<FilterComparison>({
         start: {
             less: false,
@@ -37,6 +34,11 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             equal: true,
         },
         af: {
+            less: false,
+            greater: false,
+            equal: true,
+        },
+        gnomadHom: {
             less: false,
             greater: false,
             equal: true,
@@ -81,7 +83,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
         return text;
     };
 
-    return (
+    return comparison ? (
         <Column>
             <Input
                 variant="outlined"
@@ -103,7 +105,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
                 </Typography>
             )}
         </Column>
-    );
+    ) : null;
 };
 
 export default NumberRangeFilter;

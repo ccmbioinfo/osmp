@@ -15,7 +15,7 @@ interface ColumnFilterProps {
     filters: DefaultFilter<string | string[] | number | number[]>[];
     preFilteredRows: Row<FlattenedQueryResponse>[];
     setFilter: (columnId: string, filterValue: any) => void;
-    columnId: string;
+    columnId: keyof FlattenedQueryResponse;
 }
 
 export const ColumnFilter: React.FC<ColumnFilterProps> = ({
@@ -48,7 +48,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                     searchable={multiSelect.includes(columnId)}
                 />
             );
-        } else if (columnId === 'start' || columnId === 'end') {
+        } else if (['start', 'end', 'af', 'gnomadHom'].includes(columnId)) {
             return (
                 <NumberRangeFilter
                     setFilter={setFilter}
