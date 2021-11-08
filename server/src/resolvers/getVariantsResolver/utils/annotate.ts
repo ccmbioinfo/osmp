@@ -15,9 +15,12 @@ const annotate = (
   const cadd: Record<string, VariantAnnotation> = {};
 
   annotationResponse.forEach(a => {
-    if (isGnomadQuery(a))
+    if (isGnomadQuery(a)) {
       a.data.forEach(d => (gnomad[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
-    if (isCADDQuery(a)) a.data.forEach(d => (cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
+    }
+    if (isCADDQuery(a)) {
+      a.data.forEach(d => (cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
+    }
   });
 
   queryResponse.forEach(response => {

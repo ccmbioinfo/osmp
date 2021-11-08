@@ -468,14 +468,14 @@
     tslib "~2.2.0"
     value-or-promise "1.0.6"
 
-"@graphql-tools/delegate@^8.4.1":
-  version "8.4.1"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/delegate/-/delegate-8.4.1.tgz#f113e6a4d39c90ad955fac09b4f0ad07fbd96551"
-  integrity sha512-Oz1DYXmAKPKgHNsFnflg+CXKRVoPJI3AGRkcaRR0kA/4VWlMiKonL2O0BZdoRd0IbtZimBeQCrDEb5TikjIv0g==
+"@graphql-tools/delegate@^8.4.2":
+  version "8.4.2"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/delegate/-/delegate-8.4.2.tgz#a61d45719855720304e3656800342cfa17d82558"
+  integrity sha512-CjggOhiL4WtyG2I3kux+1/p8lQxSFHBj0gwa0NxnQ6Vsnpw7Ig5VP1ovPnitFuBv2k4QdC37Nj2xv2n7DRn8fw==
   dependencies:
     "@graphql-tools/batch-execute" "^8.3.1"
     "@graphql-tools/schema" "^8.3.1"
-    "@graphql-tools/utils" "^8.5.1"
+    "@graphql-tools/utils" "^8.5.3"
     dataloader "2.0.0"
     tslib "~2.3.0"
     value-or-promise "1.0.11"
@@ -501,11 +501,11 @@
     tslib "~2.1.0"
 
 "@graphql-tools/import@^6.2.6", "@graphql-tools/import@^6.3.1":
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/import/-/import-6.6.0.tgz#4779d08ce2b62ddaa95dbe4877e26cdabc1f746f"
-  integrity sha512-qRuvLQQoeF3XEnz1uaH+7Xhs6TA7dUvyJi2VTzD6zLRPoqMXRxtSwoW67jlvskau31mI+7Q8yqG0P3QpdYg1Dw==
+  version "6.6.1"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/import/-/import-6.6.1.tgz#2a7e1ceda10103ffeb8652a48ddc47150b035485"
+  integrity sha512-i9WA6k+erJMci822o9w9DoX+uncVBK60LGGYW8mdbhX0l7wEubUpA000thJ1aarCusYh0u+ZT9qX0HyVPXu25Q==
   dependencies:
-    "@graphql-tools/utils" "8.5.2"
+    "@graphql-tools/utils" "8.5.3"
     resolve-from "5.0.0"
     tslib "~2.3.0"
 
@@ -619,10 +619,10 @@
   dependencies:
     tslib "~2.3.0"
 
-"@graphql-tools/utils@8.5.2", "@graphql-tools/utils@^8.0.0", "@graphql-tools/utils@^8.5.1":
-  version "8.5.2"
-  resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-8.5.2.tgz#fa775d92c19237f648105f7d4aeeeb63ba3d257f"
-  integrity sha512-wxA51td/759nQziPYh+HxE0WbURRufrp1lwfOYMgfK4e8Aa6gCa1P1p6ERogUIm423NrIfOVau19Q/BBpHdolw==
+"@graphql-tools/utils@8.5.3", "@graphql-tools/utils@^8.0.0", "@graphql-tools/utils@^8.5.1", "@graphql-tools/utils@^8.5.3":
+  version "8.5.3"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/utils/-/utils-8.5.3.tgz#404062e62cae9453501197039687749c4885356e"
+  integrity sha512-HDNGWFVa8QQkoQB0H1lftvaO1X5xUaUDk1zr1qDe0xN1NL0E/CrQdJ5UKLqOvH4hkqVUPxQsyOoAZFkaH6rLHg==
   dependencies:
     tslib "~2.3.0"
 
@@ -3295,11 +3295,11 @@ graphql-depth-limit@1.1.0:
     arrify "^1.0.1"
 
 graphql-middleware@^6.0.10:
-  version "6.1.11"
-  resolved "https://registry.yarnpkg.com/graphql-middleware/-/graphql-middleware-6.1.11.tgz#197baa3bc45c384898a9d04441052934fb9cefa7"
-  integrity sha512-5thAGtAQmuKHsUkGtUFsqqtF78mWcWn//a/8bLaRnCmsQ6gjt+HBcGXmtZgbjmOfQ/UrrgGfwPV2+6w4TahGZA==
+  version "6.1.12"
+  resolved "https://registry.yarnpkg.com/graphql-middleware/-/graphql-middleware-6.1.12.tgz#8c8c99d8c31e8bb4376f89c7af389ddc0a8ac9c1"
+  integrity sha512-9Z4grqhabrbw2oCEDlRMzggETKIAe3cluEW0HxR63r/+L9l48PCirve6rowJlhdsGeopM/Gd3ZrnL0mhECOQCw==
   dependencies:
-    "@graphql-tools/delegate" "^8.4.1"
+    "@graphql-tools/delegate" "^8.4.2"
     "@graphql-tools/schema" "^8.3.1"
 
 graphql-subscriptions@^1.2.1:
@@ -4639,10 +4639,10 @@ mongodb-connection-string-url@^2.0.0:
     "@types/whatwg-url" "^8.2.1"
     whatwg-url "^9.1.0"
 
-mongodb-memory-server-core@7.6.2:
-  version "7.6.2"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server-core/-/mongodb-memory-server-core-7.6.2.tgz#accd52cb68dafefe3937c17384de796e51d7e16d"
-  integrity sha512-+KUqbfCvvpmhvdVqFXE39NGkwWCnDO/kia8OqJE/fPfsEba/+RIBkdIPmZzF09nSolNdov8TkmhNQJ3zmGxm2Q==
+mongodb-memory-server-core@7.6.3:
+  version "7.6.3"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server-core/-/mongodb-memory-server-core-7.6.3.tgz#ba3ff2f50dc1cf5105683f15de54202976931af0"
+  integrity sha512-5rv79YlPoPvguRfFv1fvR78z69/QohGD+65f9UYWDfD70ykXpf6tAXPpWJ4ww/ues7FIVepkFCr3aiUvu6lA+A==
   dependencies:
     "@types/mongodb" "^3.6.20"
     "@types/tmp" "^0.2.2"
@@ -4664,11 +4664,11 @@ mongodb-memory-server-core@7.6.2:
     yauzl "^2.10.0"
 
 mongodb-memory-server@^7.4.3:
-  version "7.6.2"
-  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-7.6.2.tgz#1ae014fcc561def6e665604d5d74a176451371fc"
-  integrity sha512-1T7WyPGT4wrLUEsDEllPNfyeyZOIQLwHx0u7EhtVe56SJNBMsW7Z4GHuCnFLyg9IuKDfVRkMiJltr9DqsMAegw==
+  version "7.6.3"
+  resolved "https://registry.yarnpkg.com/mongodb-memory-server/-/mongodb-memory-server-7.6.3.tgz#8b2827363ca16aaf250cba07f7a2b49e502735d4"
+  integrity sha512-yHDE9FGxOpSRUzitF9Qx3JjEgayCSJI3JOW2wgeBH/5PAsUdisy2nRxRiNwwLDooQ7tohllWCRTXlWqyarUEMQ==
   dependencies:
-    mongodb-memory-server-core "7.6.2"
+    mongodb-memory-server-core "7.6.3"
     tslib "^2.3.0"
 
 mongodb@4.1.3:

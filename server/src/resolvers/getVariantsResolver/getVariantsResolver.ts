@@ -95,7 +95,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     ) as PromiseFulfilledResult<AnnotationQueryResponse>[]
   ).map(a => a.value);
 
-  // todo: this should be a pipeline each call of which returns [data, errors]
   let annotatedData;
 
   if (annotations.find(a => !a.error)) {

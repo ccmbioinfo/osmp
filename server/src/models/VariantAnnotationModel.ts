@@ -19,25 +19,13 @@ const variantAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   nhomalt: {
-    type: String, // The two possible values for assembly is 'GRCh37' and 'GRCh38'. Changing this to an int versus string increases query speed for large dataset.
+    type: String, 
   },
   an: {
     type: Number,
   },
   af: {
     type: Number,
-  },
-  filter: {
-    type: String,
-  },
-  gene: {
-    type: String,
-  },
-  transcript: {
-    type: String,
-  },
-  cdna: {
-    type: String,
   },
   assembly: {
     type: String,

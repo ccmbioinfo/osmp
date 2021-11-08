@@ -60,7 +60,7 @@ services:
       - ./mongo/data:/data/db
     networks:
       - ssmp
-      
+
   test-node-1:
     image: node:16.3-buster
     environment:
@@ -108,6 +108,7 @@ services:
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
       KEYCLOAK_PORT: ${KEYCLOAK_PORT}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      DB_VENDOR: H2
       REACT_URL: ${REACT_URL}
       AUTH0_BROKER_AUTH_URL: ${TEST_NODE_TOKEN_ISSUER}authorize
       AUTH0_BROKER_TOKEN_URL: ${TEST_NODE_TOKEN_ISSUER}oauth/token

@@ -12,7 +12,7 @@ The front end is a React.js SPA bootstrapped with [create-react-app](https://git
     ```
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn install' react 
+    docker-compose run --rm --entrypoint='yarn install' react
     ```
 - bring up the react app using [docker-compose](https://docs.docker.com/compose/):
 
@@ -35,7 +35,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn install' ssmp-server 
+    docker-compose run --rm --entrypoint='yarn install' ssmp-server
     ```
 - bring up the server using [docker-compose](https://docs.docker.com/compose/):
 
@@ -46,7 +46,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 
 - to run the tests:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn test' ssmp-server 
+    docker-compose run --rm --entrypoint='yarn test' ssmp-server
     ```
 
 ## Keycloak
@@ -60,3 +60,23 @@ docker exec -i <keycloak-container-name> bash /usr/scripts/bootstrap-keycloak.sh
 ```
 
 The keycloak admin portal can be accessed in the browser by navigating to localhost and the port specified by the `KEYCLOAK_PORT` env var, e.g., `localhost:9821`
+
+## Mongo
+
+Annotations can be imported into mongo using the following command. Note that that the headers should not be included in the csv and the order of the fields passed to the `fields` argument should match the order of the fields in the csv.
+
+```bash
+mongoimport --db=annotations --collection=annotations --type=csv \
+   --columnsHaveTypes \
+   --fields="pos.int32(),ref.string(),alt.string(),chrom.string(),af.double(),nhomalt.int32(),assembly.string()" \
+   --file=<filename>.csv \
+   -u <username> --password=<pass> --authenticationDatabase=admin
+```
+
+Then make sure to create the following indexes:
+
+```
+db.annotations.createIndex({"pos": 1})
+db.annotations.createIndex({"assembly":1})
+db.annotations.createIndex({"alt": 1, "chrom": 1, "pos": 1, "ref": 1 })
+```
