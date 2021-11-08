@@ -57,10 +57,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             setText(val);
         } else {
             setError(false);
-            if (val === '') {
-                setText(val);
-                num = undefined;
-            } else if (hasDecimal && !decimalValue.length) {
+            if (val === '' || (hasDecimal && !decimalValue.length)) {
                 setText(val);
                 num = undefined;
             } else {
