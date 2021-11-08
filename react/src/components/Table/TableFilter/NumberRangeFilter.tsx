@@ -39,25 +39,35 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
         },
     });
 
+    let num: number | undefined | string;
     const handleComparisonValue = (
         columnId: string,
         e: React.ChangeEvent<HTMLInputElement>,
         comparison: ComparisonType
     ) => {
         const val = e.target.value;
-        console.log(val);
-        if (isNaN(parseFloat(val)) && val !== '') {
+
+        // Check if input value is a float
+        const hasDecimal = val.includes('.');
+        const decimalValue = (hasDecimal ? val.split('.') : [val, ''])[1];
+        const parsed = parseFloat(val).toFixed(decimalValue.length);
+
+        if (isNaN(Number(parsed)) && val !== '') {
             setError(true);
             setText(val);
         } else {
             setError(false);
-            let num;
             if (val === '') {
                 setText(val);
                 num = undefined;
+            } else if (hasDecimal && !decimalValue.length) {
+                setText(val);
+                num = undefined;
             } else {
-                num = parseFloat(val);
+                setText(parsed);
+                num = parseFloat(parsed);
             }
+
             if (comparison.less) {
                 setFilter(columnId, [-Infinity, num]);
             } else if (comparison.greater) {

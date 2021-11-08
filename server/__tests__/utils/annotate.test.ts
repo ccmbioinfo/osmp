@@ -38,8 +38,6 @@ describe('Test whether variants get annotated', () => {
 
     const result = annotate(variants, annotations);
 
-    console.log(result);
-
     // Check if the corresponding variant has info fields populated
     result.forEach(nodeData =>
       expect(nodeData.variant.info).toEqual({
