@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import { v4 as uuidv4 } from 'uuid';
-import { VariantAnnotation, AnnotationQueryResponse } from '../../../types';
+import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import logger from '../../../logger';
 
 const ANNOTATION_URL_38 =
@@ -29,7 +29,7 @@ const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
   protpos: 29
 */
 
-const NAME_MAP: Record<string, keyof VariantAnnotation> = {
+const NAME_MAP: Record<string, keyof CaddAnnotation> = {
   Chr: 'chrom',
   Pos: 'pos',
   Ref: 'ref',
@@ -84,7 +84,7 @@ const _formatAnnotations = (annotations: string) => {
   const headers = headerRow
     .split(/\W+/)
     .filter(Boolean)
-    .reduce<Record<number, keyof VariantAnnotation>>(
+    .reduce<Record<number, keyof CaddAnnotation>>(
       (acc, curr, i) => ({
         ...acc,
         [i]: NAME_MAP[curr],
@@ -95,9 +95,9 @@ const _formatAnnotations = (annotations: string) => {
   return annotationsArray.map(annotation =>
     annotation
       .split(/\W+/)
-      .reduce<VariantAnnotation>(
+      .reduce<CaddAnnotation>(
         (acc, curr, i) => ({ ...acc, [headers[i]]: curr }),
-        {} as VariantAnnotation
+        {} as CaddAnnotation
       )
   );
 };
@@ -127,7 +127,7 @@ const _buildQuery = async (position: string, assemblyId: string) => {
 const fetchAnnotations = (
   position: string,
   assemblyId: string
-): Promise<AnnotationQueryResponse> => {
+): Promise<CADDAnnotationQueryResponse> => {
   const source = 'CADD annotations';
   return _getAnnotations(position, assemblyId)
     .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
