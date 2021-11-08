@@ -1,24 +1,19 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
-const useDebounce = <F extends (...args: any) => any>(
-  func: F,
-  waitFor: number,
-): ((...args: Parameters<F>) => ReturnType<F>) => {
-  const timer = useRef<NodeJS.Timer | null>();
-  const savedFunc = useRef<F | null>(func);
+function useDebounce<T>(initialValue: T, time: number): [T, T, React.Dispatch<T>] {
+    const [value, setValue] = useState<T>(initialValue);
+    const [debouncedValue, setDebouncedValue] = useState<T>(initialValue);
 
-  useEffect(() => {
-    savedFunc.current = func;
-  }, [waitFor]);
+    useEffect(() => {
+        const debounce = setTimeout(() => {
+            setDebouncedValue(value);
+        }, time);
+        return () => {
+            clearTimeout(debounce);
+        };
+    }, [value, time]);
 
-  return useCallback((...args: any) => {
-    if (timer.current) {
-      clearTimeout(timer.current);
-      timer.current = null;
-    }
-
-    timer.current = setTimeout(() => savedFunc.current?.(...args), waitFor);
-  }, []) as (...args: Parameters<F>) => ReturnType<F>;
-};
+    return [debouncedValue, value, setValue];
+}
 
 export default useDebounce;
