@@ -30,9 +30,11 @@ export const annotate = (
 
     if (variantKey in annotationKeyMap) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { alt, assembly, chrom, ref, pos, type, ...rest } = annotationKeyMap[variantKey];
+      const { alt, assembly, chrom, ref, pos, type, nhomalt, ...rest } =
+        annotationKeyMap[variantKey];
       r.variant.info = {
         ...r.variant.info,
+        gnomadHom: nhomalt,
         ...rest,
       };
     }

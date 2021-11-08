@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
-  af?: number;
+  af?: Maybe<number>;
   aaAlt?: Maybe<string>;
   aaPos?: Maybe<string>;
   aaRef?: Maybe<string>;
-  cdna?: Maybe<string>;
+  cdna?: Maybe<number>;
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
   gnomadHet?: Maybe<string>;
-  gnomadHom?: Maybe<string>;
+  gnomadHom?: Maybe<number>;
   transcript?: Maybe<string>;
 }
 
@@ -119,7 +119,7 @@ export interface CaddAnnotation extends VariantCoordinate {
   aaAlt: string;
   aaPos: string;
   aaRef: string;
-  cdna: string;
+  cdna: number;
   consequence: string;
   transcript: string;
 }

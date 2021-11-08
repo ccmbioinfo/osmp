@@ -14,7 +14,9 @@ const annotate = (
     }-${response.variant.ref}`;
 
     if (key in annotationKeys) {
-      response.variant.info = { ...response.variant.info, ...annotationKeys[key] };
+      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+      const { chrom, pos, alt, ref, ...rest } = annotationKeys[key];
+      response.variant.info = { ...response.variant.info, ...rest };
     }
   });
 
