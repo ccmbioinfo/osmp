@@ -1,5 +1,5 @@
 import { AnnotationQueryResponse, GnomadAnnotation } from '../../../types';
-import { GnomadAnnotationId } from '../../../models/VariantAnnotationModel';
+import { GnomadAnnotationId } from '../../../models/GnomadAnnotationModel';
 import { GnomadAnnotation as GnomadAnnotationModel } from '../../../models/index';
 import { v4 as uuidv4 } from 'uuid';
 

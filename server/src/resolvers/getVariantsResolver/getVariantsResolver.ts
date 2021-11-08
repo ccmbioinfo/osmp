@@ -11,6 +11,7 @@ import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
+import annotateGnomad from './utils/annotateGnomad';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -75,6 +76,9 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   if (!!caddAannotations && !caddAannotations.value.error) {
     annotatedData = annotateCadd(combinedResults, caddAannotations.value.data);
+  }
+  if (annotatedData) {
+    annotatedData = await annotateGnomad(annotatedData);
   }
 
   return { errors, data: annotatedData ?? combinedResults };

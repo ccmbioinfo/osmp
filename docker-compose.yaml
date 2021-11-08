@@ -34,7 +34,7 @@ services:
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
-      MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017
+      MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING}
     user: "1000" #node
     working_dir: /usr/app
     ports:
@@ -46,8 +46,7 @@ services:
       - ssmp
 
   mongo:
-    image: mongo
-    container_name: mongo
+    image: mongo:latest
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}

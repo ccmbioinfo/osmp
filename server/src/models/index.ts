@@ -1,3 +1,3 @@
-import GnomadAnnotation from './VariantAnnotationModel';
+import GnomadAnnotation from './GnomadAnnotationModel';
 
 export { GnomadAnnotation };

@@ -1,5 +1,5 @@
 import { VariantQueryDataResult } from '../../types';
-import { GnomadAnnotationId } from '../VariantAnnotationModel';
+import { GnomadAnnotationId } from '../GnomadAnnotationModel';
 
 const getCoordinates = (result: VariantQueryDataResult[]) => {
   let start = +Infinity;

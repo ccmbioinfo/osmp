@@ -1,43 +1,38 @@
-import { AnnotationQueryResponse, VariantAnnotation, VariantQueryDataResult } from '../../../types';
+import GnomadAnnotationModel from '../../../models/GnomadAnnotationModel';
+import getCoordinates from '../../../models/utils/getCoordinates';
+import { VariantQueryDataResult } from '../../../types';
 
-const isCADDQuery = (arg: AnnotationQueryResponse): arg is AnnotationQueryResponse =>
-  arg.source === 'CADD annotations';
+const annotate = async (
+  queryResponse: VariantQueryDataResult[]
+): Promise<VariantQueryDataResult[]> => {
+  const annotationCoordinates = getCoordinates(queryResponse);
 
-const isGnomadQuery = (arg: AnnotationQueryResponse): arg is AnnotationQueryResponse =>
-  arg.source === 'gnomAD annotations';
+  const results = await GnomadAnnotationModel.getAnnotations(
+    annotationCoordinates,
+    'gnomAD_GRCh37'
+  );
 
-const annotate = (
-  queryResponse: VariantQueryDataResult[],
-  annotationResponse: AnnotationQueryResponse[]
-): VariantQueryDataResult[] => {
-  const gnomad: Record<string, VariantAnnotation> = {};
+  const annotationKeyMap = Object.fromEntries(
+    results.map(a => [`${a.ref}-${a.pos}-${a.chrom}-${a.assembly.replace(/\D/g, '')}`, a])
+  );
 
-  const cadd: Record<string, VariantAnnotation> = {};
+  console.log(annotationKeyMap);
 
-  annotationResponse.forEach(a => {
-    if (isGnomadQuery(a))
-      a.data.forEach(d => (gnomad[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
-    if (isCADDQuery(a)) a.data.forEach(d => (cadd[`${d.alt}-${d.chrom}-${d.pos}-${d.ref}`] = d));
-  });
-
-  queryResponse.forEach(response => {
-    const key = `${response.variant.alt}-${response.variant.referenceName.replace(/chr/i, '')}-${
-      response.variant.start
-    }-${response.variant.ref}`;
-
-    let gnomadAnnotation;
-    let caddAnnotation;
-
-    if (key in gnomad) {
-      const { af, gnomadHet, gnomadHom } = gnomad[key];
-      gnomadAnnotation = { af, gnomadHet, gnomadHom };
+  queryResponse.forEach(r => {
+    if (
+      `${r.variant.ref}-${r.variant.start}-${
+        r.variant.referenceName
+      }-${r.variant.assemblyId.replace(/\D/g, '')}` in annotationKeyMap
+    ) {
+      r.variant.info = {
+        ...r.variant.info,
+        ...annotationKeyMap[
+          `${r.variant.ref}-${r.variant.start}-${
+            r.variant.referenceName
+          }-${r.variant.assemblyId.replace(/\D/g, '')}`
+        ],
+      };
     }
-
-    if (key in cadd) {
-      caddAnnotation = cadd[key];
-    }
-
-    response.variant.info = { ...caddAnnotation, ...gnomadAnnotation };
   });
 
   return queryResponse;

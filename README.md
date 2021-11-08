@@ -68,7 +68,7 @@ Annotations can be imported into mongo using the following command. Note that th
 ```bash
 mongoimport --db=annotations --collection=annotations --type=csv \
    --columnsHaveTypes \
-   --fields="pos.int32(),ref.string(),alt.string(),chrom.string(),af.double(),nhomalt.int32(),assembly.string()" \
+   --fields="pos.int32(),ref.string(),alt.string(),chrom.string(),nhomalt.int32(),an.int32(),af.double(),assembly.string()" \
    --file=<filename>.csv \
    -u <username> --password=<pass> --authenticationDatabase=admin
 ```

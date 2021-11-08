@@ -5,7 +5,7 @@ export type GnomadAnnotationId = Pick<GnomadAnnotation, 'alt' | 'chrom' | 'ref' 
 
 interface GnomadAnnotationDocument extends Document, GnomadAnnotation {}
 
-const variantAnnotationSchema = new mongoose.Schema({
+const gnomandAnnotationSchema = new mongoose.Schema({
   chrom: {
     type: String,
   },
@@ -19,7 +19,7 @@ const variantAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   nhomalt: {
-    type: String, 
+    type: String,
   },
   an: {
     type: Number,
@@ -46,18 +46,16 @@ interface GnomadAnnotationModelMethods extends Model<GnomadAnnotation> {
   getAnnotations(ids: AnnotationInput, assemblyId: string): Promise<GnomadAnnotation[]>;
 }
 
-variantAnnotationSchema.statics.getAnnotations = async function (
+gnomandAnnotationSchema.statics.getAnnotations = async function (
   this: Model<GnomadAnnotationDocument>,
   ids: AnnotationInput,
   assemblyId: string
 ) {
-  // Format from remote node aka stager: position: '19:44905791-44909393', assemblyId: 'GRCh37'
-
   const { start, end, coordinates } = ids;
 
   if (coordinates.length > 0 && assemblyId) {
     const annotation = await this.aggregate([
-      { $match: { assembly: { $eq: assemblyId } } },
+      { $match: { assembly: assemblyId } },
       { $match: { pos: { $gte: start, $lte: end } } },
       {
         $match: {
@@ -65,6 +63,7 @@ variantAnnotationSchema.statics.getAnnotations = async function (
         },
       },
     ]);
+    console.log(`${annotation.length} gnomad annots found`);
     return annotation;
   } else {
     return [];
@@ -73,7 +72,8 @@ variantAnnotationSchema.statics.getAnnotations = async function (
 
 const GnomadAnnotationModel = model<GnomadAnnotationDocument, GnomadAnnotationModelMethods>(
   'GnomadAnnotation',
-  variantAnnotationSchema
+  gnomandAnnotationSchema,
+  'annotations'
 );
 
 export default GnomadAnnotationModel;

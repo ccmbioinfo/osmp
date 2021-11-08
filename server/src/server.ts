@@ -17,7 +17,17 @@ const app = express();
 
 const memoryStore = new session.MemoryStore();
 
-mongoose.connect(process.env.MONGO_CONNECTION_STRING!);
+console.log(process.env.MONGO_CONNECTION_STRING);
+
+mongoose
+  .connect(process.env.MONGO_CONNECTION_STRING!)
+  .then(r => {
+    logger.info('successfully connected to mongo!');
+  })
+  .catch(e => {
+    logger.error('Failed connecting to Mongo: ' + e);
+    throw e;
+  });
 
 app.use(
   session({
