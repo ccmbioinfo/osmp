@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Row } from 'react-table';
 import { Column, Input } from '../..';
 import SOURCES from '../../../constants/sources';
+import { useDebounce } from '../../../hooks';
 import { FlattenedQueryResponse } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
@@ -24,12 +25,20 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     columnId,
     preFilteredRows,
 }) => {
+    const [debouncedInput, input, setInput] = useDebounce<string | undefined>('', 500);
+
     const filter = filters.find(f => f.id === columnId);
-
     const placeholder = 'Search';
-
     const singleSelect = ['source'];
     const multiSelect = ['sex', 'zygosity', 'consequence'];
+
+    useEffect(() => {
+        setFilter(columnId, debouncedInput);
+    }, [setFilter, debouncedInput, columnId]);
+
+    useEffect(() => {
+        if (!filter) setInput('');
+    }, [filter, setInput]);
 
     const resolveComponent = () => {
         if (singleSelect.concat(multiSelect).includes(columnId)) {
@@ -61,9 +70,11 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             return (
                 <Input
                     variant="outlined"
-                    value={filter ? filter.value.toString() : ''}
+                    value={input}
                     placeholder={placeholder}
-                    onChange={e => setFilter(columnId, e.target.value)}
+                    onChange={e => {
+                        setInput(e.target.value);
+                    }}
                 />
             );
         }

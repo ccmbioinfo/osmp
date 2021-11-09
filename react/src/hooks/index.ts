@@ -1,6 +1,7 @@
 import downloadCsv from './downloadCsv';
 import resolveAssembly from './resolveAssembly';
 import useClickAway from './useClickAway';
+import useDebounce from './useDebounce';
 import useErrorContext from './useErrorContext';
 import useFormReducer from './useFormReducer';
 import useOverflow from './useOverflow';
@@ -12,6 +13,7 @@ export {
     downloadCsv,
     resolveAssembly,
     useClickAway,
+    useDebounce,
     useErrorContext,
     useFormReducer,
     useOverflow,
