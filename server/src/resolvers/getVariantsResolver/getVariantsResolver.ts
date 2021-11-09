@@ -16,9 +16,6 @@ import annotateGnomad from './utils/annotateGnomad';
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
 
-/**
- *  typeguard: is this a variant query or an annotation query
- */
 const isVariantQuery = (
   arg: VariantQueryResponse | CADDAnnotationQueryResponse
 ): arg is VariantQueryResponse => arg.source !== 'CADD annotations';
@@ -42,7 +39,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const errors: SourceError[] = [];
   const combinedResults: VariantQueryDataResult[] = [];
 
-  /* for now, this will inspect all promises and pass on errors, including annotation promise, will probably want to change soon */
+  /* inspect variant results and combine if no errors */
   settled.forEach(response => {
     if (
       response.status === 'fulfilled' &&
@@ -67,22 +64,20 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
+  // once variants are merged, handle annotations
   const caddAannotations = settled.find(
     res => res.status === 'fulfilled' && !isVariantQuery(res.value)
   ) as PromiseFulfilledResult<CADDAnnotationQueryResponse>;
 
-  // todo: this should be a pipeline each call of which returns [data, errors]
-  let annotatedData;
+  let data;
 
   if (!!caddAannotations && !caddAannotations.value.error) {
-    annotatedData = annotateCadd(combinedResults, caddAannotations.value.data);
+    data = annotateCadd(combinedResults, caddAannotations.value.data);
   }
 
-  if (annotatedData) {
-    annotatedData = await annotateGnomad(annotatedData);
-  }
+  data = await annotateGnomad(data ?? combinedResults);
 
-  return { errors, data: annotatedData ?? combinedResults };
+  return { errors, data };
 };
 
 const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
