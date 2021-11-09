@@ -12,4 +12,4 @@ yarn-error.log*
 
 */mysql
 server/whole_genome_SNVs_inclAnno.tsv.gz.tbi
-mongo
+mongo/data

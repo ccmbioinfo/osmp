@@ -2,6 +2,7 @@ import { Maybe } from 'graphql/jsutils/Maybe';
 
 /* typescript types that map to graphql types, should be updated whenever schema is updated -- note that these are coming from our own server now */
 export interface VariantResponseInfoFields {
+    af?: Maybe<number>;
     aaAlt?: Maybe<string>;
     aaPos?: Maybe<string>;
     aaRef?: Maybe<string>;
@@ -9,7 +10,7 @@ export interface VariantResponseInfoFields {
     consequence?: Maybe<string>;
     geneName?: Maybe<string>;
     gnomadHet?: Maybe<string>;
-    gnomadHom?: Maybe<string>;
+    gnomadHom?: Maybe<number>;
     transcript?: Maybe<string>;
 }
 

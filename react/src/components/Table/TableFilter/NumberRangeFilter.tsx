@@ -16,16 +16,12 @@ interface NumberRangeFilterProps {
     preFilteredRows: Row<FlattenedQueryResponse>[];
 }
 
-const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
-    setFilter,
-    filters,
-    columnId,
-    preFilteredRows,
-}) => {
+const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter, filters, columnId }) => {
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState<string>('');
 
     // If we have more columns we want to add number comparison too, they would be added to this list.
+    // todo: move to a declarative model on the Column def
     const [filterComparison, setFilterComparison] = useState<FilterComparison>({
         start: {
             less: false,
@@ -33,6 +29,16 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             equal: true,
         },
         end: {
+            less: false,
+            greater: false,
+            equal: true,
+        },
+        af: {
+            less: false,
+            greater: false,
+            equal: true,
+        },
+        gnomadHom: {
             less: false,
             greater: false,
             equal: true,
@@ -45,7 +51,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
         comparison: ComparisonType
     ) => {
         const val = e.target.value;
-        if (isNaN(parseInt(val)) && val !== '') {
+        if (isNaN(parseFloat(val)) && val !== '') {
             setError(true);
             setText(val);
         } else {
@@ -55,7 +61,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
                 setText(val);
                 num = undefined;
             } else {
-                num = parseInt(val);
+                num = parseFloat(val);
             }
             if (comparison.less) {
                 setFilter(columnId, [-Infinity, num]);
@@ -77,7 +83,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
         return text;
     };
 
-    return (
+    return comparison ? (
         <Column>
             <Input
                 variant="outlined"
@@ -99,7 +105,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
                 </Typography>
             )}
         </Column>
-    );
+    ) : null;
 };
 
 export default NumberRangeFilter;
