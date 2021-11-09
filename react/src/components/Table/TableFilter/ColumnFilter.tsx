@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row } from 'react-table';
 import { Column, Input } from '../..';
 import SOURCES from '../../../constants/sources';
@@ -25,21 +25,24 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     columnId,
     preFilteredRows,
 }) => {
+    // Local input state for debouncing
+    const filter = filters.find(f => f.id === columnId);
     const [debouncedInput, input, setInput] = useDebounce<string | undefined>('', 500);
 
-    const filter = filters.find(f => f.id === columnId);
     const placeholder = 'Search';
+
     const singleSelect = ['source'];
     const multiSelect = ['sex', 'zygosity', 'consequence'];
 
     useEffect(() => {
+        // Do something with the debounced value
+        // e.g., setCities(cities.filter(el => el.name.includes(debouncedValue)))
         setFilter(columnId, debouncedInput);
     }, [setFilter, debouncedInput, columnId]);
 
     useEffect(() => {
         if (!filter) setInput('');
     }, [filter, setInput]);
-
     const resolveComponent = () => {
         if (singleSelect.concat(multiSelect).includes(columnId)) {
             return (
