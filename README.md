@@ -76,7 +76,5 @@ mongoimport --db=annotations --collection=annotations --type=csv \
 Then make sure to create the following indexes:
 
 ```
-db.annotations.createIndex({"pos": 1})
-db.annotations.createIndex({"assembly":1})
-db.annotations.createIndex({"alt": 1, "chrom": 1, "pos": 1, "ref": 1 })
+db.annotations.createIndexes([ {"pos": 1}, {"assembly":1}, {"alt": 1, "chrom": 1, "pos": 1, "ref": 1 } ])
 ```
