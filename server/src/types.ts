@@ -5,7 +5,7 @@ export interface VariantResponseInfoFields {
   aaAlt?: Maybe<string>;
   aaPos?: Maybe<string>;
   aaRef?: Maybe<string>;
-  cdna?: Maybe<number>;
+  cdna?: Maybe<string>;
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
   gnomadHet?: Maybe<string>;
@@ -119,7 +119,7 @@ export interface CaddAnnotation extends VariantCoordinate {
   aaAlt: string;
   aaPos: string;
   aaRef: string;
-  cdna: number;
+  cdna: string;
   consequence: string;
   transcript: string;
 }

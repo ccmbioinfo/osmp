@@ -6,7 +6,7 @@ export interface VariantResponseInfoFields {
     aaAlt?: Maybe<string>;
     aaPos?: Maybe<string>;
     aaRef?: Maybe<string>;
-    cdna?: Maybe<number>;
+    cdna?: Maybe<string>;
     consequence?: Maybe<string>;
     geneName?: Maybe<string>;
     gnomadHet?: Maybe<string>;
