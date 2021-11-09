@@ -40,14 +40,12 @@ describe('Test whether variants get annotated', () => {
 
     const result = annotate(variants, annotations);
 
-    console.log(result);
-
     // Check if the corresponding variant has info fields populated
     result.forEach(nodeData =>
       expect(nodeData.variant.info).toEqual({
         af: annotations[0].af,
         an: annotations[0].an,
-        nhomalt: annotations[0].nhomalt,
+        gnomadHom: annotations[0].nhomalt,
       })
     );
   });
