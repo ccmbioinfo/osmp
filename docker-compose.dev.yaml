@@ -2,6 +2,7 @@ version: "3.9"
 services:
   ssmp-server:
     image: ghcr.io/ccmbioinfo/ssmp:dev
+    init: true
     environment:
       TEST_NODE_URL: ${TEST_NODE_URL}
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}

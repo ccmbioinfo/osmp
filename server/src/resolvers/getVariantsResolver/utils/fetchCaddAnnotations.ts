@@ -4,7 +4,6 @@ import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
-import logger from '../../../logger';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -63,15 +62,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const query = await _buildQuery(position, assemblyId);
   const execPromise = promisify(exec);
 
-  let response;
-  try {
-    response = execPromise(query, { maxBuffer: 10e7 }); // 100mb
-  } catch (err) {
-    logger.error(err);
-    throw err;
-  }
-
-  return response;
+  return execPromise(query, { maxBuffer: 10e7 }); // 100mb
 };
 
 const _formatAnnotations = (annotations: string) => {
