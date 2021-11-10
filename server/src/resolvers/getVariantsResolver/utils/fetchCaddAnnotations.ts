@@ -70,6 +70,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     logger.error(err);
     throw err;
   }
+
   return response;
 };
 
