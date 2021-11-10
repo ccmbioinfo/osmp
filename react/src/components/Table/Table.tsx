@@ -236,7 +236,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'consequence',
                         id: 'consequence',
                         Header: 'consequence',
-                        width: 105,
+                        width: 150,
                         filter: 'includesSome',
                     },
                     { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
@@ -247,7 +247,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: 105,
                         filter: 'between',
                     },
-                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 105 },
+                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
                 ],
             },
             {
