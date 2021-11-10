@@ -176,13 +176,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="alt" />,
+                        accessor: 'alt',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
                         width: getColumnWidth(tableData, 'alt', 'Alt'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="ref" />,
+                        accessor: 'ref',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
@@ -347,7 +349,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="contactInfo" />,
+                        accessor: 'contactInfo',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
