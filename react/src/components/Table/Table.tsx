@@ -112,7 +112,6 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
             results.push(flattenBaseResults(d));
         }
     });
-    console.log(results);
     return results.map(result => formatNullValues(result));
 };
 
@@ -224,13 +223,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'af',
                         id: 'af',
-                        Header: 'gnomAD_AF',
+                        Header: 'gnomAD_AF_exome',
                         width: 105,
                         filter: 'between',
                     },
-                    { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
+                    {
+                        id: 'aaChange',
+                        Header: 'aaChange',
+                        width: 105,
+                        Cell: ({ row }: { row: Row<FlattenedQueryResponse> }) => (
+                            <span>
+                                {!!row.original.aaPos?.trim()
+                                    ? `p.${row.original.aaRef}${row.original.aaPos}${row.original.aaAlt}`
+                                    : ''}
+                            </span>
+                        ),
+                    },
+                    /* { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
                     { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
-                    { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 },
+                    { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 }, */
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
                     {
                         accessor: 'consequence',
@@ -239,7 +250,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: 150,
                         filter: 'includesSome',
                     },
-                    { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
+                    /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
                     {
                         accessor: 'gnomadHom',
                         id: 'gnomadHom',
