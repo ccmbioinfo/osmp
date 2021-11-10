@@ -53,8 +53,8 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    state.maxFrequency.value <= 0.02,
-                error: 'Value must be <= .02.',
+                    state.maxFrequency.value <= 0.05,
+                error: 'Value must be <= .05.',
             },
         ],
     },
