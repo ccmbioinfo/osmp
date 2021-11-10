@@ -11,6 +11,7 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
+    Column as ColumnType,
     HeaderGroup,
     Row,
     useFilters,
@@ -111,6 +112,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
             results.push(flattenBaseResults(d));
         }
     });
+    console.log(results);
     return results.map(result => formatNullValues(result));
 };
 
@@ -174,13 +176,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="alt" />,
+                        accessor: 'alt',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
                         width: getColumnWidth(tableData, 'alt', 'Alt'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="ref" />,
+                        accessor: 'ref',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
@@ -217,6 +221,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableSortBy: true,
                         width: 79,
                     },
+                    {
+                        accessor: 'af',
+                        id: 'af',
+                        Header: 'gnomAD_AF',
+                        width: 105,
+                        filter: 'between',
+                    },
                     { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
                     { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
                     { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 },
@@ -229,7 +240,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'includesSome',
                     },
                     { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
-                    { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomadHom', width: 105 },
+                    {
+                        accessor: 'gnomadHom',
+                        id: 'gnomadHom',
+                        Header: 'gnomadHom',
+                        width: 105,
+                        filter: 'between',
+                    },
                     { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 105 },
                 ],
             },
@@ -332,7 +349,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="contactInfo" />,
+                        accessor: 'contactInfo',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
@@ -530,9 +548,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         .flat()
                         .filter(
                             c =>
-                                !dummyColumns.concat(columnsWithoutFilters).includes(c.id as string)
+                                !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id)
                         )
-                        .map((v, i) => (
+                        .map((v: ColumnType<FlattenedQueryResponse>, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
                                     {v.Header}
@@ -541,7 +559,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     preFilteredRows={preFilteredRows}
                                     filters={filters}
                                     setFilter={setFilter}
-                                    columnId={v.id as string}
+                                    columnId={v.id! as keyof FlattenedQueryResponse}
                                 />
                             </Column>
                         ))}

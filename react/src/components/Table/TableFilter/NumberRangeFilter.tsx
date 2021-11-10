@@ -16,16 +16,12 @@ interface NumberRangeFilterProps {
     preFilteredRows: Row<FlattenedQueryResponse>[];
 }
 
-const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
-    setFilter,
-    filters,
-    columnId,
-    preFilteredRows,
-}) => {
+const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter, filters, columnId }) => {
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState<string>('');
 
     // If we have more columns we want to add number comparison too, they would be added to this list.
+    // todo: move to a declarative model on the Column def
     const [filterComparison, setFilterComparison] = useState<FilterComparison>({
         start: {
             less: false,
@@ -37,9 +33,18 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
             greater: false,
             equal: true,
         },
+        af: {
+            less: false,
+            greater: false,
+            equal: true,
+        },
+        gnomadHom: {
+            less: false,
+            greater: false,
+            equal: true,
+        },
     });
 
-    let num: number | undefined | string;
     const handleComparisonValue = (
         columnId: string,
         e: React.ChangeEvent<HTMLInputElement>,
@@ -47,49 +52,34 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
     ) => {
         const val = e.target.value;
 
-        // Check if input value is a float
-        const hasDecimal = val.includes('.');
-        const decimalValue = (hasDecimal ? val.split('.') : [val, ''])[1];
-        const parsed = parseFloat(val).toFixed(decimalValue.length);
+        const parsed = parseFloat(val);
 
-        if (isNaN(Number(parsed)) && val !== '') {
+        if (val === '') {
+            setText(val);
+            setFilter(columnId, [-Infinity, Infinity]);
+        } else if (!parsed) {
             setError(true);
             setText(val);
         } else {
             setError(false);
-            if (val === '' || (hasDecimal && !decimalValue.length)) {
-                setText(val);
-                num = undefined;
-            } else {
-                setText(parsed);
-                num = parseFloat(parsed);
-            }
-
+            setText(parsed.toString());
             if (comparison.less) {
-                setFilter(columnId, [-Infinity, num]);
+                setFilter(columnId, [-Infinity, parsed]);
             } else if (comparison.greater) {
-                setFilter(columnId, [num, +Infinity]);
+                setFilter(columnId, [parsed, +Infinity]);
             } else {
-                setFilter(columnId, [num, num]);
+                setFilter(columnId, [parsed, parsed]);
             }
         }
     };
 
-    const filterValue = filters.find(f => f.id === columnId)?.value as Array<number>;
     const comparison = filterComparison[columnId];
 
-    const resolveComparisonValue = (comparison: ComparisonType) => {
-        if (filterValue) {
-            return comparison.less ? filterValue[1] : filterValue[0];
-        }
-        return text;
-    };
-
-    return (
+    return comparison ? (
         <Column>
             <Input
                 variant="outlined"
-                value={resolveComparisonValue(comparison)}
+                value={text}
                 onChange={e => handleComparisonValue(columnId, e, comparison)}
                 placeholder="Search"
                 InputAdornmentStart={
@@ -107,7 +97,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({
                 </Typography>
             )}
         </Column>
-    );
+    ) : null;
 };
 
 export default NumberRangeFilter;
