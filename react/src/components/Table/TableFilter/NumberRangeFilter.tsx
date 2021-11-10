@@ -51,43 +51,35 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter, filter
         comparison: ComparisonType
     ) => {
         const val = e.target.value;
-        if (isNaN(parseFloat(val)) && val !== '') {
+
+        const parsed = parseFloat(val);
+
+        if (val === '') {
+            setText(val);
+            setFilter(columnId, [-Infinity, Infinity]);
+        } else if (!parsed) {
             setError(true);
             setText(val);
         } else {
             setError(false);
-            let num;
-            if (val === '') {
-                setText(val);
-                num = undefined;
-            } else {
-                num = parseFloat(val);
-            }
+            setText(parsed.toString());
             if (comparison.less) {
-                setFilter(columnId, [-Infinity, num]);
+                setFilter(columnId, [-Infinity, parsed]);
             } else if (comparison.greater) {
-                setFilter(columnId, [num, +Infinity]);
+                setFilter(columnId, [parsed, +Infinity]);
             } else {
-                setFilter(columnId, [num, num]);
+                setFilter(columnId, [parsed, parsed]);
             }
         }
     };
 
-    const filterValue = filters.find(f => f.id === columnId)?.value as Array<number>;
     const comparison = filterComparison[columnId];
-
-    const resolveComparisonValue = (comparison: ComparisonType) => {
-        if (filterValue) {
-            return comparison.less ? filterValue[1] : filterValue[0];
-        }
-        return text;
-    };
 
     return comparison ? (
         <Column>
             <Input
                 variant="outlined"
-                value={resolveComparisonValue(comparison)}
+                value={text}
                 onChange={e => handleComparisonValue(columnId, e, comparison)}
                 placeholder="Search"
                 InputAdornmentStart={
