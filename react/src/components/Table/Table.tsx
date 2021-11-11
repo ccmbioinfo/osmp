@@ -22,6 +22,7 @@ import {
     useTable,
 } from 'react-table';
 import './dragscroll.css';
+import SOURCES from '../../constants/sources';
 import { downloadCsv, useOverflow } from '../../hooks';
 import {
     CallsetInfoFields,
@@ -115,6 +116,10 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
     return results.map(result => formatNullValues(result));
 };
 
+const FILTER_OPTIONS: { [K in keyof FlattenedQueryResponse]?: string[] } = {
+    source: SOURCES,
+};
+
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
@@ -204,6 +209,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'source',
+                        filter: 'singleSelect',
                         id: 'source',
                         Header: 'Source',
                         width: getColumnWidth(tableData, 'source', 'Source'),
@@ -247,8 +253,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'consequence',
                         id: 'consequence',
                         Header: 'consequence',
-                        width: 150,
-                        filter: 'includesSome',
+                        width: 105,
+                        filter: 'multiSelect',
                     },
                     /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
                     {
@@ -316,18 +322,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'sex',
+                        filter: 'multiSelect',
                         id: 'sex',
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
-                        filter: 'includesSome',
                         Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
                     {
                         accessor: 'zygosity',
+                        filter: 'multiSelect',
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
-                        filter: 'includesSome',
                     },
                     {
                         accessor: 'geographicOrigin',
@@ -568,9 +574,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 </Typography>
                                 <ColumnFilter
                                     preFilteredRows={preFilteredRows}
-                                    filters={filters}
-                                    setFilter={setFilter}
-                                    columnId={v.id! as keyof FlattenedQueryResponse}
+                                    filterModel={filters.find(
+                                        f => f.id === (v.id as keyof FlattenedQueryResponse)
+                                    )}
+                                    options={
+                                        !!(
+                                            !!v.id &&
+                                            !!FILTER_OPTIONS[v.id as keyof FlattenedQueryResponse]
+                                        )
+                                            ? FILTER_OPTIONS[v.id as keyof FlattenedQueryResponse]
+                                            : undefined
+                                    }
+                                    setFilter={setFilter.bind(null, v.id as string)}
+                                    type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
+                                    columnId={v.id as keyof FlattenedQueryResponse}
                                 />
                             </Column>
                         ))}
