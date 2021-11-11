@@ -23,6 +23,7 @@ services:
       context: server
       target: BUILD_IMAGE
     image: ghcr.io/ccmbioinfo/ssmp:dev
+    init: true
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
