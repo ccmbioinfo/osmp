@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
+import axios from 'axios';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -12,6 +12,9 @@ const ANNOTATION_URL_37 =
 
 const INDEX_37_PATH = '/home/node/cadd_wgs_ghr37_index.gz.tbi';
 const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
+
+const CADD_37_VERSION = 'GRCh37-v1.4';
+const CADD_38_VERSION = 'GRCh38-v1.4';
 
 /*
   indexes for headers in annotation tsv: 
@@ -40,23 +43,6 @@ const NAME_MAP: Record<string, keyof CaddAnnotation> = {
   cDNApos: 'cdna',
   protPos: 'aaPos',
 };
-
-/* eslint-disable camelcase */
-interface EnsemblRegionMap {
-  seq_region_name: number; // chrom if coord_system==chromosome
-  end: number;
-  strand: number;
-  assembly: string;
-  start: number;
-  coord_system: string;
-}
-
-interface PositionMapperResponse {
-  mappings: {
-    original: EnsemblRegionMap;
-    mapped: EnsemblRegionMap;
-  }[];
-}
 
 const _getAnnotations = async (position: string, assemblyId: string) => {
   const query = await _buildQuery(position, assemblyId);
@@ -97,32 +83,59 @@ const _formatAnnotations = (annotations: string) => {
 const _buildQuery = async (position: string, assemblyId: string) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
 
-  let mappedPosition;
-
-  /* if assembly target is 37, map to 37, since FE will return only 38 coordinates -- todo: in new flow we'll just liftover ourselves and not fetch in advance */
-  if (resolvedAssemblyId !== '38') {
-    const mappedPositionResponse = await axios.get<PositionMapperResponse>(
-      `http://rest.ensembl.org/map/homo_sapiens/GRCh38/${position}/GRCh37`
-    );
-    const { seq_region_name: chrom, start, end } = mappedPositionResponse.data.mappings[0]?.mapped;
-    mappedPosition = `${chrom}:${start}-${end}`;
-  }
-
-  const resolvedPosition = mappedPosition ?? position;
-
   const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
   const indexPath = resolvedAssemblyId === '38' ? INDEX_38_PATH : INDEX_37_PATH;
 
-  return `tabix -h  ${annotationUrl} ${indexPath} ${resolvedPosition} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
+  return `tabix -h  ${annotationUrl} ${indexPath} ${position} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
 };
 
-const fetchAnnotations = (
-  position: string,
+/* note that this API is unstable, result counts vary, sometimes nothing is returned at all */
+const _getAnnotationsFromApi = (region: string, assembly: string) => {
+  const version = resolveAssembly(assembly) === '37' ? CADD_37_VERSION : CADD_38_VERSION;
+  console.log(`https://cadd.gs.washington.edu/api/v1.0/${version}_inclAnno/${region}`);
+  return axios
+    .get<string[][]>(`https://cadd.gs.washington.edu/api/v1.0/${version}_inclAnno/${region}`)
+    .then(r => {
+      const [header, ...results] = r.data;
+      console.log('QUERY RETURNED');
+      console.log(results.length);
+      if (results) {
+        const headers = header.reduce<Record<number, keyof CaddAnnotation>>((acc, curr, i) => {
+          if (NAME_MAP[curr]) {
+            return { ...acc, [i]: NAME_MAP[curr] };
+          } else return acc;
+        }, {});
+
+        return results.map(row =>
+          row.reduce<CaddAnnotation>((acc, curr, i) => {
+            if (headers[i]) {
+              return { ...acc, [headers[i]]: curr };
+            } else return acc;
+          }, {} as CaddAnnotation)
+        );
+      } else {
+        return [];
+      }
+    });
+};
+
+const fetchAnnotationsFromApi = (
+  regions: string[],
   assemblyId: string
 ): Promise<CADDAnnotationQueryResponse> => {
   const source = 'CADD annotations';
-  return _getAnnotations(position, assemblyId)
-    .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
+  const regionPromises = regions.map(r => _getAnnotationsFromApi(r, assemblyId));
+
+  return Promise.all(regionPromises)
+    .then(result => {
+      return result.reduce<CADDAnnotationQueryResponse>(
+        (acc, curr) => ({
+          source,
+          data: [...acc.data, ...curr],
+        }),
+        { source, data: [] }
+      );
+    })
     .catch(error => ({
       error: {
         id: uuidv4(),
@@ -134,4 +147,35 @@ const fetchAnnotations = (
     }));
 };
 
-export default fetchAnnotations;
+const fetchAnnotations = (
+  regions: string[],
+  assemblyId: string
+): Promise<CADDAnnotationQueryResponse> => {
+  const source = 'CADD annotations';
+
+  const regionPromises = regions.map(r => _getAnnotations(r, assemblyId));
+
+  return Promise.all(regionPromises)
+    .then(result =>
+      result.reduce<CADDAnnotationQueryResponse>(
+        (acc, curr) => ({
+          source,
+          data: [...acc.data, ..._formatAnnotations(curr?.stdout || '')],
+        }),
+        { source, data: [] }
+      )
+    )
+    .catch(error => ({
+      error: {
+        id: uuidv4(),
+        code: 500,
+        message: `Error fetching annotations: ${error}`,
+      },
+      source,
+      data: [],
+    }));
+};
+
+console.log(!!fetchAnnotations);
+
+export default fetchAnnotationsFromApi;

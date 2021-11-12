@@ -1,6 +1,5 @@
 import logger from '../../logger';
 import {
-  CADDAnnotationQueryResponse,
   CombinedVariantQueryResponse,
   QueryInput,
   SourceError,
@@ -16,36 +15,25 @@ import annotateGnomad from './utils/annotateGnomad';
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
 
-const isVariantQuery = (
-  arg: VariantQueryResponse | CADDAnnotationQueryResponse
-): arg is VariantQueryResponse => arg.source !== 'CADD annotations';
-
 const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQueryResponse> => {
   const {
     input: {
       sources,
       variant: { assemblyId },
-      gene: { position },
+      // todo: we don't need position in the results anymore
     },
   } = args;
 
-  // fetch CADD and data in parallel
-  const caddAnnotationsPromise = fetchCaddAnnotations(position, assemblyId);
-
   const queries = sources.map(source => buildSourceQuery(source, args));
 
-  const settled = await Promise.allSettled([caddAnnotationsPromise, ...queries]);
+  const settled = await Promise.allSettled(queries);
 
   const errors: SourceError[] = [];
   const combinedResults: VariantQueryDataResult[] = [];
 
   /* inspect variant results and combine if no errors */
   settled.forEach(response => {
-    if (
-      response.status === 'fulfilled' &&
-      isVariantQuery(response.value) &&
-      !response.value.error
-    ) {
+    if (response.status === 'fulfilled' && !response.value.error) {
       combinedResults.push(...response.value.data);
     } else if (response.status === 'fulfilled' && !!response.value.error) {
       const message =
@@ -64,20 +52,48 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
-  // once variants are merged, handle annotations
-  const caddAannotations = settled.find(
-    res => res.status === 'fulfilled' && !isVariantQuery(res.value)
-  ) as PromiseFulfilledResult<CADDAnnotationQueryResponse>;
+  let annotatedData = combinedResults;
 
-  let data;
+  if (combinedResults.length) {
+    const chr = combinedResults[0].variant.referenceName;
+    const posiitions = [
+      ...new Set(combinedResults.map(r => r.variant.start).sort((a, b) => (a < b ? -1 : 1))),
+    ];
 
-  if (!!caddAannotations && !caddAannotations.value.error) {
-    data = annotateCadd(combinedResults, caddAannotations.value.data);
+    // todo: this is too blunt, the savings from merely narrowing the range are less than 10% for DMD, resulting in 4 large bins
+    // when fetching these large bins in parallel, the heap size allocation is exceeded and node crashes
+    // so we'll want to use kmeans or other algorithm to find the smallest regions, and if they're bigger than 600kb together, just abort
+    // we could also just defer to vep values from gnomad in this case
+    // hmm what would be smarter is to get the VEP from gnomad, then pass only the unknowns to the CADD process, though we'll probably have the same problem
+    // but this way we can just reject out of hand anything that's bigger than 600kb... yeah that's a good compromise, assuming our mongodb can handle it
+    // we'll need to benchmark there, then
+    const regions: string[] = [];
+    const maxSize = 100;
+    let currPos = 0;
+    let basePos = 0;
+    posiitions.forEach(pos => {
+      if (!basePos) {
+        basePos = pos;
+      }
+      if (pos - basePos > maxSize) {
+        regions.push(`${chr}:${basePos}-${currPos}`);
+        basePos = currPos;
+      }
+      currPos = pos;
+    });
+
+    const caddAnnotations = await fetchCaddAnnotations(regions, assemblyId);
+
+    if (!caddAnnotations.error) {
+      annotatedData = annotateCadd(combinedResults, caddAnnotations.data);
+    } else {
+      errors.push({ error: caddAnnotations.error, source: caddAnnotations.source });
+    }
+
+    annotatedData = await annotateGnomad(annotatedData);
   }
 
-  data = await annotateGnomad(data ?? combinedResults);
-
-  return { errors, data };
+  return { errors, data: annotatedData };
 };
 
 const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
