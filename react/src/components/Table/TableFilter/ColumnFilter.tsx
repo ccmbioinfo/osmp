@@ -1,7 +1,6 @@
 import React from 'react';
 import { Row } from 'react-table';
 import { Column, Input } from '../..';
-import SOURCES from '../../../constants/sources';
 import { FlattenedQueryResponse } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
@@ -12,58 +11,48 @@ export type DefaultFilter<T> = {
 };
 
 interface ColumnFilterProps {
-    filters: DefaultFilter<string | string[] | number | number[]>[];
-    preFilteredRows: Row<FlattenedQueryResponse>[];
-    setFilter: (columnId: string, filterValue: any) => void;
     columnId: keyof FlattenedQueryResponse;
+    filterModel?: DefaultFilter<string | string[] | number | number[]>;
+    options?: string[];
+    preFilteredRows: Row<FlattenedQueryResponse>[];
+    setFilter: (filterValue: any) => void;
+    type?: 'singleSelect' | 'multiSelect' | 'text' | 'between';
 }
 
 export const ColumnFilter: React.FC<ColumnFilterProps> = ({
-    filters,
-    setFilter,
     columnId,
+    filterModel,
+    options,
     preFilteredRows,
+    setFilter,
+    type,
 }) => {
-    const filter = filters.find(f => f.id === columnId);
-
     const placeholder = 'Search';
 
-    const singleSelect = ['source'];
-    const multiSelect = ['sex', 'zygosity', 'consequence'];
-
     const resolveComponent = () => {
-        if (singleSelect.concat(multiSelect).includes(columnId)) {
+        if (!!type && ['singleSelect', 'multiSelect'].includes(type)) {
             return (
                 <SelectionFilter
                     setFilter={setFilter}
                     columnId={columnId}
-                    options={singleSelect.includes(columnId) ? SOURCES : []}
-                    filter={
-                        singleSelect.includes(columnId)
-                            ? (filter as DefaultFilter<string>)
-                            : (filter as DefaultFilter<string[]>)
-                    }
+                    options={options || []}
+                    filter={filterModel as DefaultFilter<string | string[]>}
                     preFilteredRows={preFilteredRows}
-                    isMulti={multiSelect.includes(columnId)}
-                    searchable={multiSelect.includes(columnId)}
+                    isMulti={type === 'multiSelect'}
+                    searchable={type === 'multiSelect'}
                 />
             );
-        } else if (['start', 'end', 'af', 'gnomadHom'].includes(columnId)) {
-            return (
-                <NumberRangeFilter
-                    setFilter={setFilter}
-                    filters={filters as DefaultFilter<number[]>[]}
-                    columnId={columnId}
-                    preFilteredRows={preFilteredRows}
-                />
-            );
+        } else if (!!type && type === 'between') {
+            return <NumberRangeFilter setFilter={setFilter} />;
         } else {
             return (
                 <Input
                     variant="outlined"
-                    value={filter ? filter.value.toString() : ''}
+                    value={(filterModel?.value || '') as string | number}
                     placeholder={placeholder}
-                    onChange={e => setFilter(columnId, e.target.value)}
+                    onChange={e => {
+                        setFilter(e.target.value);
+                    }}
                 />
             );
         }
