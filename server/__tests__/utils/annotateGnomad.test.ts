@@ -1,19 +1,21 @@
-import annotate from '../../src/resolvers/getVariantsResolver/utils/annotate';
-import { VariantAnnotation, VariantQueryDataResult } from '../../src/types';
+import { annotate } from '../../src/resolvers/getVariantsResolver/utils/annotateGnomad';
+import { GnomadAnnotation, VariantQueryDataResult } from '../../src/types';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
 */
 describe('Test whether variants get annotated', () => {
-  const annotations: VariantAnnotation[] = [
+  const annotations: GnomadAnnotation[] = [
     {
+      af: 1,
       alt: 'T',
-      ref: 'A',
+      an: 1,
+      assembly: 'gnomAD_GRCh37',
       chrom: '1',
+      nhomalt: 1,
       pos: 123456,
-      aaAlt: 'Z',
-      cdna: 'ABC',
-      transcript: 'ENSTFAKE10000',
+      ref: 'A',
+      type: 'exome',
     },
   ];
 
@@ -38,18 +40,12 @@ describe('Test whether variants get annotated', () => {
 
     const result = annotate(variants, annotations);
 
-    console.log(result);
-
     // Check if the corresponding variant has info fields populated
     result.forEach(nodeData =>
       expect(nodeData.variant.info).toEqual({
-        alt: 'T',
-        ref: 'A',
-        chrom: '1',
-        pos: 123456,
-        aaAlt: annotations[0].aaAlt,
-        cdna: annotations[0].cdna,
-        transcript: annotations[0].transcript,
+        af: annotations[0].af,
+        an: annotations[0].an,
+        gnomadHom: annotations[0].nhomalt,
       })
     );
   });

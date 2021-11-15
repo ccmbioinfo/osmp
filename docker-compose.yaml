@@ -23,6 +23,7 @@ services:
       context: server
       target: BUILD_IMAGE
     image: ghcr.io/ccmbioinfo/ssmp:dev
+    init: true
     environment:
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
@@ -34,6 +35,7 @@ services:
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET: ${TEST_NODE_SSMP_TOKEN_CLIENT_SECRET}
       TEST_NODE_SSMP_TOKEN_ENDPOINT: ${TEST_NODE_SSMP_TOKEN_ENDPOINT}
       TEST_NODE_TOKEN_AUDIENCE: ${TEST_NODE_TOKEN_AUDIENCE}
+      MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING}
     user: "1000" #node
     working_dir: /usr/app
     ports:
@@ -41,6 +43,20 @@ services:
     volumes:
       - ./server:/usr/app
     entrypoint: "yarn start-dev"
+    networks:
+      - ssmp
+
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_PORT: ${MONGO_INITDB_PORT}
+    ports:
+      - ${MONGO_INITDB_PORT}:27017
+    volumes:
+      - ./mongo/data:/data/db
     networks:
       - ssmp
 
@@ -91,6 +107,7 @@ services:
       KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
       KEYCLOAK_PORT: ${KEYCLOAK_PORT}
       KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      DB_VENDOR: H2
       REACT_URL: ${REACT_URL}
       AUTH0_BROKER_AUTH_URL: ${TEST_NODE_TOKEN_ISSUER}authorize
       AUTH0_BROKER_TOKEN_URL: ${TEST_NODE_TOKEN_ISSUER}oauth/token

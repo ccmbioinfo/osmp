@@ -42,6 +42,8 @@
   "dependencies": {
     "@graphql-tools/mock": "^8.1.3",
     "@graphql-tools/schema": "^7.1.5",
+    "@turf/clusters-kmeans": "^6.5.0",
+    "@turf/helpers": "^6.5.0",
     "@types/mongoose": "^5.11.97",
     "apollo-server-express": "3.x",
     "axios": ">=0.21.2",

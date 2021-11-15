@@ -3,6 +3,7 @@ import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
 import { IconButton } from '../../index';
+import { FlattenedQueryResponse } from '../Table';
 
 export type ComparisonType = {
     less: boolean;
@@ -16,16 +17,11 @@ export type ComparisonOption = {
     label: string;
 };
 
-export interface FilterComparison {
-    start: ComparisonType;
-    end: ComparisonType;
-}
+export type FilterComparison = { [K in keyof FlattenedQueryResponse]?: ComparisonType };
 
 interface InputComparisonDropdownProps {
-    columnId: keyof FilterComparison;
-    filterComparison: FilterComparison;
-    setFilterComparison: React.Dispatch<React.SetStateAction<FilterComparison>>;
-    setFilter: (columnId: string, filterValue: any) => void;
+    setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;
+    setFilter: (filterValue: any) => void;
 }
 
 const Icons = Object.freeze({
@@ -34,32 +30,30 @@ const Icons = Object.freeze({
     greater: <FaGreaterThanEqual size={7} />,
 });
 
+const COMPARISON_OPTIONS: ComparisonOption[] = [
+    {
+        id: 1,
+        value: 'less',
+        label: '<',
+    },
+    {
+        id: 2,
+        value: 'greater',
+        label: '>',
+    },
+    {
+        id: 3,
+        value: 'equal',
+        label: '=',
+    },
+];
+
 export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = ({
-    columnId,
-    filterComparison,
     setFilterComparison,
     setFilter,
 }) => {
     const [open, setOpen] = useState(false);
     const [sign, setSign] = useState<keyof ComparisonType>('equal');
-
-    const COMPARISON_OPTIONS: ComparisonOption[] = [
-        {
-            id: 1,
-            value: 'less',
-            label: '<',
-        },
-        {
-            id: 2,
-            value: 'greater',
-            label: '>',
-        },
-        {
-            id: 3,
-            value: 'equal',
-            label: '=',
-        },
-    ];
 
     const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
@@ -77,17 +71,16 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
                 <SelectableList
                     options={COMPARISON_OPTIONS}
                     onSelect={value => {
-                        setSign(value as (prevState: keyof ComparisonType) => keyof ComparisonType);
+                        setSign(value as keyof ComparisonType);
 
-                        const getKeys = Object.keys as <T extends object>(obj: T) => Array<keyof T>;
-
-                        const newComparison = filterComparison;
-                        getKeys(newComparison[columnId]).forEach(v => {
-                            newComparison[columnId][v] = v === value;
+                        setFilterComparison({
+                            less: false,
+                            greater: false,
+                            equal: false,
+                            ...{ [value as keyof ComparisonType]: true },
                         });
-                        setFilterComparison(newComparison);
 
-                        setFilter(columnId, (old = []) => {
+                        setFilter((old = []) => {
                             const min = old[0] ? parseFloat(old[0]) : old[0];
                             const max = old[1] ? parseFloat(old[1]) : old[1];
                             const n = getFiniteNumber(min) || getFiniteNumber(max);

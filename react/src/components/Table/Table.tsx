@@ -11,6 +11,7 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
+    Column as ColumnType,
     HeaderGroup,
     Row,
     useFilters,
@@ -21,6 +22,7 @@ import {
     useTable,
 } from 'react-table';
 import './dragscroll.css';
+import SOURCES from '../../constants/sources';
 import { downloadCsv, useOverflow } from '../../hooks';
 import {
     CallsetInfoFields,
@@ -114,6 +116,10 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
     return results.map(result => formatNullValues(result));
 };
 
+const FILTER_OPTIONS: { [K in keyof FlattenedQueryResponse]?: string[] } = {
+    source: SOURCES,
+};
+
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
@@ -174,18 +180,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="alt" />,
-                        id: 'alt',
-                        Header: 'Alt',
-                        width: getColumnWidth(tableData, 'alt', 'Alt'),
-                    },
-                    {
-                        accessor: state => <CellPopover state={state} id="ref" />,
-                        id: 'ref',
-                        Header: 'Ref',
-                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
-                    },
-                    {
                         accessor: 'start',
                         id: 'start',
                         Header: 'Start',
@@ -200,7 +194,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'between',
                     },
                     {
+                        accessor: 'ref',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
+                        id: 'ref',
+                        Header: 'Ref',
+                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                    },
+                    {
+                        accessor: 'alt',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
+                        id: 'alt',
+                        Header: 'Alt',
+                        width: getColumnWidth(tableData, 'alt', 'Alt'),
+                    },
+                    {
                         accessor: 'source',
+                        filter: 'singleSelect',
                         id: 'source',
                         Header: 'Source',
                         width: getColumnWidth(tableData, 'source', 'Source'),
@@ -217,20 +226,45 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableSortBy: true,
                         width: 79,
                     },
-                    { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
+                    {
+                        accessor: 'af',
+                        id: 'af',
+                        Header: 'gnomAD_AF_exome',
+                        width: 105,
+                        filter: 'between',
+                    },
+                    {
+                        id: 'aaChange',
+                        Header: 'aaChange',
+                        width: 105,
+                        Cell: ({ row }: { row: Row<FlattenedQueryResponse> }) => (
+                            <span>
+                                {!!row.original.aaPos?.trim()
+                                    ? `p.${row.original.aaRef}${row.original.aaPos}${row.original.aaAlt}`
+                                    : ''}
+                            </span>
+                        ),
+                    },
+                    /* { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
                     { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
-                    { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 },
+                    { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 }, */
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
                     {
                         accessor: 'consequence',
                         id: 'consequence',
                         Header: 'consequence',
                         width: 105,
-                        filter: 'includesSome',
+                        filter: 'multiSelect',
                     },
-                    { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 },
-                    { accessor: 'gnomadHom', id: 'gnomadHom', Header: 'gnomadHom', width: 105 },
-                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 105 },
+                    /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
+                    {
+                        accessor: 'gnomadHom',
+                        id: 'gnomadHom',
+                        Header: 'gnomadHom',
+                        width: 105,
+                        filter: 'between',
+                    },
+                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
                 ],
             },
             {
@@ -288,18 +322,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'sex',
+                        filter: 'multiSelect',
                         id: 'sex',
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
-                        filter: 'includesSome',
                         Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
                     {
                         accessor: 'zygosity',
+                        filter: 'multiSelect',
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
-                        filter: 'includesSome',
                     },
                     {
                         accessor: 'geographicOrigin',
@@ -332,7 +366,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
-                        accessor: state => <CellPopover state={state} id="contactInfo" />,
+                        accessor: 'contactInfo',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
@@ -526,22 +561,33 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {advancedFiltersOpen && (
                 <TableFilters justifyContent="flex-start" alignItems="flex-start">
                     {columns
-                        .map(c => c.columns)
-                        .flat()
+                        .flatMap(c => c.columns)
+                        .sort((a, b) => ( (a.id || 0) > (b.id || 0) ? 1 : -1))
                         .filter(
                             c =>
-                                !dummyColumns.concat(columnsWithoutFilters).includes(c.id as string)
+                                !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id)
                         )
-                        .map((v, i) => (
+                        .map((v: ColumnType<FlattenedQueryResponse>, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
                                     {v.Header}
                                 </Typography>
                                 <ColumnFilter
                                     preFilteredRows={preFilteredRows}
-                                    filters={filters}
-                                    setFilter={setFilter}
-                                    columnId={v.id as string}
+                                    filterModel={filters.find(
+                                        f => f.id === (v.id as keyof FlattenedQueryResponse)
+                                    )}
+                                    options={
+                                        !!(
+                                            !!v.id &&
+                                            !!FILTER_OPTIONS[v.id as keyof FlattenedQueryResponse]
+                                        )
+                                            ? FILTER_OPTIONS[v.id as keyof FlattenedQueryResponse]
+                                            : undefined
+                                    }
+                                    setFilter={setFilter.bind(null, v.id as string)}
+                                    type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
+                                    columnId={v.id as keyof FlattenedQueryResponse}
                                 />
                             </Column>
                         ))}

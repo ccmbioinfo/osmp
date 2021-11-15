@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
-
 export interface VariantResponseInfoFields {
+  af?: Maybe<number>;
   aaAlt?: Maybe<string>;
   aaPos?: Maybe<string>;
   aaRef?: Maybe<string>;
@@ -9,7 +9,7 @@ export interface VariantResponseInfoFields {
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
   gnomadHet?: Maybe<string>;
-  gnomadHom?: Maybe<string>;
+  gnomadHom?: Maybe<number>;
   transcript?: Maybe<string>;
 }
 
@@ -34,7 +34,7 @@ export interface VariantResponseFields {
   assemblyId: AssemblyId;
   callsets: CallSet[];
   end: number;
-  info?: Maybe<VariantResponseInfoFields>;
+  info?: VariantResponseInfoFields;
   ref: string;
   referenceName: string;
   start: number;
@@ -108,14 +108,29 @@ export interface QueryInput {
 
 /* end graphql schema types */
 
-export interface VariantAnnotation extends VariantResponseInfoFields {
+export interface VariantCoordinate {
+  alt: string;
+  chrom: string;
   ref: string;
   pos: number;
-  chrom: string;
-  alt: string;
 }
 
-export type VariantAnnotationId = Pick<VariantAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
+export interface CaddAnnotation extends VariantCoordinate {
+  aaAlt: string;
+  aaPos: string;
+  aaRef: string;
+  cdna: string;
+  consequence: string;
+  transcript: string;
+}
+
+export interface GnomadAnnotation extends VariantCoordinate {
+  af: number;
+  an: number;
+  nhomalt: number;
+  assembly: string;
+  type: string;
+}
 
 export interface ErrorResponse {
   id: string;
@@ -130,7 +145,7 @@ export interface QueryResult<T> {
 }
 
 export type VariantQueryResponse = QueryResult<VariantQueryDataResult[]>;
-export type AnnotationQueryResponse = QueryResult<VariantAnnotation[]>;
+export type CADDAnnotationQueryResponse = QueryResult<CaddAnnotation[]>;
 
 export interface SourceError {
   source: string;

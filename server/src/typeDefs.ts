@@ -7,6 +7,7 @@ export default gql`
   }
 
   type VariantResponseInfoFields {
+    af: Float
     aaAlt: String
     aaPos: String
     aaRef: String

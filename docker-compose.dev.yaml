@@ -2,6 +2,7 @@ version: "3.9"
 services:
   ssmp-server:
     image: ghcr.io/ccmbioinfo/ssmp:dev
+    init: true
     environment:
       TEST_NODE_URL: ${TEST_NODE_URL}
       KEYCLOAK_AUTH_URL: ${KEYCLOAK_AUTH_URL}
@@ -12,6 +13,7 @@ services:
       PT_AUTH0_CLIENT_SECRET: ${PT_AUTH0_TOKEN_CLIENT_SECRET}
       PT_AUTH0_TOKEN_ENDPOINT: ${PT_AUTH0_TOKEN_ENDPOINT}
       PT_ENDPOINT: ${TEST_NODE_URL}
+      MONGO_CONNECTION_STRING: ${MONGO_CONNECTION_STRING}
     ports:
       - 3000:3000
     logging:

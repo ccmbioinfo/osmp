@@ -21,6 +21,7 @@ const fetchVariantsQuery = gql`
                     }
                     end
                     info {
+                        af
                         aaAlt
                         aaPos
                         aaRef

@@ -123,6 +123,7 @@ jobs:
           KEYCLOAK_AUTH_URL: ${{ secrets.KEYCLOAK_AUTH_URL }}
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
           NODE_ENV: development
           PT_AUTH0_TOKEN_CLIENT_ID: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_ID }}
           PT_AUTH0_TOKEN_CLIENT_SECRET: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_SECRET }}

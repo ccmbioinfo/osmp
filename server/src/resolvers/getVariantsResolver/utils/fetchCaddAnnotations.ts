@@ -3,8 +3,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import { v4 as uuidv4 } from 'uuid';
-import { VariantAnnotation, AnnotationQueryResponse } from '../../../types';
-import logger from '../../../logger';
+import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -29,7 +28,7 @@ const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
   protpos: 29
 */
 
-const NAME_MAP: Record<string, keyof VariantAnnotation> = {
+const NAME_MAP: Record<string, keyof CaddAnnotation> = {
   Chr: 'chrom',
   Pos: 'pos',
   Ref: 'ref',
@@ -63,14 +62,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const query = await _buildQuery(position, assemblyId);
   const execPromise = promisify(exec);
 
-  let response;
-  try {
-    response = execPromise(query, { maxBuffer: 10e7 }); // 100mb
-  } catch (err) {
-    logger.error(err);
-    throw err;
-  }
-  return response;
+  return execPromise(query, { maxBuffer: 10e7 }); // 100mb
 };
 
 const _formatAnnotations = (annotations: string) => {
@@ -84,7 +76,7 @@ const _formatAnnotations = (annotations: string) => {
   const headers = headerRow
     .split(/\W+/)
     .filter(Boolean)
-    .reduce<Record<number, keyof VariantAnnotation>>(
+    .reduce<Record<number, keyof CaddAnnotation>>(
       (acc, curr, i) => ({
         ...acc,
         [i]: NAME_MAP[curr],
@@ -95,9 +87,9 @@ const _formatAnnotations = (annotations: string) => {
   return annotationsArray.map(annotation =>
     annotation
       .split(/\W+/)
-      .reduce<VariantAnnotation>(
+      .reduce<CaddAnnotation>(
         (acc, curr, i) => ({ ...acc, [headers[i]]: curr }),
-        {} as VariantAnnotation
+        {} as CaddAnnotation
       )
   );
 };
@@ -127,10 +119,10 @@ const _buildQuery = async (position: string, assemblyId: string) => {
 const fetchAnnotations = (
   position: string,
   assemblyId: string
-): Promise<AnnotationQueryResponse> => {
-  const source = 'annotations';
+): Promise<CADDAnnotationQueryResponse> => {
+  const source = 'CADD annotations';
   return _getAnnotations(position, assemblyId)
-    .then(result => ({ source, data: _formatAnnotations(result.stdout) }))
+    .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
     .catch(error => ({
       error: {
         id: uuidv4(),

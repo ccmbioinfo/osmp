@@ -27,6 +27,7 @@ describe('Test getVariants query', () => {
             }
             end
             info {
+              af
               aaAlt
               aaPos
               aaRef

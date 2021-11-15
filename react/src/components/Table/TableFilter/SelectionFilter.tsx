@@ -1,3 +1,4 @@
+import { isNullOrUndefined } from 'util';
 import React, { useState } from 'react';
 import { Row } from 'react-table';
 import { ComboBox } from '../..';
@@ -5,8 +6,8 @@ import { FlattenedQueryResponse } from '../Table';
 import { DefaultFilter } from './ColumnFilter';
 
 interface SelectionFilterProps {
-    setFilter: (columnId: string, filterValue: any) => void;
-    columnId: string;
+    setFilter: (filterValue: any) => void;
+    columnId: keyof FlattenedQueryResponse;
     options?: string[];
     filter?: DefaultFilter<string | string[]>;
     isMulti?: boolean;
@@ -27,11 +28,7 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
 
     // If no explicit list of options is provided, we dynamically calculate the options from the table query results.
     const dynamicOptions = React.useMemo(() => {
-        const options: Set<string> = new Set();
-        preFilteredRows.forEach(row => {
-            options.add(row.values[columnId]);
-        });
-        return [...options.values()];
+        return [...new Set(preFilteredRows.map(r => r.values[columnId]))];
     }, [columnId, preFilteredRows]);
 
     const selections = options && !!options.length ? options : dynamicOptions;
@@ -40,14 +37,14 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
         setSearchTerm('');
         if (isMulti) {
             if (filter) {
-                setFilter(columnId, (filter: string[]) => {
+                setFilter((filter: string[]) => {
                     return filter.includes(val) ? filter.filter(v => v !== val) : [...filter, val];
                 });
             } else {
-                setFilter(columnId, [val]);
+                setFilter([val]);
             }
         } else {
-            setFilter(columnId, val);
+            setFilter(val);
         }
     };
 
@@ -67,7 +64,7 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
                 .map((n, id) => ({
                     id,
                     value: n,
-                    label: n,
+                    label: isNullOrUndefined(n) || !n.trim().length ? 'Not Available' : n,
                 }))}
             onSelect={handleSelectionFilter}
             placeholder="Select"
