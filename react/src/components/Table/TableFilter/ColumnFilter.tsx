@@ -32,7 +32,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
 
     useEffect(() => {
         setFilter(debouncedInput);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedInput]);
 
     useEffect(() => {

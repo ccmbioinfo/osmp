@@ -562,7 +562,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 <TableFilters justifyContent="flex-start" alignItems="flex-start">
                     {columns
                         .flatMap(c => c.columns)
-                        .sort((a, b) => ( (a.id || 0) > (b.id || 0) ? 1 : -1))
+                        .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
                         .filter(
                             c =>
                                 !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id)
