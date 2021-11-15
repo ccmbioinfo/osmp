@@ -12,7 +12,6 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
     HeaderGroup,
-    Row,
     useFilters,
     useFlexLayout,
     useGlobalFilter,
@@ -31,7 +30,6 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
-import { formatNullValues } from '../../utils';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { CellPopover } from './CellPopover';
 import {
@@ -93,34 +91,43 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         ...variantInfo,
     };
 };
-
-// includes computed and dummy columns not in initial data
-// seems that RT doesn't distinguish between native and computed fields, so setting as optional
 export interface ResultTableColumns extends FlattenedQueryResponse {
-    empty_case_details?: string;
-    empty_variation_details?: string;
-    aaChange?: string;
+    aaChange: string;
+    emptyCaseDetails: string;
+    emptyVariationDetails: string;
 }
 
-/* flatten data */
+const addAdditionalFieldsAndFormatNulls = (results: FlattenedQueryResponse) => {
+    const reformatted = Object.fromEntries(
+        Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
+    ) as FlattenedQueryResponse;
+    return {
+        ...reformatted,
+        emptyCaseDetails: '',
+        emptyVariationDetails: '',
+        aaChange: reformatted.aaPos?.trim()
+            ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
+            : '',
+    };
+};
+
+/* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
 const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
-    const results: FlattenedQueryResponse[] = [];
-    queryResult.forEach(d => {
+    return queryResult.flatMap(d => {
         if (d.variant.callsets.length) {
             //one row per individual per callset
-            d.variant.callsets
+            return d.variant.callsets
                 .filter(cs => cs.individualId === d.individual.individualId)
-                .forEach(cs => {
-                    results.push({
+                .map(cs =>
+                    addAdditionalFieldsAndFormatNulls({
                         ...cs.info,
                         ...flattenBaseResults(d),
-                    });
-                });
+                    })
+                );
         } else {
-            results.push(flattenBaseResults(d));
+            return addAdditionalFieldsAndFormatNulls(flattenBaseResults(d));
         }
     });
-    return results.map(result => formatNullValues(result));
 };
 
 const FILTER_OPTIONS: { [K in keyof ResultTableColumns]?: string[] } = {
@@ -152,7 +159,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
+    const dummyColumns = React.useMemo(() => ['emptyVariationDetails', 'emptyCaseDetails'], []);
 
     const columnsWithoutFilters = React.useMemo(() => ['contactInfo', 'chromosome'], []);
 
@@ -243,7 +250,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'variation_details',
                 columns: [
                     {
-                        id: 'empty_variation_details',
+                        id: 'emptyVariationDetails',
                         Header: '',
                         disableSortBy: true,
                         width: 79,
@@ -260,15 +267,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'aaChange',
                         Header: 'aaChange',
                         width: 105,
-                        Cell: ({ row }) => (
-                            <span>
-                                {!!row.original.aaPos?.trim()
-                                    ? `p.${row.original.aaRef}${row.original.aaPos}${row.original.aaAlt}`
-                                    : ''}
-                            </span>
-                        ),
                     },
-
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
                     {
                         accessor: 'consequence',
@@ -293,7 +292,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 id: 'case_details',
                 columns: [
                     {
-                        id: 'empty_case_details',
+                        id: 'emptyCaseDetails',
                         Header: '',
                         disableSortBy: true,
                         width: 70,
@@ -470,18 +469,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
-    /**
-     * The downloadCsv function takes in a JSON array for the csv export.
-     * However, the contact column contains a button instead of a string.
-     * The formatDataForCsv takes all visible row data that has been materialized on react-table
-     * and replaces the contact button with the original email string.
-     */
-    const formatDataForCsv = <T extends Row<any>>(rows: T[]): T['values'][] =>
-        rows.map(r => ({
-            ...r.values,
-            contactInfo: (r.original as ResultTableColumns).contactInfo,
-        }));
-
     const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
 
     const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
@@ -526,8 +513,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         variant="primary"
                         onClick={() => {
                             downloadCsv(
-                                formatDataForCsv(rows),
-                                visibleColumns.map(c => c.id)
+                                rows.map(r => r.values as ResultTableColumns),
+                                visibleColumns.map(c => c.id as keyof ResultTableColumns)
                             );
                         }}
                     >
@@ -563,7 +550,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                             ) {
                                                                 toggleHideColumn(c.id, c.isVisible);
                                                                 toggleHideColumn(
-                                                                    'empty_' + c.parent.id,
+                                                                    'empty' + c.parent.id,
                                                                     !c.isVisible
                                                                 );
                                                             } else {
