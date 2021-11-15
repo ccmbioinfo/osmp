@@ -12,6 +12,7 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
     HeaderGroup,
+    Row,
     useFilters,
     useFlexLayout,
     useGlobalFilter,
@@ -97,7 +98,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     emptyVariationDetails: string;
 }
 
-const addAdditionalFieldsAndFormatNulls = (results: FlattenedQueryResponse) => {
+const addAdditionalFieldsAndFormatNulls = (results: FlattenedQueryResponse): ResultTableColumns => {
     const reformatted = Object.fromEntries(
         Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
     ) as FlattenedQueryResponse;
@@ -166,7 +167,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const filterTypes = React.useMemo(
         () => ({
             multiSelect: (
-                rows: Row<FlattenedQueryResponse>[],
+                rows: Row<ResultTableColumns>[],
                 columnIds: string[],
                 filterValue: string[]
             ) =>
