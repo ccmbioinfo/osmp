@@ -149,7 +149,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const columnsWithoutFilters = React.useMemo(() => ['contact', 'chromosome'], []);
 
+    const filterTypes = React.useMemo(
+        () => ({
+            multiSelect: (
+                rows: Row<FlattenedQueryResponse>[],
+                columnIds: string[],
+                filterValue: string[]
+            ) =>
+                filterValue.length
+                    ? rows.filter(row => filterValue.includes(row.values[columnIds[0]]))
+                    : rows,
+        }),
+        []
+    );
+
     type Accessor = string | (() => JSX.Element) | ((state: any) => any);
+
     // Dynamically adjust column width based on cell's longest text.
     const getColumnWidth = React.useCallback(
         (data: FlattenedQueryResponse[], accessor: Accessor, headerText: string) => {
@@ -401,12 +416,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             columns,
             defaultColumn,
             data: tableData,
-            filterTypes: {
-                multiSelect: (rows, columnIds, filterValue: string[]) =>
-                    filterValue.length
-                        ? rows.filter(row => filterValue.includes(row.values[columnIds[0]]))
-                        : rows,
-            },
+            filterTypes,
             initialState: {
                 sortBy: sortByArray,
                 hiddenColumns: [
