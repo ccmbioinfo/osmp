@@ -3,7 +3,7 @@ import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
 import { IconButton } from '../../index';
-import { FlattenedQueryResponse } from '../Table';
+import { ResultTableColumns } from '../Table';
 
 export type ComparisonType = {
     less: boolean;
@@ -17,7 +17,7 @@ export type ComparisonOption = {
     label: string;
 };
 
-export type FilterComparison = { [K in keyof FlattenedQueryResponse]?: ComparisonType };
+export type FilterComparison = { [K in keyof ResultTableColumns]?: ComparisonType };
 
 interface InputComparisonDropdownProps {
     setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;

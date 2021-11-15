@@ -11,7 +11,6 @@ import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
-    Column as ColumnType,
     HeaderGroup,
     Row,
     useFilters,
@@ -95,8 +94,16 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
     };
 };
 
+// includes computed and dummy columns not in initial data
+// seems that RT doesn't distinguish between native and computed fields, so setting as optional
+export interface ResultTableColumns extends FlattenedQueryResponse {
+    empty_case_details?: string;
+    empty_variation_details?: string;
+    aaChange?: string;
+}
+
 /* flatten data */
-const prepareData = (queryResult: VariantQueryDataResult[]) => {
+const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
     const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(d => {
         if (d.variant.callsets.length) {
@@ -116,7 +123,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
     return results.map(result => formatNullValues(result));
 };
 
-const FILTER_OPTIONS: { [K in keyof FlattenedQueryResponse]?: string[] } = {
+const FILTER_OPTIONS: { [K in keyof ResultTableColumns]?: string[] } = {
     source: SOURCES,
 };
 
@@ -147,7 +154,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const dummyColumns = React.useMemo(() => ['empty_variation_details', 'empty_case_details'], []);
 
-    const columnsWithoutFilters = React.useMemo(() => ['contact', 'chromosome'], []);
+    const columnsWithoutFilters = React.useMemo(() => ['contactInfo', 'chromosome'], []);
 
     const filterTypes = React.useMemo(
         () => ({
@@ -167,7 +174,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     // Dynamically adjust column width based on cell's longest text.
     const getColumnWidth = React.useCallback(
-        (data: FlattenedQueryResponse[], accessor: Accessor, headerText: string) => {
+        (data: ResultTableColumns[], accessor: Accessor, headerText: string) => {
             if (typeof accessor === 'string') {
                 accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
             }
@@ -183,7 +190,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const columns = React.useMemo(
-        (): ColumnGroup<FlattenedQueryResponse>[] => [
+        (): ColumnGroup<ResultTableColumns>[] => [
             {
                 Header: 'Core',
                 id: 'core',
@@ -250,9 +257,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         id: 'aaChange',
+                        accessor: 'aaChange',
                         Header: 'aaChange',
                         width: 105,
-                        Cell: ({ row }: { row: Row<FlattenedQueryResponse> }) => (
+                        Cell: ({ row }) => (
                             <span>
                                 {!!row.original.aaPos?.trim()
                                     ? `p.${row.original.aaRef}${row.original.aaPos}${row.original.aaAlt}`
@@ -260,9 +268,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             </span>
                         ),
                     },
-                    /* { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
-                    { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
-                    { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 }, */
+
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
                     {
                         accessor: 'consequence',
@@ -383,7 +389,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'contactInfo',
                         Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
-                        id: 'contact',
+                        id: 'contactInfo',
                         Header: 'Contact',
                         width: 120,
                     },
@@ -461,7 +467,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
-    const handleGroupChange = (g: HeaderGroup<FlattenedQueryResponse>) =>
+    const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
     /**
@@ -473,12 +479,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const formatDataForCsv = <T extends Row<any>>(rows: T[]): T['values'][] =>
         rows.map(r => ({
             ...r.values,
-            contact: (r.original as FlattenedQueryResponse).contactInfo,
+            contactInfo: (r.original as ResultTableColumns).contactInfo,
         }));
 
-    const isHeader = (column: HeaderGroup<FlattenedQueryResponse>) => !column.parent;
+    const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
 
-    const isHeaderExpanded = (column: HeaderGroup<FlattenedQueryResponse>) => {
+    const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
         if (isHeader(column) && column.columns && column.Header !== 'Core') {
             const visibleColumns = column.columns.filter(c => c.isVisible).map(c => c.id);
             const intersection = visibleColumns.filter(value => dummyColumns.includes(value));
@@ -583,27 +589,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             c =>
                                 !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id)
                         )
-                        .map((v: ColumnType<FlattenedQueryResponse>, i) => (
+                        .map((v, i) => (
                             <Column key={i}>
                                 <Typography variant="subtitle" bold>
                                     {v.Header}
                                 </Typography>
                                 <ColumnFilter
                                     preFilteredRows={preFilteredRows}
-                                    filterModel={filters.find(
-                                        f => f.id === (v.id as keyof FlattenedQueryResponse)
-                                    )}
+                                    filterModel={filters.find(f => f.id === v.id)}
                                     options={
                                         !!(
                                             !!v.id &&
-                                            !!FILTER_OPTIONS[v.id as keyof FlattenedQueryResponse]
+                                            !!FILTER_OPTIONS[v.id as keyof ResultTableColumns]
                                         )
-                                            ? FILTER_OPTIONS[v.id as keyof FlattenedQueryResponse]
+                                            ? FILTER_OPTIONS[v.id as keyof ResultTableColumns]
                                             : undefined
                                     }
                                     setFilter={setFilter.bind(null, v.id as string)}
                                     type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
-                                    columnId={v.id as keyof FlattenedQueryResponse}
+                                    columnId={v.id as keyof ResultTableColumns}
                                 />
                             </Column>
                         ))}
