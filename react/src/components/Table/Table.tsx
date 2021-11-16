@@ -20,6 +20,7 @@ import {
     usePagination,
     useSortBy,
     useTable,
+    TableInstance,
 } from 'react-table';
 import './dragscroll.css';
 import SOURCES from '../../constants/sources';
@@ -53,6 +54,8 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
+type RowSpanHeader = { id: string; topCellIndex: number; topCellValue?: any };
+
 export type FlattenedQueryResponse = Omit<
     IndividualResponseFields,
     'info' | 'diseases' | 'phenotypicFeatures'
@@ -65,7 +68,8 @@ export type FlattenedQueryResponse = Omit<
     VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
 
 /* flatten all but callsets field */
-const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
+const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse[] => {
+    const baseResults: FlattenedQueryResponse[] = [];
     const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
     const {
@@ -75,53 +79,55 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         ...restIndividual
     } = result.individual;
 
-    console.log(phenotypicFeatures)
+    console.log(phenotypicFeatures);
 
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
         ''
     );
-    const flattenedPhenotypes = ([
-        {
-            ageOfOnset: '10',
-            dateOfOnset: '2021',
-            levelSeverity: '1',
-            onsetType: 'new',
-            phenotypeId: '123'
-        },
-        {
-            ageOfOnset: '10',
-            dateOfOnset: '2021',
-            levelSeverity: '1',
-            onsetType: 'new',
-            phenotypeId: '123'
-        },
-        {
-            ageOfOnset: '10',
-            dateOfOnset: '2021',
-            levelSeverity: '1',
-            onsetType: 'new',
-            phenotypeId: '123'
-        }
-    ] || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
-        ''
-    );
 
-    return {
-        contactInfo,
-        diseases: flattenedDiseases,
-        ...individualInfo,
-        phenotypes: flattenedPhenotypes,
-        ...restIndividual,
-        ...restVariant,
-        source,
-        ...variantInfo,
-    };
+    (
+        [
+            {
+                ageOfOnset: '10',
+                dateOfOnset: '2021',
+                levelSeverity: '1',
+                onsetType: 'new',
+                phenotypeId: '123',
+            },
+            {
+                ageOfOnset: '10',
+                dateOfOnset: '2021',
+                levelSeverity: '1',
+                onsetType: 'new',
+                phenotypeId: '123',
+            },
+            {
+                ageOfOnset: '10',
+                dateOfOnset: '2021',
+                levelSeverity: '1',
+                onsetType: 'new',
+                phenotypeId: '123',
+            },
+        ] || []
+    ).forEach(v => {
+        baseResults.push({
+            contactInfo,
+            diseases: flattenedDiseases,
+            ...individualInfo,
+            phenotypes: `${v.phenotypeId}:${v.levelSeverity}`,
+            ...restIndividual,
+            ...restVariant,
+            source,
+            ...variantInfo,
+        });
+    });
+
+    return baseResults;
 };
 
 /* flatten data */
-const prepareData = (queryResult: VariantQueryDataResult[]) => {
+const prepareData = (queryResult: VariantQueryDataResult[], groupPhenotypes: boolean) => {
     const results: FlattenedQueryResponse[] = [];
     queryResult.forEach(d => {
         if (d.variant.callsets.length) {
@@ -129,17 +135,19 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
             d.variant.callsets
                 .filter(cs => cs.individualId === d.individual.individualId)
                 .forEach(cs => {
-                    results.push({
-                        ...cs.info,
-                        ...flattenBaseResults(d),
-                    });
+                    flattenBaseResults(d).forEach(r =>
+                        results.push({
+                            ...cs.info,
+                            ...r,
+                        })
+                    );
                 });
         } else {
-            results.push(flattenBaseResults(d));
+            results.push(...flattenBaseResults(d));
         }
     });
 
-    console.log(results)
+    console.log(results);
 
     return results.map(result => formatNullValues(result));
 };
@@ -148,11 +156,32 @@ const FILTER_OPTIONS: { [K in keyof FlattenedQueryResponse]?: string[] } = {
     source: SOURCES,
 };
 
+// hook for adding rowspan
+function useRowSpan(instance: TableInstance<FlattenedQueryResponse>) {
+    const { allColumns } = instance;
+
+    let rowSpanHeaders: RowSpanHeader[] = [];
+
+    allColumns.forEach((column, i) => {
+        const { id, enableRowSpan } = column;
+
+        if (enableRowSpan !== undefined) {
+            rowSpanHeaders = [...rowSpanHeaders, { id, topCellValue: null, topCellIndex: 0 }];
+        }
+    });
+
+    Object.assign(instance, { rowSpanHeaders });
+}
+
 const Table: React.FC<TableProps> = ({ variantData }) => {
+    const [groupPhenotypes, setGroupPhenotypes] = useState<boolean>(true);
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
     const [showModal, setShowModal] = useState<Boolean>(false);
 
-    const tableData = useMemo(() => prepareData(variantData), [variantData]);
+    const tableData = useMemo(
+        () => prepareData(variantData, groupPhenotypes),
+        [groupPhenotypes, variantData]
+    );
     const sortByArray = useMemo(
         () => [
             {
@@ -221,6 +250,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'chromosome',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'start',
@@ -228,6 +258,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Start',
                         width: getColumnWidth(tableData, 'start', 'Start'),
                         filter: 'between',
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'end',
@@ -235,6 +266,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'End',
                         width: getColumnWidth(tableData, 'end', 'End'),
                         filter: 'between',
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'ref',
@@ -242,6 +274,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'ref',
                         Header: 'Ref',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'alt',
@@ -249,6 +282,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'alt',
                         Header: 'Alt',
                         width: getColumnWidth(tableData, 'alt', 'Alt'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'source',
@@ -256,6 +290,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'source',
                         Header: 'Source',
                         width: getColumnWidth(tableData, 'source', 'Source'),
+                        enableRowSpan: groupPhenotypes,
                     },
                 ],
             },
@@ -268,6 +303,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: '',
                         disableSortBy: true,
                         width: 79,
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'af',
@@ -275,6 +311,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'gnomAD_AF_exome',
                         width: 105,
                         filter: 'between',
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         id: 'aaChange',
@@ -287,17 +324,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     : ''}
                             </span>
                         ),
+                        enableRowSpan: groupPhenotypes,
                     },
                     /* { accessor: 'aaAlt', id: 'aaAlt', Header: 'aaAlt', width: 105 },
                     { accessor: 'aaPos', id: 'aaPos', Header: 'aaPos', width: 105 },
                     { accessor: 'aaRef', id: 'aaRef', Header: 'aaRef', width: 105 }, */
-                    { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
+                    {
+                        accessor: 'cdna',
+                        id: 'cdna',
+                        Header: 'cdna',
+                        width: 105,
+                        enableRowSpan: groupPhenotypes,
+                    },
                     {
                         accessor: 'consequence',
                         id: 'consequence',
                         Header: 'consequence',
                         width: 105,
                         filter: 'multiSelect',
+                        enableRowSpan: groupPhenotypes,
                     },
                     /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
                     {
@@ -306,8 +351,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'gnomadHom',
                         width: 105,
                         filter: 'between',
+                        enableRowSpan: groupPhenotypes,
                     },
-                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
+                    {
+                        accessor: 'transcript',
+                        id: 'transcript',
+                        Header: 'transcript',
+                        width: 150,
+                        enableRowSpan: groupPhenotypes,
+                    },
                 ],
             },
             {
@@ -319,36 +371,42 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: '',
                         disableSortBy: true,
                         width: 70,
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'datasetId',
                         id: 'datasetId',
                         Header: 'Dataset ID',
                         width: getColumnWidth(tableData, 'datasetId', 'Dataset ID'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'dp',
                         id: 'dp',
                         Header: 'DP',
                         width: getColumnWidth(tableData, 'dp', 'DP'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'ad',
                         id: 'ad',
                         Header: 'AD',
                         width: getColumnWidth(tableData, 'ad', 'AD'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'gq',
                         id: 'gq',
                         Header: 'GQ',
                         width: getColumnWidth(tableData, 'gq', 'GQ'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
                         Header: 'Ethnicity',
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'phenotypes',
@@ -370,6 +428,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Sex',
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
                         Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'zygosity',
@@ -377,36 +436,42 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'geographicOrigin',
                         id: 'geographicOrigin',
                         Header: 'Geographic Origin',
                         width: getColumnWidth(tableData, 'geographicOrigin', 'Geographic Origin'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'candidateGene',
                         id: 'candidateGene',
                         Header: 'Candidate Gene',
                         width: getColumnWidth(tableData, 'candidateGene', 'Candidate Gene'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'classifications',
                         id: 'classifications',
                         Header: 'Classifications',
                         width: getColumnWidth(tableData, 'classifications', 'Classifications'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'diseases',
                         id: 'diseases',
                         Header: 'Diseases',
                         width: getColumnWidth(tableData, 'diseases', 'Diseases'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'diagnosis',
                         id: 'diagnosis',
                         Header: 'Diagnosis',
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
+                        enableRowSpan: groupPhenotypes,
                     },
                     {
                         accessor: 'contactInfo',
@@ -414,11 +479,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'contact',
                         Header: 'Contact',
                         width: 120,
+                        enableRowSpan: groupPhenotypes,
                     },
                 ],
             },
         ],
-        [getColumnWidth, tableData]
+        [groupPhenotypes, getColumnWidth, tableData]
     );
 
     const defaultColumn = React.useMemo(
@@ -457,7 +523,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useFlexLayout,
         useGlobalFilter,
         useSortBy,
-        usePagination
+        usePagination,
+        hooks => {
+            hooks.useInstance.push(useRowSpan);
+        }
     );
 
     const {
@@ -482,6 +551,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         toggleHideColumn,
         visibleColumns,
         rows,
+        rowSpanHeaders,
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
@@ -736,24 +806,58 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         </THead>
 
                         <tbody {...getTableBodyProps()}>
+                            {rows.map((row, i) => {
+                                prepareRow(row);
+
+                                for (let j = 0; j < row.allCells.length; j++) {
+                                    let cell = row.allCells[j];
+                                    let rowSpanHeader = (rowSpanHeaders as RowSpanHeader[]).find(
+                                        x => x.id === cell.column.id
+                                    );
+
+                                    if (rowSpanHeader !== undefined) {
+                                        if (
+                                            rowSpanHeader.topCellValue === null ||
+                                            rowSpanHeader.topCellValue !== cell.value
+                                        ) {
+                                            cell.isRowSpanned = false;
+                                            rowSpanHeader.topCellValue = cell.value;
+                                            rowSpanHeader.topCellIndex = i;
+                                            cell.rowSpan = 1;
+                                        } else {
+                                            rows[cell.column.topCellIndex].allCells[j].rowSpan++;
+                                            cell.isRowSpanned = true;
+                                        }
+                                    }
+                                }
+                                return null;
+                            })}
+
                             {page.length > 0 ? (
                                 page.map(row => {
-                                    prepareRow(row);
+                                    // prepareRow(row);
+
                                     const { key, ...restRowProps } = row.getRowProps();
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {
                                                 const { key, ...restCellProps } =
                                                     cell.getCellProps();
-                                                return (
-                                                    <td key={key} {...restCellProps}>
-                                                        <CellText>
-                                                            <Typography variant="subtitle">
-                                                                {cell.render('Cell')}
-                                                            </Typography>
-                                                        </CellText>
-                                                    </td>
-                                                );
+                                                if (cell.isRowSpanned) return null;
+                                                else
+                                                    return (
+                                                        <td
+                                                            key={key}
+                                                            rowSpan={cell.rowSpan}
+                                                            {...restCellProps}
+                                                        >
+                                                            <CellText>
+                                                                <Typography variant="subtitle">
+                                                                    {cell.render('Cell')}
+                                                                </Typography>
+                                                            </CellText>
+                                                        </td>
+                                                    );
                                             })}
                                         </motion.tr>
                                     );
