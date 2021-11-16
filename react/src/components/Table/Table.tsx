@@ -74,11 +74,36 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         phenotypicFeatures,
         ...restIndividual
     } = result.individual;
+
+    console.log(phenotypicFeatures)
+
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
         ''
     );
-    const flattenedPhenotypes = (phenotypicFeatures || []).reduce(
+    const flattenedPhenotypes = ([
+        {
+            ageOfOnset: '10',
+            dateOfOnset: '2021',
+            levelSeverity: '1',
+            onsetType: 'new',
+            phenotypeId: '123'
+        },
+        {
+            ageOfOnset: '10',
+            dateOfOnset: '2021',
+            levelSeverity: '1',
+            onsetType: 'new',
+            phenotypeId: '123'
+        },
+        {
+            ageOfOnset: '10',
+            dateOfOnset: '2021',
+            levelSeverity: '1',
+            onsetType: 'new',
+            phenotypeId: '123'
+        }
+    ] || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
         ''
     );
@@ -113,6 +138,9 @@ const prepareData = (queryResult: VariantQueryDataResult[]) => {
             results.push(flattenBaseResults(d));
         }
     });
+
+    console.log(results)
+
     return results.map(result => formatNullValues(result));
 };
 
