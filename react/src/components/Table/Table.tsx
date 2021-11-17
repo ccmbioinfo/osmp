@@ -825,8 +825,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             rowSpanHeader.topCellIndex = i;
                                             cell.rowSpan = 1;
                                         } else {
-                                            rows[cell.column.topCellIndex].allCells[j].rowSpan++;
-                                            cell.isRowSpanned = true;
+                                            const currentRow = rows[cell.column.topCellIndex];
+                                            const currentCell = currentRow?.allCells[j];
+
+                                            if (currentRow && currentCell) {
+                                                rows[cell.column.topCellIndex].allCells[j].rowSpan++;
+                                                cell.isRowSpanned = true;
+                                            }
                                         }
                                     }
                                 }
@@ -844,7 +849,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 const { key, ...restCellProps } =
                                                     cell.getCellProps();
                                                 if (cell.isRowSpanned) return null;
-                                                else
+                                                else {
+                                                    console.log('this is row span', cell.rowSpan)
                                                     return (
                                                         <td
                                                             key={key}
@@ -858,6 +864,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                             </CellText>
                                                         </td>
                                                     );
+                                                }
                                             })}
                                         </motion.tr>
                                     );
