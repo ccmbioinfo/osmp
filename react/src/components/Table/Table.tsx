@@ -55,7 +55,12 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
-type RowSpanHeader = { id: string; topCellIndex: number; topCellValue?: any };
+type RowSpanHeader = {
+    id: string;
+    topCellIndex: number;
+    topCellUuid: string | null;
+    topCellValue?: any;
+};
 
 export type FlattenedQueryResponse = Omit<
     IndividualResponseFields,
@@ -66,7 +71,9 @@ export type FlattenedQueryResponse = Omit<
         'callsets' | 'info'
     > &
     CallsetInfoFields &
-    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string } & { id: string };
+    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string } & {
+        id: string;
+    };
 
 /* flatten all but callsets field */
 const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse[] => {
@@ -163,10 +170,14 @@ function useRowSpan(instance: TableInstance<FlattenedQueryResponse>) {
     let rowSpanHeaders: RowSpanHeader[] = [];
 
     allColumns.forEach((column, i) => {
+        console.log(column);
         const { id, enableRowSpan } = column;
 
-        if (enableRowSpan !== undefined) {
-            rowSpanHeaders = [...rowSpanHeaders, { id, topCellValue: null, topCellIndex: 0 }];
+        if (enableRowSpan) {
+            rowSpanHeaders = [
+                ...rowSpanHeaders,
+                { id, topCellValue: null, topCellIndex: 0, topCellUuid: null },
+            ];
         }
     });
 
@@ -412,14 +423,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'phenotypes',
                         id: 'phenotypes',
                         Header: 'Phenotypes',
-                        width: getColumnWidth(
-                            tableData,
-                            state =>
-                                (state.phenotypicFeatures || [])
-                                    .map((p: any) => p.phenotypeId)
-                                    .join(', '),
-                            'Phenotypes'
-                        ),
+                        width: 105,
                     },
                     {
                         accessor: 'sex',
@@ -556,7 +560,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    console.log(rowSpanHeaders)
+    console.log(rowSpanHeaders);
 
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
@@ -819,18 +823,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     if (rowSpanHeader !== undefined) {
                                         if (
                                             rowSpanHeader.topCellValue === null ||
-                                            rowSpanHeader.topCellValue !== cell.value
+                                            rowSpanHeader.topCellValue !== cell.value ||
+                                            rowSpanHeader.topCellUuid !== cell.row.original.id
                                         ) {
+                                            console.log(cell);
                                             row.allCells[j].isRowSpanned = false;
                                             rowSpanHeader.topCellValue = cell.value;
                                             rowSpanHeader.topCellIndex = i;
+                                            rowSpanHeader.topCellUuid = cell.row.original.id;
                                             cell.rowSpan = 1;
                                         } else {
                                             const currentRow = rows[rowSpanHeader.topCellIndex];
                                             const currentCell = currentRow?.allCells[j];
 
                                             if (currentRow && currentCell) {
-                                                rows[rowSpanHeader.topCellIndex].allCells[j].rowSpan++;
+                                                rows[rowSpanHeader.topCellIndex].allCells[j]
+                                                    .rowSpan++;
                                                 row.allCells[j].isRowSpanned = true;
                                             }
                                         }
@@ -847,9 +855,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             {row.cells.map(cell => {
                                                 const { key, ...restCellProps } =
                                                     cell.getCellProps();
-                                                console.log(cell)
-                                                if (cell.isRowSpanned) return null;
-                                                else {
+                                                if (cell.isRowSpanned) {
+                                                    return null;
+                                                } else {
                                                     return (
                                                         <td
                                                             key={key}
