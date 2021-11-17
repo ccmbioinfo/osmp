@@ -170,7 +170,6 @@ function useRowSpan(instance: TableInstance<FlattenedQueryResponse>) {
     let rowSpanHeaders: RowSpanHeader[] = [];
 
     allColumns.forEach((column, i) => {
-        console.log(column);
         const { id, enableRowSpan } = column;
 
         if (enableRowSpan) {
@@ -559,9 +558,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     } = tableInstance;
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
-
-    console.log(rowSpanHeaders);
-
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
@@ -826,7 +822,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             rowSpanHeader.topCellValue !== cell.value ||
                                             rowSpanHeader.topCellUuid !== cell.row.original.id
                                         ) {
-                                            console.log(cell);
                                             row.allCells[j].isRowSpanned = false;
                                             rowSpanHeader.topCellValue = cell.value;
                                             rowSpanHeader.topCellIndex = i;
@@ -853,15 +848,50 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {
-                                                const { key, ...restCellProps } =
+                                                const { key, style, ...restCellProps } =
                                                     cell.getCellProps();
+
+                                                let cellStyle = style;
+
+                                                const phenotypeVisible = visibleColumns.find(
+                                                    c => c.id === 'phenotypes'
+                                                );
+
+                                                const rowGroup = cell.column.filteredRows
+                                                    .filter(
+                                                        r => r.original.id === cell.row.original.id
+                                                    )
+                                                    .map(d => Number(d.id));
+
+                                                // Assign the proper style to create "merged cell" effect
+                                                if (
+                                                    (cell.rowSpan ||
+                                                        (cell.isRowSpanned &&
+                                                            Number(cell.row.id) ===
+                                                                Math.max(...rowGroup) - 1)) &&
+                                                    phenotypeVisible
+                                                ) {
+                                                    cellStyle = Object.assign(style, {
+                                                        borderBottom: 'none',
+                                                    });
+                                                }
+
                                                 if (cell.isRowSpanned) {
-                                                    return null;
+                                                    if (phenotypeVisible) {
+                                                        return (
+                                                            <td
+                                                                style={cellStyle}
+                                                                key={key}
+                                                                {...restCellProps}
+                                                            ></td>
+                                                        );
+                                                    } else return null;
                                                 } else {
                                                     return (
                                                         <td
                                                             key={key}
                                                             rowSpan={cell.rowSpan}
+                                                            style={cellStyle}
                                                             {...restCellProps}
                                                         >
                                                             <CellText>
