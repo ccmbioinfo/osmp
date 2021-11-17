@@ -49,6 +49,7 @@ import {
 } from './Table.styles';
 import { ColumnFilter } from './TableFilter/ColumnFilter';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
+import { v4 as uuidv4 } from 'uuid';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -65,7 +66,7 @@ export type FlattenedQueryResponse = Omit<
         'callsets' | 'info'
     > &
     CallsetInfoFields &
-    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
+    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string } & { id: string };
 
 /* flatten all but callsets field */
 const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse[] => {
@@ -79,7 +80,7 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         ...restIndividual
     } = result.individual;
 
-    console.log(phenotypicFeatures);
+    const id = uuidv4();
 
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
@@ -112,6 +113,7 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         ] || []
     ).forEach(v => {
         baseResults.push({
+            id,
             contactInfo,
             diseases: flattenedDiseases,
             ...individualInfo,
@@ -146,8 +148,6 @@ const prepareData = (queryResult: VariantQueryDataResult[], groupPhenotypes: boo
             results.push(...flattenBaseResults(d));
         }
     });
-
-    console.log(results);
 
     return results.map(result => formatNullValues(result));
 };
@@ -556,6 +556,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
+    console.log(rowSpanHeaders)
+
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
@@ -808,7 +810,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         <tbody {...getTableBodyProps()}>
                             {rows.map((row, i) => {
                                 prepareRow(row);
-
                                 for (let j = 0; j < row.allCells.length; j++) {
                                     let cell = row.allCells[j];
                                     let rowSpanHeader = (rowSpanHeaders as RowSpanHeader[]).find(
@@ -820,17 +821,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             rowSpanHeader.topCellValue === null ||
                                             rowSpanHeader.topCellValue !== cell.value
                                         ) {
-                                            cell.isRowSpanned = false;
+                                            row.allCells[j].isRowSpanned = false;
                                             rowSpanHeader.topCellValue = cell.value;
                                             rowSpanHeader.topCellIndex = i;
                                             cell.rowSpan = 1;
                                         } else {
-                                            const currentRow = rows[cell.column.topCellIndex];
+                                            const currentRow = rows[rowSpanHeader.topCellIndex];
                                             const currentCell = currentRow?.allCells[j];
 
                                             if (currentRow && currentCell) {
-                                                rows[cell.column.topCellIndex].allCells[j].rowSpan++;
-                                                cell.isRowSpanned = true;
+                                                rows[rowSpanHeader.topCellIndex].allCells[j].rowSpan++;
+                                                row.allCells[j].isRowSpanned = true;
                                             }
                                         }
                                     }
@@ -840,17 +841,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                             {page.length > 0 ? (
                                 page.map(row => {
-                                    // prepareRow(row);
-
                                     const { key, ...restRowProps } = row.getRowProps();
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {
                                                 const { key, ...restCellProps } =
                                                     cell.getCellProps();
+                                                console.log(cell)
                                                 if (cell.isRowSpanned) return null;
                                                 else {
-                                                    console.log('this is row span', cell.rowSpan)
                                                     return (
                                                         <td
                                                             key={key}
