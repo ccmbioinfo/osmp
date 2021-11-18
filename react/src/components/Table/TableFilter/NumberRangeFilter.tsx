@@ -18,10 +18,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
         equal: true,
     });
 
-    const handleComparisonValue = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        comparison: ComparisonType
-    ) => {
+    const handleComparisonValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
 
         const parsed = parseFloat(val);
@@ -59,7 +56,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
             <Input
                 variant="outlined"
                 value={text}
-                onChange={e => handleComparisonValue(e, filterComparison)}
+                onChange={e => handleComparisonValue(e)}
                 placeholder="Search"
                 InputAdornmentStart={
                     <InputComparisonDropdown
