@@ -90,57 +90,12 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         ''
     );
 
-    const flattenedPhenotypes = (
-        [
-            {
-                ageOfOnset: '10',
-                dateOfOnset: '2021',
-                levelSeverity: '1',
-                onsetType: 'new',
-                phenotypeId: '123',
-            },
-            {
-                ageOfOnset: '10',
-                dateOfOnset: '2021',
-                levelSeverity: '1',
-                onsetType: 'new',
-                phenotypeId: '123',
-            },
-            {
-                ageOfOnset: '10',
-                dateOfOnset: '2021',
-                levelSeverity: '1',
-                onsetType: 'new',
-                phenotypeId: '123',
-            },
-        ] || []
-    ).reduce((a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`, '');
+    const flattenedPhenotypes = (phenotypicFeatures || []).reduce(
+        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
+        ''
+    );
 
-    const subRows = (
-        [
-            {
-                ageOfOnset: '10',
-                dateOfOnset: '2021',
-                levelSeverity: '1',
-                onsetType: 'new',
-                phenotypeId: '123',
-            },
-            {
-                ageOfOnset: '10',
-                dateOfOnset: '2021',
-                levelSeverity: '1',
-                onsetType: 'new',
-                phenotypeId: '123',
-            },
-            {
-                ageOfOnset: '10',
-                dateOfOnset: '2021',
-                levelSeverity: '1',
-                onsetType: 'new',
-                phenotypeId: '123',
-            },
-        ] || []
-    ).map(v => {
+    const subRows = (phenotypicFeatures || []).map(v => {
         return {
             id,
             contactInfo,
