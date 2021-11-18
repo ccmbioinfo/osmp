@@ -512,12 +512,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     </Button>
                     <Button
                         variant="primary"
-                        onClick={() => {
+                        onClick={() =>
                             downloadCsv(
                                 rows.map(r => r.values as ResultTableColumns),
-                                visibleColumns.map(c => c.id as keyof ResultTableColumns)
-                            );
-                        }}
+                                visibleColumns
+                                    .filter(c => c.id && !c.id.match(/^empty/i))
+                                    .map(c => c.id as keyof ResultTableColumns)
+                            )
+                        }
                     >
                         Export Data
                     </Button>
