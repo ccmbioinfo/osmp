@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row } from 'react-table';
 import { Column, Input } from '../..';
-import { FlattenedQueryResponse } from '../Table';
+import { ResultTableColumns } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
 
@@ -11,10 +11,10 @@ export type DefaultFilter<T> = {
 };
 
 interface ColumnFilterProps {
-    columnId: keyof FlattenedQueryResponse;
+    columnId: keyof ResultTableColumns;
     filterModel?: DefaultFilter<string | string[] | number | number[]>;
     options?: string[];
-    preFilteredRows: Row<FlattenedQueryResponse>[];
+    preFilteredRows: Row<ResultTableColumns>[];
     setFilter: (filterValue: any) => void;
     type?: 'singleSelect' | 'multiSelect' | 'text' | 'between';
 }

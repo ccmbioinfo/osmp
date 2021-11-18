@@ -3,7 +3,7 @@ import { FaClipboard, FaClipboardCheck } from 'react-icons/fa';
 import { IoIosClose } from 'react-icons/io';
 import styled from 'styled-components';
 import { Background, Column, Flex, IconButton, Popover, Snackbar } from '../index';
-import { FlattenedQueryResponse } from './Table';
+import { ResultTableColumns } from './Table';
 import { CellText } from './Table.styles';
 
 interface CellPopoverProps<T> {
@@ -26,7 +26,7 @@ const PopoverText = styled(props => <CellText {...props} />)`
         ${props => props.theme.space[2]} 0;
 `;
 
-export const CellPopover: React.FC<CellPopoverProps<FlattenedQueryResponse>> = ({ state, id }) => {
+export const CellPopover: React.FC<CellPopoverProps<ResultTableColumns>> = ({ state, id }) => {
     const [copied, setCopied] = useState(false); // Whether text is copied
     const [openContact, setOpenContact] = useState(false);
     const [snackbarActive, setSnackbarActive] = useState(false);

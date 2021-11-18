@@ -2,17 +2,17 @@ import { isNullOrUndefined } from 'util';
 import React, { useState } from 'react';
 import { Row } from 'react-table';
 import { ComboBox } from '../..';
-import { FlattenedQueryResponse } from '../Table';
+import { ResultTableColumns } from '../Table';
 import { DefaultFilter } from './ColumnFilter';
 
 interface SelectionFilterProps {
     setFilter: (filterValue: any) => void;
-    columnId: keyof FlattenedQueryResponse;
+    columnId: keyof ResultTableColumns;
     options?: string[];
     filter?: DefaultFilter<string | string[]>;
     isMulti?: boolean;
     searchable?: boolean;
-    preFilteredRows: Row<FlattenedQueryResponse>[];
+    preFilteredRows: Row<ResultTableColumns>[];
 }
 
 const SelectionFilter: React.FC<SelectionFilterProps> = ({
