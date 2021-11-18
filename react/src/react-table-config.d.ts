@@ -112,17 +112,11 @@ declare module 'react-table' {
         extends UseFiltersColumnProps<D>,
             UseGroupByColumnProps<D>,
             UseResizeColumnsColumnProps<D>,
-            UseSortByColumnProps<D> {
-        topCellValue: any;
-        topCellIndex: number;
-    }
+            UseSortByColumnProps<D> {}
 
     export interface Cell<D extends Record<string, unknown> = Record<string, unknown>>
         extends UseGroupByCellProps<D>,
-            UseRowStateCellProps<D> {
-        rowSpan: number;
-        isRowSpanned?: boolean;
-    }
+            UseRowStateCellProps<D> {}
 
     export interface Row<D extends Record<string, unknown> = Record<string, unknown>>
         extends UseExpandedRowProps<D>,
