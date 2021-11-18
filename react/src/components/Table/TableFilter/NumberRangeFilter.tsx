@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Column, Input, Typography } from '../..';
+import { useDebounce } from '../../../hooks';
 import { ComparisonType, InputComparisonDropdown } from './InputComparisonDropdown';
 
 interface NumberRangeFilterProps {
@@ -8,7 +9,8 @@ interface NumberRangeFilterProps {
 
 const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
     const [error, setError] = useState<boolean>(false);
-    const [text, setText] = useState<string>('');
+
+    const [debouncedInput, text, setText] = useDebounce<string>('', 500);
 
     const [filterComparison, setFilterComparison] = useState<ComparisonType>({
         less: false,
@@ -26,22 +28,31 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
 
         if (val === '') {
             setText(val);
-            setFilter([-Infinity, Infinity]);
-        } else if (!parsed) {
+        } else if (!parsed && parsed !== 0) {
+            console.log(parsed);
             setError(true);
             setText(val);
         } else {
             setError(false);
             setText(parsed.toString());
-            if (comparison.less) {
+        }
+    };
+
+    useEffect(() => {
+        const parsed = parseFloat(debouncedInput);
+
+        if (debouncedInput === '') setFilter([-Infinity, Infinity]);
+        else {
+            if (filterComparison.less) {
                 setFilter([-Infinity, parsed]);
-            } else if (comparison.greater) {
+            } else if (filterComparison.greater) {
                 setFilter([parsed, +Infinity]);
             } else {
                 setFilter([parsed, parsed]);
             }
         }
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedInput, filterComparison]);
 
     return (
         <Column>
