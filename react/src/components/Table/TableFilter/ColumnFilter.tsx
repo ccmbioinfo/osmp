@@ -1,5 +1,5 @@
-import React from 'react';
-import { Row } from 'react-table';
+import React, { useEffect, useState } from 'react';
+import { Row, useAsyncDebounce } from 'react-table';
 import { Column, Input } from '../..';
 import { ResultTableColumns } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
@@ -27,13 +27,26 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     setFilter,
     type,
 }) => {
+    const [input, setInput] = useState<string>('');
+
+    useEffect(() => {
+        if (!filterModel) setInput('');
+    }, [filterModel, setInput]);
+
     const placeholder = 'Search';
+
+    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
+
+    const handleChange = (val: string) => {
+        debouncedSetFilter(val);
+        setInput(val);
+    };
 
     const resolveComponent = () => {
         if (!!type && ['singleSelect', 'multiSelect'].includes(type)) {
             return (
                 <SelectionFilter
-                    setFilter={setFilter}
+                    setFilter={debouncedSetFilter}
                     columnId={columnId}
                     options={options || []}
                     filter={filterModel as DefaultFilter<string | string[]>}
@@ -48,10 +61,10 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
             return (
                 <Input
                     variant="outlined"
-                    value={(filterModel?.value || '') as string | number}
+                    value={input}
                     placeholder={placeholder}
                     onChange={e => {
-                        setFilter(e.target.value);
+                        handleChange(e.target.value);
                     }}
                 />
             );

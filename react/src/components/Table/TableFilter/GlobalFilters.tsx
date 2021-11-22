@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
 import styled from 'styled-components/macro';
 import { Flex, Input } from '../..';
@@ -14,14 +14,20 @@ const SearchInput = styled(Input)`
 `;
 
 export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter }) => {
-    const handleChange = useAsyncDebounce(value => {
-        setFilter(value || undefined);
-    }, 10);
+    const [input, setInput] = useState<string>('');
+
+    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
+
+    const handleChange = (val: string) => {
+        debouncedSetFilter(val);
+        setInput(val);
+    };
+
     return (
         <Flex>
             <SearchInput
                 variant="outlined"
-                value={filter || ''}
+                value={input}
                 placeholder="Search All Columns..."
                 onChange={e => handleChange(e.target.value)}
             />

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAsyncDebounce } from 'react-table';
 import { Column, Input, Typography } from '../..';
 import { ComparisonType, InputComparisonDropdown } from './InputComparisonDropdown';
 
@@ -8,7 +9,7 @@ interface NumberRangeFilterProps {
 
 const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
     const [error, setError] = useState<boolean>(false);
-    const [text, setText] = useState<string>('');
+    const [text, setText] = useState('');
 
     const [filterComparison, setFilterComparison] = useState<ComparisonType>({
         less: false,
@@ -16,39 +17,47 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
         equal: true,
     });
 
-    const handleComparisonValue = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        comparison: ComparisonType
-    ) => {
+    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
+
+    const handleComparisonValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
+
+        if (val === '' || /^0?\.0*$/.test(val)) {
+            return setText(val);
+        }
 
         const parsed = parseFloat(val);
 
-        if (val === '') {
-            setText(val);
-            setFilter([-Infinity, Infinity]);
-        } else if (!parsed) {
+        if (!parsed && parsed !== 0) {
             setError(true);
-            setText(val);
+            return setText(val);
         } else {
             setError(false);
-            setText(parsed.toString());
-            if (comparison.less) {
-                setFilter([-Infinity, parsed]);
-            } else if (comparison.greater) {
-                setFilter([parsed, +Infinity]);
-            } else {
-                setFilter([parsed, parsed]);
-            }
+            return setText(parsed.toString());
         }
     };
+
+    useEffect(() => {
+        const parsed = parseFloat(text);
+
+        if (!parsed) debouncedSetFilter([-Infinity, Infinity]);
+        else {
+            if (filterComparison.less) {
+                debouncedSetFilter([-Infinity, parsed]);
+            } else if (filterComparison.greater) {
+                debouncedSetFilter([parsed, +Infinity]);
+            } else {
+                debouncedSetFilter([parsed, parsed]);
+            }
+        }
+    }, [text, debouncedSetFilter, filterComparison.less, filterComparison.greater]);
 
     return (
         <Column>
             <Input
                 variant="outlined"
                 value={text}
-                onChange={e => handleComparisonValue(e, filterComparison)}
+                onChange={e => handleComparisonValue(e)}
                 placeholder="Search"
                 InputAdornmentStart={
                     <InputComparisonDropdown
