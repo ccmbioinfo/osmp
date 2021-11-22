@@ -22,23 +22,25 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
     const handleComparisonValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
 
+        if (val === '' || /^0?\.0*$/.test(val)) {
+            return setText(val);
+        }
+
         const parsed = parseFloat(val);
 
-        if (val === '') {
-            setText(val);
-        } else if (!parsed && parsed !== 0) {
+        if (!parsed && parsed !== 0) {
             setError(true);
-            setText(val);
+            return setText(val);
         } else {
             setError(false);
-            setText(parsed.toString());
+            return setText(parsed.toString());
         }
     };
 
     useEffect(() => {
         const parsed = parseFloat(text);
 
-        if (text === '') debouncedSetFilter([-Infinity, Infinity]);
+        if (!parsed) debouncedSetFilter([-Infinity, Infinity]);
         else {
             if (filterComparison.less) {
                 debouncedSetFilter([-Infinity, parsed]);
