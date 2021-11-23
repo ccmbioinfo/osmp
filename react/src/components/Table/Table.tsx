@@ -22,8 +22,6 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
-import './dragscroll.css';
-import { v4 as uuidv4 } from 'uuid';
 import SOURCES from '../../constants/sources';
 import { downloadCsv, useOverflow } from '../../hooks';
 import {
@@ -37,6 +35,7 @@ import {
 import { formatNullValues } from '../../utils';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { CellPopover } from './CellPopover';
+import './dragscroll.css';
 import {
     CellText,
     Footer,
@@ -64,9 +63,7 @@ export type BaseFlattenedQueryResponse = Omit<
         'callsets' | 'info'
     > &
     CallsetInfoFields &
-    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string } & {
-        id: string;
-    };
+    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
 
 export type FlattenedQueryResponse = BaseFlattenedQueryResponse & {
     subRows: BaseFlattenedQueryResponse[];
@@ -83,8 +80,6 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
         ...restIndividual
     } = result.individual;
 
-    const id = uuidv4();
-
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
         ''
@@ -97,7 +92,6 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
 
     const subRows = (phenotypicFeatures || []).map(v => {
         return {
-            id,
             contactInfo,
             diseases: flattenedDiseases,
             ...individualInfo,
@@ -110,7 +104,6 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
     });
 
     return {
-        id,
         contactInfo,
         diseases: flattenedDiseases,
         ...individualInfo,
