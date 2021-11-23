@@ -797,7 +797,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                         (cell.row.depth === 1 &&
                                                             Number(cell.row.index) <
                                                                 subRows - 1)) &&
-                                                    cell.column.enableRowSpan
+                                                    cell.column.enableRowSpan &&
+                                                    phenotypeVisible
                                                 ) {
                                                     cellStyle = Object.assign(style, {
                                                         borderBottom: 'none',
