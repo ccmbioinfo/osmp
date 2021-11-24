@@ -657,8 +657,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                 >
                                                                     {/* {column.render('Header')} */}
                                                                     {console.log(column)}
-                                                                    {HEADERS[column.id] !== '' &&
-                                                                    HEADERS[column.id] ? (
+                                                                    {HEADERS[column.id] ? (
                                                                         <Tooltip
                                                                             text={
                                                                                 HEADERS[column.id]
