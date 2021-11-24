@@ -72,8 +72,6 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
     );
 };
 
-function isReactText(children: any) {
-    return ['string', 'number'].includes(typeof children);
-}
+const isReactText = (children: any) => ['string', 'number'].includes(typeof children);
 
 export default Tooltip;
