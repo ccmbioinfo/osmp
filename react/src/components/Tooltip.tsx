@@ -1,8 +1,8 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Arrow, useHover, useLayer } from 'react-laag';
-import { Typography } from './index';
 import theme from '../constants/theme';
+import { Typography } from './index';
 
 interface TooltipProps {
     text: string;
