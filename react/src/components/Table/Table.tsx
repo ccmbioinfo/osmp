@@ -655,8 +655,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     alignItems="center"
                                                                     justifyContent="center"
                                                                 >
-                                                                    {/* {column.render('Header')} */}
-                                                                    {console.log(column)}
                                                                     {HEADERS[column.id] ? (
                                                                         <Tooltip
                                                                             text={
