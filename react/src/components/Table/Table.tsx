@@ -21,6 +21,7 @@ import {
     useTable,
 } from 'react-table';
 import './dragscroll.css';
+import HEADERS from '../../constants/headers';
 import SOURCES from '../../constants/sources';
 import { downloadCsv, useOverflow } from '../../hooks';
 import {
@@ -259,7 +260,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'af',
                         id: 'af',
-                        Header: state => <Tooltip text="hello">gnomad_exome_AF</Tooltip>,
+                        Header: 'gnomad_exome_AF',
                         width: 105,
                         filter: 'between',
                     },
@@ -622,7 +623,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         {headerGroup.headers.map(column => {
                                             const { key, ...restHeaderProps } =
                                                 column.getHeaderProps(
-                                                    column.getSortByToggleProps()
+                                                    column.getSortByToggleProps({
+                                                        title: undefined,
+                                                    })
                                                 );
                                             return (
                                                 <TH key={key} {...restHeaderProps}>
@@ -652,7 +655,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     alignItems="center"
                                                                     justifyContent="center"
                                                                 >
-                                                                    {column.render('Header')}
+                                                                    {/* {column.render('Header')} */}
+                                                                    {console.log(column)}
+                                                                    {HEADERS[column.id] !== '' &&
+                                                                    HEADERS[column.id] ? (
+                                                                        <Tooltip
+                                                                            text={
+                                                                                HEADERS[column.id]
+                                                                            }
+                                                                        >
+                                                                            {column.render(
+                                                                                'Header'
+                                                                            )}
+                                                                        </Tooltip>
+                                                                    ) : (
+                                                                        column.render('Header')
+                                                                    )}
                                                                     {column.Header !== 'Core' &&
                                                                         isHeader(column) &&
                                                                         (isHeaderExpanded(

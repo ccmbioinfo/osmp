@@ -1,6 +1,8 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Arrow, useHover, useLayer } from 'react-laag';
+import { Typography } from './index';
+import theme from '../constants/theme';
 
 interface TooltipProps {
     text: string;
@@ -14,6 +16,14 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
         placement: 'top-center',
         triggerOffset: 8,
     });
+
+    const tooltipStyles = {
+        backgroundColor: theme.colors.shadow,
+        borderRadius: theme.radii.base,
+        color: theme.background.main,
+        padding: `0 ${theme.space[1]}`,
+        width: 200,
+    };
 
     let trigger;
     if (isReactText(children)) {
@@ -40,19 +50,19 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
                     {isOver && (
                         <motion.div
                             className="tooltip-box"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, scale: 0.9, ...tooltipStyles }}
+                            animate={{ opacity: 1, scale: 1, ...tooltipStyles }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.1 }}
                             {...layerProps}
                         >
-                            {text}
+                            <Typography variant="subtitle">{text}</Typography>
                             <Arrow
                                 {...arrowProps}
-                                backgroundColor="black"
-                                borderColor="black"
+                                backgroundColor={theme.colors.shadow}
+                                borderColor={theme.colors.shadow}
                                 borderWidth={1}
-                                size={6}
+                                size={5}
                             />
                         </motion.div>
                     )}
