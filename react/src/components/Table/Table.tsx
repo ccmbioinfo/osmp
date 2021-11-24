@@ -31,7 +31,7 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
-import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
+import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
 import { CellPopover } from './CellPopover';
 import {
     CellText,
@@ -259,7 +259,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'af',
                         id: 'af',
-                        Header: 'gnomAD_AF_exome',
+                        Header: state => <Tooltip text="hello">gnomad_exome_AF</Tooltip>,
                         width: 105,
                         filter: 'between',
                     },
