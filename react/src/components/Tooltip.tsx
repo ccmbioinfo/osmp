@@ -5,10 +5,10 @@ import theme from '../constants/theme';
 import { Typography } from './index';
 
 interface TooltipProps {
-    text: string;
+    helperText: string;
 }
 
-const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
+const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
     const [isOver, hoverProps] = useHover({ delayEnter: 100, delayLeave: 300 });
 
     const { triggerProps, layerProps, arrowProps, renderLayer } = useLayer({
@@ -56,7 +56,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => {
                             transition={{ duration: 0.1 }}
                             {...layerProps}
                         >
-                            <Typography variant="subtitle">{text}</Typography>
+                            <Typography variant="subtitle">{helperText}</Typography>
                             <Arrow
                                 {...arrowProps}
                                 backgroundColor={theme.colors.shadow}

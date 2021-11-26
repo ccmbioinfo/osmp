@@ -207,7 +207,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
-                        Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
@@ -242,7 +241,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
-                        Header: 'Source',
+                        Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
                         width: getColumnWidth(tableData, 'source', 'Source'),
                     },
                 ],
@@ -260,7 +259,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'af',
                         id: 'af',
-                        Header: 'gnomad_exome_AF',
+                        Header: <Tooltip helperText={HEADERS['af']}>gnomad_exome_AF</Tooltip>,
                         width: 105,
                         filter: 'between',
                     },
@@ -326,7 +325,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
-                        Header: 'Ethnicity',
+                        Header: <Tooltip helperText={HEADERS['ethnicity']}>Ethnicity</Tooltip>,
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
                     {
@@ -346,7 +345,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
-                        Header: 'Sex',
+                        Header: <Tooltip helperText={HEADERS['sex']}>Sex</Tooltip>,
                         width: getColumnWidth(tableData, 'sex', 'Sex'),
                         Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
@@ -360,7 +359,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'geographicOrigin',
                         id: 'geographicOrigin',
-                        Header: 'Geographic Origin',
+                        Header: (
+                            <Tooltip helperText={HEADERS['geographicOrigin']}>
+                                Geographic Origin
+                            </Tooltip>
+                        ),
                         width: getColumnWidth(tableData, 'geographicOrigin', 'Geographic Origin'),
                     },
                     {
@@ -378,7 +381,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'diseases',
                         id: 'diseases',
-                        Header: 'Diseases',
+                        Header: <Tooltip helperText={HEADERS['diseases']}>Diseases</Tooltip>,
                         width: getColumnWidth(tableData, 'diseases', 'Diseases'),
                     },
                     {
@@ -391,7 +394,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'contactInfo',
                         Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contactInfo',
-                        Header: 'Contact',
+                        Header: <Tooltip helperText={HEADERS['contactInfo']}>Contact</Tooltip>,
                         width: 120,
                     },
                 ],
@@ -655,19 +658,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     alignItems="center"
                                                                     justifyContent="center"
                                                                 >
-                                                                    {HEADERS[column.id] ? (
-                                                                        <Tooltip
-                                                                            text={
-                                                                                HEADERS[column.id]
-                                                                            }
-                                                                        >
-                                                                            {column.render(
-                                                                                'Header'
-                                                                            )}
-                                                                        </Tooltip>
-                                                                    ) : (
-                                                                        column.render('Header')
-                                                                    )}
+                                                                    {column.render('Header')}
                                                                     {column.Header !== 'Core' &&
                                                                         isHeader(column) &&
                                                                         (isHeaderExpanded(
