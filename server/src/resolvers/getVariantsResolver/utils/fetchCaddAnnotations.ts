@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
@@ -41,27 +40,9 @@ const NAME_MAP: Record<string, keyof CaddAnnotation> = {
   protPos: 'aaPos',
 };
 
-/* eslint-disable camelcase */
-interface EnsemblRegionMap {
-  seq_region_name: number; // chrom if coord_system==chromosome
-  end: number;
-  strand: number;
-  assembly: string;
-  start: number;
-  coord_system: string;
-}
-
-interface PositionMapperResponse {
-  mappings: {
-    original: EnsemblRegionMap;
-    mapped: EnsemblRegionMap;
-  }[];
-}
-
 const _getAnnotations = async (position: string, assemblyId: string) => {
   const query = await _buildQuery(position, assemblyId);
   const execPromise = promisify(exec);
-
   return execPromise(query, { maxBuffer: 10e7 }); // 100mb
 };
 
@@ -96,24 +77,10 @@ const _formatAnnotations = (annotations: string) => {
 
 const _buildQuery = async (position: string, assemblyId: string) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
-
-  let mappedPosition;
-
-  /* if assembly target is 37, map to 37, since FE will return only 38 coordinates -- todo: in new flow we'll just liftover ourselves and not fetch in advance */
-  if (resolvedAssemblyId !== '38') {
-    const mappedPositionResponse = await axios.get<PositionMapperResponse>(
-      `http://rest.ensembl.org/map/homo_sapiens/GRCh38/${position}/GRCh37`
-    );
-    const { seq_region_name: chrom, start, end } = mappedPositionResponse.data.mappings[0]?.mapped;
-    mappedPosition = `${chrom}:${start}-${end}`;
-  }
-
-  const resolvedPosition = mappedPosition ?? position;
-
   const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
   const indexPath = resolvedAssemblyId === '38' ? INDEX_38_PATH : INDEX_37_PATH;
 
-  return `tabix -h  ${annotationUrl} ${indexPath} ${resolvedPosition} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
+  return `tabix -h  ${annotationUrl} ${indexPath} ${position} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
 };
 
 const fetchAnnotations = (
@@ -121,17 +88,31 @@ const fetchAnnotations = (
   assemblyId: string
 ): Promise<CADDAnnotationQueryResponse> => {
   const source = 'CADD annotations';
-  return _getAnnotations(position, assemblyId)
-    .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
-    .catch(error => ({
+  const [start, end] = position.replace(/.+:/, '').split('-');
+  const size = +end - +start;
+  if (size > 600000) {
+    return Promise.resolve({
       error: {
         id: uuidv4(),
-        code: 500,
-        message: `Error fetching annotations: ${error}`,
+        code: 422,
+        message: `Gene of size ${size.toLocaleString()}bp is too large to annotate with VEP. Annotating with gnomAD only!`,
       },
       source,
       data: [],
-    }));
+    });
+  } else {
+    return _getAnnotations(position, assemblyId)
+      .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
+      .catch(error => ({
+        error: {
+          id: uuidv4(),
+          code: 500,
+          message: `Error fetching annotations: ${error}`,
+        },
+        source,
+        data: [],
+      }));
+  }
 };
 
 export default fetchAnnotations;

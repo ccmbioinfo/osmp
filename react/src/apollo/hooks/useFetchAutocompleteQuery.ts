@@ -3,14 +3,13 @@ import { useLazyApolloQuery } from '../client';
 
 /* 
     fetch autocomplete results with ensembl id and genomic position 
-    note that position is given according to GRCh38 assembly and may need to be converted
 */
 const autocompleteQuery = gql`
     query FetchAutocomplete($q: String) {
         autocompleteResults(q: $q)
             @rest(
                 type: "AutoCompleteSuggestion"
-                path: "query?species=human&fields=symbol,genomic_pos,ensembl.gene&{args}"
+                path: "query?species=human&fields=genomic_pos_hg19,symbol,genomic_pos,ensembl.gene&{args}"
             ) {
             hits {
                 symbol
@@ -18,6 +17,12 @@ const autocompleteQuery = gql`
                     gene
                 }
                 genomic_pos {
+                    chr
+                    end
+                    start
+                    strand
+                }
+                genomic_pos_hg19 {
                     chr
                     end
                     start
@@ -36,6 +41,12 @@ const useFetchAutocompleteQuery = () =>
                     symbol: string;
                     ensembl: { gene: string };
                     genomic_pos: {
+                        chr: string;
+                        end: number;
+                        start: number;
+                        strand: number;
+                    };
+                    genomic_pos_hg19: {
                         chr: string;
                         end: number;
                         start: number;

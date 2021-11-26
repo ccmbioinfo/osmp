@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
 import { useFetchAutocompleteQuery } from '../apollo/hooks';
+import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
 
@@ -11,12 +12,30 @@ interface SelectionValue {
 }
 
 interface GeneSearchProps {
+    assembly: AssemblyId;
     geneName: string;
     onSelect: (gene: SelectionValue) => void;
     onChange: (geneName: string) => void;
 }
 
-const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect }) => {
+interface HitPosition {
+    chr: string;
+    start: number;
+    end: number;
+}
+
+interface HitPositions {
+    genomic_pos: HitPosition;
+    genomic_pos_hg19: HitPosition;
+}
+
+const getPosition = (assembly: AssemblyId, position: HitPositions) => {
+    const is38 = /38/.test(assembly);
+    const resolvedPosition = is38 ? position.genomic_pos : position.genomic_pos_hg19;
+    return `${resolvedPosition.chr}:${resolvedPosition.start}-${resolvedPosition.end}`;
+};
+
+const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
     const [options, setOptions] = useState<SelectableListItem<SelectionValue>[]>([]);
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
@@ -39,19 +58,21 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ geneName, onChange, onSelect })
         if (autocompleteResults) {
             setOptions(
                 (autocompleteResults.autocompleteResults.hits || [])
-                    .filter(hit => !!hit.ensembl?.gene && !!hit.genomic_pos)
+                    .filter(
+                        hit => !!hit.ensembl?.gene && !!hit.genomic_pos && !!hit.genomic_pos_hg19
+                    )
                     .map((hit, i) => ({
                         value: {
                             name: hit.symbol.toUpperCase(),
                             ensemblId: hit.ensembl?.gene,
-                            position: `${hit.genomic_pos.chr}:${hit.genomic_pos.start}-${hit.genomic_pos.end}`,
+                            position: getPosition(assembly, hit),
                         },
                         id: i,
                         label: hit.symbol.toUpperCase(),
                     }))
             );
         }
-    }, [autocompleteResults]);
+    }, [assembly, autocompleteResults]);
 
     return (
         <ComboBox

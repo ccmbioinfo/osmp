@@ -134,10 +134,6 @@ const VariantQueryPage: React.FC<{}> = () => {
         queryOptionsForm.sources.value.includes(source)
             ? update(queryOptionsForm.sources.value.filter(s => s !== source))
             : update(queryOptionsForm.sources.value.concat(source));
-        // This code toggles off the selection when you click it again, which is a bit unintuitive for the current combobox set up
-        // queryOptionsForm.sources.value.includes(source)
-        //     ? update(queryOptionsForm.sources.value.filter(s => s !== source))
-        //     : update(queryOptionsForm.sources.value.concat(source));
     };
 
     return (
@@ -167,6 +163,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Gene Name
                         </Typography>
                         <GeneSearch
+                            assembly={queryOptionsForm.assemblyId.value}
                             geneName={queryOptionsForm.gene.value}
                             onChange={geneName => updateQueryOptionsForm('gene')(geneName)}
                             onSelect={val => {
@@ -210,7 +207,11 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Assembly ID
                         </Typography>
                         <ComboBox
-                            onSelect={val => updateQueryOptionsForm('assemblyId')(val)}
+                            onSelect={val => {
+                                updateQueryOptionsForm('gene')('');
+                                updateQueryOptionsForm('ensemblId')('');
+                                updateQueryOptionsForm('assemblyId')(val);
+                            }}
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
                                 value: resolveAssembly(a),
