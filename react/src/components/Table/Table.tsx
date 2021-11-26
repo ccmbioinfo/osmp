@@ -207,6 +207,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
+                        Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
