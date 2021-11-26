@@ -14,7 +14,6 @@ interface TypographyProps extends TypographyOverrides {
 }
 
 const Component = styled.p<TypographyProps>`
-    margin-inline-start: ${props => props.theme.space[2]};
     margin-inline-end: ${props => props.theme.space[2]};
     color: ${props => (props.error ? props.theme.colors.error : 'inherit')};
     font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};

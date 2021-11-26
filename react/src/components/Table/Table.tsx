@@ -337,10 +337,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             <PhenotypeViewer
                                 phenotypes={row.original.phenotypes}
                                 expanded={row.isExpanded}
-                                onClick={() => {
-                                    row.toggleRowExpanded(!row.isExpanded);
-                                    console.log(row);
-                                }}
+                                onClick={() => row.toggleRowExpanded(!row.isExpanded)}
                             ></PhenotypeViewer>
                         ),
                         Header: 'Phenotypes',
@@ -722,10 +719,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {
-                                                const { key, ...restCellProps } =
+                                                const { key, style, ...restCellProps } =
                                                     cell.getCellProps();
                                                 return (
-                                                    <td key={key} {...restCellProps}>
+                                                    <td
+                                                        key={key}
+                                                        style={{
+                                                            paddingRight: 0,
+                                                            paddingLeft: 0,
+                                                            ...style,
+                                                        }}
+                                                        {...restCellProps}
+                                                    >
                                                         <CellText>
                                                             <Typography variant="subtitle">
                                                                 {cell.render('Cell')}

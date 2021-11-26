@@ -1,13 +1,6 @@
 import React from 'react';
-import styled from 'styled-components/macro';
-import { Body, Column, Flex, Typography } from '../components';
+import { Body, Column, Divider, Flex, Typography } from '../components';
 import { useUserInfo } from '../hooks';
-
-const Divider = styled.div`
-    background-color: lightgrey;
-    height: 1px;
-    margin: ${props => props.theme.space[5]} 0;
-`;
 
 const AboutPage: React.FC<{}> = () => {
     const userInfo = useUserInfo();
