@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Divider } from '../index';
 import { CellText } from './Table.styles';
 
 interface PhenotypeViewerProps {
@@ -8,7 +9,14 @@ interface PhenotypeViewerProps {
     onClick: () => void;
 }
 
+const CellBorder = styled(Divider)`
+    width: 200px;
+    margin: 1rem 0;
+`;
+
 const Text = styled(props => <CellText {...props} />)`
+    margin-inline-start: 0;
+    margin-inline-end: 0;
     white-space: break-spaces;
     cursor: pointer;
     &:hover {
@@ -22,9 +30,12 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded,
         expanded ? (
             <>
                 {phenotypicFeatures.map((p, key) => (
-                    <Text key={key} onClick={onClick}>
-                        {p}
-                    </Text>
+                    <>
+                        <Text key={key} onClick={onClick}>
+                            {p}
+                        </Text>
+                        {!isLastElement(key, phenotypicFeatures) && <CellBorder />}
+                    </>
                 ))}
             </>
         ) : (
@@ -34,5 +45,7 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded,
         <span>{phenotypes}</span>
     );
 };
+
+const isLastElement = (index: number, list: Array<any>) => index === list.length - 1;
 
 export default PhenotypeViewer;
