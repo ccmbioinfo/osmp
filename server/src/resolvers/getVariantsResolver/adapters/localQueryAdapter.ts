@@ -20,7 +20,7 @@ const getLocalQuery = async (): Promise<VariantQueryResponse> => {
   try {
     localQueryResponse = await new Promise<LocalQueryResponse[]>(resolve => {
       resolve(
-        Array(1)
+        Array(5)
           .fill(null)
           .map(() => {
             return {
@@ -48,20 +48,32 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
   if (!response) {
     return [];
   } else {
-    return response.map((r, i) => ({
+    return response.map(r => ({
       source: 'local',
       individual: {
-        individualId: 'testId1',
+        individualId: 'someTestId',
+        phenotypicFeatures: Array(5)
+          .fill(null)
+          .map(() => ({
+            ageOfOnset: {
+              age: 10,
+              ageGroup: 'some group',
+            },
+            dateOfOnset: '2021-10-10',
+            levelSeverity: 'high',
+            onsetType: '3',
+            phenotypeId: '4',
+          })),
       },
       variant: {
         alt: r.alternative,
         assemblyId: resolveAssembly('GRCh37'),
         callsets: [],
-        end: 50162978 + i,
+        end: 50162978,
         info: {},
         ref: r.reference,
         referenceName: '1', // this should be referenceName
-        start: 50162978 + i,
+        start: 50162978,
       },
       contactInfo: 'DrExample@gmail.com',
     }));

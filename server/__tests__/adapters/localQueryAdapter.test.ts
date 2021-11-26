@@ -14,12 +14,24 @@ describe('Test local query adapter', () => {
     const transformed = transformLocalQueryResponse([
       { reference: 'A', alternative: 'T', chromosome: 'X', extraneous: 'foo' },
     ]);
-
-    expect(transformed).toEqual([
-      {
+    const expectedResponse = Array(1)
+      .fill(null)
+      .map(() => ({
         source: 'local',
         individual: {
-          individualId: 'testId1',
+          individualId: `someTestId`,
+          phenotypicFeatures: Array(5)
+            .fill(null)
+            .map(() => ({
+              ageOfOnset: {
+                age: 10,
+                ageGroup: 'some group',
+              },
+              dateOfOnset: '2021-10-10',
+              levelSeverity: 'high',
+              onsetType: '3',
+              phenotypeId: '4',
+            })),
         },
         variant: {
           alt: 'T',
@@ -32,7 +44,10 @@ describe('Test local query adapter', () => {
           start: 50162978,
         },
         contactInfo: 'DrExample@gmail.com',
-      },
-    ]);
+      }));
+
+    expectedResponse.forEach((e, i) => {
+      expect(transformed[i]).toEqual(e);
+    });
   });
 });

@@ -2,6 +2,7 @@ import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
 import ComboBox from './ComboBox';
+import Divider from './Divider';
 import ErrorProvider, {
     clearError,
     ErrorContext,
@@ -38,6 +39,7 @@ export {
     Column,
     ComboBox,
     Container,
+    Divider,
     ErrorContext,
     ErrorProvider,
     ErrorFallback,

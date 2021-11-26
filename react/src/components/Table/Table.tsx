@@ -13,6 +13,7 @@ import {
     ColumnGroup,
     HeaderGroup,
     Row,
+    useExpanded,
     useFilters,
     useFlexLayout,
     useGlobalFilter,
@@ -34,6 +35,8 @@ import {
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
 import { CellPopover } from './CellPopover';
+import './dragscroll.css';
+import PhenotypeViewer from './PhenotypeViewer';
 import {
     CellText,
     Footer,
@@ -261,7 +264,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'af',
                         id: 'af',
                         Header: <Tooltip helperText={HEADERS['af']}>gnomad_exome_AF</Tooltip>,
-                        width: 105,
+                        width: 110,
                         filter: 'between',
                     },
                     {
@@ -332,6 +335,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'phenotypes',
                         id: 'phenotypes',
+                        Cell: ({ cell: { row } }) => (
+                            <PhenotypeViewer
+                                phenotypes={row.original.phenotypes}
+                                expanded={row.isExpanded}
+                                onClick={() => row.toggleRowExpanded(!row.isExpanded)}
+                            ></PhenotypeViewer>
+                        ),
                         Header: 'Phenotypes',
                         width: getColumnWidth(
                             tableData,
@@ -440,6 +450,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useFlexLayout,
         useGlobalFilter,
         useSortBy,
+        useExpanded,
         usePagination
     );
 
@@ -716,10 +727,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {
-                                                const { key, ...restCellProps } =
+                                                const { key, style, ...restCellProps } =
                                                     cell.getCellProps();
                                                 return (
-                                                    <td key={key} {...restCellProps}>
+                                                    <td
+                                                        key={key}
+                                                        style={{
+                                                            paddingRight: 0,
+                                                            paddingLeft: 0,
+                                                            ...style,
+                                                        }}
+                                                        {...restCellProps}
+                                                    >
                                                         <CellText>
                                                             <Typography variant="subtitle">
                                                                 {cell.render('Cell')}
