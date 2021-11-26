@@ -1,12 +1,17 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Arrow, useHover, useLayer } from 'react-laag';
+import styled from 'styled-components';
 import theme from '../constants/theme';
 import { Typography } from './index';
 
 interface TooltipProps {
     helperText: string;
 }
+
+const TextWrapper = styled.span`
+    text-decoration: dotted underline;
+`;
 
 const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
     const [isOver, hoverProps] = useHover({ delayEnter: 100, delayLeave: 300 });
@@ -28,9 +33,14 @@ const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
     let trigger;
     if (isReactText(children)) {
         trigger = (
-            <span className="tooltip-text-wrapper" {...triggerProps} {...hoverProps}>
+            <TextWrapper
+                style={{ textDecoration: 'dotted underline' }}
+                className="tooltip-text-wrapper"
+                {...triggerProps}
+                {...hoverProps}
+            >
                 {children}
-            </span>
+            </TextWrapper>
         );
     } else {
         // In case of an react-element, we need to clone it in order to attach our own props
