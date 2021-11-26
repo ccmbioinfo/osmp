@@ -24,6 +24,7 @@ import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
 import Table from './Table/Table';
 import { CellText } from './Table/Table.styles';
+import Tooltip from './Tooltip';
 import Typography from './Typography';
 
 export {
@@ -58,5 +59,6 @@ export {
     Snackbar,
     Spinner,
     Table,
+    Tooltip,
     Typography,
 };

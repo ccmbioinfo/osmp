@@ -21,6 +21,7 @@ declare module 'styled-components' {
             success: string;
             info: string;
             warning: string;
+            shadow: string;
         };
         space: string[];
         fontFamily: {

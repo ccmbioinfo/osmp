@@ -20,6 +20,7 @@ const theme: DefaultTheme = {
         success: '#4caf50',
         info: '#2196f3',
         warning: '#ff9800',
+        shadow: '#484948',
     },
     space: [
         '0rem',
