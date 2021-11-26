@@ -162,6 +162,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Gene Name
                         </Typography>
                         <GeneSearch
+                            assembly={queryOptionsForm.assemblyId.value}
                             geneName={queryOptionsForm.gene.value}
                             onChange={geneName =>
                                 updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
