@@ -20,13 +20,11 @@ const autocompleteQuery = gql`
                     chr
                     end
                     start
-                    strand
                 }
                 genomic_pos_hg19 {
                     chr
                     end
                     start
-                    strand
                 }
             }
         }
@@ -44,13 +42,11 @@ const useFetchAutocompleteQuery = () =>
                         chr: string;
                         end: number;
                         start: number;
-                        strand: number;
                     };
                     genomic_pos_hg19: {
                         chr: string;
                         end: number;
                         start: number;
-                        strand: number;
                     };
                 }[];
             };
