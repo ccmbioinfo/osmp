@@ -76,7 +76,7 @@ interface QueryOptionsFormState {
     ensemblId: string;
     gene: string;
     maxFrequency: number;
-    position: number;
+    position: string;
     sources: string[];
 }
 
@@ -102,7 +102,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 gene: '',
                 maxFrequency: 0.01,
                 sources: [],
-                position: 0,
+                position: '',
             },
             queryOptionsFormValidator
         );
@@ -116,7 +116,7 @@ const VariantQueryPage: React.FC<{}> = () => {
             gene: {
                 ensemblId: queryOptionsForm.ensemblId.value,
                 geneName: queryOptionsForm.gene.value,
-                position: queryOptionsForm.position.value.toString(), //for now
+                position: queryOptionsForm.position.value,
             },
             sources: queryOptionsForm.sources.value,
         },
@@ -128,13 +128,12 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const client = useApolloClient();
 
-    const toggleSource = (source: string) => {
-        const update = updateQueryOptionsForm('sources');
-
+    const toggleSource = (source: string) =>
         queryOptionsForm.sources.value.includes(source)
-            ? update(queryOptionsForm.sources.value.filter(s => s !== source))
-            : update(queryOptionsForm.sources.value.concat(source));
-    };
+            ? updateQueryOptionsForm({
+                  sources: queryOptionsForm.sources.value.filter(s => s !== source),
+              })
+            : updateQueryOptionsForm({ sources: queryOptionsForm.sources.value.concat(source) });
 
     return (
         <Body>
@@ -165,12 +164,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <GeneSearch
                             assembly={queryOptionsForm.assemblyId.value}
                             geneName={queryOptionsForm.gene.value}
-                            onChange={geneName => updateQueryOptionsForm('gene')(geneName)}
-                            onSelect={val => {
-                                updateQueryOptionsForm('gene')(val.name);
-                                updateQueryOptionsForm('ensemblId')(val.ensemblId);
-                                updateQueryOptionsForm('position')(val.position);
-                            }}
+                            onChange={geneName =>
+                                updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
+                            }
+                            onSelect={val => updateQueryOptionsForm(val)}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>
@@ -180,10 +177,12 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Input
                             variant="outlined"
-                            onChange={e => {
-                                updateQueryOptionsForm('ensemblId')(e.currentTarget.value);
-                                updateQueryOptionsForm('gene')('');
-                            }}
+                            onChange={e =>
+                                updateQueryOptionsForm({
+                                    ensemblId: e.currentTarget.value,
+                                    gene: '',
+                                })
+                            }
                             value={queryOptionsForm.ensemblId.value}
                         />
                         <ErrorText error={queryOptionsForm.ensemblId.error || ''} />
@@ -195,9 +194,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                         </Typography>
                         <Input
                             variant="outlined"
-                            onChange={e => {
-                                updateQueryOptionsForm('maxFrequency')(e.currentTarget.value);
-                            }}
+                            onChange={e =>
+                                updateQueryOptionsForm({ maxFrequency: +e.currentTarget.value })
+                            }
                             value={queryOptionsForm.maxFrequency.value}
                         />
                         <ErrorText error={queryOptionsForm.maxFrequency.error} />
@@ -207,11 +206,13 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Assembly ID
                         </Typography>
                         <ComboBox
-                            onSelect={val => {
-                                updateQueryOptionsForm('gene')('');
-                                updateQueryOptionsForm('ensemblId')('');
-                                updateQueryOptionsForm('assemblyId')(val);
-                            }}
+                            onSelect={val =>
+                                updateQueryOptionsForm({
+                                    assemblyId: val as AssemblyId,
+                                    gene: '',
+                                    ensemblId: '',
+                                })
+                            }
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
                                 value: resolveAssembly(a),

@@ -1,8 +1,5 @@
 import { ResultTableColumns } from '../components/Table/Table';
-
-function getKeys<O extends {}>(o: O) {
-    return Object.keys(o) as Array<keyof O>;
-}
+import getKeys from '../utils/getKeys';
 
 const objectToCsv = <T extends object>(data: T[]) => {
     const csvRows = [];

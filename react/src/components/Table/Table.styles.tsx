@@ -38,6 +38,7 @@ export const Styles = styled.div`
             margin: 0;
             padding: 0.5rem;
             border-bottom: 1px solid lightgrey;
+            border-right: 1px solid lavender;
             text-align: center;
             font-size: ${props => props.theme.fontSizes.xs};
             display: flex;
