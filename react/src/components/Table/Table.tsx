@@ -13,6 +13,7 @@ import {
     ColumnGroup,
     HeaderGroup,
     Row,
+    useExpanded,
     useFilters,
     useFlexLayout,
     useGlobalFilter,
@@ -20,7 +21,6 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
-import './dragscroll.css';
 import SOURCES from '../../constants/sources';
 import { downloadCsv, useOverflow } from '../../hooks';
 import {
@@ -33,6 +33,8 @@ import {
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Typography } from '../index';
 import { CellPopover } from './CellPopover';
+import './dragscroll.css';
+import PhenotypeViewer from './PhenotypeViewer';
 import {
     CellText,
     Footer,
@@ -331,6 +333,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'phenotypes',
                         id: 'phenotypes',
+                        Cell: ({ cell: { row } }) => (
+                            <PhenotypeViewer
+                                phenotypes={row.original.phenotypes}
+                                expanded={row.isExpanded}
+                                onClick={() => {
+                                    row.toggleRowExpanded(!row.isExpanded);
+                                    console.log(row);
+                                }}
+                            ></PhenotypeViewer>
+                        ),
                         Header: 'Phenotypes',
                         width: getColumnWidth(
                             tableData,
@@ -435,6 +447,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useFlexLayout,
         useGlobalFilter,
         useSortBy,
+        useExpanded,
         usePagination
     );
 
