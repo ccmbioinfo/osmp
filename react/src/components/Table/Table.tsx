@@ -262,7 +262,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'af',
                         id: 'af',
                         Header: 'gnomAD_AF_exome',
-                        width: 105,
+                        width: 110,
                         filter: 'between',
                     },
                     {
