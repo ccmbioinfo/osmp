@@ -36,20 +36,34 @@ const useFormReducer = <S>(initialState: S, Validator?: Validator<S>) => {
 
     return [
         state,
-        (field: keyof S) => (value: S[keyof S]) =>
-            dispatch({ type: 'update', payload: { field, value } }),
+        (values: Partial<S>) => dispatch({ type: 'update', payload: values }),
         () => dispatch({ type: 'reset', payload: initialState }),
     ] as const;
 };
 
 const makeReducer =
     <S>(validator?: Validator<S>) =>
-    <R extends FormState<S>, A extends { type: string; payload: unknown }>(state: R, action: A) => {
+    <R extends FormState<S>, A extends { type: string; payload: Partial<S> }>(
+        state: R,
+        action: A
+    ) => {
         switch (action.type) {
             case 'update':
-                const { field, value } = action.payload as { field: keyof S; value: S[keyof S] };
-                const newState = { ...state, ...{ [field]: { value, error: '' } } };
-                return validator ? setErrors(newState, validator) : newState;
+                const newFields = action.payload;
+                const newState = Object.keys(state).reduce(
+                    (acc, k) => ({
+                        ...acc,
+                        [k]: {
+                            ...state[k as keyof S],
+                            value:
+                                k in newFields
+                                    ? newFields[k as keyof S]
+                                    : state[k as keyof S].value,
+                        },
+                    }),
+                    {} as FormState<S>
+                );
+                return setErrors(newState, validator);
             case 'reset':
                 return makeFreshState(action.payload as S);
             default:
@@ -98,7 +112,7 @@ const validateField = <S>(
     return error;
 };
 
-export const setErrors = <S>(form: FormState<S>, validator: Validator<S>) => {
+export const setErrors = <S>(form: FormState<S>, validator?: Validator<S>) => {
     for (let field in form) {
         form[field]['error'] = validateField(form, validator, field, form[field].value);
     }
