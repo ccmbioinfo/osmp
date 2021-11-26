@@ -18,16 +18,20 @@ const Text = styled(props => <CellText {...props} />)`
 
 const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded, onClick }) => {
     const phenotypicFeatures = phenotypes.split(';');
-    return expanded ? (
-        <>
-            {phenotypicFeatures.map((p, key) => (
-                <Text key={key} onClick={onClick}>
-                    {p}
-                </Text>
-            ))}
-        </>
+    return phenotypicFeatures.length > 1 ? (
+        expanded ? (
+            <>
+                {phenotypicFeatures.map((p, key) => (
+                    <Text key={key} onClick={onClick}>
+                        {p}
+                    </Text>
+                ))}
+            </>
+        ) : (
+            <Text onClick={onClick}>{`${phenotypicFeatures.length} phenotypes`}</Text>
+        )
     ) : (
-        <Text onClick={onClick}>{`${phenotypicFeatures.length} phenotypes`}</Text>
+        <span>{phenotypes}</span>
     );
 };
 
