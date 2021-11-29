@@ -56,6 +56,15 @@ export const Styles = styled.div`
             overflow: scroll;
             display: block;
         }
+
+        // Hide scrollbar for different browsers
+        tbody::-webkit-scrollbar {
+            width: 0 !important;
+        } /* Chrome, Safari, Opera */
+        tbody {
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
     }
 `;
 
