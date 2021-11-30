@@ -481,7 +481,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const horizontalRef = React.useRef(null);
     const verticalRef = React.useRef(null);
-    const { refXOverflowing } = useOverflow(horizontalRef);
     const { isScrolling } = useOverflow(verticalRef);
 
     const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
