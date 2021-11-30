@@ -21,7 +21,6 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
-import './dragscroll.css';
 import HEADERS from '../../constants/headers';
 import SOURCES from '../../constants/sources';
 import { downloadCsv, useOverflow } from '../../hooks';
@@ -33,6 +32,13 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
+import {
+    addAdditionalFieldsAndFormatNulls,
+    calculateColumnWidth,
+    flattenBaseResults,
+    isHeader,
+    isHeaderExpanded,
+} from '../../utils';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
 import { CellPopover } from './CellPopover';
 import './dragscroll.css';
@@ -65,56 +71,11 @@ export type FlattenedQueryResponse = Omit<
     > &
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
-
-/* flatten all but callsets field */
-const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
-    const { contactInfo, source } = result;
-    const { callsets, info: variantInfo, ...restVariant } = result.variant;
-    const {
-        diseases,
-        info: individualInfo,
-        phenotypicFeatures,
-        ...restIndividual
-    } = result.individual;
-    const flattenedDiseases = (diseases || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
-        ''
-    );
-    const flattenedPhenotypes = (phenotypicFeatures || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
-        ''
-    );
-
-    return {
-        contactInfo,
-        diseases: flattenedDiseases,
-        ...individualInfo,
-        phenotypes: flattenedPhenotypes,
-        ...restIndividual,
-        ...restVariant,
-        source,
-        ...variantInfo,
-    };
-};
 export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
 }
-
-const addAdditionalFieldsAndFormatNulls = (results: FlattenedQueryResponse): ResultTableColumns => {
-    const reformatted = Object.fromEntries(
-        Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
-    ) as FlattenedQueryResponse;
-    return {
-        ...reformatted,
-        emptyCaseDetails: '',
-        emptyVariationDetails: '',
-        aaChange: reformatted.aaPos?.trim()
-            ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
-            : '',
-    };
-};
 
 /* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
 const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
@@ -182,24 +143,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    type Accessor = string | (() => JSX.Element) | ((state: any) => any);
-
     // Dynamically adjust column width based on cell's longest text.
-    const getColumnWidth = React.useCallback(
-        (data: ResultTableColumns[], accessor: Accessor, headerText: string) => {
-            if (typeof accessor === 'string') {
-                accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
-            }
-            const maxWidth = 600;
-            const magicSpacing = 10;
-            const cellLength = Math.max(
-                ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
-                headerText.length
-            );
-            return Math.min(maxWidth, cellLength * magicSpacing);
-        },
-        []
-    );
+    const getColumnWidth = React.useCallback(calculateColumnWidth, []);
+
+    const getChildColumns = (groupId: string) => {
+        const targetGroup = columns.find(header => header.id === groupId);
+        if (targetGroup) {
+            return targetGroup.columns
+                .map(c => c.id)
+                .filter(id => id && !dummyColumns.includes(id)) as string[];
+        } else throw new Error(`Group ${groupId} not found!`);
+    };
 
     const columns = React.useMemo(
         (): ColumnGroup<ResultTableColumns>[] => [
@@ -232,21 +186,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
-                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                     },
                     {
                         accessor: 'alt',
                         Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
-                        width: getColumnWidth(tableData, 'alt', 'Alt'),
                     },
                     {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
                         Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
-                        width: getColumnWidth(tableData, 'source', 'Source'),
                     },
                 ],
             },
@@ -264,7 +215,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'af',
                         id: 'af',
                         Header: <Tooltip helperText={HEADERS['af']}>gnomad_exome_AF</Tooltip>,
-                        width: 110,
+                        width: getColumnWidth(tableData, 'af', 'gnomad_exome_AF'),
                         filter: 'between',
                     },
                     {
@@ -312,19 +263,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'dp',
                         id: 'dp',
                         Header: 'DP',
-                        width: getColumnWidth(tableData, 'dp', 'DP'),
                     },
                     {
                         accessor: 'ad',
                         id: 'ad',
                         Header: 'AD',
-                        width: getColumnWidth(tableData, 'ad', 'AD'),
                     },
                     {
                         accessor: 'gq',
                         id: 'gq',
                         Header: 'GQ',
-                        width: getColumnWidth(tableData, 'gq', 'GQ'),
                     },
                     {
                         accessor: 'ethnicity',
@@ -343,21 +291,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             ></PhenotypeViewer>
                         ),
                         Header: 'Phenotypes',
-                        width: getColumnWidth(
-                            tableData,
-                            state =>
-                                (state.phenotypicFeatures || [])
-                                    .map((p: any) => p.phenotypeId)
-                                    .join(', '),
-                            'Phenotypes'
-                        ),
+                        width: getColumnWidth(tableData, 'phenotypes', 'Phenotypes'),
                     },
                     {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: <Tooltip helperText={HEADERS['sex']}>Sex</Tooltip>,
-                        width: getColumnWidth(tableData, 'sex', 'Sex'),
                         Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
                     {
@@ -423,15 +363,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    const getChildColumns = (groupId: string) => {
-        const targetGroup = columns.find(header => header.id === groupId);
-        if (targetGroup) {
-            return targetGroup.columns
-                .map(c => c.id)
-                .filter(id => id && !dummyColumns.includes(id)) as string[];
-        } else throw new Error(`Group ${groupId} not found!`);
-    };
-
     const tableInstance = useTable(
         {
             columns,
@@ -483,19 +414,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const horizonstalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
-    const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
+    const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
-
-    const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
-
-    const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
-        if (isHeader(column) && column.columns && column.Header !== 'Core') {
-            const visibleColumns = column.columns.filter(c => c.isVisible).map(c => c.id);
-            const intersection = visibleColumns.filter(value => dummyColumns.includes(value));
-            return !intersection.length;
-        }
-        return false;
-    };
 
     return (
         <>
@@ -551,7 +471,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     <Checkbox
                                         label={g.Header as string}
                                         checked={g.isVisible}
-                                        onClick={() => handleGroupChange(g)}
+                                        onClick={() => toggleGroupVisibility(g)}
                                     />
                                     {g.columns?.map(
                                         (c, id) =>
@@ -680,7 +600,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 <CgArrowsMergeAltH
                                                                                     size={18}
                                                                                     onClick={() =>
-                                                                                        handleGroupChange(
+                                                                                        toggleGroupVisibility(
                                                                                             column
                                                                                         )
                                                                                     }
@@ -691,7 +611,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 <CgArrowsShrinkH
                                                                                     size={18}
                                                                                     onClick={() =>
-                                                                                        handleGroupChange(
+                                                                                        toggleGroupVisibility(
                                                                                             column
                                                                                         )
                                                                                     }
