@@ -12,6 +12,7 @@ import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
+import getG4rdNodeQuery from './adapters/g4rdAdapter';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -86,6 +87,8 @@ const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQuer
       return getLocalQuery();
     case 'remote-test':
       return getRemoteTestNodeQuery(args);
+    case 'g4rd':
+      return getG4rdNodeQuery(args);
     default:
       throw new Error(`source ${source} not found!`);
   }

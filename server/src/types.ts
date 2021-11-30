@@ -89,7 +89,7 @@ export interface VariantQueryDataResult {
 
 export interface VariantQueryInput {
   assemblyId: AssemblyId;
-  maxFrequency?: number;
+  maxFrequency: number;
 }
 
 export interface GeneQueryInput {
@@ -107,6 +107,18 @@ export interface QueryInput {
 }
 
 /* end graphql schema types */
+
+/* start OpenAPI schema types */
+
+type OAQueryResponseResult = Omit<VariantQueryDataResult, 'source'>;
+
+export interface OAQueryResponse {
+  exists: boolean;
+  numTotalResults: number;
+  results: OAQueryResponseResult[];
+}
+
+/* end OpenAPI Schema types */
 
 export interface VariantCoordinate {
   alt: string;
@@ -162,7 +174,7 @@ export interface GqlContext {
   res: Response;
 }
 
-export type ResultTransformer<T> = (args: T | null) => VariantQueryDataResult[];
+export type ResultTransformer<T> = (args: T) => VariantQueryDataResult[];
 
 export type ErrorTransformer<T> = (args: T | null) => ErrorResponse | undefined;
 
