@@ -11,7 +11,7 @@ export const CellText = styled.span`
 
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
-    margin-bottom: ${props => props.theme.space[5]};
+    margin-bottom: ${props => props.theme.space[4]};
 `;
 interface StylesProps {
     isScrolling: boolean;

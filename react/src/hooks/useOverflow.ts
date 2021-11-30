@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState, useMemo } from 'react';
+import { RefObject, useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
 
 import useWindowSize from './useWindowSize';

@@ -1,4 +1,5 @@
 .container {
+    /* overflow: initial prevents dragging */
     overflow: initial;
     padding-bottom: 20px;
     transform: rotateX(180deg);

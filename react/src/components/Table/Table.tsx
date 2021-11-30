@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     BsFillCaretDownFill,
@@ -623,7 +623,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
             <Styles className="scroll-inactive" isScrolling={isScrolling} ref={verticalRef}>
                 {/* If not overflowing, top scrollbar is not shown.  */}
-                <ScrollContainer className="container" ignoreElements="p">
+                <ScrollContainer
+                    className="container"
+                    ignoreElements="p"
+                    // hideScrollbars={!refXOverflowing}
+                >
                     <table {...getTableProps()} ref={horizontalRef}>
                         <THead>
                             {headerGroups.map(headerGroup => {
