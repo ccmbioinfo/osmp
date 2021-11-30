@@ -723,7 +723,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         </THead>
 
                         <tbody
-                            className={isScrolling ? undefined : 'scroll-inactive'}
+                            // className={isScrolling ? undefined : 'scroll-inactive'}
                             ref={verticalRef}
                             onScroll={() => {
                                 // console.log('hello')

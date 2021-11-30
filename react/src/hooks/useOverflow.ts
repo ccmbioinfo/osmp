@@ -23,8 +23,6 @@ function useOverflow(ref: RefObject<HTMLElement>): {
 
     const [isScrolling, setIsScrolling] = useState(false);
 
-    console.log('is scrolling', isScrolling);
-
     const size = useWindowSize();
 
     const handleEndScroll = useMemo(
@@ -32,7 +30,7 @@ function useOverflow(ref: RefObject<HTMLElement>): {
             _.debounce(() => {
                 setIsScrolling(false);
                 console.log('END SCROLL');
-            }, 100),
+            }, 500),
         []
     );
 
