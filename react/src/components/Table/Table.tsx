@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     BsFillCaretDownFill,
@@ -480,8 +480,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const horizonstalRef = React.useRef(null);
-    const { refXOverflowing } = useOverflow(horizonstalRef);
+    const horizontalRef = React.useRef(null);
+    const verticalRef = React.useRef(null);
+    const { refXOverflowing } = useOverflow(horizontalRef);
+    const { refYOverflowing, refYScrollBegin, refYScrollEnd, isScrolling } =
+        useOverflow(verticalRef);
 
     const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
@@ -627,7 +630,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     hideScrollbars={!refXOverflowing}
                     ignoreElements="p"
                 >
-                    <table {...getTableProps()} ref={horizonstalRef}>
+                    <table {...getTableProps()} ref={horizontalRef}>
                         <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
@@ -719,7 +722,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             })}
                         </THead>
 
-                        <tbody {...getTableBodyProps()}>
+                        <tbody
+                            className={isScrolling ? undefined : 'scroll-inactive'}
+                            ref={verticalRef}
+                            onScroll={() => {
+                                // console.log('hello')
+                            }}
+                            {...getTableBodyProps()}
+                        >
                             {page.length > 0 ? (
                                 page.map(row => {
                                     prepareRow(row);

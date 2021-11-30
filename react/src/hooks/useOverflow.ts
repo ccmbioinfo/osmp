@@ -1,8 +1,10 @@
-import { RefObject, useEffect, useState } from 'react';
+import { RefObject, useEffect, useState, useMemo } from 'react';
+import _ from 'lodash';
 
 import useWindowSize from './useWindowSize';
 
 function useOverflow(ref: RefObject<HTMLElement>): {
+    isScrolling: boolean;
     refXOverflowing: boolean;
     refYOverflowing: boolean;
     refXScrollBegin: boolean;
@@ -19,7 +21,20 @@ function useOverflow(ref: RefObject<HTMLElement>): {
     const [refYScrollBegin, setRefYScrollBegin] = useState(true);
     const [refYScrollEnd, setRefYScrollEnd] = useState(false);
 
+    const [isScrolling, setIsScrolling] = useState(false);
+
+    console.log('is scrolling', isScrolling);
+
     const size = useWindowSize();
+
+    const handleEndScroll = useMemo(
+        () =>
+            _.debounce(() => {
+                setIsScrolling(false);
+                console.log('END SCROLL');
+            }, 100),
+        []
+    );
 
     useEffect((): any => {
         if (!ref?.current) {
@@ -40,6 +55,8 @@ function useOverflow(ref: RefObject<HTMLElement>): {
         }
 
         const handleScroll = (): void => {
+            setIsScrolling(true);
+
             // Handle X Overflow
             const offsetRight = ref?.current?.scrollWidth! - ref?.current?.clientWidth!;
             if (ref?.current?.scrollLeft! >= offsetRight && refXScrollEnd === false) {
@@ -67,14 +84,27 @@ function useOverflow(ref: RefObject<HTMLElement>): {
             } else {
                 setRefYScrollBegin(false);
             }
+
+            handleEndScroll();
         };
 
         observerRef.addEventListener('scroll', handleScroll);
 
-        return (): void => observerRef?.removeEventListener('scroll', handleScroll);
-    }, [ref, refXOverflowing, refYOverflowing, refXScrollEnd, refYScrollEnd, size.width]); // Empty array ensures that effect is only run on mount and unmount
+        return (): void => {
+            observerRef?.removeEventListener('scroll', handleScroll);
+        };
+    }, [
+        ref,
+        refXOverflowing,
+        refYOverflowing,
+        refXScrollEnd,
+        refYScrollEnd,
+        size.width,
+        handleEndScroll,
+    ]); // Empty array ensures that effect is only run on mount and unmount
 
     return {
+        isScrolling,
         refXOverflowing,
         refYOverflowing,
         refXScrollBegin,

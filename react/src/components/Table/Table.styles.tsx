@@ -58,10 +58,10 @@ export const Styles = styled.div`
         }
 
         // Hide scrollbar for different browsers
-        tbody::-webkit-scrollbar {
+        tbody.scroll-inactive::-webkit-scrollbar {
             width: 0 !important;
         } /* Chrome, Safari, Opera */
-        tbody {
+        tbody.scroll-inactive {
             -ms-overflow-style: none; /* IE and Edge */
             scrollbar-width: none; /* Firefox */
         }
