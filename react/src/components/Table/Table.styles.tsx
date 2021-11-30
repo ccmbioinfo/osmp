@@ -11,7 +11,7 @@ export const CellText = styled.span`
 
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
-    margin: 0;
+    margin-bottom: ${props => props.theme.space[5]};
 `;
 interface StylesProps {
     isScrolling: boolean;
@@ -36,7 +36,6 @@ export const Styles = styled.div<StylesProps>`
             : ''}
 
     > div > table {
-        position: relative;
         width: 100%;
         border-spacing: 0;
         transform: rotateX(180deg);
@@ -50,9 +49,12 @@ export const Styles = styled.div<StylesProps>`
             }
         }
 
-        thead tr th {
+        thead,
+        th {
             position: sticky;
-            top: 0px;
+            top: -40px;
+            z-index: 999;
+            background: white;
         }
 
         th,

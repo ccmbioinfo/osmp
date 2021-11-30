@@ -1,7 +1,5 @@
 .container {
-    /* width: 100%;
-    max-height: 60vh; */
-    overflow: scroll;
+    overflow: initial;
     padding-bottom: 20px;
     transform: rotateX(180deg);
 }

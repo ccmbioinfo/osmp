@@ -35,7 +35,6 @@ import {
 } from '../../types';
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
 import { CellPopover } from './CellPopover';
-import './dragscroll.css';
 import PhenotypeViewer from './PhenotypeViewer';
 import {
     CellText,
@@ -483,10 +482,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const horizontalRef = React.useRef(null);
     const verticalRef = React.useRef(null);
     const { refXOverflowing } = useOverflow(horizontalRef);
-    const { refYOverflowing, refYScrollBegin, refYScrollEnd, isScrolling } =
-        useOverflow(verticalRef);
-
-    console.log('is scrolling', isScrolling);
+    const { isScrolling } = useOverflow(verticalRef);
 
     const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
@@ -627,11 +623,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
             <Styles className="scroll-inactive" isScrolling={isScrolling} ref={verticalRef}>
                 {/* If not overflowing, top scrollbar is not shown.  */}
-                <ScrollContainer
-                    className="container"
-                    hideScrollbars={!refXOverflowing}
-                    ignoreElements="p"
-                >
+                <ScrollContainer className="container" ignoreElements="p">
                     <table {...getTableProps()} ref={horizontalRef}>
                         <THead>
                             {headerGroups.map(headerGroup => {
@@ -724,12 +716,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             })}
                         </THead>
 
-                        <tbody
-                            onScroll={() => {
-                                // console.log('hello')
-                            }}
-                            {...getTableBodyProps()}
-                        >
+                        <tbody {...getTableBodyProps()}>
                             {page.length > 0 ? (
                                 page.map(row => {
                                     prepareRow(row);

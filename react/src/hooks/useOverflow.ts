@@ -29,8 +29,7 @@ function useOverflow(ref: RefObject<HTMLElement>): {
         () =>
             _.debounce(() => {
                 setIsScrolling(false);
-                console.log('END SCROLL');
-            }, 500),
+            }, 100),
         []
     );
 
