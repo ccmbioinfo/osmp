@@ -1,11 +1,9 @@
 .container {
-    width: 100%;
+    /* width: 100%;
+    max-height: 60vh; */
+    overflow: scroll;
     padding-bottom: 20px;
-    overflow: hidden !important;
-    overflow-x: scroll !important;
     transform: rotateX(180deg);
-    position: sticky;
-    top: 0;
 }
 
 .container::-webkit-scrollbar {

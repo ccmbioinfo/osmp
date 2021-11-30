@@ -486,6 +486,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const { refYOverflowing, refYScrollBegin, refYScrollEnd, isScrolling } =
         useOverflow(verticalRef);
 
+    console.log('is scrolling', isScrolling);
+
     const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
@@ -623,7 +625,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </TableFilters>
             )}
 
-            <Styles>
+            <Styles className="scroll-inactive" isScrolling={isScrolling} ref={verticalRef}>
                 {/* If not overflowing, top scrollbar is not shown.  */}
                 <ScrollContainer
                     className="container"
@@ -723,8 +725,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         </THead>
 
                         <tbody
-                            // className={isScrolling ? undefined : 'scroll-inactive'}
-                            ref={verticalRef}
                             onScroll={() => {
                                 // console.log('hello')
                             }}

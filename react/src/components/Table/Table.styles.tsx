@@ -13,13 +13,30 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin: 0;
 `;
+interface StylesProps {
+    isScrolling: boolean;
+}
 
-export const Styles = styled.div`
+export const Styles = styled.div<StylesProps>`
     padding: 1rem;
     display: block;
     max-width: 100%;
+    max-height: 60vh;
+    overflow: scroll;
+
+    ${props =>
+        !props.isScrolling
+            ? `
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+        ::-webkit-scrollbar {
+            width: 0 !important;
+        }
+    `
+            : ''}
 
     > div > table {
+        position: relative;
         width: 100%;
         border-spacing: 0;
         transform: rotateX(180deg);
@@ -31,6 +48,11 @@ export const Styles = styled.div`
                     border-bottom: 0;
                 }
             }
+        }
+
+        thead tr th {
+            position: sticky;
+            top: 0px;
         }
 
         th,
@@ -52,18 +74,7 @@ export const Styles = styled.div`
         }
 
         tbody {
-            max-height: 60vh;
-            overflow: scroll;
             display: block;
-        }
-
-        // Hide scrollbar for different browsers
-        tbody.scroll-inactive::-webkit-scrollbar {
-            width: 0 !important;
-        } /* Chrome, Safari, Opera */
-        tbody.scroll-inactive {
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
         }
     }
 `;
