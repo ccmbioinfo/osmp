@@ -1,3 +1,4 @@
+import camelize from './camelize';
 import formatErrorMessage from './formatErrorMessage';
 import getKeys from './getKeys';
 import {
@@ -9,6 +10,7 @@ import {
 } from './tableHelpers';
 
 export {
+    camelize,
     isHeader,
     isHeaderExpanded,
     flattenBaseResults,

@@ -4,6 +4,7 @@ import { ColumnInstance, HeaderGroup, Row, UseTableInstanceProps } from 'react-t
 import { downloadCsv } from '../../hooks';
 import { Button, Checkbox, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';
+import { camelize } from '../../utils';
 
 interface ColumnVisibilityModalProps<T extends object>
     extends Pick<UseTableInstanceProps<T>, 'toggleHideColumn'> {
@@ -71,7 +72,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                                                     ) {
                                                         toggleHideColumn(c.id, c.isVisible);
                                                         toggleHideColumn(
-                                                            'empty' + c.parent.id,
+                                                            camelize(`empty ${c.parent.id}`),
                                                             !c.isVisible
                                                         );
                                                     } else {
