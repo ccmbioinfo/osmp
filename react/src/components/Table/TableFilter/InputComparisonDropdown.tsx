@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
-import { IdType, UseFiltersInstanceProps } from 'react-table';
+import { UseFiltersColumnProps } from 'react-table';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
 import { IconButton } from '../../index';
@@ -21,9 +21,8 @@ export type ComparisonOption = {
 export type FilterComparison = { [K in keyof ResultTableColumns]?: ComparisonType };
 
 interface InputComparisonDropdownProps<T extends {}>
-    extends Pick<UseFiltersInstanceProps<T>, 'setFilter'> {
+    extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;
-    columnId: IdType<T>;
 }
 
 const Icons = Object.freeze({
@@ -51,7 +50,6 @@ const COMPARISON_OPTIONS: ComparisonOption[] = [
 ];
 
 export function InputComparisonDropdown<T extends {}>({
-    columnId,
     setFilterComparison,
     setFilter,
 }: InputComparisonDropdownProps<T>) {
@@ -83,7 +81,7 @@ export function InputComparisonDropdown<T extends {}>({
                             ...{ [value as keyof ComparisonType]: true },
                         });
 
-                        setFilter(columnId, (old = []) => {
+                        setFilter((old = []) => {
                             const min = old[0] ? parseFloat(old[0]) : old[0];
                             const max = old[1] ? parseFloat(old[1]) : old[1];
                             const n = getFiniteNumber(min) || getFiniteNumber(max);

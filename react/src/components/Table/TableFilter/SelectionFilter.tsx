@@ -1,11 +1,12 @@
 import { isNullOrUndefined } from 'util';
 import React, { useState } from 'react';
-import { IdType, UseFiltersInstanceProps } from 'react-table';
+import { IdType, UseFiltersColumnProps, UseFiltersInstanceProps } from 'react-table';
 import { ComboBox } from '../..';
 import { DefaultFilter } from './ColumnFilter';
 
 interface SelectionFilterProps<T extends {}>
-    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows' | 'setFilter'> {
+    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows'>,
+        Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     columnId: IdType<T>;
     options?: string[];
     filter?: DefaultFilter<string | string[]>;
@@ -35,14 +36,14 @@ export function SelectionFilter<T extends {}>({
         setSearchTerm('');
         if (isMulti) {
             if (filter) {
-                setFilter(columnId, (filter: string[]) => {
+                setFilter((filter: string[]) => {
                     return filter.includes(val) ? filter.filter(v => v !== val) : [...filter, val];
                 });
             } else {
-                setFilter(columnId, [val]);
+                setFilter([val]);
             }
         } else {
-            setFilter(columnId, val);
+            setFilter(val);
         }
     };
 

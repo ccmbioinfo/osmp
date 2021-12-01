@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { IdType, useAsyncDebounce, UseFiltersInstanceProps } from 'react-table';
+import {
+    IdType,
+    useAsyncDebounce,
+    UseFiltersColumnProps,
+    UseFiltersInstanceProps,
+} from 'react-table';
 import { Column, Input } from '../..';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
@@ -10,7 +15,8 @@ export type DefaultFilter<T> = {
 };
 
 interface ColumnFilterProps<T extends {}>
-    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows' | 'setFilter'> {
+    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows'>,
+        Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     columnId: IdType<T>;
     filterModel?: DefaultFilter<string | string[] | number | number[]>;
     options?: string[];
@@ -33,10 +39,7 @@ export function ColumnFilter<T extends {}>({
 
     const placeholder = 'Search';
 
-    const debouncedSetFilter = useAsyncDebounce(
-        (filterValue: any) => setFilter(columnId, filterValue),
-        500
-    );
+    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
 
     const handleChange = (val: string) => {
         debouncedSetFilter(val);
@@ -57,7 +60,7 @@ export function ColumnFilter<T extends {}>({
                 />
             );
         } else if (!!type && type === 'between') {
-            return <NumberRangeFilter columnId={columnId} setFilter={setFilter} />;
+            return <NumberRangeFilter setFilter={setFilter} />;
         } else {
             return (
                 <Input
@@ -65,7 +68,7 @@ export function ColumnFilter<T extends {}>({
                     value={input}
                     placeholder={placeholder}
                     onChange={e => {
-                        console.log(e);
+                        console.log('hello');
                         handleChange(e.target.value);
                     }}
                 />

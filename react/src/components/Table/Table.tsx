@@ -6,6 +6,7 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
     HeaderGroup,
+    IdType,
     Row,
     useExpanded,
     useFilters,
@@ -99,7 +100,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         () => ({
             multiSelect: (
                 rows: Row<ResultTableColumns>[],
-                columnIds: string[],
+                columnIds: IdType<ResultTableColumns>[],
                 filterValue: string[]
             ) =>
                 filterValue.length
