@@ -115,9 +115,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const getChildColumns = (groupId: string) => {
         const targetGroup = columns.find(header => header.id === groupId);
         if (targetGroup) {
-            return targetGroup.columns
-                .filter(c => c.type !== 'empty')
-                .map(c => c.id) as string[];
+            return targetGroup.columns.filter(c => c.type !== 'empty').map(c => c.id) as string[];
         } else throw new Error(`Group ${groupId} not found!`);
     };
 
@@ -134,7 +132,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         type: 'fixed',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
-                        disableFilters: true
+                        disableFilters: true,
                     },
                     {
                         accessor: 'start',
@@ -157,14 +155,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
-                        type: 'fixed'
+                        type: 'fixed',
                     },
                     {
                         accessor: 'alt',
                         Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
-                        type: 'fixed'
+                        type: 'fixed',
                     },
                     {
                         accessor: 'source',
@@ -323,7 +321,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'contactInfo',
                         Header: <Tooltip helperText={HEADERS['contactInfo']}>Contact</Tooltip>,
                         width: 120,
-                        disableFilters: true
+                        disableFilters: true,
                     },
                 ],
             },
@@ -388,18 +386,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const paginationProps = {
-        pageSize,
-        pageCount,
-        pageIndex,
-        pageOptions,
-        canPreviousPage,
-        canNextPage,
-        gotoPage,
-        previousPage,
-        nextPage,
-        setPageSize,
-    };
     const horizonstalRef = useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
@@ -587,7 +573,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </ScrollContainer>
             </Styles>
 
-            <Footer props={paginationProps} />
+            <Footer
+                props={{
+                    pageSize,
+                    pageCount,
+                    pageIndex,
+                    pageOptions,
+                    canPreviousPage,
+                    canNextPage,
+                    gotoPage,
+                    previousPage,
+                    nextPage,
+                    setPageSize,
+                }}
+            />
         </>
     );
 };
