@@ -8,8 +8,6 @@ import { ColumnFilter } from './TableFilter/ColumnFilter';
 
 interface AdvancedFiltersProps<T extends {}> extends Pick<UseFiltersInstanceProps<T>, 'setFilter'> {
     columns: ColumnGroup<T>[];
-    dummyColumns: string[];
-    columnsWithoutFilters: string[];
     preFilteredRows: Row<T>[];
     filters: Filters<T>;
 }
@@ -20,8 +18,6 @@ const FILTER_OPTIONS: { [K in keyof ResultTableColumns]?: string[] } = {
 
 export default function AdvancedFilters<T extends {}>({
     columns,
-    dummyColumns,
-    columnsWithoutFilters,
     preFilteredRows,
     filters,
     setFilter,
@@ -31,7 +27,7 @@ export default function AdvancedFilters<T extends {}>({
             {columns
                 .flatMap(c => c.columns)
                 .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
-                .filter(c => !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id))
+                .filter(c => !!c.id && c.type !== 'empty' && !c.disableFilters)
                 .map((v, i) => (
                     <Column key={i}>
                         <Typography variant="subtitle" bold>

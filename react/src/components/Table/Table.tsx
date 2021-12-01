@@ -95,20 +95,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    /**
-     * The way react-table is set up is if all columns are hidden, the header group will disappear.
-     * This is undesired because user may want to re-expand the column.
-     * The workaround for this is to keep some columns with fixed visibility.
-     */
-    const fixedColumns = useMemo(
-        () => ['core', 'chromosome', 'referenceName', 'alt', 'ref', 'start', 'end', 'source'],
-        []
-    );
-
-    const dummyColumns = useMemo(() => ['emptyVariationDetails', 'emptyCaseDetails'], []);
-
-    const columnsWithoutFilters = useMemo(() => ['contactInfo', 'chromosome'], []);
-
     const filterTypes = useMemo(
         () => ({
             multiSelect: (
@@ -130,8 +116,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         const targetGroup = columns.find(header => header.id === groupId);
         if (targetGroup) {
             return targetGroup.columns
-                .map(c => c.id)
-                .filter(id => id && !dummyColumns.includes(id)) as string[];
+                .filter(c => c.type !== 'empty')
+                .map(c => c.id) as string[];
         } else throw new Error(`Group ${groupId} not found!`);
     };
 
@@ -140,16 +126,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Core',
                 id: 'core',
+                type: 'fixed',
                 columns: [
                     {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
+                        type: 'fixed',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                        disableFilters: true
                     },
                     {
                         accessor: 'start',
                         id: 'start',
+                        type: 'fixed',
                         Header: 'Start',
                         width: getColumnWidth(tableData, 'start', 'Start'),
                         filter: 'between',
@@ -157,6 +147,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'end',
                         id: 'end',
+                        type: 'fixed',
                         Header: 'End',
                         width: getColumnWidth(tableData, 'end', 'End'),
                         filter: 'between',
@@ -166,17 +157,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
+                        type: 'fixed'
                     },
                     {
                         accessor: 'alt',
                         Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
+                        type: 'fixed'
                     },
                     {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
+                        type: 'fixed',
                         Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
                     },
                 ],
@@ -187,6 +181,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 columns: [
                     {
                         id: 'emptyVariationDetails',
+                        type: 'empty',
                         Header: '',
                         disableSortBy: true,
                         width: 79,
@@ -229,6 +224,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 columns: [
                     {
                         id: 'emptyCaseDetails',
+                        type: 'empty',
                         Header: '',
                         disableSortBy: true,
                         width: 70,
@@ -327,6 +323,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'contactInfo',
                         Header: <Tooltip helperText={HEADERS['contactInfo']}>Contact</Tooltip>,
                         width: 120,
+                        disableFilters: true
                     },
                 ],
             },
@@ -407,7 +404,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
-        g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
+        g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
     return (
         <>
@@ -437,8 +434,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     headerGroups={headerGroups}
                     toggleGroupVisibility={toggleGroupVisibility}
                     toggleHideColumn={toggleHideColumn}
-                    fixedColumns={fixedColumns}
-                    dummyColumns={dummyColumns}
                     visibleColumns={visibleColumns}
                 />
             </TableFilters>
@@ -446,8 +441,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {advancedFiltersOpen && (
                 <AdvancedFilters
                     columns={columns}
-                    dummyColumns={dummyColumns}
-                    columnsWithoutFilters={columnsWithoutFilters}
                     preFilteredRows={preFilteredRows}
                     filters={filters}
                     setFilter={setFilter}

@@ -11,8 +11,6 @@ interface ColumnVisibilityModalProps<T extends object>
     visibleColumns: ColumnInstance<T>[];
     headerGroups: HeaderGroup<T>[];
     toggleGroupVisibility: (g: HeaderGroup<T>) => void;
-    fixedColumns: string[];
-    dummyColumns: string[];
 }
 
 export default function ColumnVisibilityModal<T extends {}>({
@@ -20,8 +18,6 @@ export default function ColumnVisibilityModal<T extends {}>({
     visibleColumns,
     headerGroups,
     toggleGroupVisibility,
-    fixedColumns,
-    dummyColumns,
     toggleHideColumn,
 }: ColumnVisibilityModalProps<T>) {
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -61,8 +57,8 @@ export default function ColumnVisibilityModal<T extends {}>({
                             />
                             {g.columns?.map(
                                 (c, id) =>
-                                    !fixedColumns.includes(c.id) &&
-                                    !dummyColumns.includes(c.id) && (
+                                    c.type !== 'fixed' &&
+                                    c.type !== 'empty' && (
                                         <div key={id} style={{ paddingLeft: 20 }}>
                                             <Checkbox
                                                 label={c.Header as string}
