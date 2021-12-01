@@ -1,12 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-    BsFillCaretDownFill,
-    BsFillCaretUpFill,
-    BsFillEyeFill,
-    BsFillEyeSlashFill,
-    BsFilter,
-} from 'react-icons/bs';
+import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
@@ -22,8 +16,7 @@ import {
     useTable,
 } from 'react-table';
 import HEADERS from '../../constants/headers';
-import SOURCES from '../../constants/sources';
-import { downloadCsv, useOverflow } from '../../hooks';
+import { useOverflow } from '../../hooks';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -39,14 +32,14 @@ import {
     isHeader,
     isHeaderExpanded,
 } from '../../utils';
-import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
+import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
+import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
+import ColumnVisibilityModal from './ColumnVisibilityModal';
 import './dragscroll.css';
 import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
-
-import { ColumnFilter } from './TableFilter/ColumnFilter';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
 
 interface TableProps {
@@ -88,13 +81,8 @@ const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[
     });
 };
 
-const FILTER_OPTIONS: { [K in keyof ResultTableColumns]?: string[] } = {
-    source: SOURCES,
-};
-
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
-    const [showModal, setShowModal] = useState<Boolean>(false);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
     const sortByArray = useMemo(
@@ -443,105 +431,27 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Clear all filters
                     </Button>
                 </InlineFlex>
-                <InlineFlex>
-                    <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
-                        Customize columns
-                        <IconPadder>
-                            {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
-                        </IconPadder>
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() =>
-                            downloadCsv(
-                                rows.map(r => r.values as ResultTableColumns),
-                                visibleColumns
-                                    .filter(c => c.id && !c.id.match(/^empty/i))
-                                    .map(c => c.id as keyof ResultTableColumns)
-                            )
-                        }
-                    >
-                        Export Data
-                    </Button>
-                    <Modal
-                        active={showModal}
-                        hideModal={() => setShowModal(false)}
-                        title="Customize Columns"
-                    >
-                        {headerGroups[0].headers
-                            .filter(header => header.Header !== 'Core')
-                            .map((g, id) => (
-                                <div key={id}>
-                                    <Checkbox
-                                        label={g.Header as string}
-                                        checked={g.isVisible}
-                                        onClick={() => toggleGroupVisibility(g)}
-                                    />
-                                    {g.columns?.map(
-                                        (c, id) =>
-                                            !fixedColumns.includes(c.id) &&
-                                            !dummyColumns.includes(c.id) && (
-                                                <div key={id} style={{ paddingLeft: 20 }}>
-                                                    <Checkbox
-                                                        label={c.Header as string}
-                                                        checked={c.isVisible}
-                                                        onClick={() => {
-                                                            if (
-                                                                c.parent &&
-                                                                g.columns?.filter(c => c.isVisible)
-                                                                    .length === 1
-                                                            ) {
-                                                                toggleHideColumn(c.id, c.isVisible);
-                                                                toggleHideColumn(
-                                                                    'empty' + c.parent.id,
-                                                                    !c.isVisible
-                                                                );
-                                                            } else {
-                                                                toggleHideColumn(c.id, c.isVisible);
-                                                            }
-                                                        }}
-                                                    />
-                                                </div>
-                                            )
-                                    )}
-                                </div>
-                            ))}
-                    </Modal>
-                </InlineFlex>
+
+                <ColumnVisibilityModal
+                    rows={rows}
+                    headerGroups={headerGroups}
+                    toggleGroupVisibility={toggleGroupVisibility}
+                    toggleHideColumn={toggleHideColumn}
+                    fixedColumns={fixedColumns}
+                    dummyColumns={dummyColumns}
+                    visibleColumns={visibleColumns}
+                />
             </TableFilters>
 
             {advancedFiltersOpen && (
-                <TableFilters justifyContent="flex-start" alignItems="flex-start">
-                    {columns
-                        .flatMap(c => c.columns)
-                        .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
-                        .filter(
-                            c =>
-                                !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id)
-                        )
-                        .map((v, i) => (
-                            <Column key={i}>
-                                <Typography variant="subtitle" bold>
-                                    {v.Header}
-                                </Typography>
-                                <ColumnFilter
-                                    preFilteredRows={preFilteredRows}
-                                    filterModel={filters.find(f => f.id === v.id)}
-                                    options={
-                                        !!(
-                                            !!v.id &&
-                                            !!FILTER_OPTIONS[v.id as keyof ResultTableColumns]
-                                        )
-                                            ? FILTER_OPTIONS[v.id as keyof ResultTableColumns]
-                                            : undefined
-                                    }
-                                    setFilter={setFilter.bind(null, v.id as string)}
-                                    type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
-                                    columnId={v.id as keyof ResultTableColumns}
-                                />
-                            </Column>
-                        ))}
-                </TableFilters>
+                <AdvancedFilters
+                    columns={columns}
+                    dummyColumns={dummyColumns}
+                    columnsWithoutFilters={columnsWithoutFilters}
+                    preFilteredRows={preFilteredRows}
+                    filters={filters}
+                    setFilter={setFilter}
+                />
             )}
 
             <Styles>

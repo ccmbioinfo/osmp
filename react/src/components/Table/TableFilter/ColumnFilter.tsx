@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Row, useAsyncDebounce } from 'react-table';
+import { IdType, useAsyncDebounce, UseFiltersInstanceProps } from 'react-table';
 import { Column, Input } from '../..';
-import { ResultTableColumns } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
 
@@ -10,23 +9,22 @@ export type DefaultFilter<T> = {
     value: T;
 };
 
-interface ColumnFilterProps {
-    columnId: keyof ResultTableColumns;
+interface ColumnFilterProps<T extends {}>
+    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows' | 'setFilter'> {
+    columnId: IdType<T>;
     filterModel?: DefaultFilter<string | string[] | number | number[]>;
     options?: string[];
-    preFilteredRows: Row<ResultTableColumns>[];
-    setFilter: (filterValue: any) => void;
     type?: 'singleSelect' | 'multiSelect' | 'text' | 'between';
 }
 
-export const ColumnFilter: React.FC<ColumnFilterProps> = ({
+export function ColumnFilter<T extends {}>({
     columnId,
     filterModel,
     options,
     preFilteredRows,
     setFilter,
     type,
-}) => {
+}: ColumnFilterProps<T>) {
     const [input, setInput] = useState<string>('');
 
     useEffect(() => {
@@ -35,7 +33,10 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
 
     const placeholder = 'Search';
 
-    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
+    const debouncedSetFilter = useAsyncDebounce(
+        (filterValue: any) => setFilter(columnId, filterValue),
+        500
+    );
 
     const handleChange = (val: string) => {
         debouncedSetFilter(val);
@@ -56,7 +57,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                 />
             );
         } else if (!!type && type === 'between') {
-            return <NumberRangeFilter setFilter={setFilter} />;
+            return <NumberRangeFilter columnId={columnId} setFilter={setFilter} />;
         } else {
             return (
                 <Input
@@ -72,4 +73,4 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     };
 
     return <Column>{resolveComponent()}</Column>;
-};
+}

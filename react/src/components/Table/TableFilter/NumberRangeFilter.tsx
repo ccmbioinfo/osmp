@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useAsyncDebounce } from 'react-table';
+import { IdType, useAsyncDebounce, UseFiltersInstanceProps } from 'react-table';
 import { Column, Input, Typography } from '../..';
 import { ComparisonType, InputComparisonDropdown } from './InputComparisonDropdown';
 
-interface NumberRangeFilterProps {
-    setFilter: (filterValue: any) => void;
+interface NumberRangeFilterProps<T extends {}>
+    extends Pick<UseFiltersInstanceProps<T>, 'setFilter'> {
+    columnId: IdType<T>;
 }
 
-const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
+export default function NumberRangeFilter<T extends {}>({
+    setFilter,
+    columnId,
+}: NumberRangeFilterProps<T>) {
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState('');
 
@@ -17,7 +21,10 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
         equal: true,
     });
 
-    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
+    const debouncedSetFilter = useAsyncDebounce(
+        (filterValue: any) => setFilter(columnId, filterValue),
+        500
+    );
 
     const handleComparisonValue = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -61,6 +68,7 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
                 placeholder="Search"
                 InputAdornmentStart={
                     <InputComparisonDropdown
+                        columnId={columnId}
                         setFilterComparison={setFilterComparison}
                         setFilter={setFilter}
                     />
@@ -73,6 +81,4 @@ const NumberRangeFilter: React.FC<NumberRangeFilterProps> = ({ setFilter }) => {
             )}
         </Column>
     );
-};
-
-export default NumberRangeFilter;
+}
