@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     BsFillCaretDownFill,
@@ -42,18 +42,10 @@ import {
 import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
 import { CellPopover } from './CellPopover';
 import './dragscroll.css';
+import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
-import {
-    CellText,
-    Footer,
-    IconPadder,
-    SkipToBeginning,
-    SkipToEnd,
-    Styles,
-    TableFilters,
-    TH,
-    THead,
-} from './Table.styles';
+import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
+
 import { ColumnFilter } from './TableFilter/ColumnFilter';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
 
@@ -120,16 +112,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
      * This is undesired because user may want to re-expand the column.
      * The workaround for this is to keep some columns with fixed visibility.
      */
-    const fixedColumns = React.useMemo(
+    const fixedColumns = useMemo(
         () => ['core', 'chromosome', 'referenceName', 'alt', 'ref', 'start', 'end', 'source'],
         []
     );
 
-    const dummyColumns = React.useMemo(() => ['emptyVariationDetails', 'emptyCaseDetails'], []);
+    const dummyColumns = useMemo(() => ['emptyVariationDetails', 'emptyCaseDetails'], []);
 
-    const columnsWithoutFilters = React.useMemo(() => ['contactInfo', 'chromosome'], []);
+    const columnsWithoutFilters = useMemo(() => ['contactInfo', 'chromosome'], []);
 
-    const filterTypes = React.useMemo(
+    const filterTypes = useMemo(
         () => ({
             multiSelect: (
                 rows: Row<ResultTableColumns>[],
@@ -155,7 +147,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         } else throw new Error(`Group ${groupId} not found!`);
     };
 
-    const columns = React.useMemo(
+    const columns = useMemo(
         (): ColumnGroup<ResultTableColumns>[] => [
             {
                 Header: 'Core',
@@ -354,7 +346,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         [getColumnWidth, tableData]
     );
 
-    const defaultColumn = React.useMemo(
+    const defaultColumn = useMemo(
         () => ({
             minWidth: 10,
             width: 60,
@@ -411,7 +403,19 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const horizonstalRef = React.useRef(null);
+    const paginationProps = {
+        pageSize,
+        pageCount,
+        pageIndex,
+        pageOptions,
+        canPreviousPage,
+        canNextPage,
+        gotoPage,
+        previousPage,
+        nextPage,
+        setPageSize,
+    };
+    const horizonstalRef = useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
@@ -679,36 +683,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     </table>
                 </ScrollContainer>
             </Styles>
-            <Footer>
-                <span>
-                    <Typography variant="subtitle">Rows per page:</Typography>
-                    <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}>
-                        {[10, 25, 50].map(pageSize => (
-                            <option key={pageSize} value={pageSize}>
-                                {pageSize}
-                            </option>
-                        ))}
-                    </select>
-                </span>
-                <Typography variant="subtitle">
-                    Page
-                    <strong>
-                        {pageIndex + 1} of {pageOptions.length}
-                    </strong>
-                </Typography>
-                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-                    <SkipToBeginning fontSize="small" />
-                </button>
-                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-                    Previous
-                </button>
-                <button onClick={() => nextPage()} disabled={!canNextPage}>
-                    Next
-                </button>
-                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-                    <SkipToEnd fontSize="small" />
-                </button>
-            </Footer>
+
+            <Footer props={paginationProps} />
         </>
     );
 };
