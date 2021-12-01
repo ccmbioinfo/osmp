@@ -13,32 +13,17 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin-bottom: ${props => props.theme.space[4]};
 `;
-interface StylesProps {
-    isScrolling: boolean;
-}
 
-export const Styles = styled.div<StylesProps>`
+export const Styles = styled.div`
     padding: 1rem;
     display: block;
     max-width: 100%;
     max-height: 60vh;
-    overflow: scroll;
 
-    ${props =>
-        !props.isScrolling
-            ? `
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-        ::-webkit-scrollbar {
-            width: 0 !important;
-        }
-    `
-            : ''}
-
-    > div > table {
+    table {
         width: 100%;
         border-spacing: 0;
-        transform: rotateX(180deg);
+        border-collapse: collapse;
 
         .tr {
             transition: all 0.3s ease-out;
@@ -49,10 +34,9 @@ export const Styles = styled.div<StylesProps>`
             }
         }
 
-        thead,
-        th {
+        thead {
             position: sticky;
-            top: -40px;
+            top: -10px;
             z-index: 999;
             background: white;
         }

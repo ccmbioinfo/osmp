@@ -21,10 +21,10 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
-import './dragscroll.css';
+//import './dragscroll.css';
 import HEADERS from '../../constants/headers';
 import SOURCES from '../../constants/sources';
-import { downloadCsv, useOverflow } from '../../hooks';
+import { downloadCsv } from '../../hooks';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -479,10 +479,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const horizontalRef = React.useRef(null);
-    const verticalRef = React.useRef(null);
-    const { isScrolling } = useOverflow(verticalRef);
-
     const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
 
@@ -619,15 +615,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         ))}
                 </TableFilters>
             )}
-
-            <Styles className="scroll-inactive" isScrolling={isScrolling} ref={verticalRef}>
-                {/* If not overflowing, top scrollbar is not shown.  */}
-                <ScrollContainer
-                    className="container"
-                    ignoreElements="p"
-                    // hideScrollbars={!refXOverflowing}
-                >
-                    <table {...getTableProps()} ref={horizontalRef}>
+            <ScrollContainer
+                className="container"
+                ignoreElements="p"
+                hideScrollbars={false}
+                vertical={false}
+            >
+                <Styles>
+                    <table {...getTableProps()}>
                         <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
@@ -757,8 +752,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             )}
                         </tbody>
                     </table>
-                </ScrollContainer>
-            </Styles>
+                </Styles>
+            </ScrollContainer>
             <Footer>
                 <span>
                     <Typography variant="subtitle">Rows per page:</Typography>
