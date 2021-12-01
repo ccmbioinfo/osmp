@@ -386,6 +386,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
+    console.log('filters', filters);
+
     const horizonstalRef = useRef(null);
     const { refXOverflowing } = useOverflow(horizonstalRef);
 

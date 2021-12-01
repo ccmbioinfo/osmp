@@ -65,6 +65,7 @@ export function ColumnFilter<T extends {}>({
                     value={input}
                     placeholder={placeholder}
                     onChange={e => {
+                        console.log(e);
                         handleChange(e.target.value);
                     }}
                 />

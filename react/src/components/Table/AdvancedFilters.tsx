@@ -41,7 +41,7 @@ export default function AdvancedFilters<T extends {}>({
                                     ? FILTER_OPTIONS[v.id as keyof ResultTableColumns]
                                     : undefined
                             }
-                            setFilter={setFilter.bind(null, v.id as string)}
+                            setFilter={setFilter}
                             type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
                             columnId={v.id as IdType<ResultTableColumns>}
                         />

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { ColumnInstance, HeaderGroup, Row, UseTableInstanceProps } from 'react-table';
 import { downloadCsv } from '../../hooks';
+import { camelize } from '../../utils';
 import { Button, Checkbox, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';
-import { camelize } from '../../utils';
 
 interface ColumnVisibilityModalProps<T extends object>
     extends Pick<UseTableInstanceProps<T>, 'toggleHideColumn'> {
