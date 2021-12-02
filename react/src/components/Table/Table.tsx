@@ -428,11 +428,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
-            <ScrollContainer
-                ignoreElements="p"
-                hideScrollbars={false}
-                vertical={false}
-            >
+            <ScrollContainer ignoreElements="p" hideScrollbars={false} vertical={false}>
                 <Styles>
                     <table {...getTableProps()}>
                         <THead>

@@ -37,6 +37,8 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
         auto: true,
     });
 
+    const { style, ...restLayerProps } = layerProps;
+
     return (
         <>
             <div {...triggerProps} onClick={onClick}>
@@ -47,7 +49,7 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
                     <Wrapper>
                         {isOpen && (
                             <Container
-                                {...layerProps}
+                                {...restLayerProps}
                                 initial={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate from
                                 animate={{ opacity: 1, scale: 1, x: 0, y: 0 }} // animate to
                                 exit={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate exit
@@ -56,6 +58,7 @@ const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsid
                                     stiffness: 800,
                                     damping: 35,
                                 }}
+                                style={{ ...style, ...{ zIndex: 999 } }}
                             >
                                 {children}
                             </Container>

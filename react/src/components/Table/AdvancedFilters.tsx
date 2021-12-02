@@ -1,7 +1,6 @@
 import { ColumnGroup, Filters, IdType, Row, UseFiltersInstanceProps } from 'react-table';
 import SOURCES from '../../constants/sources';
 import { Column, Typography } from '../index';
-import './dragscroll.css';
 import { ResultTableColumns } from './Table';
 import { TableFilters } from './Table.styles';
 import { ColumnFilter } from './TableFilter/ColumnFilter';
