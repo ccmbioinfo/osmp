@@ -1,21 +1,20 @@
 import { isNullOrUndefined } from 'util';
 import React, { useState } from 'react';
-import { Row } from 'react-table';
+import { IdType, UseFiltersColumnProps, UseFiltersInstanceProps } from 'react-table';
 import { ComboBox } from '../..';
-import { ResultTableColumns } from '../Table';
 import { DefaultFilter } from './ColumnFilter';
 
-interface SelectionFilterProps {
-    setFilter: (filterValue: any) => void;
-    columnId: keyof ResultTableColumns;
+interface SelectionFilterProps<T extends {}>
+    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows'>,
+        Pick<UseFiltersColumnProps<T>, 'setFilter'> {
+    columnId: IdType<T>;
     options?: string[];
     filter?: DefaultFilter<string | string[]>;
     isMulti?: boolean;
     searchable?: boolean;
-    preFilteredRows: Row<ResultTableColumns>[];
 }
 
-const SelectionFilter: React.FC<SelectionFilterProps> = ({
+export function SelectionFilter<T extends {}>({
     setFilter,
     columnId,
     options,
@@ -23,7 +22,7 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
     isMulti,
     searchable,
     preFilteredRows,
-}) => {
+}: SelectionFilterProps<T>) {
     const [searchTerm, setSearchTerm] = useState<string>('');
 
     // If no explicit list of options is provided, we dynamically calculate the options from the table query results.
@@ -75,6 +74,6 @@ const SelectionFilter: React.FC<SelectionFilterProps> = ({
             onChange={val => setSearchTerm(val || '')}
         />
     );
-};
+}
 
 export default SelectionFilter;

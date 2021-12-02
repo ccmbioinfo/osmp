@@ -37,7 +37,7 @@ export const Styles = styled.div`
         thead {
             position: sticky;
             top: -10px;
-            z-index: 999;
+            z-index: 5;
             background: white;
         }
 

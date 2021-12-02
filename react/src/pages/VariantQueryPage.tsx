@@ -20,10 +20,10 @@ import {
     Typography,
 } from '../components';
 import SOURCES from '../constants/sources';
-import { resolveAssembly, useErrorContext, useFormReducer } from '../hooks';
+import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
-import { formatErrorMessage } from '../utils';
+import { formatErrorMessage, resolveAssembly } from '../utils';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {

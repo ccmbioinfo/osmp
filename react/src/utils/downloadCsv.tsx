@@ -1,4 +1,3 @@
-import { ResultTableColumns } from '../components/Table/Table';
 import getKeys from '../utils/getKeys';
 
 const objectToCsv = <T extends object>(data: T[]) => {
@@ -34,7 +33,7 @@ const download = (data: BlobPart) => {
  * @param headers A list of column ids that user wants to download
  */
 
-const downloadCsv = (rows: ResultTableColumns[], selectedHeaders: (keyof ResultTableColumns)[]) => {
+const downloadCsv = <T extends object>(rows: T[], selectedHeaders: (keyof T)[]) => {
     const selectedRows = rows.map(r =>
         selectedHeaders.reduce((acc, curr) => ({ ...acc, ...{ [curr]: r[curr] } }), {})
     );

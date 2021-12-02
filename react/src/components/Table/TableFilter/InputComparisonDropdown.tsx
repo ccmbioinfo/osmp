@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
+import { UseFiltersColumnProps } from 'react-table';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
 import { IconButton } from '../../index';
@@ -19,9 +20,9 @@ export type ComparisonOption = {
 
 export type FilterComparison = { [K in keyof ResultTableColumns]?: ComparisonType };
 
-interface InputComparisonDropdownProps {
+interface InputComparisonDropdownProps<T extends {}>
+    extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;
-    setFilter: (filterValue: any) => void;
 }
 
 const Icons = Object.freeze({
@@ -48,10 +49,10 @@ const COMPARISON_OPTIONS: ComparisonOption[] = [
     },
 ];
 
-export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = ({
+export function InputComparisonDropdown<T extends {}>({
     setFilterComparison,
     setFilter,
-}) => {
+}: InputComparisonDropdownProps<T>) {
     const [open, setOpen] = useState(false);
     const [sign, setSign] = useState<keyof ComparisonType>('equal');
 
@@ -98,4 +99,4 @@ export const InputComparisonDropdown: React.FC<InputComparisonDropdownProps> = (
             )}
         </div>
     );
-};
+}
