@@ -429,7 +429,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 />
             )}
             <ScrollContainer
-                className="container"
                 ignoreElements="p"
                 hideScrollbars={false}
                 vertical={false}
