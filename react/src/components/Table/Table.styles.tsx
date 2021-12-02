@@ -11,18 +11,19 @@ export const CellText = styled.span`
 
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
-    margin: 0;
+    margin-bottom: ${props => props.theme.space[4]};
 `;
 
 export const Styles = styled.div`
     padding: 1rem;
     display: block;
     max-width: 100%;
+    max-height: 60vh;
 
-    > div > table {
+    table {
         width: 100%;
         border-spacing: 0;
-        transform: rotateX(180deg);
+        border-collapse: collapse;
 
         .tr {
             transition: all 0.3s ease-out;
@@ -31,6 +32,13 @@ export const Styles = styled.div`
                     border-bottom: 0;
                 }
             }
+        }
+
+        thead {
+            position: sticky;
+            top: -10px;
+            z-index: 999;
+            background: white;
         }
 
         th,
@@ -52,8 +60,6 @@ export const Styles = styled.div`
         }
 
         tbody {
-            max-height: 60vh;
-            overflow: scroll;
             display: block;
         }
     }

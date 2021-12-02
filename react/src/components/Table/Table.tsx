@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
@@ -17,7 +17,6 @@ import {
     useTable,
 } from 'react-table';
 import HEADERS from '../../constants/headers';
-import { useOverflow } from '../../hooks';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -37,7 +36,6 @@ import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
-import './dragscroll.css';
 import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
@@ -387,11 +385,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    console.log('filters', filters);
-
-    const horizonstalRef = useRef(null);
-    const { refXOverflowing } = useOverflow(horizonstalRef);
-
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
@@ -435,15 +428,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
-
-            <Styles>
-                {/* If not overflowing, top scrollbar is not shown.  */}
-                <ScrollContainer
-                    className="container"
-                    hideScrollbars={!refXOverflowing}
-                    ignoreElements="p"
-                >
-                    <table {...getTableProps()} ref={horizonstalRef}>
+            <ScrollContainer
+                className="container"
+                ignoreElements="p"
+                hideScrollbars={false}
+                vertical={false}
+            >
+                <Styles>
+                    <table {...getTableProps()}>
                         <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
@@ -573,8 +565,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             )}
                         </tbody>
                     </table>
-                </ScrollContainer>
-            </Styles>
+                </Styles>
+            </ScrollContainer>
 
             <Footer
                 props={{
