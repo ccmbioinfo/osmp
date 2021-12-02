@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { ColumnInstance, HeaderGroup, Row, UseTableInstanceProps } from 'react-table';
-import { downloadCsv } from '../../hooks';
+import { downloadCsv } from '../../utils';
 import { camelize } from '../../utils';
 import { Button, Checkbox, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';

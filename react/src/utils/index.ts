@@ -1,6 +1,8 @@
 import camelize from './camelize';
+import downloadCsv from './downloadCsv';
 import formatErrorMessage from './formatErrorMessage';
 import getKeys from './getKeys';
+import resolveAssembly from './resolveAssembly';
 import {
     addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
@@ -10,12 +12,14 @@ import {
 } from './tableHelpers';
 
 export {
-    camelize,
-    isHeader,
-    isHeaderExpanded,
-    flattenBaseResults,
     addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
+    camelize,
+    downloadCsv,
+    flattenBaseResults,
     formatErrorMessage,
     getKeys,
+    isHeader,
+    isHeaderExpanded,
+    resolveAssembly,
 };
