@@ -1,49 +1,94 @@
-import { addMocksToSchema } from '@graphql-tools/mock';
 import { makeExecutableSchema } from '@graphql-tools/schema';
+import {
+  G4RDQueryResult,
+  transformG4RDQueryResponse,
+} from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
 import typeDefs from '../../src/typeDefs';
-import { testGraphQLQuery } from '../testGraphQLQuery';
 import { CombinedVariantQueryResponse } from '../../src/types';
+import { addMocksToSchema } from '@graphql-tools/mock';
+import { testGraphQLQuery } from '../testGraphQLQuery';
+
+/* an around the world test here would validate the transformer and pass it to the schema */
+
+const testResponse: G4RDQueryResult = {
+  exists: true,
+  numTotalResults: 1,
+  results: [
+    {
+      variant: {
+        variantId: 'rs201202918',
+        assemblyId: 'GRCh37',
+        refseqId: 'NM_001304829.2',
+        start: 100573569,
+        end: 100573569,
+        ref: 'G',
+        alt: 'A',
+        callsets: [
+          {
+            callsetId: '12345.sample-singleton-report.csv',
+            individualId: '12345',
+            info: { ad: 4, dp: 13, qual: 62.8, zygosity: 'heterozygous' },
+          },
+        ],
+        info: {
+          geneName: 'SASS6',
+          aaChanges: 'NA',
+          transcript: 'ENST00000287482',
+          gnomadHom: 0,
+          cdna: 'c.361-9C>T',
+        },
+      },
+      individual: {
+        individualId: '12345',
+        diseases: [],
+        phenotypicFeatures: [
+          { phenotypeId: 'HP:0002140', levelSeverity: null },
+          { phenotypeId: 'HP:0002326', levelSeverity: null },
+          { phenotypeId: 'HP:0012158', levelSeverity: null },
+        ],
+        sex: 'NCIT:C46112',
+      },
+      contactInfo: 'Test User',
+    },
+  ],
+};
+
+const transformed = transformG4RDQueryResponse(testResponse, '1:1234');
 
 /**
  * Confirm that variant query schema performs and validates as expected
  */
-describe('Test minimal getVariants query', () => {
+describe('Test g4rd query response transformer', () => {
   const GetVariants = `
     query GetVariants($input: QueryInput) {
       getVariants(input: $input) {
         data {
           variant {
             alt
+            assemblyId
             callsets {
               callsetId
               individualId
               info {
                 ad
                 dp
-                gq
                 qual
                 zygosity
               }
             }
             end
             info {
-              af
-              aaAlt
-              aaPos
-              aaRef
               cdna
-              consequence
               geneName
-              gnomadHet
               gnomadHom
               transcript
             }
             ref
             referenceName
             start
+            variantId
           }
           individual {
-            datasetId
             diseases {
               ageOfOnset {
                 age
@@ -55,22 +100,9 @@ describe('Test minimal getVariants query', () => {
               outcome
               stage
             }
-            ethnicity
-            geographicOrigin
             individualId
-            info {
-              diagnosis
-              candidateGene
-              classifications
-            }
             phenotypicFeatures {
-              ageOfOnset {
-                age
-                ageGroup
-              }
-              dateOfOnset
               levelSeverity
-              onsetType
               phenotypeId
             }
             sex
@@ -92,9 +124,8 @@ describe('Test minimal getVariants query', () => {
 
   it('issues a valid query', async () => {
     const schema = makeExecutableSchema({ typeDefs });
-    // the bare minimum acceptable response object
     const mockResponse: CombinedVariantQueryResponse = {
-      data: [],
+      data: transformed,
       errors: [],
     };
 
@@ -105,7 +136,6 @@ describe('Test minimal getVariants query', () => {
     const schemaWithMocks = addMocksToSchema({
       schema,
       mocks,
-      preserveResolvers: false,
     });
 
     const queryResponse = await testGraphQLQuery({

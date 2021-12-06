@@ -22,7 +22,7 @@ export interface CallsetInfoFields {
 }
 
 export interface CallSet {
-  callSetId: string;
+  callsetId: string;
   individualId: string;
   info: CallsetInfoFields;
 }
@@ -38,6 +38,7 @@ export interface VariantResponseFields {
   ref: string;
   referenceName: string;
   start: number;
+  variantId?: Maybe<string>;
   variantType?: Maybe<string>;
 }
 
@@ -89,7 +90,7 @@ export interface VariantQueryDataResult {
 
 export interface VariantQueryInput {
   assemblyId: AssemblyId;
-  maxFrequency?: number;
+  maxFrequency: number;
 }
 
 export interface GeneQueryInput {
@@ -107,6 +108,18 @@ export interface QueryInput {
 }
 
 /* end graphql schema types */
+
+/* start OpenAPI schema types */
+
+type OAQueryResponseResult = Omit<VariantQueryDataResult, 'source'>;
+
+export interface OAQueryResponse {
+  exists: boolean;
+  numTotalResults: number;
+  results: OAQueryResponseResult[];
+}
+
+/* end OpenAPI Schema types */
 
 export interface VariantCoordinate {
   alt: string;
@@ -162,9 +175,9 @@ export interface GqlContext {
   res: Response;
 }
 
-export type ResultTransformer<T> = (args: T | null) => VariantQueryDataResult[];
+export type ResultTransformer<T> = (model: T, ...args: any[]) => VariantQueryDataResult[];
 
-export type ErrorTransformer<T> = (args: T | null) => ErrorResponse | undefined;
+export type ErrorTransformer<T> = (model: T | null) => ErrorResponse | undefined;
 
 export enum Assembly {
   GRCh37 = 37,
