@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Row, useAsyncDebounce } from 'react-table';
+import {
+    IdType,
+    useAsyncDebounce,
+    UseFiltersColumnProps,
+    UseFiltersInstanceProps,
+} from 'react-table';
 import { Column, Input } from '../..';
-import { ResultTableColumns } from '../Table';
 import NumberRangeFilter from './NumberRangeFilter';
 import SelectionFilter from './SelectionFilter';
 
@@ -10,23 +14,23 @@ export type DefaultFilter<T> = {
     value: T;
 };
 
-interface ColumnFilterProps {
-    columnId: keyof ResultTableColumns;
+interface ColumnFilterProps<T extends {}>
+    extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows'>,
+        Pick<UseFiltersColumnProps<T>, 'setFilter'> {
+    columnId: IdType<T>;
     filterModel?: DefaultFilter<string | string[] | number | number[]>;
     options?: string[];
-    preFilteredRows: Row<ResultTableColumns>[];
-    setFilter: (filterValue: any) => void;
     type?: 'singleSelect' | 'multiSelect' | 'text' | 'between';
 }
 
-export const ColumnFilter: React.FC<ColumnFilterProps> = ({
+export function ColumnFilter<T extends {}>({
     columnId,
     filterModel,
     options,
     preFilteredRows,
     setFilter,
     type,
-}) => {
+}: ColumnFilterProps<T>) {
     const [input, setInput] = useState<string>('');
 
     useEffect(() => {
@@ -64,6 +68,7 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
                     value={input}
                     placeholder={placeholder}
                     onChange={e => {
+                        console.log('hello');
                         handleChange(e.target.value);
                     }}
                 />
@@ -72,4 +77,4 @@ export const ColumnFilter: React.FC<ColumnFilterProps> = ({
     };
 
     return <Column>{resolveComponent()}</Column>;
-};
+}

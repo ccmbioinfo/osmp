@@ -1,17 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-    BsFillCaretDownFill,
-    BsFillCaretUpFill,
-    BsFillEyeFill,
-    BsFillEyeSlashFill,
-    BsFilter,
-} from 'react-icons/bs';
+import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
     HeaderGroup,
+    IdType,
     Row,
     useExpanded,
     useFilters,
@@ -21,10 +16,7 @@ import {
     useSortBy,
     useTable,
 } from 'react-table';
-import './dragscroll.css';
 import HEADERS from '../../constants/headers';
-import SOURCES from '../../constants/sources';
-import { downloadCsv, useOverflow } from '../../hooks';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -33,22 +25,20 @@ import {
     VariantResponseFields,
     VariantResponseInfoFields,
 } from '../../types';
-import { Button, Checkbox, Column, Flex, InlineFlex, Modal, Tooltip, Typography } from '../index';
-import { CellPopover } from './CellPopover';
-import './dragscroll.css';
-import PhenotypeViewer from './PhenotypeViewer';
 import {
-    CellText,
-    Footer,
-    IconPadder,
-    SkipToBeginning,
-    SkipToEnd,
-    Styles,
-    TableFilters,
-    TH,
-    THead,
-} from './Table.styles';
-import { ColumnFilter } from './TableFilter/ColumnFilter';
+    addAdditionalFieldsAndFormatNulls,
+    calculateColumnWidth,
+    flattenBaseResults,
+    isHeader,
+    isHeaderExpanded,
+} from '../../utils';
+import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
+import AdvancedFilters from './AdvancedFilters';
+import { CellPopover } from './CellPopover';
+import ColumnVisibilityModal from './ColumnVisibilityModal';
+import Footer from './Footer/Footer';
+import PhenotypeViewer from './PhenotypeViewer';
+import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
 
 interface TableProps {
@@ -65,56 +55,11 @@ export type FlattenedQueryResponse = Omit<
     > &
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
-
-/* flatten all but callsets field */
-const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
-    const { contactInfo, source } = result;
-    const { callsets, info: variantInfo, ...restVariant } = result.variant;
-    const {
-        diseases,
-        info: individualInfo,
-        phenotypicFeatures,
-        ...restIndividual
-    } = result.individual;
-    const flattenedDiseases = (diseases || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
-        ''
-    );
-    const flattenedPhenotypes = (phenotypicFeatures || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
-        ''
-    );
-
-    return {
-        contactInfo,
-        diseases: flattenedDiseases,
-        ...individualInfo,
-        phenotypes: flattenedPhenotypes,
-        ...restIndividual,
-        ...restVariant,
-        source,
-        ...variantInfo,
-    };
-};
 export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
 }
-
-const addAdditionalFieldsAndFormatNulls = (results: FlattenedQueryResponse): ResultTableColumns => {
-    const reformatted = Object.fromEntries(
-        Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
-    ) as FlattenedQueryResponse;
-    return {
-        ...reformatted,
-        emptyCaseDetails: '',
-        emptyVariationDetails: '',
-        aaChange: reformatted.aaPos?.trim()
-            ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
-            : '',
-    };
-};
 
 /* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
 const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
@@ -135,13 +80,8 @@ const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[
     });
 };
 
-const FILTER_OPTIONS: { [K in keyof ResultTableColumns]?: string[] } = {
-    source: SOURCES,
-};
-
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
-    const [showModal, setShowModal] = useState<Boolean>(false);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
     const sortByArray = useMemo(
@@ -154,25 +94,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    /**
-     * The way react-table is set up is if all columns are hidden, the header group will disappear.
-     * This is undesired because user may want to re-expand the column.
-     * The workaround for this is to keep some columns with fixed visibility.
-     */
-    const fixedColumns = React.useMemo(
-        () => ['core', 'chromosome', 'referenceName', 'alt', 'ref', 'start', 'end', 'source'],
-        []
-    );
-
-    const dummyColumns = React.useMemo(() => ['emptyVariationDetails', 'emptyCaseDetails'], []);
-
-    const columnsWithoutFilters = React.useMemo(() => ['contactInfo', 'chromosome'], []);
-
-    const filterTypes = React.useMemo(
+    const filterTypes = useMemo(
         () => ({
             multiSelect: (
                 rows: Row<ResultTableColumns>[],
-                columnIds: string[],
+                columnIds: IdType<ResultTableColumns>[],
                 filterValue: string[]
             ) =>
                 filterValue.length
@@ -182,40 +108,35 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         []
     );
 
-    type Accessor = string | (() => JSX.Element) | ((state: any) => any);
-
     // Dynamically adjust column width based on cell's longest text.
-    const getColumnWidth = React.useCallback(
-        (data: ResultTableColumns[], accessor: Accessor, headerText: string) => {
-            if (typeof accessor === 'string') {
-                accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
-            }
-            const maxWidth = 600;
-            const magicSpacing = 10;
-            const cellLength = Math.max(
-                ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
-                headerText.length
-            );
-            return Math.min(maxWidth, cellLength * magicSpacing);
-        },
-        []
-    );
+    const getColumnWidth = React.useCallback(calculateColumnWidth, []);
 
-    const columns = React.useMemo(
+    const getChildColumns = (groupId: string) => {
+        const targetGroup = columns.find(header => header.id === groupId);
+        if (targetGroup) {
+            return targetGroup.columns.filter(c => c.type !== 'empty').map(c => c.id) as string[];
+        } else throw new Error(`Group ${groupId} not found!`);
+    };
+
+    const columns = useMemo(
         (): ColumnGroup<ResultTableColumns>[] => [
             {
                 Header: 'Core',
                 id: 'core',
+                type: 'fixed',
                 columns: [
                     {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
+                        type: 'fixed',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                        disableFilters: true,
                     },
                     {
                         accessor: 'start',
                         id: 'start',
+                        type: 'fixed',
                         Header: 'Start',
                         width: getColumnWidth(tableData, 'start', 'Start'),
                         filter: 'between',
@@ -223,6 +144,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'end',
                         id: 'end',
+                        type: 'fixed',
                         Header: 'End',
                         width: getColumnWidth(tableData, 'end', 'End'),
                         filter: 'between',
@@ -232,21 +154,21 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
-                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                        type: 'fixed',
                     },
                     {
                         accessor: 'alt',
                         Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
-                        width: getColumnWidth(tableData, 'alt', 'Alt'),
+                        type: 'fixed',
                     },
                     {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
+                        type: 'fixed',
                         Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
-                        width: getColumnWidth(tableData, 'source', 'Source'),
                     },
                 ],
             },
@@ -256,6 +178,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 columns: [
                     {
                         id: 'emptyVariationDetails',
+                        type: 'empty',
                         Header: '',
                         disableSortBy: true,
                         width: 79,
@@ -264,7 +187,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'af',
                         id: 'af',
                         Header: <Tooltip helperText={HEADERS['af']}>gnomad_exome_AF</Tooltip>,
-                        width: 110,
+                        width: getColumnWidth(tableData, 'af', 'gnomad_exome_AF'),
                         filter: 'between',
                     },
                     {
@@ -298,6 +221,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 columns: [
                     {
                         id: 'emptyCaseDetails',
+                        type: 'empty',
                         Header: '',
                         disableSortBy: true,
                         width: 70,
@@ -312,19 +236,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'dp',
                         id: 'dp',
                         Header: 'DP',
-                        width: getColumnWidth(tableData, 'dp', 'DP'),
                     },
                     {
                         accessor: 'ad',
                         id: 'ad',
                         Header: 'AD',
-                        width: getColumnWidth(tableData, 'ad', 'AD'),
                     },
                     {
                         accessor: 'gq',
                         id: 'gq',
                         Header: 'GQ',
-                        width: getColumnWidth(tableData, 'gq', 'GQ'),
                     },
                     {
                         accessor: 'ethnicity',
@@ -343,21 +264,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             ></PhenotypeViewer>
                         ),
                         Header: 'Phenotypes',
-                        width: getColumnWidth(
-                            tableData,
-                            state =>
-                                (state.phenotypicFeatures || [])
-                                    .map((p: any) => p.phenotypeId)
-                                    .join(', '),
-                            'Phenotypes'
-                        ),
+                        width: getColumnWidth(tableData, 'phenotypes', 'Phenotypes'),
                     },
                     {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: <Tooltip helperText={HEADERS['sex']}>Sex</Tooltip>,
-                        width: getColumnWidth(tableData, 'sex', 'Sex'),
                         Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
                     },
                     {
@@ -407,6 +320,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'contactInfo',
                         Header: <Tooltip helperText={HEADERS['contactInfo']}>Contact</Tooltip>,
                         width: 120,
+                        disableFilters: true,
                     },
                 ],
             },
@@ -414,7 +328,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         [getColumnWidth, tableData]
     );
 
-    const defaultColumn = React.useMemo(
+    const defaultColumn = useMemo(
         () => ({
             minWidth: 10,
             width: 60,
@@ -422,15 +336,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         }),
         []
     );
-
-    const getChildColumns = (groupId: string) => {
-        const targetGroup = columns.find(header => header.id === groupId);
-        if (targetGroup) {
-            return targetGroup.columns
-                .map(c => c.id)
-                .filter(id => id && !dummyColumns.includes(id)) as string[];
-        } else throw new Error(`Group ${groupId} not found!`);
-    };
 
     const tableInstance = useTable(
         {
@@ -480,22 +385,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter, pageIndex, pageSize } = state;
 
-    const horizonstalRef = React.useRef(null);
-    const { refXOverflowing } = useOverflow(horizonstalRef);
-
-    const handleGroupChange = (g: HeaderGroup<ResultTableColumns>) =>
-        g.columns?.map(c => !fixedColumns.includes(c.id) && toggleHideColumn(c.id, c.isVisible));
-
-    const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
-
-    const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
-        if (isHeader(column) && column.columns && column.Header !== 'Core') {
-            const visibleColumns = column.columns.filter(c => c.isVisible).map(c => c.id);
-            const intersection = visibleColumns.filter(value => dummyColumns.includes(value));
-            return !intersection.length;
-        }
-        return false;
-    };
+    const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
+        g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
     return (
         <>
@@ -519,115 +410,27 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Clear all filters
                     </Button>
                 </InlineFlex>
-                <InlineFlex>
-                    <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
-                        Customize columns
-                        <IconPadder>
-                            {showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}
-                        </IconPadder>
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() =>
-                            downloadCsv(
-                                rows.map(r => r.values as ResultTableColumns),
-                                visibleColumns
-                                    .filter(c => c.id && !c.id.match(/^empty/i))
-                                    .map(c => c.id as keyof ResultTableColumns)
-                            )
-                        }
-                    >
-                        Export Data
-                    </Button>
-                    <Modal
-                        active={showModal}
-                        hideModal={() => setShowModal(false)}
-                        title="Customize Columns"
-                    >
-                        {headerGroups[0].headers
-                            .filter(header => header.Header !== 'Core')
-                            .map((g, id) => (
-                                <div key={id}>
-                                    <Checkbox
-                                        label={g.Header as string}
-                                        checked={g.isVisible}
-                                        onClick={() => handleGroupChange(g)}
-                                    />
-                                    {g.columns?.map(
-                                        (c, id) =>
-                                            !fixedColumns.includes(c.id) &&
-                                            !dummyColumns.includes(c.id) && (
-                                                <div key={id} style={{ paddingLeft: 20 }}>
-                                                    <Checkbox
-                                                        label={c.Header as string}
-                                                        checked={c.isVisible}
-                                                        onClick={() => {
-                                                            if (
-                                                                c.parent &&
-                                                                g.columns?.filter(c => c.isVisible)
-                                                                    .length === 1
-                                                            ) {
-                                                                toggleHideColumn(c.id, c.isVisible);
-                                                                toggleHideColumn(
-                                                                    'empty' + c.parent.id,
-                                                                    !c.isVisible
-                                                                );
-                                                            } else {
-                                                                toggleHideColumn(c.id, c.isVisible);
-                                                            }
-                                                        }}
-                                                    />
-                                                </div>
-                                            )
-                                    )}
-                                </div>
-                            ))}
-                    </Modal>
-                </InlineFlex>
+
+                <ColumnVisibilityModal
+                    rows={rows}
+                    headerGroups={headerGroups}
+                    toggleGroupVisibility={toggleGroupVisibility}
+                    toggleHideColumn={toggleHideColumn}
+                    visibleColumns={visibleColumns}
+                />
             </TableFilters>
 
             {advancedFiltersOpen && (
-                <TableFilters justifyContent="flex-start" alignItems="flex-start">
-                    {columns
-                        .flatMap(c => c.columns)
-                        .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
-                        .filter(
-                            c =>
-                                !!c.id && !dummyColumns.concat(columnsWithoutFilters).includes(c.id)
-                        )
-                        .map((v, i) => (
-                            <Column key={i}>
-                                <Typography variant="subtitle" bold>
-                                    {v.Header}
-                                </Typography>
-                                <ColumnFilter
-                                    preFilteredRows={preFilteredRows}
-                                    filterModel={filters.find(f => f.id === v.id)}
-                                    options={
-                                        !!(
-                                            !!v.id &&
-                                            !!FILTER_OPTIONS[v.id as keyof ResultTableColumns]
-                                        )
-                                            ? FILTER_OPTIONS[v.id as keyof ResultTableColumns]
-                                            : undefined
-                                    }
-                                    setFilter={setFilter.bind(null, v.id as string)}
-                                    type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
-                                    columnId={v.id as keyof ResultTableColumns}
-                                />
-                            </Column>
-                        ))}
-                </TableFilters>
+                <AdvancedFilters
+                    columns={columns}
+                    preFilteredRows={preFilteredRows}
+                    filters={filters}
+                    setFilter={setFilter}
+                />
             )}
-
-            <Styles>
-                {/* If not overflowing, top scrollbar is not shown.  */}
-                <ScrollContainer
-                    className="container"
-                    hideScrollbars={!refXOverflowing}
-                    ignoreElements="p"
-                >
-                    <table {...getTableProps()} ref={horizonstalRef}>
+            <ScrollContainer ignoreElements="p" hideScrollbars={false} vertical={false}>
+                <Styles>
+                    <table {...getTableProps()}>
                         <THead>
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
@@ -680,7 +483,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 <CgArrowsMergeAltH
                                                                                     size={18}
                                                                                     onClick={() =>
-                                                                                        handleGroupChange(
+                                                                                        toggleGroupVisibility(
                                                                                             column
                                                                                         )
                                                                                     }
@@ -691,7 +494,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 <CgArrowsShrinkH
                                                                                     size={18}
                                                                                     onClick={() =>
-                                                                                        handleGroupChange(
+                                                                                        toggleGroupVisibility(
                                                                                             column
                                                                                         )
                                                                                     }
@@ -757,38 +560,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             )}
                         </tbody>
                     </table>
-                </ScrollContainer>
-            </Styles>
-            <Footer>
-                <span>
-                    <Typography variant="subtitle">Rows per page:</Typography>
-                    <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}>
-                        {[10, 25, 50].map(pageSize => (
-                            <option key={pageSize} value={pageSize}>
-                                {pageSize}
-                            </option>
-                        ))}
-                    </select>
-                </span>
-                <Typography variant="subtitle">
-                    Page
-                    <strong>
-                        {pageIndex + 1} of {pageOptions.length}
-                    </strong>
-                </Typography>
-                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-                    <SkipToBeginning fontSize="small" />
-                </button>
-                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-                    Previous
-                </button>
-                <button onClick={() => nextPage()} disabled={!canNextPage}>
-                    Next
-                </button>
-                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-                    <SkipToEnd fontSize="small" />
-                </button>
-            </Footer>
+                </Styles>
+            </ScrollContainer>
+
+            <Footer
+                props={{
+                    pageSize,
+                    pageCount,
+                    pageIndex,
+                    pageOptions,
+                    canPreviousPage,
+                    canNextPage,
+                    gotoPage,
+                    previousPage,
+                    nextPage,
+                    setPageSize,
+                }}
+            />
         </>
     );
 };

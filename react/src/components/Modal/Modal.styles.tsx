@@ -12,7 +12,7 @@ export const ModalBlock = styled.div`
     top: 0;
     display: flex;
     opacity: 1;
-    z-index: 400;
+    z-index: 999;
 `;
 
 export const ModalOverlay = styled.a`
@@ -42,7 +42,7 @@ export const ModalContainer = styled.div`
     padding: 0 1.75rem;
     width: 60vh;
     animation: slide-down 0.2s ease 1;
-    z-index: 1;
+    z-index: 999;
     box-shadow: 0 0.2rem 0.5rem rgba(48, 55, 66, 0.3);
 `;
 

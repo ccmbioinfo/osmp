@@ -28,6 +28,7 @@ const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
         color: theme.background.main,
         padding: `0 ${theme.space[1]}`,
         width: 200,
+        zIndex: 999,
     };
 
     let trigger;
