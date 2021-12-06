@@ -25,8 +25,8 @@ const testResponse: G4RDQueryResult = {
         alt: 'A',
         callsets: [
           {
-            callsetId: 'P0000002.sample-singleton-report-2199-sk0445-c-mz-removed.csv',
-            individualId: 'P0000002',
+            callsetId: '12345.sample-singleton-report.csv',
+            individualId: '12345',
             info: { ad: 4, dp: 13, qual: 62.8, zygosity: 'heterozygous' },
           },
         ],
@@ -39,7 +39,7 @@ const testResponse: G4RDQueryResult = {
         },
       },
       individual: {
-        individualId: 'P0000002',
+        individualId: '12345',
         diseases: [],
         phenotypicFeatures: [
           { phenotypeId: 'HP:0002140', levelSeverity: null },
