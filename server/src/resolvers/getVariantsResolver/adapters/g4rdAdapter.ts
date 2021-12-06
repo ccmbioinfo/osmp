@@ -68,8 +68,8 @@ const getG4rdNodeQuery = async (
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
   logger.debug(url);
   logger.debug(Authorization);
-  logger.debug(gene);
-  logger.debug(variant);
+  logger.debug(JSON.stringify(gene));
+  logger.debug(JSON.stringify(variant));
   try {
     G4RDNodeQueryResponse = await axios.post<G4RDQueryResult>(
       `${process.env.G4RD_URL}/rest/variants/match`,
@@ -151,8 +151,9 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
 export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
   response,
   position: string
-) =>
-  response.results.map(r => {
+) => {
+  logger.debug(JSON.stringify(response));
+  return response.results.map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
@@ -166,5 +167,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
 
     return { individual, variant, contactInfo, source: SOURCE_NAME };
   });
+};
 
 export default getG4rdNodeQuery;
