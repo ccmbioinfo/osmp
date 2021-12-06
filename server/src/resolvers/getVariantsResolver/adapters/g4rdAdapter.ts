@@ -65,6 +65,11 @@ const getG4rdNodeQuery = async (
       source: SOURCE_NAME,
     };
   }
+  const url = `${process.env.G4RD_URL}/rest/variants/match`;
+  logger.debug(url);
+  logger.debug(Authorization);
+  logger.debug(gene);
+  logger.debug(variant);
   try {
     G4RDNodeQueryResponse = await axios.post<G4RDQueryResult>(
       `${process.env.G4RD_URL}/rest/variants/match`,
