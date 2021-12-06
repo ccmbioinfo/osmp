@@ -160,7 +160,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
           assemblyId: 'GRCh37',
           callsets: [
             {
-              callSetId: Faker.random.alphaNumeric(10),
+              callsetId: Faker.random.alphaNumeric(10),
               individualId,
               info: {
                 ad: Faker.datatype.number({ min: 10000, max: 20000 }),

@@ -22,7 +22,7 @@ export interface CallsetInfoFields {
 }
 
 export interface CallSet {
-  callSetId: string;
+  callsetId: string;
   individualId: string;
   info: CallsetInfoFields;
 }
@@ -38,6 +38,7 @@ export interface VariantResponseFields {
   ref: string;
   referenceName: string;
   start: number;
+  variantId?: Maybe<string>;
   variantType?: Maybe<string>;
 }
 
@@ -174,9 +175,9 @@ export interface GqlContext {
   res: Response;
 }
 
-export type ResultTransformer<T> = (args: T) => VariantQueryDataResult[];
+export type ResultTransformer<T> = (model: T, ...args: any[]) => VariantQueryDataResult[];
 
-export type ErrorTransformer<T> = (args: T | null) => ErrorResponse | undefined;
+export type ErrorTransformer<T> = (model: T | null) => ErrorResponse | undefined;
 
 export enum Assembly {
   GRCh37 = 37,

@@ -9,7 +9,7 @@ const fetchVariantsQuery = gql`
                 variant {
                     alt
                     callsets {
-                        callSetId
+                        callsetId
                         individualId
                         info {
                             ad
@@ -35,6 +35,7 @@ const fetchVariantsQuery = gql`
                     ref
                     referenceName
                     start
+                    variantId
                 }
                 individual {
                     datasetId

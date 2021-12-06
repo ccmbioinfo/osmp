@@ -5,10 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../../../logger';
 import {
   ErrorTransformer,
-  OAQueryResponse,
+  IndividualResponseFields,
   QueryInput,
   ResultTransformer,
   VariantQueryResponse,
+  VariantResponseFields,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
 
@@ -19,15 +20,39 @@ const BEARER_CACHE_KEY = 'g4rdToken';
 
 type G4RDNodeQueryError = AxiosError<string>;
 
+type G4RDVariantBaseResponseFields = Omit<VariantResponseFields, 'referenceName'>;
+
+interface G4RDVariantInfoFields {
+  geneName: string;
+  aaChanges: string;
+  transcript: string;
+  gnomadHom: number;
+  cdna: string;
+}
+
+export interface G4RDQueryResult {
+  exists: boolean;
+  numTotalResults: number;
+  results: {
+    contactInfo: string;
+    individual: Pick<
+      IndividualResponseFields,
+      'individualId' | 'diseases' | 'sex' | 'phenotypicFeatures'
+    >;
+    variant: G4RDVariantBaseResponseFields & { refseqId: string } & { info: G4RDVariantInfoFields };
+  }[];
+}
+
 /**
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
  */
-const getG4rdNodeQuery = async ({
-  input: { gene, variant },
-}: QueryInput): Promise<VariantQueryResponse> => {
+const getG4rdNodeQuery = async (
+  { input: { gene, variant } }: QueryInput,
+  position: string
+): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
-  let G4RDNodeQueryResponse: null | AxiosResponse<OAQueryResponse> = null;
+  let G4RDNodeQueryResponse: null | AxiosResponse<G4RDQueryResult> = null;
   let Authorization = '';
   try {
     Authorization = await getAuthHeader();
@@ -41,7 +66,7 @@ const getG4rdNodeQuery = async ({
     };
   }
   try {
-    G4RDNodeQueryResponse = await axios.post<OAQueryResponse>(
+    G4RDNodeQueryResponse = await axios.post<G4RDQueryResult>(
       `${process.env.G4RD_URL}/rest/variants/match`,
       {
         gene,
@@ -56,7 +81,10 @@ const getG4rdNodeQuery = async ({
   }
 
   return {
-    data: transformG4RDQueryResponse((G4RDNodeQueryResponse?.data as OAQueryResponse) || []),
+    data: transformG4RDQueryResponse(
+      (G4RDNodeQueryResponse?.data as G4RDQueryResult) || [],
+      position
+    ),
     error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
     source: SOURCE_NAME,
   };
@@ -115,7 +143,23 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
   }
 };
 
-const transformG4RDQueryResponse: ResultTransformer<OAQueryResponse> = response =>
-  response.results.map(r => ({ ...r, source: SOURCE_NAME }));
+export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
+  response,
+  position: string
+) =>
+  response.results.map(r => {
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    const { refseqId, ...restVariant } = r.variant;
+    const { individual, contactInfo } = r;
+    const { aaChanges, ...restVariantInfo } = restVariant.info;
+
+    const variant: VariantResponseFields = {
+      ...restVariant,
+      info: restVariantInfo,
+      referenceName: position.split(':')[0],
+    };
+
+    return { individual, variant, contactInfo, source: SOURCE_NAME };
+  });
 
 export default getG4rdNodeQuery;

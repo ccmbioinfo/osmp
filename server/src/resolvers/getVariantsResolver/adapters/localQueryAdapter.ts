@@ -38,7 +38,7 @@ const getLocalQuery = async (): Promise<VariantQueryResponse> => {
   }
 
   return {
-    data: transformLocalQueryResponse(localQueryResponse),
+    data: transformLocalQueryResponse(localQueryResponse || []),
     error: transformLocalErrorResponse(localQueryError),
     source: 'local',
   };

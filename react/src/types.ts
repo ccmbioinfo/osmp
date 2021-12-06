@@ -23,7 +23,7 @@ export interface CallsetInfoFields {
 }
 
 export interface CallSet {
-    callSetId: string;
+    callsetId: string;
     individualId: string;
     info: CallsetInfoFields;
 }
@@ -39,6 +39,7 @@ export interface VariantResponseFields {
     ref: string;
     referenceName: string;
     start: number;
+    variantId?: Maybe<string>;
     variantType?: Maybe<string>;
 }
 

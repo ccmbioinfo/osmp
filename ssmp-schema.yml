@@ -31,7 +31,7 @@ components:
         A callset for a variant
       type: object
       properties:
-        callSetId:
+        callsetId:
           description: |
             The ID of the callset
           type: string

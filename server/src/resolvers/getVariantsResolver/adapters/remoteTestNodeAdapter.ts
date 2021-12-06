@@ -158,7 +158,7 @@ const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[
       assemblyId: resolveAssembly('GRCh37'),
       callsets: r.genotypes.map(g => ({
         individualId: g.participant_codename,
-        callSetId: g.analysis_id.toString(),
+        callsetId: g.analysis_id.toString(),
         info: {
           ad: g.alt_depths,
           burder: g.burden,

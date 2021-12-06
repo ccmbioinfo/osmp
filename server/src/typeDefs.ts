@@ -29,7 +29,7 @@ export default gql`
   }
 
   type CallSet {
-    callSetId: String
+    callsetId: String
     datasetId: String
     individualId: String
     info: CallSetInfoFields
@@ -44,6 +44,7 @@ export default gql`
     ref: String!
     referenceName: String
     start: Int!
+    variantId: String
     variantType: String
   }
 
@@ -105,12 +106,12 @@ export default gql`
   }
 
   input VariantQueryInput {
-    assemblyId: String
-    maxFrequency: Float
+    assemblyId: String!
+    maxFrequency: Float!
   }
 
   input GeneQueryInput {
-    geneName: String
+    geneName: String!
     ensemblId: String
     position: String
   }
