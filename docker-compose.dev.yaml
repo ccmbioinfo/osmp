@@ -4,15 +4,16 @@ services:
     image: ghcr.io/ccmbioinfo/ssmp:dev
     init: true
     environment:
-      TEST_NODE_URL:
-      KEYCLOAK_AUTH_URL:
-      KEYCLOAK_REALM:
-      KEYCLOAK_CLIENT_ID:
-      NODE_ENV: development
-      G4RD_USERNAME:
+      G4RD_AUTH_METHOD:
       G4RD_PASSWORD:
       G4RD_URL:
+      G4RD_USERNAME:
+      KEYCLOAK_AUTH_URL:
+      KEYCLOAK_CLIENT_ID:
+      KEYCLOAK_REALM:
       MONGO_CONNECTION_STRING:
+      NODE_ENV: development
+      TEST_NODE_URL:
     ports:
       - 3000:3000
     logging:

@@ -120,14 +120,15 @@ jobs:
         # Compose uses the registry credentials of the client
         env:
           COMPOSE_FILE: docker-compose.dev.yaml
+          G4RD_AUTH_METHOD: ${{ secrets.G4RD_AUTH_METHOD }}
+          G4RD_PASSWORD: ${{ secrets.G4RD_PASSWORD }}
+          G4RD_URL: ${{ secrets.G4RD_URL }}
+          G4RD_USERNAME: ${{ secrets.G4RD_USERNAME }}
           KEYCLOAK_AUTH_URL: ${{ secrets.KEYCLOAK_AUTH_URL }}
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
           NODE_ENV: development
-          G4RD_USERNAME: ${{ secrets.G4RD_USERNAME }}
-          G4RD_PASSWORD: ${{ secrets.G4RD_PASSWORD }}
-          G4RD_URL: ${{ secrets.G4RD_URL }}
           TEST_NODE_URL: ${{ secrets.TEST_NODE_URL }}
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
