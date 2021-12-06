@@ -125,10 +125,9 @@ jobs:
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
           NODE_ENV: development
-          PT_AUTH0_TOKEN_CLIENT_ID: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_ID }}
-          PT_AUTH0_TOKEN_CLIENT_SECRET: ${{ secrets.PT_AUTH0_TOKEN_CLIENT_SECRET }}
-          PT_AUTH0_TOKEN_ENDPOINT: ${{ secrets.PT_AUTH0_TOKEN_ENDPOINT }}
-          PT_ENDPOINT: ${{ secrets.PT_ENDPOINT }}
+          G4RD_USERNAME: ${{ secrets.G4RD_USERNAME }}
+          G4RD_PASSWORD: ${{ secrets.G4RD_PASSWORD }}
+          G4RD_URL: ${{ secrets.G4RD_URL }}
           TEST_NODE_URL: ${{ secrets.TEST_NODE_URL }}
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
