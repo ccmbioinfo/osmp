@@ -111,7 +111,7 @@ const getAuthHeader = async () => {
     G4RD_GRANT_TYPE: grant_type,
   } = process.env;
   if (process.env.G4RD_AUTH_METHOD === 'basic') {
-    return Buffer.from(`${username}:${password}`).toString('base64');
+    return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
   } else if (process.env.G4RD_AUTH_METHOD === 'bearer') {
     const cachedToken = getFromCache(BEARER_CACHE_KEY);
     if (cachedToken) {

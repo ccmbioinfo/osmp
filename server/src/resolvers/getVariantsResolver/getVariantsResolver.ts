@@ -81,7 +81,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   return { errors, data };
 };
 
-// position is temporary b/c PT currently not returning referenceName
 const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
   switch (source) {
     case 'local':
