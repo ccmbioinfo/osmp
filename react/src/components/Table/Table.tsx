@@ -176,6 +176,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'source',
                         type: 'fixed',
                         Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
+                        width: getColumnWidth(tableData, 'source', 'Source'),
                     },
                 ],
             },
@@ -208,7 +209,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'consequence',
                         id: 'consequence',
                         Header: 'consequence',
-                        width: 105,
+                        width: 125,
                         filter: 'multiSelect',
                     },
                     /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */

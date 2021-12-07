@@ -12,7 +12,7 @@ const StyledList = styled.ul`
     overflow: auto;
     position: absolute;
     top: 20px;
-    z-index: 1;
+    z-index: 998;
 `;
 
 const StyledListItem = styled.li`        
