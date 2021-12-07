@@ -82,6 +82,7 @@ const getG4rdNodeQuery = async (
       }
     );
   } catch (e) {
+    logger.error(e);
     G4RDNodeQueryError = e;
   }
 
