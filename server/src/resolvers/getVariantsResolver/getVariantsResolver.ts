@@ -33,7 +33,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   // fetch CADD and data in parallel
   const caddAnnotationsPromise = fetchCaddAnnotations(position, assemblyId);
 
-  const queries = sources.map(source => buildSourceQuery(source, args, position));
+  const queries = sources.map(source => buildSourceQuery(source, args));
 
   const settled = await Promise.allSettled([caddAnnotationsPromise, ...queries]);
 
@@ -82,18 +82,14 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 };
 
 // position is temporary b/c PT currently not returning referenceName
-const buildSourceQuery = (
-  source: string,
-  args: QueryInput,
-  position: string
-): Promise<VariantQueryResponse> => {
+const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
   switch (source) {
     case 'local':
       return getLocalQuery();
     case 'remote-test':
       return getRemoteTestNodeQuery(args);
     case 'g4rd':
-      return getG4rdNodeQuery(args, position);
+      return getG4rdNodeQuery(args);
     default:
       throw new Error(`source ${source} not found!`);
   }

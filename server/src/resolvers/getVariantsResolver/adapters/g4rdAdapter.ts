@@ -48,10 +48,9 @@ export interface G4RDQueryResult {
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
  */
-const getG4rdNodeQuery = async (
-  { input: { gene, variant } }: QueryInput,
-  position: string
-): Promise<VariantQueryResponse> => {
+const getG4rdNodeQuery = async ({
+  input: { gene: geneInput, variant },
+}: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
   let G4RDNodeQueryResponse: null | AxiosResponse<G4RDQueryResult> = null;
   let Authorization = '';
@@ -69,11 +68,12 @@ const getG4rdNodeQuery = async (
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
   logger.debug(url);
   logger.debug(Authorization);
+  const { position, ...gene } = geneInput;
   logger.debug(JSON.stringify(gene));
   logger.debug(JSON.stringify(variant));
   try {
     G4RDNodeQueryResponse = await axios.post<G4RDQueryResult>(
-      `${process.env.G4RD_URL}/rest/variants/match`,
+      url,
       {
         gene,
         variant,
@@ -148,7 +148,7 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
     return {
       id: uuidv4(),
       code: error.response?.status || 500,
-      message: error.response?.data,
+      message: error.response?.data.toString(),
     };
   }
 };
