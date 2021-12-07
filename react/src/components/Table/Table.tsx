@@ -237,6 +237,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: 70,
                     },
                     {
+                        accessor: 'individualId',
+                        id: 'individualId',
+                        Header: 'Individual ID',
+                        width: getColumnWidth(tableData, 'individualId', 'Individual ID'),
+                    },
+                    {
                         accessor: 'datasetId',
                         id: 'datasetId',
                         Header: 'Dataset ID',
