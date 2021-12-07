@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import https from 'https';
 import jwtDecode from 'jwt-decode';
 import { URLSearchParams } from 'url';
 import { v4 as uuidv4 } from 'uuid';
@@ -79,6 +80,7 @@ const getG4rdNodeQuery = async (
       },
       {
         headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }
     );
   } catch (e) {
