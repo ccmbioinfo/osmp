@@ -45,16 +45,13 @@ interface TableProps {
     variantData: VariantQueryDataResult[];
 }
 
-export type FlattenedQueryResponse = Omit<
-    IndividualResponseFields,
-    'info' | 'diseases' | 'phenotypicFeatures'
-> &
+export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
     IndividualInfoFields & { contactInfo: string } & Omit<
         VariantResponseFields,
         'callsets' | 'info'
     > &
     CallsetInfoFields &
-    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
+    VariantResponseInfoFields & { source: string; diseases: string };
 export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
@@ -270,11 +267,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
                     {
-                        accessor: 'phenotypes',
-                        id: 'phenotypes',
+                        accessor: 'phenotypicFeatures',
+                        id: 'phenotypicFeatures',
                         Cell: ({ cell: { row } }) => (
                             <PhenotypeViewer
-                                phenotypes={row.original.phenotypes}
+                                phenotypes={row.original.phenotypicFeatures}
                                 expanded={row.isExpanded}
                                 onClick={() => row.toggleRowExpanded(!row.isExpanded)}
                             ></PhenotypeViewer>

@@ -163,7 +163,7 @@ const VariantQueryPage: React.FC<{}> = () => {
             <Background variant="light">
                 <Flex alignItems="center">
                     <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold={!queryOptionsForm.ensemblId.value}>
+                        <Typography variant="subtitle" bold>
                             Gene Name
                         </Typography>
                         <GeneSearch

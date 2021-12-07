@@ -10,16 +10,13 @@ import {
 
 type Accessor = string | (() => JSX.Element) | ((state: any) => any);
 
-export type FlattenedQueryResponse = Omit<
-    IndividualResponseFields,
-    'info' | 'diseases' | 'phenotypicFeatures'
-> &
+export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
     IndividualInfoFields & { contactInfo: string } & Omit<
         VariantResponseFields,
         'callsets' | 'info'
     > &
     CallsetInfoFields &
-    VariantResponseInfoFields & { source: string; phenotypes: string; diseases: string };
+    VariantResponseInfoFields & { source: string; diseases: string };
 
 export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
@@ -30,18 +27,9 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
 export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
     const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
-    const {
-        diseases,
-        info: individualInfo,
-        phenotypicFeatures,
-        ...restIndividual
-    } = result.individual;
+    const { diseases, info: individualInfo, ...restIndividual } = result.individual;
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
-        ''
-    );
-    const flattenedPhenotypes = (phenotypicFeatures || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.phenotypeId}: ${c.levelSeverity}`,
         ''
     );
 
@@ -49,7 +37,6 @@ export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQue
         contactInfo,
         diseases: flattenedDiseases,
         ...individualInfo,
-        phenotypes: flattenedPhenotypes,
         ...restIndividual,
         ...restVariant,
         source,

@@ -1,10 +1,12 @@
 import React from 'react';
+import { Maybe } from 'graphql/jsutils/Maybe';
 import styled from 'styled-components';
+import { PhenotypicFeaturesFields } from '../../types';
 import { Divider } from '../index';
 import { CellText } from './Table.styles';
 
 interface PhenotypeViewerProps {
-    phenotypes: string;
+    phenotypes: Maybe<PhenotypicFeaturesFields[]>;
     expanded: Boolean;
     onClick: () => void;
 }
@@ -25,25 +27,22 @@ const Text = styled(props => <CellText {...props} />)`
 `;
 
 const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded, onClick }) => {
-    const phenotypicFeatures = phenotypes.split(';');
-    return phenotypicFeatures.length ? (
+    return !!phenotypes ? (
         expanded ? (
             <>
-                {phenotypicFeatures.map((p, key) => (
+                {phenotypes.map((p, key) => (
                     <>
                         <Text key={key} onClick={onClick}>
-                            {p.includes('null') ? p.replace(': null', '') : p}
+                            {`${p.phenotypeId}${p.levelSeverity ? `: ${p.levelSeverity}` : ''}`}
                         </Text>
-                        {!isLastElement(key, phenotypicFeatures) && <CellBorder />}
+                        {!isLastElement(key, phenotypes) && <CellBorder />}
                     </>
                 ))}
             </>
         ) : (
-            <Text onClick={onClick}>{`${phenotypicFeatures.length} phenotypes`}</Text>
+            <Text onClick={onClick}>{`${phenotypes?.length || 0} phenotypes`}</Text>
         )
-    ) : (
-        <span>{phenotypes}</span>
-    );
+    ) : null;
 };
 
 const isLastElement = (index: number, list: Array<any>) => index === list.length - 1;
