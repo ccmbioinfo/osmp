@@ -85,6 +85,8 @@ const getG4rdNodeQuery = async (
     G4RDNodeQueryError = e;
   }
 
+  logger.debug(JSON.stringify(G4RDNodeQueryResponse));
+
   return {
     data: transformG4RDQueryResponse(
       (G4RDNodeQueryResponse?.data as G4RDQueryResult) || [],
@@ -153,7 +155,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
   position: string
 ) => {
   logger.debug(JSON.stringify(response));
-  return response.results.map(r => {
+  return (response.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
