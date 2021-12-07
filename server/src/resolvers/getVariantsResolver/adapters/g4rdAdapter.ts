@@ -88,8 +88,6 @@ const getG4rdNodeQuery = async ({
     G4RDNodeQueryError = e;
   }
 
-  logger.debug(JSON.stringify(G4RDNodeQueryResponse));
-
   return {
     data: transformG4RDQueryResponse(
       (G4RDNodeQueryResponse?.data as G4RDQueryResult) || [],
