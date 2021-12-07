@@ -26,13 +26,13 @@ const Text = styled(props => <CellText {...props} />)`
 
 const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded, onClick }) => {
     const phenotypicFeatures = phenotypes.split(';');
-    return phenotypicFeatures.length > 1 ? (
+    return phenotypicFeatures.length ? (
         expanded ? (
             <>
                 {phenotypicFeatures.map((p, key) => (
                     <>
                         <Text key={key} onClick={onClick}>
-                            {p}
+                            {p.includes('null') ? p.replace(': null', '') : p}
                         </Text>
                         {!isLastElement(key, phenotypicFeatures) && <CellBorder />}
                     </>

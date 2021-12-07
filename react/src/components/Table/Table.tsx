@@ -61,6 +61,16 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     emptyVariationDetails: string;
 }
 
+const resolveSex = (sexPhenotype: string) => {
+    if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
+        return 'Male';
+    } else if (sexPhenotype.toLowerCase().startsWith('f') || sexPhenotype === 'NCIT:C46113') {
+        return 'Female';
+    } else if (sexPhenotype === 'NCIT:C46113') {
+        return 'Other Sex';
+    } else return 'Unknown';
+};
+
 /* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
 const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
     return queryResult.flatMap(d => {
@@ -271,7 +281,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: <Tooltip helperText={HEADERS['sex']}>Sex</Tooltip>,
-                        Cell: ({ cell: { value } }) => <>{value ? value : 'NA'}</>,
+                        Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
                         accessor: 'zygosity',

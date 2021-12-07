@@ -52,8 +52,13 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         required: true,
         rules: [
             {
+                valid: (state: FormState<QueryOptionsFormState>) => !!+state.maxFrequency.value,
+                error: 'Value must be a number!',
+            },
+
+            {
                 valid: (state: FormState<QueryOptionsFormState>) =>
-                    state.maxFrequency.value <= 0.05,
+                    +state.maxFrequency.value <= 0.05,
                 error: 'Value must be <= .05.',
             },
         ],
@@ -75,7 +80,7 @@ interface QueryOptionsFormState {
     assemblyId: AssemblyId;
     ensemblId: string;
     gene: string;
-    maxFrequency: number;
+    maxFrequency: string;
     position: string;
     sources: string[];
 }
@@ -100,7 +105,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 assemblyId: 'GRCh37',
                 ensemblId: '',
                 gene: '',
-                maxFrequency: 0.01,
+                maxFrequency: '0.01',
                 sources: [],
                 position: '',
             },
@@ -195,7 +200,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Input
                             variant="outlined"
                             onChange={e =>
-                                updateQueryOptionsForm({ maxFrequency: +e.currentTarget.value })
+                                updateQueryOptionsForm({ maxFrequency: e.currentTarget.value })
                             }
                             value={queryOptionsForm.maxFrequency.value}
                         />
