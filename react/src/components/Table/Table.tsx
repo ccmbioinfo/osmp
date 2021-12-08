@@ -268,9 +268,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
                     {
-                        accessor: 'phenotypicFeatures',
+                        accessor: state =>
+                            state.phenotypicFeatures
+                                ? state.phenotypicFeatures
+                                      .map(p => `${p.phenotypeId}: ${p.levelSeverity}`)
+                                      .join(', ')
+                                : '',
                         id: 'phenotypicFeatures',
-                        Cell: ({ cell: { row } }) => (
+                        Cell: ({ row }: { row: Row<ResultTableColumns> }) => (
                             <PhenotypeViewer
                                 phenotypes={row.original.phenotypicFeatures}
                                 expanded={row.isExpanded}
