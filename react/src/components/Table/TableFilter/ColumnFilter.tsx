@@ -34,6 +34,7 @@ export function ColumnFilter<T extends {}>({
     const [input, setInput] = useState<string>('');
 
     useEffect(() => {
+        console.log(filterModel);
         if (!filterModel) setInput('');
     }, [filterModel, setInput]);
 
@@ -60,7 +61,12 @@ export function ColumnFilter<T extends {}>({
                 />
             );
         } else if (!!type && type === 'between') {
-            return <NumberRangeFilter setFilter={setFilter} />;
+            return (
+                <NumberRangeFilter
+                    filter={filterModel as DefaultFilter<number[]>}
+                    setFilter={setFilter}
+                />
+            );
         } else {
             return (
                 <Input
