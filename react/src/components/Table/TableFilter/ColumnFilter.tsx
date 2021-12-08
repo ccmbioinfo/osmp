@@ -34,7 +34,6 @@ export function ColumnFilter<T extends {}>({
     const [input, setInput] = useState<string>('');
 
     useEffect(() => {
-        console.log(filterModel);
         if (!filterModel) setInput('');
     }, [filterModel, setInput]);
 
@@ -73,10 +72,7 @@ export function ColumnFilter<T extends {}>({
                     variant="outlined"
                     value={input}
                     placeholder={placeholder}
-                    onChange={e => {
-                        console.log('hello');
-                        handleChange(e.target.value);
-                    }}
+                    onChange={e => handleChange(e.target.value)}
                 />
             );
         }
