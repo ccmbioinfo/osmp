@@ -55,8 +55,8 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 - If you are using CCM's VMs, you can set up local forwarding as follows: 
   - To login into your VM: ```eval $(ssh-agent -s) && ssh-add``` and ```ssh -A <username>@dev-<username>.ccm.sickkids.ca```. Make sure that you already have a VM allocated to you. 
   - To forward your local port to ubuntu@ssmp-dev: ```ssh -ANL 0.0.0.0:8443:staging-ccm.phenotips.genomics4rd.ca:443 ubuntu@ssmp.ccmdev.ca```
-  - Set ```G4RD_URL``` in your local ```.env``` to https://dev-<username>.ccm.sickkids.ca:8443.
-Now, any request sent to your G4RD_URL would be tunneled to `staging-ccm.phenotips.genomics4rd.ca:443` on the staging VM. 
+  - Set ```G4RD_URL``` in your local ```.env``` to ```https://dev-<username>.ccm.sickkids.ca:8443```.
+Now, any request sent to your ```G4RD_URL``` would be tunneled to ```staging-ccm.phenotips.genomics4rd.ca:443``` on the staging VM. 
 
 ## Keycloak
 
