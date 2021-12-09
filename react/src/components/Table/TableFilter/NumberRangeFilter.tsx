@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useAsyncDebounce, UseFiltersColumnProps } from 'react-table';
 import { Column, Input, Typography } from '../..';
+import { DefaultFilter } from './ColumnFilter';
 import { ComparisonType, InputComparisonDropdown } from './InputComparisonDropdown';
 
-interface NumberRangeFilterProps<T extends {}>
-    extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {}
+interface NumberRangeFilterProps<T extends {}> extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {
+    filter: DefaultFilter<number[]>;
+}
 
-export default function NumberRangeFilter<T extends {}>({ setFilter }: NumberRangeFilterProps<T>) {
+export default function NumberRangeFilter<T extends {}>({
+    filter,
+    setFilter,
+}: NumberRangeFilterProps<T>) {
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState('');
 
@@ -50,6 +55,10 @@ export default function NumberRangeFilter<T extends {}>({ setFilter }: NumberRan
             }
         }
     }, [text, debouncedSetFilter, filterComparison.less, filterComparison.greater]);
+
+    useEffect(() => {
+        if (!filter) setText('');
+    }, [filter, setText]);
 
     return (
         <Column>

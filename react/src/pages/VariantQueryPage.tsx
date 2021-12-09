@@ -172,7 +172,14 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onChange={geneName =>
                                 updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
                             }
-                            onSelect={val => updateQueryOptionsForm(val)}
+                            onSelect={val => {
+                                const { position, ensemblId } = val;
+                                updateQueryOptionsForm({
+                                    gene: val.name,
+                                    ensemblId,
+                                    position,
+                                });
+                            }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>

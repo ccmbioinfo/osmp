@@ -60,17 +60,19 @@ export function ColumnFilter<T extends {}>({
                 />
             );
         } else if (!!type && type === 'between') {
-            return <NumberRangeFilter setFilter={setFilter} />;
+            return (
+                <NumberRangeFilter
+                    filter={filterModel as DefaultFilter<number[]>}
+                    setFilter={setFilter}
+                />
+            );
         } else {
             return (
                 <Input
                     variant="outlined"
                     value={input}
                     placeholder={placeholder}
-                    onChange={e => {
-                        console.log('hello');
-                        handleChange(e.target.value);
-                    }}
+                    onChange={e => handleChange(e.target.value)}
                 />
             );
         }
