@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import https from 'https';
 import jwtDecode from 'jwt-decode';
 import { URLSearchParams } from 'url';
 import { v4 as uuidv4 } from 'uuid';
@@ -76,7 +75,6 @@ const getG4rdNodeQuery = async ({
       },
       {
         headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }
     );
   } catch (e) {
@@ -151,7 +149,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
   response,
   position: string
 ) => {
-  logger.debug(JSON.stringify(response));
   return (response.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
