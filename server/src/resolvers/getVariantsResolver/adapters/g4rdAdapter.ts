@@ -76,7 +76,6 @@ const getG4rdNodeQuery = async ({
       },
       {
         headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }
     );
   } catch (e) {
@@ -151,7 +150,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
   response,
   position: string
 ) => {
-  logger.debug(JSON.stringify(response));
   return (response.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
