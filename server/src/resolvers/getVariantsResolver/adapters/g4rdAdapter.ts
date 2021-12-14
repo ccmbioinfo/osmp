@@ -11,6 +11,8 @@ import {
   ResultTransformer,
   VariantQueryResponse,
   VariantResponseFields,
+  G4RDPatientQueryResult,
+  IndividualInfoFields,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
 
@@ -53,6 +55,7 @@ const getG4rdNodeQuery = async ({
 }: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
   let G4RDNodeQueryResponse: null | AxiosResponse<G4RDQueryResult> = null;
+  let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
   let Authorization = '';
   try {
     Authorization = await getAuthHeader();
@@ -79,6 +82,19 @@ const getG4rdNodeQuery = async ({
         httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }
     );
+
+    // Get patients info
+    if (G4RDNodeQueryResponse) {
+      const individualIds = G4RDNodeQueryResponse.data.results.map(v => v.individual.individualId);
+      const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
+        .map(id => `id=${id}`)
+        .join('&')}`;
+
+      G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(patientUrl, {
+        headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      });
+    }
   } catch (e) {
     logger.error(e);
     G4RDNodeQueryError = e;
@@ -87,6 +103,7 @@ const getG4rdNodeQuery = async ({
   return {
     data: transformG4RDQueryResponse(
       (G4RDNodeQueryResponse?.data as G4RDQueryResult) || [],
+      (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
       position
     ),
     error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
@@ -149,12 +166,35 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
 
 export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
   response,
+  patientResponse: G4RDPatientQueryResult[],
   position: string
 ) => {
+  const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
+
   return (response.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
+
+    // ethnicity, geographicOrigin, info: { candidateGene, classifications, diagnosis }
+
+    const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
+
+    let info: IndividualInfoFields = {};
+    let ethnicity: string = '';
+
+    if (patient) {
+      const candidateGene = (patient.genes ?? []).map(g => g.gene).join(', ');
+      const classifications = patient.clinicalStatus;
+      const diagnosis = patient.notes.diagnosis_notes;
+      ethnicity = Object.values(patient.ethnicity).flat().join(', ');
+      info = {
+        candidateGene,
+        diagnosis,
+        classifications,
+      };
+    }
+
     const { aaChanges, ...restVariantInfo } = restVariant.info;
 
     const variant: VariantResponseFields = {
@@ -163,7 +203,20 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
       referenceName: position.split(':')[0],
     };
 
-    return { individual, variant, contactInfo, source: SOURCE_NAME };
+    const individualResponseFields: IndividualResponseFields = {
+      ...individual,
+      ethnicity,
+      info,
+    };
+
+    console.log({
+      individual: individualResponseFields,
+      variant,
+      contactInfo,
+      source: SOURCE_NAME,
+    });
+
+    return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
   });
 };
 

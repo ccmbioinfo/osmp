@@ -27,7 +27,7 @@ const Text = styled(props => <CellText {...props} />)`
 `;
 
 const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded, onClick }) => {
-    return !!phenotypes ? (
+    return !!phenotypes && !!phenotypes.length ? (
         expanded ? (
             <>
                 {phenotypes.map((p, key) => (
@@ -40,7 +40,7 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded,
                 ))}
             </>
         ) : (
-            <Text onClick={onClick}>{`${phenotypes?.length || 0} phenotypes`}</Text>
+            <Text onClick={onClick}>{`${phenotypes.length} phenotypes`}</Text>
         )
     ) : null;
 };

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
@@ -65,7 +66,7 @@ export interface DiseaseFields {
 }
 
 export interface IndividualInfoFields {
-  cadidateGene?: Maybe<string>;
+  candidateGene?: Maybe<string>;
   classifications?: Maybe<string>;
   diagnosis?: Maybe<string>;
 }
@@ -184,4 +185,119 @@ export enum Assembly {
   hg19 = 37,
   GRCh38 = 38,
   hg38 = 38,
+}
+export interface Apgar {
+  apgar1?: number;
+  apgar5?: number;
+}
+
+export interface Contact {
+  institution?: string;
+  user_id?: string;
+  name?: string;
+  email?: string;
+}
+
+export interface DateOfBirth {
+  year?: number;
+  month?: number;
+  day?: number;
+}
+
+export interface DateOfDeath {
+  year?: number;
+  range?: {
+    years?: number;
+  };
+}
+export interface Ethnicity {
+  maternal_ethnicity: string[];
+  paternal_ethnicity: string[];
+}
+
+export interface FamilyHistory {
+  miscarriages: Maybe<boolean>;
+  consanguinity: Maybe<boolean>;
+  affectedRelatives: Maybe<boolean>;
+}
+
+export interface Feature {
+  id: string;
+  label: string;
+  type: string;
+  observed: string;
+}
+
+export interface Gene {
+  gene: string;
+  strategy: string[];
+  status: string;
+}
+
+export interface Link {
+  rel: string;
+  href: string;
+  allowedMethods: string[];
+}
+
+export interface Meta {
+  hgnc_version: Date;
+  omim_version: Date;
+  hpo_version: string;
+  phenotips_version: string;
+}
+
+export interface Notes {
+  family_history: string;
+  prenatal_development: string;
+  indication_for_referral: string;
+  medical_history: string;
+  diagnosis_notes: string;
+}
+
+export interface PatientName {
+  last_name: string;
+  first_name: string;
+}
+
+export interface Solved {
+  status?: 'solved' | 'unsolved';
+  pubmed_id?: string;
+  notes?: string;
+}
+
+export interface Specificity {
+  date: Date;
+  score: number;
+  server: string;
+}
+
+export interface G4RDPatientQueryResult {
+  date: Date;
+  apgar: Apgar;
+  notes: Notes;
+  ethnicity: Ethnicity;
+  date_of_birth: DateOfBirth;
+  solved: Solved;
+  external_id: string;
+  clinicalStatus: 'affected' | 'unaffected';
+  features: Feature[];
+  disorders: Pick<Feature, 'id' | 'label'>[];
+  date_of_death: DateOfDeath;
+  contact: Contact;
+  last_modification_date: Date;
+  patient_name: PatientName;
+  specificity: Specificity;
+  nonstandard_features: any[];
+  links: Link[];
+  id: string;
+  prenatal_perinatal_history: { [key: string]: number | null };
+  family_history: FamilyHistory;
+  life_status: string;
+  sex: string;
+  reporter: string;
+  last_modified_by: string;
+  report_id: string;
+  meta: Meta;
+  genes?: Gene[];
 }
