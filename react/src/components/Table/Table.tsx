@@ -448,9 +448,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 />
             )}
 
-            <Typography variant="h3" bold>
-                {tableData.length} results found
-            </Typography>
             <ScrollContainer ignoreElements="p" hideScrollbars={false} vertical={false}>
                 <Styles>
                     <table {...getTableProps()}>

@@ -193,7 +193,7 @@ export interface Apgar {
 
 export interface Contact {
   institution?: string;
-  user_id?: string;
+  id?: string;
   name?: string;
   email?: string;
 }
@@ -216,9 +216,9 @@ export interface Ethnicity {
 }
 
 export interface FamilyHistory {
-  miscarriages: Maybe<boolean>;
-  consanguinity: Maybe<boolean>;
-  affectedRelatives: Maybe<boolean>;
+  miscarriages?: Maybe<boolean>;
+  consanguinity?: Maybe<boolean>;
+  affectedRelatives?: Maybe<boolean>;
 }
 
 export interface Feature {
@@ -241,14 +241,16 @@ export interface Link {
 }
 
 export interface Meta {
-  hgnc_version: Date;
-  omim_version: Date;
-  hpo_version: string;
-  phenotips_version: string;
+  ordo_version?: string;
+  hgnc_version?: Date;
+  omim_version?: Date;
+  hpo_version?: string;
+  phenotips_version?: string;
 }
 
 export interface Notes {
   family_history: string;
+  genetic_notes: string;
   prenatal_development: string;
   indication_for_referral: string;
   medical_history: string;
@@ -272,19 +274,26 @@ export interface Specificity {
   server: string;
 }
 
+export interface ParentalNames {
+  paternal_first_name: string;
+  paternal_last_name: string;
+  maternal_first_name: string;
+  maternal_last_name: string;
+}
 export interface G4RDPatientQueryResult {
   date: Date;
+  parental_names?: ParentalNames;
   apgar: Apgar;
   notes: Notes;
   ethnicity: Ethnicity;
   date_of_birth: DateOfBirth;
   solved: Solved;
   external_id: string;
-  clinicalStatus: 'affected' | 'unaffected';
+  clinicalStatus: string; // string for now - should be affected | unaffected in prod
   features: Feature[];
   disorders: Pick<Feature, 'id' | 'label'>[];
   date_of_death: DateOfDeath;
-  contact: Contact;
+  contact: Contact[];
   last_modification_date: Date;
   patient_name: PatientName;
   specificity: Specificity;
@@ -300,4 +309,5 @@ export interface G4RDPatientQueryResult {
   report_id: string;
   meta: Meta;
   genes?: Gene[];
+  'clinical-diagnosis'?: any[];
 }

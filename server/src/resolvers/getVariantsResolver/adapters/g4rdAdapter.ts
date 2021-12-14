@@ -85,7 +85,9 @@ const getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariantQueryResponse) {
-      const individualIds = G4RDVariantQueryResponse.data.results.map(v => v.individual.individualId);
+      const individualIds = G4RDVariantQueryResponse.data.results.map(
+        v => v.individual.individualId
+      );
       const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
         .map(id => `id=${id}`)
         .join('&')}`;
@@ -165,13 +167,13 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
 };
 
 export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = (
-  response,
+  variantResponse,
   patientResponse: G4RDPatientQueryResult[],
   position: string
 ) => {
   const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
 
-  return (response.results || []).map(r => {
+  return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
@@ -184,6 +186,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
     let ethnicity: string = '';
 
     if (patient) {
+      console.log(patient);
       const candidateGene = (patient.genes ?? []).map(g => g.gene).join(', ');
       const classifications = patient.clinicalStatus;
       const diagnosis = patient.notes.diagnosis_notes;
@@ -208,13 +211,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       ethnicity,
       info,
     };
-
-    console.log({
-      individual: individualResponseFields,
-      variant,
-      contactInfo,
-      source: SOURCE_NAME,
-    });
 
     return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
   });
