@@ -1,6 +1,6 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import {
-  G4RDQueryResult,
+  G4RDVariantQueryResult,
   transformG4RDQueryResponse,
 } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
 import typeDefs from '../../src/typeDefs';
@@ -10,7 +10,7 @@ import { testGraphQLQuery } from '../testGraphQLQuery';
 
 /* an around the world test here would validate the transformer and pass it to the schema */
 
-const testResponse: G4RDQueryResult = {
+const testResponse: G4RDVariantQueryResult = {
   exists: true,
   numTotalResults: 1,
   results: [

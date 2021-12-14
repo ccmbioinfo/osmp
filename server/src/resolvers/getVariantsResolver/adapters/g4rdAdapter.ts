@@ -33,7 +33,7 @@ interface G4RDVariantInfoFields {
   cdna: string;
 }
 
-export interface G4RDQueryResult {
+export interface G4RDVariantQueryResult {
   exists: boolean;
   numTotalResults: number;
   results: {
@@ -54,7 +54,7 @@ const getG4rdNodeQuery = async ({
   input: { gene: geneInput, variant },
 }: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
-  let G4RDNodeQueryResponse: null | AxiosResponse<G4RDQueryResult> = null;
+  let G4RDVariantQueryResponse: null | AxiosResponse<G4RDVariantQueryResult> = null;
   let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
   let Authorization = '';
   try {
@@ -71,7 +71,7 @@ const getG4rdNodeQuery = async ({
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
   const { position, ...gene } = geneInput;
   try {
-    G4RDNodeQueryResponse = await axios.post<G4RDQueryResult>(
+    G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
       url,
       {
         gene,
@@ -84,8 +84,8 @@ const getG4rdNodeQuery = async ({
     );
 
     // Get patients info
-    if (G4RDNodeQueryResponse) {
-      const individualIds = G4RDNodeQueryResponse.data.results.map(v => v.individual.individualId);
+    if (G4RDVariantQueryResponse) {
+      const individualIds = G4RDVariantQueryResponse.data.results.map(v => v.individual.individualId);
       const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
         .map(id => `id=${id}`)
         .join('&')}`;
@@ -102,7 +102,7 @@ const getG4rdNodeQuery = async ({
 
   return {
     data: transformG4RDQueryResponse(
-      (G4RDNodeQueryResponse?.data as G4RDQueryResult) || [],
+      (G4RDVariantQueryResponse?.data as G4RDVariantQueryResult) || [],
       (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
       position
     ),
@@ -164,7 +164,7 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
   }
 };
 
-export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
+export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = (
   response,
   patientResponse: G4RDPatientQueryResult[],
   position: string
