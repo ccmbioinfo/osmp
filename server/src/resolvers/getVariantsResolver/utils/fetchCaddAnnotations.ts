@@ -1,5 +1,3 @@
-// import { exec } from 'child_process';
-// import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
 import { v4 as uuidv4 } from 'uuid';
