@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { exec } from 'child_process';
-import { promisify } from 'util';
+// import { exec } from 'child_process';
+// import { promisify } from 'util';
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,83 +31,58 @@ const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
   protpos: 29
 */
 
-const NAME_MAP: Record<string, keyof CaddAnnotation> = {
-  Chr: 'chrom',
-  Pos: 'pos',
-  Ref: 'ref',
-  Alt: 'alt',
-  Consequence: 'consequence',
-  oAA: 'aaRef',
-  nAA: 'aaAlt',
-  FeatureID: 'transcript',
-  cDNApos: 'cdna',
-  protPos: 'aaPos',
-};
-
 const _getAnnotations = async (position: string, assemblyId: string) => {
-  const query = await _buildQuery(position, assemblyId);
-  const execPromise = promisify(exec);
-  return execPromise(query, { maxBuffer: 10e7 }); // 100mb
-};
-
-const _formatAnnotations = (annotations: string) => {
-  const annotationsArray = annotations.split('\n');
-  const headerRow = annotationsArray.shift();
-
-  if (!headerRow) {
-    return [];
-  }
-
-  const headers = headerRow
-    .split(/\W+/)
-    .filter(Boolean)
-    .reduce<Record<number, keyof CaddAnnotation>>(
-      (acc, curr, i) => ({
-        ...acc,
-        [i]: NAME_MAP[curr],
-      }),
-      {}
-    );
-
-  return annotationsArray.map(annotation =>
-    annotation
-      .split(/\W+/)
-      .reduce<CaddAnnotation>(
-        (acc, curr, i) => ({ ...acc, [headers[i]]: curr }),
-        {} as CaddAnnotation
-      )
-  );
-};
-
-const _buildQuery = async (position: string, assemblyId: string) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
   const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
   const indexPath = resolvedAssemblyId === '38' ? INDEX_38_PATH : INDEX_37_PATH;
 
   const tbiIndexed = new TabixIndexedFile({
     filehandle: new RemoteFile(annotationUrl, { fetch: fetch as Fetcher }),
-    tbiPath: indexPath
+    tbiPath: indexPath,
   });
 
   const { chromosome, start, end } = resolveChromosome(position);
 
-  const lines: any[] = [];
+  const lines: string[] = [];
   if (chromosome && start && end) {
-    try {
-      await tbiIndexed.getLines(`${chromosome}`, Number(start) - 1, Number(end) + 1, line => {
-        lines.push(line)
-      });
-    }
-    catch (e) {
-      console.log(e)
-    }
+    await tbiIndexed.getLines(`${chromosome}`, Number(start) - 1, Number(end) + 1, line => {
+      lines.push(line);
+    });
   }
 
   console.log(lines);
+  return lines;
+};
 
-  console.log(`tabix -h  ${annotationUrl} ${indexPath} ${position} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`)
+const _formatAnnotations = (annotations: string[]) => {
+  const headersMap: Record<number, keyof CaddAnnotation> = {
+    0: 'chrom',
+    1: 'pos',
+    2: 'ref',
+    3: 'alt',
+    7: 'consequence',
+    16: 'aaRef',
+    17: 'aaAlt',
+    19: 'transcript',
+    24: 'cdna',
+    28: 'aaPos',
+  };
 
-  return `tabix -h  ${annotationUrl} ${indexPath} ${position} | awk 'NR!=1{print $1,$2,$3,$4,$8,$17,$18,$20,$25,$29}'`;
+  const headersIndex = Object.keys(headersMap);
+  const headers = Object.values(headersMap);
+
+  const result = annotations.map(annotation => {
+    // Get only the required annotation columns
+    const annotationColumns = annotation
+      .split('\t')
+      .filter((a, i) => headersIndex.some(headerId => Number(headerId) === i));
+    return Object.fromEntries(
+      headers.map((h, i) => [h, annotationColumns[i]])
+    ) as unknown as CaddAnnotation;
+  });
+
+  console.log(result);
+  return result;
 };
 
 const fetchAnnotations = (
@@ -130,7 +104,7 @@ const fetchAnnotations = (
     });
   } else {
     return _getAnnotations(position, assemblyId)
-      .then(result => ({ source, data: _formatAnnotations(result?.stdout || '') }))
+      .then(result => ({ source, data: _formatAnnotations(result) }))
       .catch(error => ({
         error: {
           id: uuidv4(),
