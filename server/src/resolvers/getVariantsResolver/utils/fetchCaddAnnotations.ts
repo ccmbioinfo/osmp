@@ -14,21 +14,6 @@ const ANNOTATION_URL_37 =
 const INDEX_37_PATH = '/home/node/cadd_wgs_ghr37_index.gz.tbi';
 const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
 
-/*
-  indexes for headers in annotation tsv: 
-  https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf
-  Chrom: 1
-  Pos: 2
-  Ref: 3
-  Alt: 4
-  Consequence: 8
-  oAA: 17
-  nAA: 18
-  FeatureID: 20
-  cDNApos: 25
-  protpos: 29
-*/
-
 const _getAnnotations = async (position: string, assemblyId: string) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
   const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
@@ -48,11 +33,28 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     });
   }
 
-  console.log(lines);
+  console.log(lines)
   return lines;
 };
 
 const _formatAnnotations = (annotations: string[]) => {
+  /*
+    indexes for headers in annotation tsv: 
+    https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf
+    Chrom: 1
+    Pos: 2
+    Ref: 3
+    Alt: 4
+    Consequence: 8
+    oAA: 17
+    nAA: 18
+    FeatureID: 20
+    cDNApos: 25
+    protpos: 29
+
+    Note that in JSON, these indexes would start at 0.
+  */
+
   const headersMap: Record<number, keyof CaddAnnotation> = {
     0: 'chrom',
     1: 'pos',
@@ -73,7 +75,10 @@ const _formatAnnotations = (annotations: string[]) => {
     // Get only the required annotation columns
     const annotationColumns = annotation
       .split('\t')
-      .filter((a, i) => headersIndex.some(headerId => Number(headerId) === i));
+      .filter(
+        (a, i) => 
+          headersIndex.some(headerId => Number(headerId) === i)
+          );
     return Object.fromEntries(
       headers.map((h, i) => [h, annotationColumns[i]])
     ) as unknown as CaddAnnotation;
