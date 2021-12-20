@@ -40,7 +40,6 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     });
   }
 
-  console.log(lines);
   return lines;
 };
 
@@ -89,7 +88,6 @@ const _formatAnnotations = (annotations: string[]) => {
     ) as unknown as CaddAnnotation;
   });
 
-  console.log(result);
   return result;
 };
 
