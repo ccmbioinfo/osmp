@@ -117,13 +117,6 @@ const patientTestResponse: G4RDPatientQueryResult[] = [
       server: 'local-omim',
     },
     nonstandard_features: [],
-    links: [
-      {
-        rel: 'https://phenotips.org/rel/patientRecord',
-        href: 'https://staging-ccm.phenotips.genomics4rd.ca/rest/patients/P0000002',
-        allowedMethods: ['DELETE', 'GET', 'PUT', 'PATCH'],
-      },
-    ],
     id: '12345',
     prenatal_perinatal_history: {
       gestation: null,

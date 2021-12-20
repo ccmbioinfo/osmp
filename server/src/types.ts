@@ -292,18 +292,18 @@ export interface PatientName {
 }
 
 export interface PrenatalPerinatalHistory {
-  multipleGestation?: null;
-  icsi?: null;
+  multipleGestation?: Maybe<boolean>;
+  icsi?: Maybe<string>;
   maternal_age?: number;
   paternal_age?: number;
-  ivf?: null;
-  assistedReproduction_donoregg?: null;
-  assistedReproduction_iui?: null;
-  twinNumber?: null;
+  ivf?: Maybe<string>;
+  assistedReproduction_donoregg?: Maybe<string>;
+  assistedReproduction_iui?: Maybe<string>;
+  twinNumber?: Maybe<number>;
   assistedReproduction_fertilityMeds?: boolean;
-  gestation?: number;
-  assistedReproduction_surrogacy?: null;
-  assistedReproduction_donorsperm?: null;
+  gestation?: Maybe<number>;
+  assistedReproduction_surrogacy?: Maybe<boolean>;
+  assistedReproduction_donorsperm?: Maybe<boolean>;
 }
 
 export interface Solved {
