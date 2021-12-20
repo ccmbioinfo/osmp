@@ -1,8 +1,8 @@
 const resolveChromosome = (position: string) => {
-  const chromosome = position.match(/^[^:]*[^ :]/gm)?.join('');
-  const coordinates = position.match(/\w[^:]*$/gm)?.join('');
-  const end = coordinates?.match(/\w[^-]*$/gm);
-  const start = coordinates?.match(/^[^-]*[^ -]/gm);
+  const chromosome = position.split(':')[0];
+  const coordinates = position.split(':')[1];
+  const end = coordinates.split('-')[0];
+  const start = coordinates.split('-')[1];
 
   return {
     chromosome,

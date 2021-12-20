@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
+import { fromEntries } from '../../../utils/typedObject';
 import fetch from 'cross-fetch';
 
 const ANNOTATION_URL_38 =
@@ -62,30 +63,22 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
  */
 
 const _formatAnnotations = (annotations: string[]) => {
-  const headersMap: Record<number, keyof CaddAnnotation> = {
-    0: 'chrom',
-    1: 'pos',
-    2: 'ref',
-    3: 'alt',
-    7: 'consequence',
-    16: 'aaRef',
-    17: 'aaAlt',
-    19: 'transcript',
-    24: 'cdna',
-    28: 'aaPos',
-  };
+  const HEADERS_INDEX_MAP: Array<[keyof CaddAnnotation, number]> = [
+    ['chrom', 0],
+    ['pos', 1],
+    ['ref', 2],
+    ['alt', 3],
+    ['consequence', 7],
+    ['aaRef', 16],
+    ['aaAlt', 17],
+    ['transcript', 19],
+    ['cdna', 24],
+    ['aaPos', 28],
+  ];
 
-  const headersIndex = Object.keys(headersMap);
-  const headers = Object.values(headersMap);
-
-  const result = annotations.map(annotation => {
-    // Get only the required annotation columns
-    const annotationColumns = annotation
-      .split('\t')
-      .filter((a, i) => headersIndex.some(headerId => Number(headerId) === i));
-    return Object.fromEntries(
-      headers.map((h, i) => [h, annotationColumns[i]])
-    ) as unknown as CaddAnnotation;
+  const result = annotations.map(a => {
+    const columns = a.split('\t');
+    return fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]]));
   });
 
   return result;
