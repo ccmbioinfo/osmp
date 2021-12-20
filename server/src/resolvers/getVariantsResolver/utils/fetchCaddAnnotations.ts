@@ -14,6 +14,13 @@ const ANNOTATION_URL_37 =
 const INDEX_37_PATH = '/home/node/cadd_wgs_ghr37_index.gz.tbi';
 const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
 
+/**
+ * The function queries CADD annotation TSV and returns a list of string, each of which represents one line in the TSV.
+ * @param position: the variant coordinates. Has the format [chromosome]:[start]-[end] (e.g. 19:12345-67890)
+ * @param assemblyId: version of the human reference genome. Can be "hg38", "hg19", "GRCh38", or "GRCh37".
+ * @returns a list of strings, each of which contains information for one variant annotation.
+ */
+
 const _getAnnotations = async (position: string, assemblyId: string) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
   const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
@@ -37,11 +44,11 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   return lines;
 };
 
-const _formatAnnotations = (annotations: string[]) => {
-  /*
-    indexes for headers in annotation tsv: 
-    https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf
-    Chrom: 1
+/**
+ * Takes in tabix query response and adapts it to @typedef CaddAnnotation
+ * @param annotations: a list of tab-delimited strings from CADD annotation TSV.
+ * Indexes for headers in the annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf.
+ *  Chrom: 1
     Pos: 2
     Ref: 3
     Alt: 4
@@ -51,10 +58,11 @@ const _formatAnnotations = (annotations: string[]) => {
     FeatureID: 20
     cDNApos: 25
     protpos: 29
+  *
+ * @returns an array of JSON of @typedef CaddAnnotation
+ */
 
-    Note that in JSON, these indexes would start at 0.
-  */
-
+const _formatAnnotations = (annotations: string[]) => {
   const headersMap: Record<number, keyof CaddAnnotation> = {
     0: 'chrom',
     1: 'pos',
