@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
-import fetch from 'node-fetch';
+import fetch from 'cross-fetch';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -33,7 +33,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     });
   }
 
-  console.log(lines)
+  console.log(lines);
   return lines;
 };
 
@@ -75,10 +75,7 @@ const _formatAnnotations = (annotations: string[]) => {
     // Get only the required annotation columns
     const annotationColumns = annotation
       .split('\t')
-      .filter(
-        (a, i) => 
-          headersIndex.some(headerId => Number(headerId) === i)
-          );
+      .filter((a, i) => headersIndex.some(headerId => Number(headerId) === i));
     return Object.fromEntries(
       headers.map((h, i) => [h, annotationColumns[i]])
     ) as unknown as CaddAnnotation;
