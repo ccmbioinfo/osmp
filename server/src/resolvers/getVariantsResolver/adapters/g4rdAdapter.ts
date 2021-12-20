@@ -178,15 +178,12 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
     const { refseqId, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
 
-    // ethnicity, geographicOrigin, info: { candidateGene, classifications, diagnosis }
-
     const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
 
     let info: IndividualInfoFields = {};
     let ethnicity: string = '';
 
     if (patient) {
-      console.log(patient);
       const candidateGene = (patient.genes ?? []).map(g => g.gene).join(', ');
       const classifications = patient.clinicalStatus;
       const diagnosis = patient.notes.diagnosis_notes;

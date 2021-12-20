@@ -131,18 +131,19 @@ const getRemoteTestNodeQuery = async (args: QueryInput): Promise<VariantQueryRes
   };
 };
 
-export const transformRemoteTestNodeErrorResponse: ErrorTransformer<RemoteTestNodeQueryError> =
-  error => {
-    if (!error) {
-      return undefined;
-    } else {
-      return {
-        id: uuidv4(),
-        code: error.response?.status || 500,
-        message: error.response?.data,
-      };
-    }
-  };
+export const transformRemoteTestNodeErrorResponse: ErrorTransformer<
+  RemoteTestNodeQueryError
+> = error => {
+  if (!error) {
+    return undefined;
+  } else {
+    return {
+      id: uuidv4(),
+      code: error.response?.status || 500,
+      message: error.response?.data,
+    };
+  }
+};
 
 export default getRemoteTestNodeQuery;
 
