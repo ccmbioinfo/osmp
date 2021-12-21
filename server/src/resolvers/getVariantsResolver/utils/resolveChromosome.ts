@@ -1,8 +1,6 @@
 const resolveChromosome = (position: string) => {
-  const chromosome = position.split(':')[0];
-  const coordinates = position.split(':')[1];
-  const end = coordinates.split('-')[0];
-  const start = coordinates.split('-')[1];
+  const [chromosome, coordinates] = position.split(':');
+  const [end, start] = coordinates.split('-');
 
   return {
     chromosome,
