@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
-import { fromEntries } from '../../../utils/typedObject';
 import fetch from 'cross-fetch';
 
 const ANNOTATION_URL_38 =
