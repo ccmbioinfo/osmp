@@ -36,7 +36,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
 
   const lines: string[] = [];
   if (chromosome && start && end) {
-    // Note that tabix library uses half-open 0-based (https://www.biostars.org/p/84686/), while the index we get from position is 1-based. 
+    // Note that tabix library uses half-open 0-based (https://www.biostars.org/p/84686/), while the index we get from position is 1-based.
     await tbiIndexed.getLines(`${chromosome}`, Number(start) - 1, Number(end) + 1, line => {
       lines.push(line);
     });
@@ -79,7 +79,9 @@ const _formatAnnotations = (annotations: string[]) => {
 
   const result = annotations.map(a => {
     const columns = a.split('\t');
-    return fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]]));
+    return Object.fromEntries(
+      HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])
+    ) as unknown as CaddAnnotation;
   });
 
   return result;
