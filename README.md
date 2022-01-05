@@ -50,13 +50,16 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
     ```
     
 ### Connecting to Phenotips 
-- The Phenotips variant matching endpoint specified [here](https://github.com/ccmbioinfo/report-scripts/blob/master/phenotips-api.md#matching-endpoint) can only be reached directly from our staging virtual machine ubuntu@ssmp-dev in the [CHEO-RI tenancy](https://github.com/ccmbioinfo/cheo-ri-infrastructure).
-- In development, for the Express server to successfully make a call to the endpoint, we need to use SSH's local forwarding protocol to forward a port from your local machine to the staging server machine. The SSH client listens to any requests or connections on a configured port, and when it receives a connection, it tunnels the connection to the SSH server. 
-- If you are using CCM's VMs, you can set up local forwarding as follows: 
+
+The Phenotips variant matching endpoint specified [here](https://github.com/ccmbioinfo/report-scripts/blob/master/phenotips-api.md#matching-endpoint) can only be reached directly from our staging virtual machine ubuntu@ssmp-dev in the [CHEO-RI tenancy](https://github.com/ccmbioinfo/cheo-ri-infrastructure).
+
+In development, for the Express server to successfully make a call to the endpoint, we need to use SSH's local forwarding protocol to forward a port from your local machine to the staging server machine. The SSH client listens to any requests or connections on a configured port, and when it receives a connection, it tunnels the connection to the SSH server. 
+
+If you are using CCM's VMs, you can set up local forwarding as follows: 
   - To login into your VM: ```eval $(ssh-agent -s) && ssh-add``` and ```ssh -A <username>@dev-<username>.ccm.sickkids.ca```. Make sure that you already have a VM allocated to you. 
-  - To forward your local port to ubuntu@ssmp-dev: ```ssh -ANL 0.0.0.0:8443:staging-ccm.phenotips.genomics4rd.ca:443 ubuntu@ssmp.ccmdev.ca```. For now, this command would need to be run alongside `docker-compose up` when you want to bring up the app.
+  - To forward your local port to ubuntu@ssmp-dev: ```ssh -ANL 0.0.0.0:8443:dev.phenotips.genomics4rd.ca:443 ubuntu@ssmp.ccmdev.ca```. For now, this command would need to be run alongside `docker-compose up` when you want to bring up the app.
   - Set ```G4RD_URL``` in your local ```.env``` to ```https://dev-<username>.ccm.sickkids.ca:8443```.
-Now, any request sent to your ```G4RD_URL``` would be tunneled to ```staging-ccm.phenotips.genomics4rd.ca:443``` on the staging VM. 
+Now, any request sent to your ```G4RD_URL``` would be tunneled to ```dev.phenotips.genomics4rd.ca:443``` on the staging VM. 
 
 ## Keycloak
 
