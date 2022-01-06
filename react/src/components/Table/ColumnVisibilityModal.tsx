@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { ColumnInstance, HeaderGroup, Row, UseTableInstanceProps } from 'react-table';
-import { downloadCsv } from '../../utils';
 import { camelize } from '../../utils';
-import { Button, Checkbox, InlineFlex, Input, Modal } from '../index';
+import { Button, Checkbox, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';
 
 interface ColumnVisibilityModalProps<T extends object>
@@ -15,25 +14,17 @@ interface ColumnVisibilityModalProps<T extends object>
 }
 
 export default function ColumnVisibilityModal<T extends {}>({
-    rows,
-    visibleColumns,
     headerGroups,
     toggleGroupVisibility,
     toggleHideColumn,
 }: ColumnVisibilityModalProps<T>) {
     const [showModal, setShowModal] = useState<boolean>(false);
-    const [filename, setFilename] = useState<string>('');
-
-    const [showDownload, setShowDownload] = useState<boolean>(false);
 
     return (
         <InlineFlex>
             <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
                 Customize columns
                 <IconPadder>{showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}</IconPadder>
-            </Button>
-            <Button variant="primary" onClick={() => setShowDownload(true)}>
-                Export Data
             </Button>
             <Modal
                 active={showModal}
@@ -78,32 +69,6 @@ export default function ColumnVisibilityModal<T extends {}>({
                             )}
                         </div>
                     ))}
-            </Modal>
-
-            <Modal
-                active={showDownload}
-                hideModal={() => {
-                    setShowDownload(false);
-                    setFilename('');
-                }}
-                title="Save Variants"
-                footer="Download CSV"
-                onClick={() =>
-                    downloadCsv(
-                        rows.map(r => r.values as T),
-                        visibleColumns
-                            .filter(c => c.id && !c.id.match(/^empty/i))
-                            .map(c => c.id as keyof T),
-                        filename
-                    )
-                }
-            >
-                <Input
-                    variant="outlined"
-                    value={filename}
-                    placeholder="Enter filename..."
-                    onChange={e => setFilename(e.target.value)}
-                />
             </Modal>
         </InlineFlex>
     );

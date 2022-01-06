@@ -36,6 +36,7 @@ import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
+import DownloadModal from './DownloadModal';
 import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
@@ -430,13 +431,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     </Button>
                 </InlineFlex>
 
-                <ColumnVisibilityModal
-                    rows={rows}
-                    headerGroups={headerGroups}
-                    toggleGroupVisibility={toggleGroupVisibility}
-                    toggleHideColumn={toggleHideColumn}
-                    visibleColumns={visibleColumns}
-                />
+                <InlineFlex>
+                    <ColumnVisibilityModal
+                        rows={rows}
+                        headerGroups={headerGroups}
+                        toggleGroupVisibility={toggleGroupVisibility}
+                        toggleHideColumn={toggleHideColumn}
+                        visibleColumns={visibleColumns}
+                    />
+                    <DownloadModal rows={rows} visibleColumns={visibleColumns} />
+                </InlineFlex>
             </TableFilters>
 
             {advancedFiltersOpen && (

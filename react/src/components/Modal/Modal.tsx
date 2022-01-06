@@ -38,9 +38,9 @@ const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModa
                         <ModalBody>{children}</ModalBody>
                         {footer && (
                             <ModalFooter>
-                                <Button
-                                variant="primary"
-                                onClick={onClick}>{footer}</Button>
+                                <Button variant="primary" onClick={onClick}>
+                                    {footer}
+                                </Button>
                             </ModalFooter>
                         )}
                     </ModalContainer>
