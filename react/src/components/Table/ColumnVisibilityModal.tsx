@@ -82,8 +82,11 @@ export default function ColumnVisibilityModal<T extends {}>({
 
             <Modal
                 active={showDownload}
-                hideModal={() => setShowDownload(false)}
-                title="Enter the name of your CSV"
+                hideModal={() => {
+                    setShowDownload(false);
+                    setFilename('');
+                }}
+                title="Save Variants"
                 footer="Download CSV"
                 onClick={() =>
                     downloadCsv(
@@ -96,6 +99,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                 }
             >
                 <Input
+                    variant="outlined"
                     value={filename}
                     placeholder="Enter filename..."
                     onChange={e => setFilename(e.target.value)}

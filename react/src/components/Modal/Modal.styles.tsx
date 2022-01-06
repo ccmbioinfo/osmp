@@ -48,7 +48,7 @@ export const ModalContainer = styled.div`
 
 export const ModalBody = styled.div`
     overflow-y: auto;
-    padding: 30px 10px;
+    padding: ${props => props.theme.space[1]};
     position: relative;
 `;
 
