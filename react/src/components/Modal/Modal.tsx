@@ -15,11 +15,12 @@ import {
 interface ModalProps {
     hideModal: () => void;
     active: Boolean;
+    onClick?: () => void;
     footer?: string;
     title?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModal }) => {
+const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModal, onClick }) => {
     return (
         <Fragment>
             {active && (
@@ -37,7 +38,7 @@ const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModa
                         <ModalBody>{children}</ModalBody>
                         {footer && (
                             <ModalFooter>
-                                <Button>{footer}</Button>
+                                <Button onClick={onClick}>{footer}</Button>
                             </ModalFooter>
                         )}
                     </ModalContainer>

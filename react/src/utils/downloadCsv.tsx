@@ -16,13 +16,16 @@ const objectToCsv = <T extends object>(data: T[]) => {
     return csvRows.join('\n');
 };
 
-const download = (data: BlobPart) => {
+const formatFileName = (filename: string) =>
+    filename.includes('.csv') ? filename : `${filename}.csv`;
+
+const download = (data: BlobPart, filename: string) => {
     const blob = new Blob([data], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
-    a.setAttribute('download', 'ssmp.csv');
+    a.setAttribute('download', formatFileName(filename));
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -33,13 +36,17 @@ const download = (data: BlobPart) => {
  * @param headers A list of column ids that user wants to download
  */
 
-const downloadCsv = <T extends object>(rows: T[], selectedHeaders: (keyof T)[]) => {
+const downloadCsv = <T extends object>(
+    rows: T[],
+    selectedHeaders: (keyof T)[],
+    filename: string
+) => {
     const selectedRows = rows.map(r =>
         selectedHeaders.reduce((acc, curr) => ({ ...acc, ...{ [curr]: r[curr] } }), {})
     );
 
     const csvData = objectToCsv(selectedRows);
-    download(csvData);
+    download(csvData, filename);
 };
 
 export default downloadCsv;
