@@ -77,7 +77,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
 };
 
 interface QueryOptionsFormState {
-    assemblyId: AssemblyId;
+    assemblyId: string;
     ensemblId: string;
     gene: string;
     maxFrequency: string;
@@ -115,7 +115,7 @@ const VariantQueryPage: React.FC<{}> = () => {
     const getArgs = () => ({
         input: {
             variant: {
-                assemblyId: queryOptionsForm.assemblyId.value,
+                assemblyId: resolveAssembly(queryOptionsForm.assemblyId.value),
                 maxFrequency: +queryOptionsForm.maxFrequency.value,
             },
             gene: {
@@ -167,7 +167,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Gene Name
                         </Typography>
                         <GeneSearch
-                            assembly={queryOptionsForm.assemblyId.value}
+                            assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
                             geneName={queryOptionsForm.gene.value}
                             onChange={geneName =>
                                 updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
@@ -227,7 +227,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
-                                value: resolveAssembly(a),
+                                value: a,
                                 label: a,
                             }))}
                             placeholder="Select"
