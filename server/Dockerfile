@@ -4,8 +4,6 @@ LABEL org.opencontainers.image.source https://github.com/ccmbioinfo/ssmp
 
 WORKDIR /usr/app
 
-RUN apt-get update && apt-get install -y tabix
-
 RUN wget -O /home/node/cadd_wgs_ghr37_index.gz.tbi https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh37/whole_genome_SNVs_inclAnno.tsv.gz.tbi \ 
     && chown node:node /home/node/cadd_wgs_ghr37_index.gz.tbi
 
