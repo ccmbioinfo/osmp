@@ -1,10 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAsyncDebounce } from 'react-table';
 import { useFetchAutocompleteQuery } from '../apollo/hooks';
 import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
 
+interface AutocompleteResults {
+    autocompleteResults: {
+        hits: {
+            symbol: string;
+            ensembl: {
+                gene: string;
+            };
+            genomic_pos: {
+                chr: string;
+                end: number;
+                start: number;
+            };
+            genomic_pos_hg19: {
+                chr: string;
+                end: number;
+                start: number;
+            };
+        }[];
+    };
+}
 interface SelectionValue {
     ensemblId: string;
     name: string;
@@ -41,7 +61,25 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
 
+    console.log(options, autocompleteResults);
+
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
+
+    const formatAutocompleteOptions = useCallback(
+        (autocompleteResults: AutocompleteResults) =>
+            (autocompleteResults.autocompleteResults.hits || [])
+                .filter(hit => !!hit.ensembl?.gene && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
+                .map((hit, i) => ({
+                    value: {
+                        name: hit.symbol.toUpperCase(),
+                        ensemblId: hit.ensembl?.gene,
+                        position: getPosition(assembly, hit),
+                    },
+                    id: i,
+                    label: hit.symbol.toUpperCase(),
+                })),
+        [assembly]
+    );
 
     useEffect(() => {
         if (options.length) {
@@ -56,23 +94,9 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
     useEffect(() => {
         if (autocompleteResults) {
-            setOptions(
-                (autocompleteResults.autocompleteResults.hits || [])
-                    .filter(
-                        hit => !!hit.ensembl?.gene && !!hit.genomic_pos && !!hit.genomic_pos_hg19
-                    )
-                    .map((hit, i) => ({
-                        value: {
-                            name: hit.symbol.toUpperCase(),
-                            ensemblId: hit.ensembl?.gene,
-                            position: getPosition(assembly, hit),
-                        },
-                        id: i,
-                        label: hit.symbol.toUpperCase(),
-                    }))
-            );
+            setOptions(formatAutocompleteOptions(autocompleteResults));
         }
-    }, [assembly, autocompleteResults]);
+    }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
 
     return (
         <ComboBox
