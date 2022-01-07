@@ -17,7 +17,7 @@ const objectToCsv = <T extends object>(data: T[]) => {
 };
 
 const formatFileName = (filename: string) =>
-    filename.includes('.csv') ? filename : `${filename}.csv`;
+    filename.endsWith('.csv') ? filename : `${filename}.csv`;
 
 const download = (data: BlobPart, filename: string) => {
     const blob = new Blob([data], { type: 'text/csv' });
