@@ -32,9 +32,7 @@ export default function DownloadModal<T extends {}>({
                 onClick={() =>
                     downloadCsv(
                         rows.map(r => r.values as T),
-                        visibleColumns
-                            .filter(c => c.id && !c.id.match(/^empty/i))
-                            .map(c => c.id as keyof T),
+                        visibleColumns.filter(c => c.id && !c.id.match(/^empty/i)).map(c => c.id),
                         filename
                     )
                 }

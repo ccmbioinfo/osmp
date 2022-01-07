@@ -1,3 +1,4 @@
+import { IdType } from 'react-table';
 import getKeys from '../utils/getKeys';
 
 const objectToCsv = <T extends object>(data: T[]) => {
@@ -38,11 +39,11 @@ const download = (data: BlobPart, filename: string) => {
 
 const downloadCsv = <T extends object>(
     rows: T[],
-    selectedHeaders: (keyof T)[],
+    selectedHeaders: IdType<T>[],
     filename: string
 ) => {
     const selectedRows = rows.map(r =>
-        selectedHeaders.reduce((acc, curr) => ({ ...acc, ...{ [curr]: r[curr] } }), {})
+        selectedHeaders.reduce((acc, curr) => ({ ...acc, ...{ [curr]: r[curr as keyof T] } }), {})
     );
 
     const csvData = objectToCsv(selectedRows);
