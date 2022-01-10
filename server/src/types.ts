@@ -188,22 +188,6 @@ export enum Assembly {
   GRCh38 = 38,
   hg38 = 38,
 }
-
-export interface AdditionalDocument {
-  date?: Date;
-  filename?: string;
-  comments?: string;
-  author?: string;
-  link?: string;
-  filesize?: number;
-  print?: boolean;
-}
-
-export interface Apgar {
-  apgar1?: number;
-  apgar5?: number;
-}
-
 export interface ClinicalDiagnosis {
   id?: string;
   label?: string;
@@ -215,46 +199,9 @@ export interface Contact {
   id?: string;
   email?: string;
 }
-
-export interface DateOfBirth {
-  month?: number;
-  year?: number;
-  day?: number;
-}
-
-export interface DateOfDeath {
-  year?: number;
-  range?: {
-    years?: number;
-  };
-}
-
 export interface Ethnicity {
   maternal_ethnicity?: string[];
   paternal_ethnicity?: string[];
-}
-
-export interface FamilyHistory {
-  miscarriages?: Maybe<boolean>;
-  consanguinity?: Maybe<boolean>;
-  affectedRelatives?: Maybe<boolean>;
-}
-
-export interface Qualifier {
-  id?: string;
-  label?: string;
-  type?: string;
-}
-
-export interface Feature {
-  id?: string;
-  label?: string;
-  type?: string;
-  observed?: string;
-  supporting_documents?: AdditionalDocument[];
-  supporting_images?: AdditionalDocument[];
-  notes?: string;
-  qualifiers?: Qualifier[];
 }
 export interface Gene {
   comments?: string;
@@ -263,15 +210,6 @@ export interface Gene {
   strategy?: string[];
   status?: string;
 }
-
-export interface Meta {
-  hgnc_version?: Date;
-  omim_version?: Date;
-  ordo_version?: string;
-  hpo_version?: string;
-  phenotips_version?: string;
-}
-
 export interface Notes {
   family_history?: string;
   prenatal_development?: string;
@@ -280,99 +218,11 @@ export interface Notes {
   medical_history?: string;
   diagnosis_notes?: string;
 }
-
-export interface ParentalNames {
-  paternal_first_name?: string;
-  maternal_first_name?: string;
-  paternal_last_name?: string;
-  maternal_last_name?: string;
-}
-
-export interface PatientName {
-  last_name?: string;
-  first_name?: string;
-}
-
-export interface PrenatalPerinatalHistory {
-  multipleGestation?: Maybe<boolean>;
-  icsi?: Maybe<string>;
-  maternal_age?: number;
-  paternal_age?: number;
-  ivf?: Maybe<string>;
-  assistedReproduction_donoregg?: Maybe<string>;
-  assistedReproduction_iui?: Maybe<string>;
-  twinNumber?: Maybe<number>;
-  assistedReproduction_fertilityMeds?: boolean;
-  gestation?: Maybe<number>;
-  assistedReproduction_surrogacy?: Maybe<boolean>;
-  assistedReproduction_donorsperm?: Maybe<boolean>;
-}
-
-export interface Solved {
-  pubmed_id?: string[];
-  notes?: string;
-  status?: string;
-}
-
-export interface Specificity {
-  date?: Date;
-  score?: number;
-  server?: string;
-}
-
-export interface Variant {
-  start_position?: string;
-  evidence?: string[];
-  gene?: string;
-  chromosome?: string;
-  inheritance?: string;
-  end_position?: string;
-  transcript?: string;
-  sanger?: string;
-  zygosity?: string;
-  interpretation?: string;
-  reference_genome?: string;
-  protein?: string;
-  effect?: string;
-  dbsnp?: string;
-  cdna?: string;
-  segregation?: string;
-}
-
 export interface G4RDPatientQueryResult {
-  additional_documents?: AdditionalDocument[];
-  allergies?: string[];
-  date?: Date;
-  parental_names?: ParentalNames;
-  apgar?: Apgar;
   notes: Notes;
   ethnicity: Ethnicity;
-  date_of_birth?: DateOfBirth;
-  global_mode_of_inheritance?: ClinicalDiagnosis[];
-  solved?: Solved;
-  external_id?: string;
-  variants?: Variant[];
   clinicalStatus?: string;
-  disorders?: ClinicalDiagnosis[];
-  features?: Feature[];
-  date_of_death?: DateOfDeath;
-  contact?: Contact[];
-  last_modification_date?: Date;
-  patient_name?: PatientName;
-  specificity?: Specificity;
-  nonstandard_features?: any[];
   id: string;
-  additional_images?: AdditionalDocument[];
-  prenatal_perinatal_history?: PrenatalPerinatalHistory;
-  family_history?: FamilyHistory;
   genes?: Gene[];
-  life_status?: string;
-  sex?: string;
   'clinical-diagnosis'?: ClinicalDiagnosis[];
-  reporter?: string;
-  last_modified_by?: string;
-  global_age_of_onset?: ClinicalDiagnosis[];
-  report_id?: string;
-  meta?: Meta;
-  medical_reports?: AdditionalDocument[];
 }

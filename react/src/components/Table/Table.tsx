@@ -70,7 +70,6 @@ const resolveSex = (sexPhenotype: string) => {
 
 /* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
 const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
-    console.log(queryResult);
     return queryResult.flatMap(d => {
         if (d.variant.callsets.length) {
             //one row per individual per callset
@@ -93,7 +92,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
 
-    console.log(tableData);
     const sortByArray = useMemo(
         () => [
             {

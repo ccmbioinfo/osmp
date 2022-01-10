@@ -171,8 +171,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
   patientResponse: G4RDPatientQueryResult[],
   position: string
 ) => {
-  console.log(variantResponse);
-
   const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
 
   return (variantResponse.results || []).map(r => {
@@ -186,11 +184,13 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
     let ethnicity: string = '';
 
     if (patient) {
-      console.log(patient);
       const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
       const classifications = patient.clinicalStatus;
       const diagnosis = patient.notes.diagnosis_notes;
-      ethnicity = Object.values(patient.ethnicity).flat().map(p => p.trim()).join(', ')
+      ethnicity = Object.values(patient.ethnicity)
+        .flat()
+        .map(p => p.trim())
+        .join(', ');
       info = {
         candidateGene,
         diagnosis,
