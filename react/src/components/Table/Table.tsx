@@ -267,6 +267,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
+                        Cell: ({ row }) => (
+                            <CellText capitalize>
+                                <CellPopover state={row.original} id="ethnicity" />
+                            </CellText>
+                        ),
                         Header: <Tooltip helperText={HEADERS['ethnicity']}>Ethnicity</Tooltip>,
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
