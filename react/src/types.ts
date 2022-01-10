@@ -54,6 +54,7 @@ export interface PhenotypicFeaturesFields {
     levelSeverity?: Maybe<string>;
     onsetType?: Maybe<string>;
     phenotypeId?: Maybe<string>;
+    phenotypeLabel?: Maybe<string>;
 }
 
 export interface DiseaseFields {
@@ -61,6 +62,7 @@ export interface DiseaseFields {
     description?: Maybe<string>;
     diseaseId: string;
     levelSeverity?: Maybe<string>;
+    diseaseLabel?: Maybe<string>;
     outcome?: Maybe<string>;
     stage?: Maybe<string>;
 }

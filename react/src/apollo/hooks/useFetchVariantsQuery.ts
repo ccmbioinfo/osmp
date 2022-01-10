@@ -46,6 +46,7 @@ const fetchVariantsQuery = gql`
                         }
                         description
                         diseaseId
+                        diseaseLabel
                         levelSeverity
                         outcome
                         stage
@@ -67,6 +68,7 @@ const fetchVariantsQuery = gql`
                         levelSeverity
                         onsetType
                         phenotypeId
+                        phenotypeLabel
                     }
                     sex
                 }

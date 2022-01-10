@@ -70,6 +70,7 @@ const resolveSex = (sexPhenotype: string) => {
 
 /* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
 const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
+    console.log(queryResult);
     return queryResult.flatMap(d => {
         if (d.variant.callsets.length) {
             //one row per individual per callset
@@ -91,6 +92,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
+
+    console.log(tableData);
     const sortByArray = useMemo(
         () => [
             {
@@ -270,9 +273,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: state =>
                             state.phenotypicFeatures
-                                ? state.phenotypicFeatures
-                                      .map(p => `${p.phenotypeId}: ${p.levelSeverity}`)
-                                      .join(', ')
+                                ? state.phenotypicFeatures.map(p => p.phenotypeLabel).join(', ')
                                 : '',
                         id: 'phenotypicFeatures',
                         Cell: ({ row }: { row: Row<ResultTableColumns> }) => (

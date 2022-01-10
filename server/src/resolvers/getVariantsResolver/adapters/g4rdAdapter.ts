@@ -171,12 +171,14 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
   patientResponse: G4RDPatientQueryResult[],
   position: string
 ) => {
+  console.log(variantResponse);
+
   const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
 
   return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { refseqId, ...restVariant } = r.variant;
-    const { individual, contactInfo } = r;
+    const { individual, contactInfo } = r;  
 
     const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
 
@@ -184,6 +186,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
     let ethnicity: string = '';
 
     if (patient) {
+      console.log(patient)
       const candidateGene = (patient.genes ?? []).map(g => g.gene).join(', ');
       const classifications = patient.clinicalStatus;
       const diagnosis = patient.notes.diagnosis_notes;
@@ -200,7 +203,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
     const variant: VariantResponseFields = {
       ...restVariant,
       info: restVariantInfo,
-      referenceName: position.split(':')[0],
+      referenceName: position.split(':')[0], // change this to chromosome
     };
 
     const individualResponseFields: IndividualResponseFields = {
@@ -208,7 +211,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       ethnicity,
       info,
     };
-
     return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
   });
 };

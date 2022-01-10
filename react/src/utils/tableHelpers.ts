@@ -29,7 +29,7 @@ export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQue
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
     const { diseases, info: individualInfo, ...restIndividual } = result.individual;
     const flattenedDiseases = (diseases || []).reduce(
-        (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseId}: ${c.description}`,
+        (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseLabel}`,
         ''
     );
 

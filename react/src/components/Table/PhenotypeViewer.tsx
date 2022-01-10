@@ -33,7 +33,7 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded,
                 {phenotypes.map((p, key) => (
                     <>
                         <Text key={key} onClick={onClick}>
-                            {`${p.phenotypeId}${p.levelSeverity ? `: ${p.levelSeverity}` : ''}`}
+                            {p.phenotypeLabel || ''}
                         </Text>
                         {!isLastElement(key, phenotypes) && <CellBorder />}
                     </>
