@@ -5,39 +5,6 @@ import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
 
-interface AutocompleteResults {
-    autocompleteResults: {
-        hits: {
-            symbol: string;
-            ensembl: {
-                gene: string;
-            };
-            genomic_pos: {
-                chr: string;
-                end: number;
-                start: number;
-            };
-            genomic_pos_hg19: {
-                chr: string;
-                end: number;
-                start: number;
-            };
-        }[];
-    };
-}
-interface SelectionValue {
-    ensemblId: string;
-    name: string;
-    position: string;
-}
-
-interface GeneSearchProps {
-    assembly: AssemblyId;
-    geneName: string;
-    onSelect: (gene: SelectionValue) => void;
-    onChange: (geneName: string) => void;
-}
-
 interface HitPosition {
     chr: string;
     start: number;
@@ -47,6 +14,30 @@ interface HitPosition {
 interface HitPositions {
     genomic_pos: HitPosition;
     genomic_pos_hg19: HitPosition;
+}
+interface AutocompleteResults {
+    autocompleteResults: {
+        hits?: {
+            symbol: string;
+            ensembl?: {
+                gene: string;
+            };
+            genomic_pos: HitPosition;
+            genomic_pos_hg19: HitPosition;
+        }[];
+    };
+}
+interface SelectionValue {
+    ensemblId?: string;
+    name: string;
+    position: string;
+}
+
+interface GeneSearchProps {
+    assembly: AssemblyId;
+    geneName: string;
+    onSelect: (gene: SelectionValue) => void;
+    onChange: (geneName: string) => void;
 }
 
 const getPosition = (assembly: AssemblyId, position: HitPositions) => {
