@@ -112,20 +112,21 @@ const VariantQueryPage: React.FC<{}> = () => {
             queryOptionsFormValidator
         );
 
-    const getArgs = () => ({
-        input: {
-            variant: {
-                assemblyId: resolveAssembly(queryOptionsForm.assemblyId.value),
-                maxFrequency: +queryOptionsForm.maxFrequency.value,
+    const getArgs = () =>
+        ({
+            input: {
+                variant: {
+                    assemblyId: resolveAssembly(queryOptionsForm.assemblyId.value),
+                    maxFrequency: +queryOptionsForm.maxFrequency.value,
+                },
+                gene: {
+                    ensemblId: queryOptionsForm.ensemblId.value,
+                    geneName: queryOptionsForm.gene.value,
+                    position: queryOptionsForm.position.value,
+                },
+                sources: queryOptionsForm.sources.value,
             },
-            gene: {
-                ensemblId: queryOptionsForm.ensemblId.value,
-                geneName: queryOptionsForm.gene.value,
-                position: queryOptionsForm.position.value,
-            },
-            sources: queryOptionsForm.sources.value,
-        },
-    });
+        } as const);
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
