@@ -77,7 +77,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
 };
 
 interface QueryOptionsFormState {
-    assemblyId: AssemblyId;
+    assemblyId: string;
     ensemblId: string;
     gene: string;
     maxFrequency: string;
@@ -112,20 +112,21 @@ const VariantQueryPage: React.FC<{}> = () => {
             queryOptionsFormValidator
         );
 
-    const getArgs = () => ({
-        input: {
-            variant: {
-                assemblyId: queryOptionsForm.assemblyId.value,
-                maxFrequency: +queryOptionsForm.maxFrequency.value,
+    const getArgs = () =>
+        ({
+            input: {
+                variant: {
+                    assemblyId: resolveAssembly(queryOptionsForm.assemblyId.value),
+                    maxFrequency: +queryOptionsForm.maxFrequency.value,
+                },
+                gene: {
+                    ensemblId: queryOptionsForm.ensemblId.value,
+                    geneName: queryOptionsForm.gene.value,
+                    position: queryOptionsForm.position.value,
+                },
+                sources: queryOptionsForm.sources.value,
             },
-            gene: {
-                ensemblId: queryOptionsForm.ensemblId.value,
-                geneName: queryOptionsForm.gene.value,
-                position: queryOptionsForm.position.value,
-            },
-            sources: queryOptionsForm.sources.value,
-        },
-    });
+        } as const);
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
@@ -167,7 +168,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Gene Name
                         </Typography>
                         <GeneSearch
-                            assembly={queryOptionsForm.assemblyId.value}
+                            assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
                             geneName={queryOptionsForm.gene.value}
                             onChange={geneName =>
                                 updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
@@ -227,7 +228,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
                                 id,
-                                value: resolveAssembly(a),
+                                value: a,
                                 label: a,
                             }))}
                             placeholder="Select"
