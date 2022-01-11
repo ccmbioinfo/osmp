@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { ColumnInstance, HeaderGroup, Row, UseTableInstanceProps } from 'react-table';
-import { downloadCsv } from '../../utils';
 import { camelize } from '../../utils';
 import { Button, Checkbox, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';
@@ -15,8 +14,6 @@ interface ColumnVisibilityModalProps<T extends object>
 }
 
 export default function ColumnVisibilityModal<T extends {}>({
-    rows,
-    visibleColumns,
     headerGroups,
     toggleGroupVisibility,
     toggleHideColumn,
@@ -28,19 +25,6 @@ export default function ColumnVisibilityModal<T extends {}>({
             <Button variant="secondary" onClick={() => setShowModal(!showModal)}>
                 Customize columns
                 <IconPadder>{showModal ? <BsFillEyeFill /> : <BsFillEyeSlashFill />}</IconPadder>
-            </Button>
-            <Button
-                variant="primary"
-                onClick={() =>
-                    downloadCsv(
-                        rows.map(r => r.values as T),
-                        visibleColumns
-                            .filter(c => c.id && !c.id.match(/^empty/i))
-                            .map(c => c.id as keyof T)
-                    )
-                }
-            >
-                Export Data
             </Button>
             <Modal
                 active={showModal}
