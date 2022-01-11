@@ -1,5 +1,4 @@
 import { IdType } from 'react-table';
-import { constants } from 'zlib';
 import getKeys from '../utils/getKeys';
 
 const objectToCsv = <T extends object>(data: T[]) => {
