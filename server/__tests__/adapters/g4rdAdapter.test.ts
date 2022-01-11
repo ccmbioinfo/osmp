@@ -1,10 +1,7 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import {
-  G4RDVariantQueryResult,
-  transformG4RDQueryResponse,
-} from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
+import { G4RDVariantQueryResult, transformG4RDQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
 import typeDefs from '../../src/typeDefs';
-import { CombinedVariantQueryResponse, G4RDPatientQueryResult } from '../../src/types';
+import { CombinedVariantQueryResponse } from '../../src/types';
 import { addMocksToSchema } from '@graphql-tools/mock';
 import { testGraphQLQuery } from '../testGraphQLQuery';
 
@@ -53,7 +50,7 @@ const testResponse: G4RDVariantQueryResult = {
   ],
 };
 
-const patientTestResponse: G4RDPatientQueryResult[] = [
+const patientTestResponse =  [
   {
     date: new Date('2021-12-14T19:40:50.000Z'),
     parental_names: {
