@@ -1,4 +1,5 @@
 import { IdType } from 'react-table';
+import { constants } from 'zlib';
 import getKeys from '../utils/getKeys';
 
 const objectToCsv = <T extends object>(data: T[]) => {
@@ -24,12 +25,10 @@ const download = (data: BlobPart, filename: string) => {
     const blob = new Blob([data], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.setAttribute('hidden', '');
     a.setAttribute('href', url);
     a.setAttribute('download', formatFileName(filename));
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 };
 
 /**
