@@ -42,7 +42,7 @@ export interface G4RDVariantQueryResult {
       IndividualResponseFields,
       'individualId' | 'diseases' | 'sex' | 'phenotypicFeatures'
     >;
-    variant: G4RDVariantBaseResponseFields & { refseqId: string } & { info: G4RDVariantInfoFields };
+    variant: G4RDVariantBaseResponseFields & { chromosome: string } & { info: G4RDVariantInfoFields };
   }[];
 }
 
@@ -175,12 +175,12 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
 
   return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    const { refseqId, ...restVariant } = r.variant;
+    const { chromosome, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
 
-    const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
+    console.log(r.variant)
 
-    console.log(patient);
+    const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
 
     let info: IndividualInfoFields = {};
     let ethnicity: string = '';
@@ -207,7 +207,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
     const variant: VariantResponseFields = {
       ...restVariant,
       info: restVariantInfo,
-      referenceName: position.split(':')[0], // change this to chromosome
+      referenceName: chromosome, // change this to chromosome
     };
 
     const individualResponseFields: IndividualResponseFields = {
