@@ -75,6 +75,7 @@ export default gql`
 
   type IndividualInfoFields {
     candidateGene: String
+    solved: String
     classifications: String
     diagnosis: String
   }

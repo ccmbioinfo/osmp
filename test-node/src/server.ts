@@ -200,6 +200,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
           geographicOrigin: Faker.address.country(),
           individualId,
           info: {
+            solved: Faker.helpers.randomize(['solved', 'unsolved']),
             candidateGene: 'SOME_GENE',
             classifications: 'SOME_CLASSIFICATIONS',
             diagnosis: 'SOME_DIAGNOSIS',

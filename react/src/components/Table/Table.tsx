@@ -338,6 +338,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
                     },
                     {
+                        accessor: 'solved',
+                        id: 'solved',
+                        Header: 'Case Solved',
+                        width: getColumnWidth(tableData, 'solvd', 'Case Solved'),
+                    },
+                    {
                         accessor: 'contactInfo',
                         Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contactInfo',

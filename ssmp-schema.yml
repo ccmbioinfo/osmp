@@ -125,6 +125,8 @@ components:
           type: string
         classifications:
           type: string
+        solved: 
+          type: string
     Query:
       description: |
         A request to the variants endpoint

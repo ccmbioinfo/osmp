@@ -201,6 +201,7 @@ describe('Test g4rd query response transformer', () => {
             ethnicity
             info {
               candidateGene
+              solved
               diagnosis
               classifications
             }

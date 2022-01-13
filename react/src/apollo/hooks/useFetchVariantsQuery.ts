@@ -57,6 +57,7 @@ const fetchVariantsQuery = gql`
                     info {
                         diagnosis
                         candidateGene
+                        solved
                         classifications
                     }
                     phenotypicFeatures {

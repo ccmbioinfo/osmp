@@ -61,6 +61,7 @@ describe('Test minimal getVariants query', () => {
             info {
               diagnosis
               candidateGene
+              solved
               classifications
             }
             phenotypicFeatures {

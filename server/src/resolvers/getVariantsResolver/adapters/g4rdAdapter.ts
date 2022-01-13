@@ -180,18 +180,22 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
 
     const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
 
+    console.log(patient);
+
     let info: IndividualInfoFields = {};
     let ethnicity: string = '';
 
     if (patient) {
       const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
-      const classifications = patient.clinicalStatus;
-      const diagnosis = patient.notes.diagnosis_notes;
+      const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
+      const diagnosis = patient.clinicalStatus;
+      const solved = patient.solved ? patient.solved.status : '';
       ethnicity = Object.values(patient.ethnicity)
         .flat()
         .map(p => p.trim())
         .join(', ');
       info = {
+        solved,
         candidateGene,
         diagnosis,
         classifications,

@@ -69,6 +69,7 @@ export interface DiseaseFields {
 
 export interface IndividualInfoFields {
     candidateGene?: Maybe<string>;
+    solved?: Maybe<string>;
     classifications?: Maybe<string>;
     diagnosis?: Maybe<string>;
 }
