@@ -92,6 +92,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
 
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
+
     const sortByArray = useMemo(
         () => [
             {
@@ -265,15 +266,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'ethnicity',
                         id: 'ethnicity',
+                        Cell: ({ row }) => (
+                            <CellText capitalize>
+                                <CellPopover state={row.original} id="ethnicity" />
+                            </CellText>
+                        ),
                         Header: <Tooltip helperText={HEADERS['ethnicity']}>Ethnicity</Tooltip>,
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
                     {
                         accessor: state =>
                             state.phenotypicFeatures
-                                ? state.phenotypicFeatures
-                                      .map(p => `${p.phenotypeId}: ${p.levelSeverity}`)
-                                      .join(', ')
+                                ? state.phenotypicFeatures.map(p => p.phenotypeLabel).join(', ')
                                 : '',
                         id: 'phenotypicFeatures',
                         Cell: ({ row }: { row: Row<ResultTableColumns> }) => (
@@ -333,6 +337,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'diagnosis',
                         Header: 'Diagnosis',
                         width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
+                    },
+                    {
+                        accessor: 'solved',
+                        id: 'solved',
+                        Header: 'Case Solved',
+                        width: getColumnWidth(tableData, 'solvd', 'Case Solved'),
                     },
                     {
                         accessor: 'contactInfo',
@@ -451,6 +461,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
+
             <ScrollContainer ignoreElements="p" hideScrollbars={false} vertical={false}>
                 <Styles>
                     <table {...getTableProps()}>

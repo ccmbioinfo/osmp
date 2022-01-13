@@ -59,6 +59,7 @@ export default gql`
     levelSeverity: String
     onsetType: String
     phenotypeId: String
+    phenotypeLabel: String
   }
 
   type IndividualResponseFields {
@@ -74,6 +75,7 @@ export default gql`
 
   type IndividualInfoFields {
     candidateGene: String
+    solved: String
     classifications: String
     diagnosis: String
   }
@@ -82,6 +84,7 @@ export default gql`
     ageOfOnset: AgeOfOnsetFields
     description: String
     diseaseId: String
+    diseaseLabel: String
     levelSeverity: String
     outcome: String
     stage: String

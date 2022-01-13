@@ -2,11 +2,16 @@ import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
 import styled from 'styled-components/macro';
 import { Flex } from '../index';
 
-export const CellText = styled.span`
+interface CellTextProps {
+    capitalize?: boolean;
+}
+
+export const CellText = styled.span<CellTextProps>`
     overflow: hidden;
     white-space: nowrap;
     display: block;
     text-overflow: ellipsis;
+    ${props => props.capitalize && `text-transform: capitalize`}
 `;
 
 export const TableFilters = styled(props => <Flex {...props} />)`

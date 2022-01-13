@@ -12,12 +12,12 @@ interface CellPopoverProps<T> {
 }
 
 const Container = styled(props => <Background {...props} />)`
-    padding: ${props => props.theme.space[1]} ${props => props.theme.space[5]};
+    padding: ${props => props.theme.space[4]} ${props => props.theme.space[4]};
     width: 300px;
 `;
 
 const FlexContainer = styled(props => <Flex {...props} />)`
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 `;
 
 const PopoverText = styled(props => <CellText {...props} />)`
@@ -53,7 +53,7 @@ export const CellPopover: React.FC<CellPopoverProps<ResultTableColumns>> = ({ st
                 />
                 <Container variant="light">
                     <FlexContainer alignItems="center" justifyContent="space-between">
-                        <PopoverText>{state[id]}</PopoverText>
+                        <PopoverText capitalize>{state[id]}</PopoverText>
                         <FlexContainer>
                             <IconButton
                                 variant="light"

@@ -11,6 +11,8 @@ import {
   ResultTransformer,
   VariantQueryResponse,
   VariantResponseFields,
+  G4RDPatientQueryResult,
+  IndividualInfoFields,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
 
@@ -31,7 +33,7 @@ interface G4RDVariantInfoFields {
   cdna: string;
 }
 
-export interface G4RDQueryResult {
+export interface G4RDVariantQueryResult {
   exists: boolean;
   numTotalResults: number;
   results: {
@@ -40,7 +42,9 @@ export interface G4RDQueryResult {
       IndividualResponseFields,
       'individualId' | 'diseases' | 'sex' | 'phenotypicFeatures'
     >;
-    variant: G4RDVariantBaseResponseFields & { refseqId: string } & { info: G4RDVariantInfoFields };
+    variant: G4RDVariantBaseResponseFields & { chromosome: string } & {
+      info: G4RDVariantInfoFields;
+    };
   }[];
 }
 
@@ -52,7 +56,8 @@ const getG4rdNodeQuery = async ({
   input: { gene: geneInput, variant },
 }: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
-  let G4RDNodeQueryResponse: null | AxiosResponse<G4RDQueryResult> = null;
+  let G4RDVariantQueryResponse: null | AxiosResponse<G4RDVariantQueryResult> = null;
+  let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
   let Authorization = '';
   try {
     Authorization = await getAuthHeader();
@@ -68,7 +73,7 @@ const getG4rdNodeQuery = async ({
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
   const { position, ...gene } = geneInput;
   try {
-    G4RDNodeQueryResponse = await axios.post<G4RDQueryResult>(
+    G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
       url,
       {
         gene,
@@ -79,6 +84,21 @@ const getG4rdNodeQuery = async ({
         httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }
     );
+
+    // Get patients info
+    if (G4RDVariantQueryResponse) {
+      const individualIds = G4RDVariantQueryResponse.data.results.map(
+        v => v.individual.individualId
+      );
+      const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
+        .map(id => `id=${id}`)
+        .join('&')}`;
+
+      G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(patientUrl, {
+        headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+      });
+    }
   } catch (e) {
     logger.error(e);
     G4RDNodeQueryError = e;
@@ -86,7 +106,8 @@ const getG4rdNodeQuery = async ({
 
   return {
     data: transformG4RDQueryResponse(
-      (G4RDNodeQueryResponse?.data as G4RDQueryResult) || [],
+      (G4RDVariantQueryResponse?.data as G4RDVariantQueryResult) || [],
+      (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
       position
     ),
     error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
@@ -147,23 +168,53 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
   }
 };
 
-export const transformG4RDQueryResponse: ResultTransformer<G4RDQueryResult> = (
-  response,
-  position: string
+export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = (
+  variantResponse,
+  patientResponse: G4RDPatientQueryResult[]
 ) => {
-  return (response.results || []).map(r => {
+  const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
+
+  return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
-    const { refseqId, ...restVariant } = r.variant;
+    const { chromosome, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
+
+    const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
+
+    let info: IndividualInfoFields = {};
+    let ethnicity: string = '';
+
+    if (patient) {
+      const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
+      const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
+      const diagnosis = patient.clinicalStatus;
+      const solved = patient.solved ? patient.solved.status : '';
+      ethnicity = Object.values(patient.ethnicity)
+        .flat()
+        .map(p => p.trim())
+        .join(', ');
+      info = {
+        solved,
+        candidateGene,
+        diagnosis,
+        classifications,
+      };
+    }
+
     const { aaChanges, ...restVariantInfo } = restVariant.info;
 
     const variant: VariantResponseFields = {
       ...restVariant,
       info: restVariantInfo,
-      referenceName: position.split(':')[0],
+      referenceName: chromosome, // change this to chromosome
     };
 
-    return { individual, variant, contactInfo, source: SOURCE_NAME };
+    const individualResponseFields: IndividualResponseFields = {
+      ...individual,
+      ethnicity,
+      info,
+    };
+    return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
   });
 };
 

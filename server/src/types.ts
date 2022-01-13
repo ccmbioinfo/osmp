@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
@@ -53,19 +54,22 @@ export interface PhenotypicFeaturesFields {
   levelSeverity?: Maybe<string>;
   onsetType?: Maybe<string>;
   phenotypeId?: Maybe<string>;
+  phenotypeLabel?: Maybe<string>;
 }
 
 export interface DiseaseFields {
   ageOfOnset?: Maybe<AgeOfOnsetFields>;
   description?: Maybe<string>;
   diseaseId: string;
+  diseaseLabel?: Maybe<string>;
   levelSeverity?: Maybe<string>;
   outcome?: Maybe<string>;
   stage?: Maybe<string>;
 }
 
 export interface IndividualInfoFields {
-  cadidateGene?: Maybe<string>;
+  candidateGene?: Maybe<string>;
+  solved?: Maybe<string>;
   classifications?: Maybe<string>;
   diagnosis?: Maybe<string>;
 }
@@ -121,6 +125,46 @@ export interface OAQueryResponse {
 
 /* end OpenAPI Schema types */
 
+/* G4RD GET patients endpoint schema */
+export interface Contact {
+  institution?: string;
+  name?: string;
+  id?: string;
+  email?: string;
+}
+export interface Ethnicity {
+  maternal_ethnicity?: string[];
+  paternal_ethnicity?: string[];
+}
+export interface Gene {
+  comments?: string;
+  gene?: string;
+  id?: string;
+  strategy?: string[];
+  status?: string;
+}
+export interface Notes {
+  family_history?: string;
+  prenatal_development?: string;
+  indication_for_referral?: string;
+  genetic_notes?: string;
+  medical_history?: string;
+  diagnosis_notes?: string;
+}
+
+export interface Solved {
+  status: 'solved' | 'unsolved' | '';
+}
+export interface G4RDPatientQueryResult {
+  notes: Notes;
+  ethnicity: Ethnicity;
+  clinicalStatus?: string;
+  id: string;
+  genes?: Gene[];
+  solved?: Solved;
+}
+
+/* End of G4RD GET patients endpoint schema */
 export interface VariantCoordinate {
   alt: string;
   chrom: string;
