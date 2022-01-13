@@ -15,7 +15,7 @@ const testResponse: G4RDVariantQueryResult = {
       variant: {
         variantId: 'rs201202918',
         assemblyId: 'GRCh37',
-        refseqId: 'NM_001304829.2',
+        chromosome: 'NM_001304829.2',
         start: 100573569,
         end: 100573569,
         ref: 'G',
