@@ -23,8 +23,8 @@ const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
 
 const _getAnnotations = async (position: string, assemblyId: string) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
-  const annotationUrl = resolvedAssemblyId === '38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
-  const indexPath = resolvedAssemblyId === '38' ? INDEX_38_PATH : INDEX_37_PATH;
+  const annotationUrl = resolvedAssemblyId === 'GRCh38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
+  const indexPath = resolvedAssemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
 
   const tbiIndexed = new TabixIndexedFile({
     filehandle: new RemoteFile(annotationUrl, { fetch: fetch as Fetcher }),
