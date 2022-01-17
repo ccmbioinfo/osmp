@@ -35,7 +35,7 @@ describe('Test local query adapter', () => {
         },
         variant: {
           alt: 'T',
-          assemblyId: '37',
+          assemblyId: 'GRCh37',
           callsets: [],
           end: 50162978,
           info: {},
