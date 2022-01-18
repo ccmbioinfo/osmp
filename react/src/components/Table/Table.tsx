@@ -13,6 +13,7 @@ import {
     useFlexLayout,
     useGlobalFilter,
     usePagination,
+    useResizeColumns,
     useSortBy,
     useTable,
 } from 'react-table';
@@ -382,6 +383,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             },
         },
         useFilters,
+        useResizeColumns,
         useFlexLayout,
         useGlobalFilter,
         useSortBy,
@@ -508,6 +510,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     justifyContent="center"
                                                                 >
                                                                     {column.render('Header')}
+                                                                    {/* Use column.getResizerProps to hook up the events correctly */}
+                                                                    <div
+                                                                        {...column.getResizerProps()}
+                                                                        className={`resizer ${
+                                                                            column.isResizing
+                                                                                ? 'isResizing'
+                                                                                : ''
+                                                                        }`}
+                                                                    />
+
                                                                     {column.Header !== 'Core' &&
                                                                         isHeader(column) &&
                                                                         (isHeaderExpanded(
