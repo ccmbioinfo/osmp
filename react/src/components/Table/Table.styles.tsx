@@ -59,6 +59,32 @@ export const Styles = styled.div`
             justify-content: center;
             transition: all 0.5s ease;
 
+            ${
+                '' /* In this example we use an absolutely position resizer,
+            so this is required. */
+            }
+            position: relative;
+
+            :last-child {
+                border-right: 0;
+            }
+
+            .resizer {
+                right: 0;
+                background: white;
+                width: 3px;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                z-index: 1;
+                ${'' /* prevents from scrolling while dragging on touch devices */}
+                touch-action :none;
+
+                &.isResizing {
+                    background: ${props => props.theme.colors.primary};
+                }
+            }
+
             :last-child {
                 border-right: 0;
             }
