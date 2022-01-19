@@ -65,6 +65,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                 .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
                 .map(hit => {
                     const { symbol, ...rest } = hit;
+
                     const ensembl = [rest.ensembl].flat();
                     const genomic_pos = [rest.genomic_pos].flat();
                     const genomic_pos_hg19 = [rest.genomic_pos_hg19].flat();
@@ -106,7 +107,6 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
     useEffect(() => {
         if (autocompleteResults) {
-            console.log(autocompleteResults);
             setOptions(formatAutocompleteOptions(autocompleteResults));
         }
     }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
