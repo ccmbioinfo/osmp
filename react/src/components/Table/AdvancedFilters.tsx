@@ -21,12 +21,9 @@ export default function AdvancedFilters<T extends {}>({
     filters,
     setFilter,
 }: AdvancedFiltersProps<T>) {
-    console.log(columns);
     return (
         <TableFilters justifyContent="flex-start" alignItems="flex-start">
             {columns
-                // .flatMap(c => c.columns)
-                // .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
                 .filter(c => !!c.id && c.type !== 'empty' && !c.disableFilters)
                 .map((v, i) => (
                     <Column key={i}>

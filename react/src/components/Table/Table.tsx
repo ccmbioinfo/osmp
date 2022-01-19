@@ -456,8 +456,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
             </TableFilters>
 
-            {console.log(columns, visibleColumns)}
-
             {advancedFiltersOpen && (
                 <AdvancedFilters
                     columns={visibleColumns}
