@@ -1,4 +1,4 @@
-import { ColumnGroup, Filters, IdType, Row, UseFiltersInstanceProps } from 'react-table';
+import { ColumnInstance, Filters, IdType, Row, UseFiltersInstanceProps } from 'react-table';
 import SOURCES from '../../constants/sources';
 import { Column, Typography } from '../index';
 import { ResultTableColumns } from './Table';
@@ -6,7 +6,7 @@ import { TableFilters } from './Table.styles';
 import { ColumnFilter } from './TableFilter/ColumnFilter';
 
 interface AdvancedFiltersProps<T extends {}> extends Pick<UseFiltersInstanceProps<T>, 'setFilter'> {
-    columns: ColumnGroup<T>[];
+    columns: ColumnInstance<T>[];
     preFilteredRows: Row<T>[];
     filters: Filters<T>;
 }
@@ -21,11 +21,12 @@ export default function AdvancedFilters<T extends {}>({
     filters,
     setFilter,
 }: AdvancedFiltersProps<T>) {
+    console.log(columns);
     return (
         <TableFilters justifyContent="flex-start" alignItems="flex-start">
             {columns
-                .flatMap(c => c.columns)
-                .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
+                // .flatMap(c => c.columns)
+                // .sort((a, b) => ((a.id || 0) > (b.id || 0) ? 1 : -1))
                 .filter(c => !!c.id && c.type !== 'empty' && !c.disableFilters)
                 .map((v, i) => (
                     <Column key={i}>
