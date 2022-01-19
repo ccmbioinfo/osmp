@@ -15,15 +15,17 @@ interface HitPositions {
     genomic_pos: HitPosition;
     genomic_pos_hg19: HitPosition;
 }
+
+interface Gene {
+    gene: string;
+}
 interface AutocompleteResults {
     autocompleteResults: {
         hits?: {
             symbol: string;
-            ensembl?: {
-                gene: string;
-            };
-            genomic_pos: HitPosition;
-            genomic_pos_hg19: HitPosition;
+            ensembl: Gene | Gene[];
+            genomic_pos: HitPosition | HitPosition[];
+            genomic_pos_hg19: HitPosition | HitPosition[];
         }[];
     };
 }
@@ -39,6 +41,9 @@ interface GeneSearchProps {
     onSelect: (gene: SelectionValue) => void;
     onChange: (geneName: string) => void;
 }
+
+/* Typeguard */
+const isMultipleGenes = (arg: Gene | Gene[]): arg is Gene[] => (arg as Gene[]).length >= 0;
 
 const getPosition = (assembly: AssemblyId, position: HitPositions) => {
     const is38 = /38/.test(assembly);
@@ -57,16 +62,27 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     const formatAutocompleteOptions = useCallback(
         (autocompleteResults: AutocompleteResults) =>
             (autocompleteResults.autocompleteResults.hits || [])
-                .filter(hit => !!hit.ensembl?.gene && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
-                .map((hit, i) => ({
-                    value: {
-                        name: hit.symbol.toUpperCase(),
-                        ensemblId: hit.ensembl?.gene,
-                        position: getPosition(assembly, hit),
-                    },
-                    id: i,
-                    label: hit.symbol.toUpperCase(),
-                })),
+                .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
+                .map((hit, i) => {
+                    const results = [hit.ensembl].flat().map((e, eid) => {
+                        return {
+                            value: {
+                                name: hit.symbol.toUpperCase(),
+                                ensemblId: e.gene,
+                                position: getPosition(assembly, {
+                                    genomic_pos: ([hit.genomic_pos].flat() as HitPosition[])[eid],
+                                    genomic_pos_hg19: (
+                                        [hit.genomic_pos_hg19].flat() as HitPosition[]
+                                    )[eid],
+                                }),
+                            },
+                            id: i + eid,
+                            label: isMultipleGenes(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
+                        };
+                    });
+                    return results;
+                })
+                .flat(),
         [assembly]
     );
 
@@ -83,6 +99,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
     useEffect(() => {
         if (autocompleteResults) {
+            console.log(autocompleteResults);
             setOptions(formatAutocompleteOptions(autocompleteResults));
         }
     }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
