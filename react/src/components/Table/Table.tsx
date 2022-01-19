@@ -133,12 +133,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Core',
                 id: 'core',
-                type: 'fixed',
                 columns: [
+                    {
+                        id: 'emptyCore',
+                        type: 'empty',
+                        Header: '',
+                        disableSortBy: true,
+                        width: 70,
+                    },
                     {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
-                        type: 'fixed',
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                         disableFilters: true,
@@ -146,7 +151,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'start',
                         id: 'start',
-                        type: 'fixed',
                         Header: 'Start',
                         width: getColumnWidth(tableData, 'start', 'Start'),
                         filter: 'between',
@@ -154,7 +158,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'end',
                         id: 'end',
-                        type: 'fixed',
                         Header: 'End',
                         width: getColumnWidth(tableData, 'end', 'End'),
                         filter: 'between',
@@ -164,20 +167,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
-                        type: 'fixed',
                     },
                     {
                         accessor: 'alt',
                         Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
-                        type: 'fixed',
                     },
                     {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
-                        type: 'fixed',
                         Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
                         width: getColumnWidth(tableData, 'source', 'Source'),
                     },
@@ -379,6 +379,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 hiddenColumns: [
                     getChildColumns('case_details'),
                     getChildColumns('variation_details'),
+                    'emptyCore',
                 ].flat(),
             },
         },
@@ -520,8 +521,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                         }`}
                                                                     />
 
-                                                                    {column.Header !== 'Core' &&
-                                                                        isHeader(column) &&
+                                                                    {isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
                                                                         ) ? (

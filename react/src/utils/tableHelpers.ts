@@ -80,10 +80,10 @@ export const calculateColumnWidth = (
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
 
 export const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
-    if (isHeader(column) && column.columns && column.Header !== 'Core') {
+    if (isHeader(column) && column.columns) {
         const visibleColumns = column.columns.filter(c => c.isVisible).map(c => c.id);
         const intersection = visibleColumns.filter(value =>
-            ['emptyVariationDetails', 'emptyCaseDetails'].includes(value)
+            ['emptyVariationDetails', 'emptyCaseDetails', 'emptyCore'].includes(value)
         );
         return !intersection.length;
     }
