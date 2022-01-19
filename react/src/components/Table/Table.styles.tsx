@@ -58,6 +58,8 @@ export const Styles = styled.div`
             align-items: center;
             justify-content: center;
             transition: all 0.5s ease;
+            overflow: hidden;
+            user-select: none;
 
             ${
                 '' /* In this example we use an absolutely position resizer,
@@ -108,6 +110,7 @@ export const TH = styled.th`
     text-align: center;
     transition: all 0.5s ease;
     border: none;
+    overflow: hidden;
 `;
 
 export const Footer = styled.div`
