@@ -63,25 +63,32 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
         (autocompleteResults: AutocompleteResults) =>
             (autocompleteResults.autocompleteResults.hits || [])
                 .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
-                .map((hit, i) => {
-                    const results = [hit.ensembl].flat().map((e, eid) => {
-                        return {
-                            value: {
-                                name: hit.symbol.toUpperCase(),
-                                ensemblId: e.gene,
-                                position: getPosition(assembly, {
-                                    genomic_pos: ([hit.genomic_pos].flat() as HitPosition[])[eid],
-                                    genomic_pos_hg19: (
-                                        [hit.genomic_pos_hg19].flat() as HitPosition[]
-                                    )[eid],
-                                }),
-                            },
-                            id: i + eid,
-                            label: isMultipleGenes(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
-                        };
-                    });
-                    return results;
+                .map(hit => {
+                    const { symbol, ...rest } = hit;
+                    const ensembl = [rest.ensembl].flat();
+                    const genomic_pos = [rest.genomic_pos].flat();
+                    const genomic_pos_hg19 = [rest.genomic_pos_hg19].flat();
+                    return {
+                        symbol,
+                        ensembl,
+                        genomic_pos,
+                        genomic_pos_hg19,
+                    };
                 })
+                .map((hit, i) =>
+                    hit.ensembl.map((e, eid) => ({
+                        value: {
+                            name: hit.symbol.toUpperCase(),
+                            ensemblId: e.gene,
+                            position: getPosition(assembly, {
+                                genomic_pos: hit.genomic_pos[eid],
+                                genomic_pos_hg19: hit.genomic_pos_hg19[eid],
+                            }),
+                        },
+                        id: i + eid,
+                        label: isMultipleGenes(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
+                    }))
+                )
                 .flat(),
         [assembly]
     );
