@@ -14,6 +14,7 @@ export interface FlexProps {
         | 'space-between'
         | 'space-around';
     variant?: 'success' | 'main' | 'light';
+    fullWidth?: boolean;
 }
 
 export const Background = styled.div<BackgroundProps>`
@@ -39,6 +40,7 @@ export const Flex = styled.div<FlexProps>`
     display: flex;
     flex-wrap: wrap;
     justify-content: ${props => props.justifyContent ?? 'inherit'};
+    ${props => props.fullWidth && `width: 100%;`}
 `;
 
 export const InlineFlex = styled.div`

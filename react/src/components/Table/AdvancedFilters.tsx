@@ -1,6 +1,8 @@
 import { ColumnInstance, Filters, IdType, Row, UseFiltersInstanceProps } from 'react-table';
+import styled from 'styled-components';
 import SOURCES from '../../constants/sources';
 import { Column, Typography } from '../index';
+import { Flex } from '../Layout';
 import { ResultTableColumns } from './Table';
 import { TableFilters } from './Table.styles';
 import { ColumnFilter } from './TableFilter/ColumnFilter';
@@ -15,6 +17,15 @@ const FILTER_OPTIONS: { [K in keyof ResultTableColumns]?: string[] } = {
     source: SOURCES,
 };
 
+const SubtleText = styled.p`
+    color: #bababa;
+    font-size: ${props => props.theme.fontSizes.xs};
+    margin-inline-end: ${props => props.theme.space[4]};
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
 export default function AdvancedFilters<T extends {}>({
     columns,
     preFilteredRows,
@@ -27,9 +38,14 @@ export default function AdvancedFilters<T extends {}>({
                 .filter(c => !!c.id && c.type !== 'empty' && !c.disableFilters)
                 .map((v, i) => (
                     <Column key={i}>
-                        <Typography variant="subtitle" bold>
-                            {v.Header}
-                        </Typography>
+                        <Flex justifyContent="space-between" fullWidth>
+                            <Typography variant="subtitle" bold>
+                                {v.Header}
+                            </Typography>
+                            <SubtleText onClick={() => setFilter(v.id, undefined)}>
+                                Clear
+                            </SubtleText>
+                        </Flex>
                         <ColumnFilter
                             preFilteredRows={preFilteredRows}
                             filterModel={filters.find(f => f.id === v.id)}
