@@ -32,7 +32,6 @@ export default function ColumnVisibilityModal<T extends {}>({
                 title="Customize Columns"
             >
                 {headerGroups[0].headers
-                    // .filter(header => header.Header !== 'Core')
                     .map((g, id) => (
                         <div key={id}>
                             <Checkbox
