@@ -15,15 +15,17 @@ interface HitPositions {
     genomic_pos: HitPosition;
     genomic_pos_hg19: HitPosition;
 }
+
+interface Gene {
+    gene: string;
+}
 interface AutocompleteResults {
     autocompleteResults: {
         hits?: {
             symbol: string;
-            ensembl?: {
-                gene: string;
-            };
-            genomic_pos: HitPosition;
-            genomic_pos_hg19: HitPosition;
+            ensembl: Gene | Gene[];
+            genomic_pos: HitPosition | HitPosition[];
+            genomic_pos_hg19: HitPosition | HitPosition[];
         }[];
     };
 }
@@ -57,16 +59,34 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     const formatAutocompleteOptions = useCallback(
         (autocompleteResults: AutocompleteResults) =>
             (autocompleteResults.autocompleteResults.hits || [])
-                .filter(hit => !!hit.ensembl?.gene && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
-                .map((hit, i) => ({
-                    value: {
-                        name: hit.symbol.toUpperCase(),
-                        ensemblId: hit.ensembl?.gene,
-                        position: getPosition(assembly, hit),
-                    },
-                    id: i,
-                    label: hit.symbol.toUpperCase(),
-                })),
+                .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
+                .map((hit, i) => {
+                    const { symbol, ...rest } = hit;
+
+                    const ensembl = [rest.ensembl].flat();
+                    const genomic_pos = [rest.genomic_pos].flat();
+                    const genomic_pos_hg19 = [rest.genomic_pos_hg19].flat();
+                    const genes = {
+                        symbol,
+                        ensembl,
+                        genomic_pos,
+                        genomic_pos_hg19,
+                    };
+
+                    return genes.ensembl.map((e, eid) => ({
+                        value: {
+                            name: genes.symbol.toUpperCase(),
+                            ensemblId: e.gene,
+                            position: getPosition(assembly, {
+                                genomic_pos: genes.genomic_pos[eid],
+                                genomic_pos_hg19: genes.genomic_pos_hg19[eid],
+                            }),
+                        },
+                        id: i + eid,
+                        label: Array.isArray(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
+                    }));
+                })
+                .flat(),
         [assembly]
     );
 
