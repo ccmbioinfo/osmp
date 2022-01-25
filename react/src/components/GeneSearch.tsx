@@ -42,9 +42,6 @@ interface GeneSearchProps {
     onChange: (geneName: string) => void;
 }
 
-/* Typeguard */
-const isMultipleGenes = (arg: Gene | Gene[]): arg is Gene[] => (arg as Gene[]).length >= 0;
-
 const getPosition = (assembly: AssemblyId, position: HitPositions) => {
     const is38 = /38/.test(assembly);
     const resolvedPosition = is38 ? position.genomic_pos : position.genomic_pos_hg19;
@@ -63,33 +60,32 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
         (autocompleteResults: AutocompleteResults) =>
             (autocompleteResults.autocompleteResults.hits || [])
                 .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
-                .map(hit => {
+                .map((hit, i) => {
                     const { symbol, ...rest } = hit;
 
                     const ensembl = [rest.ensembl].flat();
                     const genomic_pos = [rest.genomic_pos].flat();
                     const genomic_pos_hg19 = [rest.genomic_pos_hg19].flat();
-                    return {
+                    const genes = {
                         symbol,
                         ensembl,
                         genomic_pos,
                         genomic_pos_hg19,
                     };
-                })
-                .map((hit, i) =>
-                    hit.ensembl.map((e, eid) => ({
+
+                    return genes.ensembl.map((e, eid) => ({
                         value: {
-                            name: hit.symbol.toUpperCase(),
+                            name: genes.symbol.toUpperCase(),
                             ensemblId: e.gene,
                             position: getPosition(assembly, {
-                                genomic_pos: hit.genomic_pos[eid],
-                                genomic_pos_hg19: hit.genomic_pos_hg19[eid],
+                                genomic_pos: genes.genomic_pos[eid],
+                                genomic_pos_hg19: genes.genomic_pos_hg19[eid],
                             }),
                         },
                         id: i + eid,
-                        label: isMultipleGenes(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
-                    }))
-                )
+                        label: Array.isArray(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
+                    }));
+                })
                 .flat(),
         [assembly]
     );
