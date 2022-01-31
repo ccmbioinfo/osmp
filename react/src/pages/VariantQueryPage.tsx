@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
+import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
@@ -17,6 +18,7 @@ import {
     Input,
     Spinner,
     Table,
+    Tooltip,
     Typography,
 } from '../components';
 import SOURCES from '../constants/sources';
@@ -202,9 +204,16 @@ const VariantQueryPage: React.FC<{}> = () => {
                     </Column>
 
                     <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold>
-                            Max Frequency
-                        </Typography>
+                        <Flex alignItems="center">
+                            <Typography variant="subtitle" bold>
+                                Max Frequency
+                            </Typography>
+                            <Tooltip helperText="The maximum allele frequency within each selected database">
+                                <div>
+                                    <RiInformationFill color="grey" />
+                                </div>
+                            </Tooltip>
+                        </Flex>
                         <Input
                             variant="outlined"
                             onChange={e =>
