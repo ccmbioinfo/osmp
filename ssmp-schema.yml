@@ -1,6 +1,6 @@
 openapi: "3.0.2"
 info:
-  title: Single-Sided Matching Portal API
+  title: One-Sided Matching Portal API
   version: "0.5"
 
 paths:
