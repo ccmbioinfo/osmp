@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
                 <NavbarContainer>
                     <NavLogo to="/">
                         {/* <NavIcon />  To-do: Add some logo here ...*/}
-                        Single-Sided Matching Portal
+                        One-Sided Matching Portal
                     </NavLogo>
                     <Menu>
                         <MenuItem>
