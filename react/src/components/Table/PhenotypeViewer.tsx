@@ -21,9 +21,7 @@ const Text = styled(props => <CellText {...props} />)`
     margin-inline-end: 0;
     white-space: break-spaces;
     cursor: pointer;
-    &:hover {
-        text-decoration: underline dotted;
-    }
+    text-decoration: underline dotted;
 `;
 
 const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, expanded, onClick }) => {

@@ -25,9 +25,7 @@ const Container = styled(motion.div)`
 
 const ClickableText = styled(props => <CellText {...props} />)`
     cursor: pointer;
-    &:hover {
-        text-decoration: underline dotted;
-    }
+    text-decoration: underline dotted;
 `;
 
 const Popover: React.FC<Props> = ({ content, children, isOpen, onClick, onOutsideClick }) => {
