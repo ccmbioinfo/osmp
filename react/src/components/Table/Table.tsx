@@ -313,7 +313,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ],
             },
             {
-                Header: 'Variation Details',
+                Header: 'Variant Details',
                 id: 'variation_details',
                 columns: [
                     {

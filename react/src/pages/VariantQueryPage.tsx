@@ -147,7 +147,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                 <Column alignItems="flex-start">
                     <Flex alignItems="center">
                         <Typography variant="h4" bold>
-                            Select Sources:
+                            Select Contributors:
                         </Typography>
                         {SOURCES.filter(Boolean).map(source => (
                             <Checkbox
@@ -216,7 +216,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                     </Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
-                            Assembly ID
+                            Genome Assembly
                         </Typography>
                         <ComboBox
                             onSelect={val =>
@@ -245,7 +245,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             onClick={() => fetchVariants({ variables: getArgs() })}
                             variant="primary"
                         >
-                            Fetch
+                            Search
                         </Button>
                         <Button
                             onClick={() => {
