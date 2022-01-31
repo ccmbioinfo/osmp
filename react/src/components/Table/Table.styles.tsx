@@ -166,6 +166,7 @@ export const SkipToBeginning = styled(BsFillSkipStartFill)`
 `;
 
 export const IconPadder = styled.span`
+    display: flex;
     margin-inline-start: ${props => props.theme.space[3]};
     color: ${props => props.theme.colors.primary};
     transition: all 0.3s ease;

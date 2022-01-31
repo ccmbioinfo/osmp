@@ -26,6 +26,7 @@ import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
+import { IconPadder } from '../components/Table/Table.styles';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
@@ -209,9 +210,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 Max Frequency
                             </Typography>
                             <Tooltip helperText="The maximum allele frequency within each selected database">
-                                <div>
+                                <IconPadder>
                                     <RiInformationFill color="grey" />
-                                </div>
+                                </IconPadder>
                             </Tooltip>
                         </Flex>
                         <Input
