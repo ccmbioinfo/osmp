@@ -60,7 +60,7 @@ const ErrorFallback: React.FC<CustomErrorFallbackProps> = ({ variant, resetError
             return (
                 <>
                     <div>
-                        <NavLogo>SSMP</NavLogo>
+                        <NavLogo>OSMP</NavLogo>
                     </div>
                     <Background>
                         <div role="alert">

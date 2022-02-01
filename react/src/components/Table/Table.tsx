@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
+import { RiInformationFill } from 'react-icons/ri';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
@@ -42,7 +43,6 @@ import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
-import { RiInformationFill } from 'react-icons/ri';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
