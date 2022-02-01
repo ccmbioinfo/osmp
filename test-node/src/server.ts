@@ -61,7 +61,7 @@ app.get(
 
     if (!result) {
       res.statusCode = 404;
-      return res.json('NOT FOUND');
+      return res.json('There are no variants matching your search criteria.');
     } else {
       return res.json(result);
     }

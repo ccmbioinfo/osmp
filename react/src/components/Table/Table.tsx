@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
+import { RiInformationFill } from 'react-icons/ri';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
@@ -38,7 +39,6 @@ import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
-import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
@@ -131,7 +131,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const columns = useMemo(
         (): ColumnGroup<ResultTableColumns>[] => [
             {
-                Header: 'Core',
+                Header: 'Variant',
                 id: 'core',
                 columns: [
                     {
@@ -164,13 +164,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'ref',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
                     },
                     {
                         accessor: 'alt',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
                     },
@@ -178,7 +176,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
-                        Header: <Tooltip helperText={HEADERS['source']}>Source</Tooltip>,
+                        Header: 'Source',
                         width: getColumnWidth(tableData, 'source', 'Source'),
                     },
                 ],
@@ -260,7 +258,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
-                        Header: <Tooltip helperText={HEADERS['sex']}>Sex</Tooltip>,
+                        Header: 'Sex',
                         Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
@@ -271,7 +269,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 <CellPopover state={row.original} id="ethnicity" />
                             </CellText>
                         ),
-                        Header: <Tooltip helperText={HEADERS['ethnicity']}>Ethnicity</Tooltip>,
+                        Header: 'Ethnicity',
                         width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
                     },
                     {
@@ -283,7 +281,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'diseases',
                         id: 'diseases',
-                        Header: <Tooltip helperText={HEADERS['diseases']}>Diseases</Tooltip>,
+                        Header: 'Diseases',
                         width: getColumnWidth(tableData, 'diseases', 'Diseases'),
                     },
                     {
@@ -296,18 +294,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'contactInfo',
                         Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contactInfo',
-                        Header: <Tooltip helperText={HEADERS['contactInfo']}>Contact</Tooltip>,
+                        Header: 'Contact',
                         width: 120,
                         disableFilters: true,
                     },
                     {
                         accessor: 'geographicOrigin',
                         id: 'geographicOrigin',
-                        Header: (
-                            <Tooltip helperText={HEADERS['geographicOrigin']}>
-                                Geographic Origin
-                            </Tooltip>
-                        ),
+                        Header: 'Geographic Origin',
                         width: getColumnWidth(tableData, 'geographicOrigin', 'Geographic Origin'),
                     },
                 ],
@@ -341,7 +335,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'af',
                         id: 'af',
-                        Header: <Tooltip helperText={HEADERS['af']}>gnomad_exome_AF</Tooltip>,
+                        Header: 'gnomad_exome_AF',
                         width: getColumnWidth(tableData, 'af', 'gnomad_exome_AF'),
                         filter: 'between',
                     },
@@ -375,6 +369,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             filterTypes,
             initialState: {
+                pageSize: tableData.length,
                 sortBy: sortByArray,
                 hiddenColumns: [
                     getChildColumns('case_details'),
@@ -397,14 +392,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         getTableBodyProps,
         headerGroups,
         page,
-        nextPage,
-        previousPage,
-        canNextPage,
-        canPreviousPage,
-        pageOptions,
-        gotoPage,
-        pageCount,
-        setPageSize,
         state,
         setFilter,
         setAllFilters,
@@ -416,7 +403,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         rows,
     } = tableInstance;
 
-    const { filters, globalFilter, pageIndex, pageSize } = state;
+    const { filters, globalFilter } = state;
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
@@ -511,6 +498,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     justifyContent="center"
                                                                 >
                                                                     {column.render('Header')}
+                                                                    {!column.id.includes('empty') &&
+                                                                        !!HEADERS[column.id] && (
+                                                                            <Tooltip
+                                                                                helperText={
+                                                                                    HEADERS[
+                                                                                        column.id
+                                                                                    ]
+                                                                                }
+                                                                            >
+                                                                                <IconPadder>
+                                                                                    <RiInformationFill color="lightgrey" />
+                                                                                </IconPadder>
+                                                                            </Tooltip>
+                                                                        )}
                                                                     {/* Use column.getResizerProps to hook up the events correctly */}
                                                                     <div
                                                                         {...column.getResizerProps()}
@@ -547,15 +548,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 />
                                                                             </IconPadder>
                                                                         ))}
-                                                                    {column.isSorted ? (
-                                                                        column.isSortedDesc ? (
-                                                                            <BsFillCaretUpFill />
+                                                                    <IconPadder>
+                                                                        {column.isSorted ? (
+                                                                            column.isSortedDesc ? (
+                                                                                <BsFillCaretUpFill color="lightgrey" />
+                                                                            ) : (
+                                                                                <BsFillCaretDownFill color="lightgrey" />
+                                                                            )
                                                                         ) : (
-                                                                            <BsFillCaretDownFill />
-                                                                        )
-                                                                    ) : (
-                                                                        ''
-                                                                    )}
+                                                                            ''
+                                                                        )}
+                                                                    </IconPadder>
                                                                 </Flex>
                                                             </motion.section>
                                                         )}
@@ -608,21 +611,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     </table>
                 </Styles>
             </ScrollContainer>
-
-            <Footer
-                props={{
-                    pageSize,
-                    pageCount,
-                    pageIndex,
-                    pageOptions,
-                    canPreviousPage,
-                    canNextPage,
-                    gotoPage,
-                    previousPage,
-                    nextPage,
-                    setPageSize,
-                }}
-            />
         </>
     );
 };

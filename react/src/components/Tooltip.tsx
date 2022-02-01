@@ -11,6 +11,7 @@ interface TooltipProps {
 
 const TextWrapper = styled.span`
     text-decoration: dotted underline;
+    color: blue;
 `;
 
 const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
@@ -35,7 +36,7 @@ const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
     if (isReactText(children)) {
         trigger = (
             <TextWrapper
-                style={{ textDecoration: 'dotted underline' }}
+                style={{ textDecoration: 'dotted underline', color: 'blue' }}
                 className="tooltip-text-wrapper"
                 {...triggerProps}
                 {...hoverProps}

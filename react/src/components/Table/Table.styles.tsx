@@ -23,7 +23,7 @@ export const Styles = styled.div`
     padding: 1rem;
     display: block;
     max-width: 100%;
-    max-height: 60vh;
+    max-height: 80vh;
 
     table {
         width: 100%;
@@ -166,6 +166,7 @@ export const SkipToBeginning = styled(BsFillSkipStartFill)`
 `;
 
 export const IconPadder = styled.span`
+    display: flex;
     margin-inline-start: ${props => props.theme.space[3]};
     color: ${props => props.theme.colors.primary};
     transition: all 0.3s ease;

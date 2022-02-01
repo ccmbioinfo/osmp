@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
+import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
@@ -17,8 +18,10 @@ import {
     Input,
     Spinner,
     Table,
+    Tooltip,
     Typography,
 } from '../components';
+import { IconPadder } from '../components/Table/Table.styles';
 import SOURCES from '../constants/sources';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
@@ -134,6 +137,26 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const client = useApolloClient();
 
+    const clearCache = () => {
+        const cache = client.cache;
+        if (data) {
+            data.getVariants.errors.forEach(e => {
+                let id = cache.identify({ ...e.error });
+                cache.evict({ id: id });
+                cache.gc();
+            });
+        }
+    };
+
+    const clearAllErrors = () => {
+        [errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]
+            .flat()
+            .forEach(e => {
+                clearCache();
+                dispatch(clearError(e.uid));
+            });
+    };
+
     const toggleSource = (source: string) =>
         queryOptionsForm.sources.value.includes(source)
             ? updateQueryOptionsForm({
@@ -202,9 +225,16 @@ const VariantQueryPage: React.FC<{}> = () => {
                     </Column>
 
                     <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold>
-                            Max Frequency
-                        </Typography>
+                        <Flex alignItems="center">
+                            <Typography variant="subtitle" bold>
+                                Max Frequency
+                            </Typography>
+                            <Tooltip helperText="The maximum allele frequency within each selected database">
+                                <IconPadder>
+                                    <RiInformationFill color="grey" />
+                                </IconPadder>
+                            </Tooltip>
+                        </Flex>
                         <Input
                             variant="outlined"
                             onChange={e =>
@@ -242,7 +272,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                             disabled={
                                 loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
                             }
-                            onClick={() => fetchVariants({ variables: getArgs() })}
+                            onClick={() => {
+                                clearAllErrors();
+                                fetchVariants({ variables: getArgs() });
+                            }}
                             variant="primary"
                         >
                             Search
@@ -266,14 +299,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         key={e.uid}
                         message={formatErrorMessage(e.code, e.message, e.source)}
                         handleCloseError={() => {
-                            const cache = client.cache;
-                            if (data) {
-                                data.getVariants.errors.forEach(e => {
-                                    let id = cache.identify({ ...e.error });
-                                    cache.evict({ id: id });
-                                    cache.gc();
-                                });
-                            }
+                            clearCache();
                             dispatch(clearError(e.uid));
                         }}
                     />
