@@ -21,12 +21,12 @@ import {
     Tooltip,
     Typography,
 } from '../components';
+import { IconPadder } from '../components/Table/Table.styles';
 import SOURCES from '../constants/sources';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
-import { IconPadder } from '../components/Table/Table.styles';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
@@ -136,6 +136,26 @@ const VariantQueryPage: React.FC<{}> = () => {
     const { state: errorState, dispatch } = useErrorContext();
 
     const client = useApolloClient();
+
+    const clearCache = () => {
+        const cache = client.cache;
+        if (data) {
+            data.getVariants.errors.forEach(e => {
+                let id = cache.identify({ ...e.error });
+                cache.evict({ id: id });
+                cache.gc();
+            });
+        }
+    };
+
+    const clearAllErrors = () => {
+        [errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]
+            .flat()
+            .forEach(e => {
+                clearCache();
+                dispatch(clearError(e.uid));
+            });
+    };
 
     const toggleSource = (source: string) =>
         queryOptionsForm.sources.value.includes(source)
@@ -252,7 +272,10 @@ const VariantQueryPage: React.FC<{}> = () => {
                             disabled={
                                 loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
                             }
-                            onClick={() => fetchVariants({ variables: getArgs() })}
+                            onClick={() => {
+                                clearAllErrors();
+                                fetchVariants({ variables: getArgs() });
+                            }}
                             variant="primary"
                         >
                             Search
@@ -276,14 +299,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         key={e.uid}
                         message={formatErrorMessage(e.code, e.message, e.source)}
                         handleCloseError={() => {
-                            const cache = client.cache;
-                            if (data) {
-                                data.getVariants.errors.forEach(e => {
-                                    let id = cache.identify({ ...e.error });
-                                    cache.evict({ id: id });
-                                    cache.gc();
-                                });
-                            }
+                            clearCache();
                             dispatch(clearError(e.uid));
                         }}
                     />

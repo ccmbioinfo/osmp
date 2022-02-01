@@ -23,7 +23,7 @@ export const Styles = styled.div`
     padding: 1rem;
     display: block;
     max-width: 100%;
-    max-height: 60vh;
+    max-height: 80vh;
 
     table {
         width: 100%;

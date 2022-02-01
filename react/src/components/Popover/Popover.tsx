@@ -25,6 +25,7 @@ const Container = styled(motion.div)`
 
 const ClickableText = styled(props => <CellText {...props} />)`
     cursor: pointer;
+    color: blue;
     text-decoration: underline dotted;
 `;
 

@@ -39,7 +39,6 @@ import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
-import Footer from './Footer/Footer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
@@ -132,7 +131,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const columns = useMemo(
         (): ColumnGroup<ResultTableColumns>[] => [
             {
-                Header: 'Core',
+                Header: 'Variant',
                 id: 'core',
                 columns: [
                     {
@@ -165,13 +164,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'ref',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="ref" />,
                         id: 'ref',
                         Header: 'Ref',
                     },
                     {
                         accessor: 'alt',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="alt" />,
                         id: 'alt',
                         Header: 'Alt',
                     },
@@ -372,6 +369,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             filterTypes,
             initialState: {
+                pageSize: tableData.length,
                 sortBy: sortByArray,
                 hiddenColumns: [
                     getChildColumns('case_details'),
@@ -394,14 +392,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         getTableBodyProps,
         headerGroups,
         page,
-        nextPage,
-        previousPage,
-        canNextPage,
-        canPreviousPage,
-        pageOptions,
-        gotoPage,
-        pageCount,
-        setPageSize,
         state,
         setFilter,
         setAllFilters,
@@ -413,7 +403,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         rows,
     } = tableInstance;
 
-    const { filters, globalFilter, pageIndex, pageSize } = state;
+    const { filters, globalFilter } = state;
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
@@ -621,21 +611,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     </table>
                 </Styles>
             </ScrollContainer>
-
-            <Footer
-                props={{
-                    pageSize,
-                    pageCount,
-                    pageIndex,
-                    pageOptions,
-                    canPreviousPage,
-                    canNextPage,
-                    gotoPage,
-                    previousPage,
-                    nextPage,
-                    setPageSize,
-                }}
-            />
         </>
     );
 };
