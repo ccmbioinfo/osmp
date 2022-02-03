@@ -42,6 +42,7 @@ import DownloadModal from './DownloadModal';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
+import Divider from '../Divider';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -405,6 +406,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter } = state;
 
+    console.log(filters, rows);
+
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
@@ -451,6 +454,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
+
+            <Flex>
+                <Typography variant="h4" bold>
+                    {tableData.length} total variants found
+                </Typography>
+                {rows.length !== tableData.length && (
+                    <Typography variant="p">
+                        {rows.length} variants matching your filters
+                    </Typography>
+                )}
+            </Flex>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
                 <Styles>

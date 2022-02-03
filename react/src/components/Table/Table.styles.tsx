@@ -43,7 +43,6 @@ export const Styles = styled.div`
             position: sticky;
             top: -10px;
             z-index: 5;
-            background: white;
         }
 
         th,
@@ -99,6 +98,7 @@ export const Styles = styled.div`
 `;
 
 export const THead = styled.thead`
+    background: white;
     box-shadow: ${props => props.theme.boxShadow};
 `;
 
