@@ -168,10 +168,11 @@ const VariantQueryPage: React.FC<{}> = () => {
         <Body>
             <Flex alignItems="center">
                 <Column alignItems="flex-start">
-                    <Flex alignItems="center">
+                    <Column alignItems="center">
                         <Typography variant="h4" bold>
-                            Select Contributors:
+                            Select Contributors
                         </Typography>
+                        <Flex>
                         {SOURCES.filter(Boolean).map(source => (
                             <Checkbox
                                 key={source}
@@ -180,8 +181,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 onClick={toggleSource.bind(null, source)}
                             />
                         ))}
-                        <ErrorText error={queryOptionsForm.sources.error} />
-                    </Flex>
+                        </Flex>
+                        {!!queryOptionsForm.sources.error.length && <ErrorText error={queryOptionsForm.sources.error} />}
+                    </Column>
                 </Column>
             </Flex>
             <Background variant="light">
