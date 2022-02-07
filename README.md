@@ -79,6 +79,13 @@ Apart from Phenotips, another data source for the SSMP development instance is a
     docker-compose up test-node-1
     ```
 
+- to populate MySQL database with variants from STAGER, download this [script](https://sickkidsca.sharepoint.com/:u:/r/sites/thecenterforcomputationalmedicineworkspace/Shared%20Documents/SSMP/data/stager-local-20210716.sql?csf=1&web=1&e=fVzHIB) and run the script using one of these two options:
+  - MySQLWorkbench
+  - ```bash
+    docker exec -i <stager-mysql-container-name> mysql -u <env.STAGER_DB_USER> --password="<env.STAGER_DB_PASSWORD>" <env.STAGER_DB> < <filepath>.sql
+    ```
+    where the `.sql` script is on the host machine.
+
 ## Keycloak
 
 The app uses [keycloak](https://www.keycloak.org/) as an identity provider and identity broker. Essentially, keycloak stores all user information and the app is a keycloak client. The implementation is currently in its earliest phases and documentation will be updated as the project evolves.
@@ -100,7 +107,7 @@ mongoimport --collection=annotations --type=csv \
    --columnsHaveTypes \
    --fields="pos.int32(),ref.string(),alt.string(),chrom.string(),nhomalt.int32(),an.int32(),af.double(),assembly.string()" \
    --file=<filename>.csv \
-   --uri=mongodb://<env.MONGO_INITDB_ROOT_USERNAME>:<env.MONGO_INITDB_ROOT_PASSWORD>@mango/<env.MONGO_INITDB_DATABASE>?autoSource=admin
+   --uri=mongodb://<env.MONGO_INITDB_ROOT_USERNAME>:<env.MONGO_INITDB_ROOT_PASSWORD>@mongo/<env.MONGO_INITDB_DATABASE>?authSource=admin
 ```
 
 Then make sure to create the following indexes:
