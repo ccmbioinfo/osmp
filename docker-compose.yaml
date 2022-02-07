@@ -100,6 +100,8 @@ services:
       MYSQL_USER: "${STAGER_DB_USER}"
       MYSQL_PASSWORD: "${STAGER_DB_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${STAGER_DB_ROOT_PASSWORD}"
+    ports: 
+      - ${STAGER_DB_PORT}:3306 
     volumes:
       - ${STAGER_DATA_VOLUME}:/var/lib/mysql
     networks:
