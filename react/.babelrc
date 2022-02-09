@@ -1,4 +1,3 @@
 {
-    "plugins": ["macros"]
+    "plugins": ["babel-plugin-styled-components"]
 }
-  
