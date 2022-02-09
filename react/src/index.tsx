@@ -2,7 +2,7 @@ import React from 'react';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
 import ReactDOM from 'react-dom';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider } from 'styled-components/macro';
 import { ErrorFallback } from '../src/components';
 import theme from '../src/constants/theme';
 import { buildLink, client } from './apollo/client';

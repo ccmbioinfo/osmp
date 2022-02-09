@@ -1,6 +1,6 @@
 import React from 'react';
 import { ImCheckboxChecked, ImCheckboxUnchecked } from 'react-icons/im';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import Typography from './Typography';
 
 interface CheckboxStyledProps {

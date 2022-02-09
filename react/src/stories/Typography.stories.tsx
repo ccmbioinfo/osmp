@@ -1,5 +1,5 @@
 import { Meta, Story } from '@storybook/react';
-import { ThemeProvider } from 'styled-components';
+import { ThemeProvider } from 'styled-components/macro';
 import Typography from '../components/Typography';
 import theme from '../constants/theme';
 
