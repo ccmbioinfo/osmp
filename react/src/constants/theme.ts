@@ -38,8 +38,8 @@ const theme: DefaultTheme = {
         body: 'Roboto',
     },
     fontSizes: {
-        xl: '2rem',
-        l: '1.5rem',
+        xl: '1.75rem',
+        l: '1.25rem',
         m: '1rem',
         s: '0.9rem',
         xs: '0.75rem',

@@ -173,16 +173,18 @@ const VariantQueryPage: React.FC<{}> = () => {
                             Select Contributors
                         </Typography>
                         <Flex>
-                        {SOURCES.filter(Boolean).map(source => (
-                            <Checkbox
-                                key={source}
-                                checked={queryOptionsForm.sources.value.includes(source)}
-                                label={source.toLocaleLowerCase()}
-                                onClick={toggleSource.bind(null, source)}
-                            />
-                        ))}
+                            {SOURCES.filter(Boolean).map(source => (
+                                <Checkbox
+                                    key={source}
+                                    checked={queryOptionsForm.sources.value.includes(source)}
+                                    label={source.toLocaleLowerCase()}
+                                    onClick={toggleSource.bind(null, source)}
+                                />
+                            ))}
                         </Flex>
-                        {!!queryOptionsForm.sources.error.length && <ErrorText error={queryOptionsForm.sources.error} />}
+                        {!!queryOptionsForm.sources.error.length && (
+                            <ErrorText error={queryOptionsForm.sources.error} />
+                        )}
                     </Column>
                 </Column>
             </Flex>

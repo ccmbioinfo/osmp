@@ -14,6 +14,11 @@ export const CellText = styled.span<CellTextProps>`
     ${props => props.capitalize && `text-transform: capitalize`}
 `;
 
+export const SummaryText = styled.p`
+    margin-top: 0px;
+    color: grey;
+`;
+
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin-bottom: ${props => props.theme.space[4]};

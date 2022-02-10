@@ -35,14 +35,14 @@ import {
     isHeaderExpanded,
 } from '../../utils';
 import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
+import { Column } from '../Layout';
 import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
 import PhenotypeViewer from './PhenotypeViewer';
-import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
+import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
-import Divider from '../Divider';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -455,16 +455,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 />
             )}
 
-            <Flex>
-                <Typography variant="h4" bold>
-                    {tableData.length} total variants found
-                </Typography>
+            <Column>
+                <br />
+                <Typography variant="h3">{tableData.length} total variants found</Typography>
                 {rows.length !== tableData.length && (
-                    <Typography variant="p">
-                        {rows.length} variants matching your filters
-                    </Typography>
+                    <SummaryText>{rows.length} variants matching your filters</SummaryText>
                 )}
-            </Flex>
+            </Column>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
                 <Styles>
