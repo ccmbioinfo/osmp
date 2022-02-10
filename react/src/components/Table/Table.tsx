@@ -35,12 +35,13 @@ import {
     isHeaderExpanded,
 } from '../../utils';
 import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
+import { Column } from '../Layout';
 import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
 import PhenotypeViewer from './PhenotypeViewer';
-import { CellText, IconPadder, Styles, TableFilters, TH, THead } from './Table.styles';
+import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
 
 interface TableProps {
@@ -410,6 +411,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter } = state;
 
+    console.log(filters, rows);
+
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
@@ -456,6 +459,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
+
+            <Column>
+                <br />
+                <Typography variant="h3">{tableData.length} total variants found</Typography>
+                {rows.length !== tableData.length && (
+                    <SummaryText>{rows.length} variants matching your filters</SummaryText>
+                )}
+            </Column>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
                 <Styles>
