@@ -92,6 +92,7 @@ const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
 
+    // transform data from VariantQueryDataResult to ResultTableColumns format.
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
 
     const sortByArray = useMemo(
@@ -389,23 +390,36 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useGlobalFilter,
         useSortBy,
         useExpanded,
-        usePagination
+        usePagination,
+        hooks => {
+            hooks.useInstance.push((Instance) => {
+                const uniqueVariantFields = ["chromosome", "start", "end", "ref", "alt"];
+    
+                let rowSpanHeaders :any = {};  // specify the type here! 
+                uniqueVariantFields.forEach((field) => {
+                    rowSpanHeaders[field] = null;
+                })
+                
+                Object.assign(Instance, {rowSpanHeaders});
+            });
+        }
     );
 
     const {
         getTableProps,
         getTableBodyProps,
-        headerGroups,
-        page,
+        headerGroups,      // useTable 
+        page,               // usePagination 
         state,
         setFilter,
         setAllFilters,
         setGlobalFilter,
         prepareRow,
         preFilteredRows,
-        toggleHideColumn,
-        visibleColumns,
+        toggleHideColumn,       // useTable 
+        visibleColumns,         // useTable
         rows,
+        rowSpanHeaders
     } = tableInstance;
 
     const { filters, globalFilter } = state;
@@ -456,26 +470,28 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
-
-            <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
+            <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>  
                 <Styles>
                     <table {...getTableProps()}>
                         <THead>
+                            {/* Headergroup_0 contains Variant, case details, variant details. Headergroups_1 contains the columns under Variant.   */}
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
                                 const { key, ...restHeaderGroupProps } =
-                                    headerGroup.getHeaderGroupProps();
+                                    headerGroup.getHeaderGroupProps();                           
                                 return (
                                     <motion.tr layout key={key} {...restHeaderGroupProps}>
+                                        {/* Loop through one header group at one time */}
                                         {headerGroup.headers.map(column => {
+                                            console.log(column);
                                             const { key, ...restHeaderProps } =
                                                 column.getHeaderProps(
                                                     column.getSortByToggleProps({
                                                         title: undefined,
                                                     })
                                                 );
-                                            return (
-                                                <TH key={key} {...restHeaderProps}>
+                                        // This is a function call for each column. 
+                                            return (<TH key={key} {...restHeaderProps}>
                                                     <AnimatePresence initial={false}>
                                                         {column.isVisible && (
                                                             <motion.section
@@ -526,7 +542,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 : ''
                                                                         }`}
                                                                     />
-
                                                                     {isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
@@ -578,9 +593,44 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                         <tbody {...getTableBodyProps()}>
                             {page.length > 0 ? (
-                                page.map(row => {
-                                    prepareRow(row);
+                                page.map(row => {                            
+                                    prepareRow(row);  
+                                   
                                     const { key, ...restRowProps } = row.getRowProps();
+
+                                    // if not isHeaderExpanded(caseDetails) 
+                                        // if rowSpanHeaders field values are not equal to the field values in the current row: 1, render this row 2, assign this row's value to rowSpanHeaders object 
+                                        // else: return null. 
+                                    // else: render this row 
+
+                                    const caseDetailsCol = headerGroups[0].headers.find(header => header.Header ==="Case Details");
+
+                                    if (caseDetailsCol && !isHeaderExpanded(caseDetailsCol)){
+
+                                        
+                                        // check if rowSpanders value are equal to the field value in the current row. // remove this function!, directly use the return values, 
+
+                                        const compareRowSpanHeaders = ()=>{
+                                            // loop through rowSpanHeaders key, check if the row's field is equal to rowSpanHeaders value. 
+
+                                            for (const [k, v] of Object.entries(rowSpanHeaders)){
+                                                if (row.cells.find(cell => cell.column.id === k)?.value !== v){
+
+                                                    return false;
+                                                }
+                                            } 
+                                            return true;
+                                        }
+                                        
+                                        if (compareRowSpanHeaders() === false){
+                                            for (const [k, v] of Object.entries(rowSpanHeaders)){
+                                                rowSpanHeaders[k] =  row.cells.find(cell => cell.column.id === k)?.value;
+                                            };
+                                        } else{
+                                            return null;
+                                        }
+                                    }
+                                    
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {
