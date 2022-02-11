@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Background,

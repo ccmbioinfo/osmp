@@ -1,6 +1,6 @@
 import React from 'react';
 import { Maybe } from 'graphql/jsutils/Maybe';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { PhenotypicFeaturesFields } from '../../types';
 import { Divider } from '../index';
 import { CellText } from './Table.styles';

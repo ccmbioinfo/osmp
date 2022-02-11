@@ -1,5 +1,5 @@
 import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 
 export const Footer = styled.div`
     display: flex; 
