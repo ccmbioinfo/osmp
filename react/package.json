@@ -148,6 +148,11 @@
         "tabWidth": 4,
         "singleQuote": true
     },
+    "babel": {
+        "plugins": [
+            "babel-plugin-styled-components"
+        ]
+    },
     "browserslist": {
         "production": [
             ">0.2%",
