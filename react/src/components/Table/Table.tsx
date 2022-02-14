@@ -40,6 +40,7 @@ import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
+import FilterPopover from './FilterPopover';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
@@ -528,6 +529,21 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 </IconPadder>
                                                                             </Tooltip>
                                                                         )}
+
+                                                                    {/* 
+                                                                        Filter icon for filtering individual columns
+                                                                    */}
+                                                                    <FilterPopover
+                                                                        columns={visibleColumns.filter(
+                                                                            c => c.id === column.id
+                                                                        )}
+                                                                        preFilteredRows={
+                                                                            preFilteredRows
+                                                                        }
+                                                                        filters={filters}
+                                                                        setFilter={setFilter}
+                                                                    />
+
                                                                     {/* Use column.getResizerProps to hook up the events correctly */}
                                                                     <div
                                                                         {...column.getResizerProps()}
