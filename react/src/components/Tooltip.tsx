@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Arrow, useHover, useLayer } from 'react-laag';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import theme from '../constants/theme';
 import { Typography } from './index';
 

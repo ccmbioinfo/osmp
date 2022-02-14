@@ -194,7 +194,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: 70,
                     },
                     {
-                        accessor: 'zygosity',
+                        accessor: state =>
+                            state.zygosity?.toLowerCase().includes('het')
+                                ? 'Heterozygous'
+                                : state.zygosity?.toLowerCase().includes('hom')
+                                ? 'Homozygous'
+                                : state.zygosity,
                         filter: 'multiSelect',
                         id: 'zygosity',
                         Header: 'Zygosity',
