@@ -44,12 +44,12 @@ export default function NumberRangeFilter<T extends {}>({
     useEffect(() => {
         const parsed = parseFloat(text);
 
-        if (!parsed) debouncedSetFilter([-Infinity, Infinity]);
+        if (!parsed) debouncedSetFilter([undefined, undefined]);
         else {
             if (filterComparison.less) {
-                debouncedSetFilter([-Infinity, parsed]);
+                debouncedSetFilter([undefined, parsed]);
             } else if (filterComparison.greater) {
-                debouncedSetFilter([parsed, +Infinity]);
+                debouncedSetFilter([parsed, undefined]);
             } else {
                 debouncedSetFilter([parsed, parsed]);
             }

@@ -44,6 +44,7 @@ import FilterPopover from './FilterPopover';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
+import Chip from '../Chip';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -92,8 +93,6 @@ const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
-    const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
-
     const tableData = useMemo(() => prepareData(variantData), [variantData]);
 
     const sortByArray = useMemo(
@@ -432,15 +431,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                     <Button
-                        variant="secondary"
-                        onClick={() => setadvancedFiltersOpen(prev => !prev)}
-                    >
-                        Advanced Filters{' '}
-                        <IconPadder>
-                            <BsFilter />
-                        </IconPadder>
-                    </Button>
-                    <Button
                         disabled={filters.length > 0 ? false : true}
                         variant="secondary"
                         onClick={() => setAllFilters([])}
@@ -461,21 +451,22 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
             </TableFilters>
 
-            {advancedFiltersOpen && (
-                <AdvancedFilters
-                    columns={visibleColumns}
-                    preFilteredRows={preFilteredRows}
-                    filters={filters}
-                    setFilter={setFilter}
-                />
-            )}
-
             <Column>
                 <br />
                 <Typography variant="h3">{tableData.length} total variants found</Typography>
                 {rows.length !== tableData.length && (
                     <SummaryText>{rows.length} variants matching your filters</SummaryText>
                 )}
+                <Flex>
+                    <Typography variant="p" bold>
+                        Active Filters:
+                    </Typography>
+                    {filters.map((f, i) => (
+                        <div key={i}>
+                            <Chip title={f.id} onDelete={() => setFilter(f.id, undefined)} />
+                        </div>
+                    ))}
+                </Flex>
             </Column>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>

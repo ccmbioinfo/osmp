@@ -60,7 +60,7 @@ export function InputComparisonDropdown<T extends {}>({
 
     useClickAway(ref, () => setOpen(false));
 
-    // Ensure value returned is a number and not +/-Infinity
+    // Ensure value returned is a number and not +/undefined
     const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
 
     return (
@@ -89,9 +89,9 @@ export function InputComparisonDropdown<T extends {}>({
                                 case 'equal':
                                     return [n, n];
                                 case 'less':
-                                    return [-Infinity, n];
+                                    return [undefined, n];
                                 case 'greater':
-                                    return [n, +Infinity];
+                                    return [n, undefined];
                             }
                         });
                     }}

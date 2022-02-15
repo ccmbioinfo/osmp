@@ -24,8 +24,8 @@ const getCoordinates = (result: VariantQueryDataResult[]) => {
   });
 
   return {
-    start: start,
-    end: end,
+    start,
+    end,
     coordinates: coordinates,
   };
 };
