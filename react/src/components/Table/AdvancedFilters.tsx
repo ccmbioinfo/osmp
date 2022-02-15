@@ -1,5 +1,5 @@
 import { ColumnInstance, Filters, IdType, Row, UseFiltersInstanceProps } from 'react-table';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import SOURCES from '../../constants/sources';
 import { Column, Typography } from '../index';
 import { Flex } from '../Layout';

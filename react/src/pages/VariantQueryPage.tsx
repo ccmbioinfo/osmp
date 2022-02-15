@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Background,
@@ -168,20 +168,24 @@ const VariantQueryPage: React.FC<{}> = () => {
         <Body>
             <Flex alignItems="center">
                 <Column alignItems="flex-start">
-                    <Flex alignItems="center">
+                    <Column alignItems="center">
                         <Typography variant="h4" bold>
-                            Select Contributors:
+                            Select Contributors
                         </Typography>
-                        {SOURCES.filter(Boolean).map(source => (
-                            <Checkbox
-                                key={source}
-                                checked={queryOptionsForm.sources.value.includes(source)}
-                                label={source.toLocaleLowerCase()}
-                                onClick={toggleSource.bind(null, source)}
-                            />
-                        ))}
-                        <ErrorText error={queryOptionsForm.sources.error} />
-                    </Flex>
+                        <Flex>
+                            {SOURCES.filter(Boolean).map(source => (
+                                <Checkbox
+                                    key={source}
+                                    checked={queryOptionsForm.sources.value.includes(source)}
+                                    label={source.toLocaleLowerCase()}
+                                    onClick={toggleSource.bind(null, source)}
+                                />
+                            ))}
+                        </Flex>
+                        {!!queryOptionsForm.sources.error.length && (
+                            <ErrorText error={queryOptionsForm.sources.error} />
+                        )}
+                    </Column>
                 </Column>
             </Flex>
             <Background variant="light">

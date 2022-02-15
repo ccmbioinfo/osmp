@@ -14,6 +14,11 @@ export const CellText = styled.span<CellTextProps>`
     ${props => props.capitalize && `text-transform: capitalize`}
 `;
 
+export const SummaryText = styled.p`
+    margin-top: 0px;
+    color: grey;
+`;
+
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin-bottom: ${props => props.theme.space[4]};
@@ -43,7 +48,6 @@ export const Styles = styled.div`
             position: sticky;
             top: -10px;
             z-index: 5;
-            background: white;
         }
 
         th,
@@ -99,6 +103,7 @@ export const Styles = styled.div`
 `;
 
 export const THead = styled.thead`
+    background: white;
     box-shadow: ${props => props.theme.boxShadow};
 `;
 
