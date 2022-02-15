@@ -417,9 +417,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     } = tableInstance;
 
     const { filters, globalFilter } = state;
-
-    console.log(filters, rows);
-
+    
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 

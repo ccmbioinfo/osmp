@@ -73,8 +73,6 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                         genomic_pos_hg19,
                     };
 
-                    console.log(genomic_pos);
-
                     return genes.ensembl.map((e, eid) => ({
                         value: {
                             name: genes.symbol.toUpperCase(),
