@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     Filters,
     IdType,
@@ -34,7 +34,15 @@ export function ColumnFilter<T extends {}>({
     setFilter,
     type,
 }: ColumnFilterProps<T>) {
-    const [input, setInput] = useState<string>('');
+    const value = useMemo(() => {
+        if (filters) {
+            return filters.find(filter => filter.id === columnId)?.value;
+        } else {
+            return '';
+        }
+    }, [filters, columnId]);
+
+    const [input, setInput] = useState<string>(value);
 
     useEffect(() => {
         if (!filterModel) setInput('');
@@ -42,7 +50,7 @@ export function ColumnFilter<T extends {}>({
 
     const placeholder = 'Search';
 
-    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 100);
+    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
 
     const handleChange = (val: string) => {
         debouncedSetFilter(val);
@@ -73,7 +81,7 @@ export function ColumnFilter<T extends {}>({
             return (
                 <Input
                     variant="outlined"
-                    value={filters.find(filter => filter.id === columnId)?.value || ''}
+                    value={input}
                     placeholder={placeholder}
                     onChange={e => handleChange(e.target.value)}
                 />

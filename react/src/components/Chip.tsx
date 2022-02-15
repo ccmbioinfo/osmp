@@ -36,7 +36,7 @@ interface ChipProps {
 
 const Chip: React.FC<ChipProps> = ({ title, onDelete }) => {
     return (
-        <ChipContainer>
+        <ChipContainer justifyContent="space-between" alignItems="center">
             <ChipTitle variant="subtitle">{title}</ChipTitle>
             <ChipDeleteContainer variant="primary" onClick={onDelete}>
                 <BsX />
