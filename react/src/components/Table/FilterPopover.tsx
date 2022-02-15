@@ -6,10 +6,9 @@ import { ColumnInstance, Filters, Row } from 'react-table';
 import { Background } from '../Layout';
 import AdvancedFilters from './AdvancedFilters';
 import { ResultTableColumns } from './Table';
+import { IconPadder } from './Table.styles';
 
 interface FilterPopoverProps<T extends {}> {
-    state?: T;
-    id?: keyof T;
     columns: ColumnInstance<T>[];
     preFilteredRows: Row<T>[];
     filters: Filters<T>;
@@ -17,8 +16,6 @@ interface FilterPopoverProps<T extends {}> {
 }
 
 const FilterPopover: React.FC<FilterPopoverProps<ResultTableColumns>> = ({
-    state,
-    id,
     columns,
     preFilteredRows,
     filters,
@@ -41,7 +38,9 @@ const FilterPopover: React.FC<FilterPopoverProps<ResultTableColumns>> = ({
     return (
         <>
             <div {...triggerProps} onClick={() => setAdvancedFilterOpen(true)}>
-                <FaFilter />
+                <IconPadder>
+                    <FaFilter />
+                </IconPadder>
             </div>
             {renderLayer(
                 <div>

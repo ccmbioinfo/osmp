@@ -135,12 +135,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Variant',
                 id: 'core',
+                disableSortBy: true,
+                disableFilters: true,
                 columns: [
                     {
                         id: 'emptyCore',
                         type: 'empty',
                         Header: '',
                         disableSortBy: true,
+                        disableFilters: true,
                         width: 70,
                     },
                     {
@@ -186,12 +189,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Case Details',
                 id: 'case_details',
+                disableSortBy: true,
+                disableFilters: true,
                 columns: [
                     {
                         id: 'emptyCaseDetails',
                         type: 'empty',
                         Header: '',
                         disableSortBy: true,
+                        disableFilters: true,
                         width: 70,
                     },
                     {
@@ -316,12 +322,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Variant Details',
                 id: 'variation_details',
+                disableSortBy: true,
+                disableFilters: true,
                 columns: [
                     {
                         id: 'emptyVariationDetails',
                         type: 'empty',
                         Header: '',
                         disableSortBy: true,
+                        disableFilters: true,
                         width: 79,
                     },
                     { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
@@ -510,6 +519,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     alignItems="center"
                                                                     justifyContent="center"
                                                                 >
+                                                                    {/* 
+                                                                        Filter icon for filtering individual columns
+                                                                    */}
+                                                                    {!column.disableFilters && (
+                                                                        <FilterPopover
+                                                                            columns={visibleColumns.filter(
+                                                                                c =>
+                                                                                    c.id ===
+                                                                                    column.id
+                                                                            )}
+                                                                            preFilteredRows={
+                                                                                preFilteredRows
+                                                                            }
+                                                                            filters={filters}
+                                                                            setFilter={setFilter}
+                                                                        />
+                                                                    )}
                                                                     {column.render('Header')}
                                                                     {!column.id.includes('empty') &&
                                                                         !!HEADERS[column.id] && (
@@ -525,20 +551,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 </IconPadder>
                                                                             </Tooltip>
                                                                         )}
-
-                                                                    {/* 
-                                                                        Filter icon for filtering individual columns
-                                                                    */}
-                                                                    <FilterPopover
-                                                                        columns={visibleColumns.filter(
-                                                                            c => c.id === column.id
-                                                                        )}
-                                                                        preFilteredRows={
-                                                                            preFilteredRows
-                                                                        }
-                                                                        filters={filters}
-                                                                        setFilter={setFilter}
-                                                                    />
 
                                                                     {/* Use column.getResizerProps to hook up the events correctly */}
                                                                     <div
@@ -579,27 +591,29 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                         ))}
 
                                                                     {/* Sorting */}
-                                                                    <IconPadder>
-                                                                        {column.isSortedDesc ? (
-                                                                            <BsFillCaretUpFill
-                                                                                color="lightgrey"
-                                                                                onClick={() =>
-                                                                                    column.toggleSortBy(
-                                                                                        false
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        ) : (
-                                                                            <BsFillCaretDownFill
-                                                                                color="lightgrey"
-                                                                                onClick={() =>
-                                                                                    column.toggleSortBy(
-                                                                                        true
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        )}
-                                                                    </IconPadder>
+                                                                    {!column.disableSortBy && (
+                                                                        <IconPadder>
+                                                                            {column.isSortedDesc ? (
+                                                                                <BsFillCaretUpFill
+                                                                                    color="lightgrey"
+                                                                                    onClick={() =>
+                                                                                        column.toggleSortBy(
+                                                                                            false
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            ) : (
+                                                                                <BsFillCaretDownFill
+                                                                                    color="lightgrey"
+                                                                                    onClick={() =>
+                                                                                        column.toggleSortBy(
+                                                                                            true
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            )}
+                                                                        </IconPadder>
+                                                                    )}
                                                                 </Flex>
                                                             </motion.section>
                                                         )}
