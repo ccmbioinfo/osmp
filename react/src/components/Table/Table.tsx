@@ -481,11 +481,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     <motion.tr layout key={key} {...restHeaderGroupProps}>
                                         {headerGroup.headers.map(column => {
                                             const { key, ...restHeaderProps } =
-                                                column.getHeaderProps(
-                                                    column.getSortByToggleProps({
-                                                        title: undefined,
-                                                    })
-                                                );
+                                                column.getHeaderProps();
                                             return (
                                                 <TH key={key} {...restHeaderProps}>
                                                     <AnimatePresence initial={false}>
@@ -554,6 +550,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                         }`}
                                                                     />
 
+                                                                    {/* Large header grouping */}
                                                                     {isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
@@ -580,15 +577,27 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 />
                                                                             </IconPadder>
                                                                         ))}
+
+                                                                    {/* Sorting */}
                                                                     <IconPadder>
-                                                                        {column.isSorted ? (
-                                                                            column.isSortedDesc ? (
-                                                                                <BsFillCaretUpFill color="lightgrey" />
-                                                                            ) : (
-                                                                                <BsFillCaretDownFill color="lightgrey" />
-                                                                            )
+                                                                        {column.isSortedDesc ? (
+                                                                            <BsFillCaretUpFill
+                                                                                color="lightgrey"
+                                                                                onClick={() =>
+                                                                                    column.toggleSortBy(
+                                                                                        false
+                                                                                    )
+                                                                                }
+                                                                            />
                                                                         ) : (
-                                                                            ''
+                                                                            <BsFillCaretDownFill
+                                                                                color="lightgrey"
+                                                                                onClick={() =>
+                                                                                    column.toggleSortBy(
+                                                                                        true
+                                                                                    )
+                                                                                }
+                                                                            />
                                                                         )}
                                                                     </IconPadder>
                                                                 </Flex>

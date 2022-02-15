@@ -46,27 +46,32 @@ const FilterPopover: React.FC<FilterPopoverProps<ResultTableColumns>> = ({
             {renderLayer(
                 <div>
                     {advancedFilterOpen && (
-                        <Background>
-                            <motion.div
-                                {...restLayerProps}
-                                initial={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate from
-                                animate={{ opacity: 1, scale: 1, x: 0, y: 0 }} // animate to
-                                exit={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate exit
-                                transition={{
-                                    type: 'spring',
-                                    stiffness: 800,
-                                    damping: 35,
-                                }}
-                                style={{ ...style, ...{ zIndex: 999 } }}
-                            >
-                                <AdvancedFilters
-                                    columns={columns}
-                                    preFilteredRows={preFilteredRows}
-                                    filters={filters}
-                                    setFilter={setFilter}
-                                />
-                            </motion.div>
-                        </Background>
+                        <motion.div
+                            {...restLayerProps}
+                            initial={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate from
+                            animate={{ opacity: 1, scale: 1, x: 0, y: 0 }} // animate to
+                            exit={{ opacity: 0, scale: 0.85, x: 0, y: 20 }} // animate exit
+                            transition={{
+                                type: 'spring',
+                                stiffness: 800,
+                                damping: 35,
+                            }}
+                            style={{
+                                ...style,
+                                ...{
+                                    zIndex: 999,
+                                    background: '#f8f8f8',
+                                    borderRadius: '0.5rem',
+                                },
+                            }}
+                        >
+                            <AdvancedFilters
+                                columns={columns}
+                                preFilteredRows={preFilteredRows}
+                                filters={filters}
+                                setFilter={setFilter}
+                            />
+                        </motion.div>
                     )}
                 </div>
             )}
