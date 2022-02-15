@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAsyncDebounce, UseFiltersColumnProps } from 'react-table';
 import { Column, Input, Typography } from '../..';
 import { DefaultFilter } from './ColumnFilter';
@@ -12,8 +12,16 @@ export default function NumberRangeFilter<T extends {}>({
     filter,
     setFilter,
 }: NumberRangeFilterProps<T>) {
+    const value = useMemo(() => {
+        if (filter) {
+            return filter.value.find(v => v !== undefined)?.toString() || '';
+        } else {
+            return '';
+        }
+    }, [filter]);
+
     const [error, setError] = useState<boolean>(false);
-    const [text, setText] = useState('');
+    const [text, setText] = useState(value);
 
     const [filterComparison, setFilterComparison] = useState<ComparisonType>({
         less: false,

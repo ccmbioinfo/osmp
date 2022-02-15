@@ -37,6 +37,7 @@ export {
     CellText,
     clearError,
     Checkbox,
+    Chip,
     Column,
     ComboBox,
     Container,

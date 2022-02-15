@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+    Filters,
     IdType,
     useAsyncDebounce,
     UseFiltersColumnProps,
@@ -18,6 +19,7 @@ interface ColumnFilterProps<T extends {}>
     extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows'>,
         Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     columnId: IdType<T>;
+    filters: Filters<T>;
     filterModel?: DefaultFilter<string | string[] | number | number[]>;
     options?: string[];
     type?: 'singleSelect' | 'multiSelect' | 'text' | 'between';
@@ -27,6 +29,7 @@ export function ColumnFilter<T extends {}>({
     columnId,
     filterModel,
     options,
+    filters,
     preFilteredRows,
     setFilter,
     type,
@@ -39,7 +42,7 @@ export function ColumnFilter<T extends {}>({
 
     const placeholder = 'Search';
 
-    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
+    const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 100);
 
     const handleChange = (val: string) => {
         debouncedSetFilter(val);
@@ -70,7 +73,7 @@ export function ColumnFilter<T extends {}>({
             return (
                 <Input
                     variant="outlined"
-                    value={input}
+                    value={filters.find(filter => filter.id === columnId)?.value || ''}
                     placeholder={placeholder}
                     onChange={e => handleChange(e.target.value)}
                 />

@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
+import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
 import ScrollContainer from 'react-indiana-drag-scroll';
@@ -34,9 +34,8 @@ import {
     isHeader,
     isHeaderExpanded,
 } from '../../utils';
-import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
+import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
-import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
@@ -44,7 +43,6 @@ import FilterPopover from './FilterPopover';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
-import Chip from '../Chip';
 
 interface TableProps {
     variantData: VariantQueryDataResult[];
@@ -457,7 +455,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 {rows.length !== tableData.length && (
                     <SummaryText>{rows.length} variants matching your filters</SummaryText>
                 )}
-                <Flex>
+                <Flex alignItems="center">
                     <Typography variant="p" bold>
                         Active Filters:
                     </Typography>
@@ -525,6 +523,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                             }
                                                                             filters={filters}
                                                                             setFilter={setFilter}
+                                                                            active={
+                                                                                !!filters.find(
+                                                                                    c =>
+                                                                                        c.id ===
+                                                                                        column.id
+                                                                                )
+                                                                            }
                                                                         />
                                                                     )}
                                                                     {column.render('Header')}

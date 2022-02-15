@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FaFilter } from 'react-icons/fa';
 import { useLayer } from 'react-laag';
 import { ColumnInstance, Filters, Row } from 'react-table';
-import { Background } from '../Layout';
+import theme from '../../constants/theme';
 import AdvancedFilters from './AdvancedFilters';
 import { ResultTableColumns } from './Table';
 import { IconPadder } from './Table.styles';
@@ -13,9 +13,11 @@ interface FilterPopoverProps<T extends {}> {
     preFilteredRows: Row<T>[];
     filters: Filters<T>;
     setFilter: (columndId: string, updater: any) => void;
+    active?: boolean;
 }
 
 const FilterPopover: React.FC<FilterPopoverProps<ResultTableColumns>> = ({
+    active,
     columns,
     preFilteredRows,
     filters,
@@ -39,7 +41,7 @@ const FilterPopover: React.FC<FilterPopoverProps<ResultTableColumns>> = ({
         <>
             <div {...triggerProps} onClick={() => setAdvancedFilterOpen(true)}>
                 <IconPadder>
-                    <FaFilter />
+                    <FaFilter color={active ? theme.colors.primary : 'inherit'} />
                 </IconPadder>
             </div>
             {renderLayer(

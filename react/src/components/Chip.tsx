@@ -9,11 +9,13 @@ export const ChipContainer = styled(props => <Flex {...props} />)`
     border-color: ${props => props.theme.colors.muted};
     align-items: center;
     padding: 0 ${props => props.theme.space[3]};
+    margin: ${props => props.theme.space[2]};
+    height: fit-content;
 `;
 export const ChipDeleteContainer = styled(props => <Button {...props} />)`
     border-radius: ${props => props.theme.radii.round};
-    height: 20px;
-    width: 20px;
+    height: 10px;
+    width: 10px;
     padding: 0;
     margin: 0;
     align-items: center;
@@ -23,6 +25,8 @@ export const ChipDeleteContainer = styled(props => <Button {...props} />)`
 `;
 export const ChipTitle = styled(props => <Typography {...props} />)`
     margin-inline-end: ${props => props.theme.space[4]};
+    margin-top: ${props => props.theme.space[3]};
+    margin-bottom: ${props => props.theme.space[3]};
 `;
 
 interface ChipProps {
