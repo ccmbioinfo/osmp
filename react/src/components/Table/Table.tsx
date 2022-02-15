@@ -58,6 +58,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
+    unique_id: number;
 }
 
 const resolveSex = (sexPhenotype: string) => {
@@ -70,35 +71,103 @@ const resolveSex = (sexPhenotype: string) => {
     } else return 'Unknown';
 };
 
-/* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
-const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
-    return queryResult.flatMap(d => {
-        if (d.variant.callsets.length) {
-            //one row per individual per callset
-            return d.variant.callsets
-                .filter(cs => cs.individualId === d.individual.individualId)
-                .map(cs =>
-                    addAdditionalFieldsAndFormatNulls({
-                        ...cs.info,
-                        ...flattenBaseResults(d),
-                    })
-                );
+/* 1, Sort queryResult in ascending order according to variant's chromosome, ref, alt, start,end. 
+2, flatten data and compute values as needed 
+(note that column display formatting function should not alter values for ease of export) */
+const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns[], number[]] => {
+    const sortedQueryResult = [...queryResult].sort(function (a, b) {
+        if (a.variant.referenceName < b.variant.referenceName) {
+            return -1;
+        } else if (
+            a.variant.referenceName === b.variant.referenceName &&
+            a.variant.ref < b.variant.ref
+        ) {
+            return -1;
+        } else if (
+            a.variant.referenceName === b.variant.referenceName &&
+            a.variant.ref === b.variant.ref &&
+            a.variant.alt < b.variant.alt
+        ) {
+            return -1;
+        } else if (
+            a.variant.referenceName === b.variant.referenceName &&
+            a.variant.ref === b.variant.ref &&
+            a.variant.alt === b.variant.alt &&
+            a.variant.start < b.variant.start
+        ) {
+            return -1;
+        } else if (
+            a.variant.referenceName === b.variant.referenceName &&
+            a.variant.ref === b.variant.ref &&
+            a.variant.alt === b.variant.alt &&
+            a.variant.start === b.variant.start &&
+            a.variant.end < b.variant.end
+        ) {
+            return -1;
         } else {
-            return addAdditionalFieldsAndFormatNulls(flattenBaseResults(d));
+            return 1;
         }
     });
+
+    var result: Array<ResultTableColumns> = [];
+    var uniqueVariantIndices: Array<number> = []; // contains indices of first encountered rows that represent unique variants.
+    const n = sortedQueryResult.length;
+    var currVariant = { chromosome: 'temp', ref: 'temp', alt: 'temp', start: 0, end: 0 };
+    var currUniqueId = 0;
+    var currRowId = 0;
+
+    for (let i = 0; i < n; i++) {
+        const d = sortedQueryResult[i];
+        if (
+            d.variant.referenceName !== currVariant['chromosome'] ||
+            d.variant.ref !== currVariant['ref'] ||
+            d.variant.alt !== currVariant['alt'] ||
+            d.variant.start !== currVariant['start'] ||
+            d.variant.end !== currVariant['end']
+        ) {
+            currUniqueId += 1;
+            uniqueVariantIndices.push(currRowId);
+            currVariant['chromosome'] = d.variant.referenceName;
+            currVariant['ref'] = d.variant.ref;
+            currVariant['alt'] = d.variant.alt;
+            currVariant['start'] = d.variant.start;
+            currVariant['end'] = d.variant.end;
+        }
+        const id = currUniqueId;
+        if (d.variant.callsets.length) {
+            result = result.concat(
+                d.variant.callsets
+                    .filter(cs => cs.individualId === d.individual.individualId)
+                    .map(cs =>
+                        addAdditionalFieldsAndFormatNulls(
+                            {
+                                ...cs.info,
+                                ...flattenBaseResults(d),
+                            },
+                            id
+                        )
+                    )
+            );
+            currRowId += d.variant.callsets.length;
+        } else {
+            result = result.concat(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), id));
+            currRowId += 1;
+        }
+    }
+    return [result, uniqueVariantIndices];
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
-
-    // transform data from VariantQueryDataResult to ResultTableColumns format.
-    const tableData = useMemo(() => prepareData(variantData), [variantData]);
+    const [tableData, uniqueVariantIndices] = useMemo(
+        () => prepareData(variantData),
+        [variantData]
+    );
 
     const sortByArray = useMemo(
         () => [
             {
-                id: 'ref',
+                id: 'unique_id',
                 desc: false,
             },
         ],
@@ -141,6 +210,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: '',
                         disableSortBy: true,
                         width: 70,
+                    },
+                    {
+                        accessor: 'unique_id',
+                        id: 'unique_id',
+                        type: 'fixed',
                     },
                     {
                         accessor: state => state.referenceName,
@@ -381,6 +455,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     getChildColumns('case_details'),
                     getChildColumns('variation_details'),
                     'emptyCore',
+                    'unique_id',
                 ].flat(),
             },
         },
@@ -390,36 +465,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useGlobalFilter,
         useSortBy,
         useExpanded,
-        usePagination,
-        hooks => {
-            hooks.useInstance.push((Instance) => {
-                const uniqueVariantFields = ["chromosome", "start", "end", "ref", "alt"];
-    
-                let rowSpanHeaders :any = {};  // specify the type here! 
-                uniqueVariantFields.forEach((field) => {
-                    rowSpanHeaders[field] = null;
-                })
-                
-                Object.assign(Instance, {rowSpanHeaders});
-            });
-        }
+        usePagination
     );
 
     const {
         getTableProps,
         getTableBodyProps,
-        headerGroups,      // useTable 
-        page,               // usePagination 
+        headerGroups,
+        page,
         state,
         setFilter,
         setAllFilters,
         setGlobalFilter,
         prepareRow,
         preFilteredRows,
-        toggleHideColumn,       // useTable 
-        visibleColumns,         // useTable
+        toggleHideColumn,
+        visibleColumns,
         rows,
-        rowSpanHeaders
     } = tableInstance;
 
     const { filters, globalFilter } = state;
@@ -470,28 +532,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     setFilter={setFilter}
                 />
             )}
-            <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>  
+            <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
                 <Styles>
                     <table {...getTableProps()}>
                         <THead>
-                            {/* Headergroup_0 contains Variant, case details, variant details. Headergroups_1 contains the columns under Variant.   */}
                             {headerGroups.map(headerGroup => {
                                 // https://github.com/tannerlinsley/react-table/discussions/2647
                                 const { key, ...restHeaderGroupProps } =
-                                    headerGroup.getHeaderGroupProps();                           
+                                    headerGroup.getHeaderGroupProps();
                                 return (
                                     <motion.tr layout key={key} {...restHeaderGroupProps}>
-                                        {/* Loop through one header group at one time */}
                                         {headerGroup.headers.map(column => {
-                                            console.log(column);
                                             const { key, ...restHeaderProps } =
                                                 column.getHeaderProps(
                                                     column.getSortByToggleProps({
                                                         title: undefined,
                                                     })
                                                 );
-                                        // This is a function call for each column. 
-                                            return (<TH key={key} {...restHeaderProps}>
+                                            return (
+                                                <TH key={key} {...restHeaderProps}>
                                                     <AnimatePresence initial={false}>
                                                         {column.isVisible && (
                                                             <motion.section
@@ -593,44 +652,21 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                         <tbody {...getTableBodyProps()}>
                             {page.length > 0 ? (
-                                page.map(row => {                            
-                                    prepareRow(row);  
-                                   
+                                page.map(row => {
+                                    prepareRow(row);
                                     const { key, ...restRowProps } = row.getRowProps();
-
-                                    // if not isHeaderExpanded(caseDetails) 
-                                        // if rowSpanHeaders field values are not equal to the field values in the current row: 1, render this row 2, assign this row's value to rowSpanHeaders object 
-                                        // else: return null. 
-                                    // else: render this row 
-
-                                    const caseDetailsCol = headerGroups[0].headers.find(header => header.Header ==="Case Details");
-
-                                    if (caseDetailsCol && !isHeaderExpanded(caseDetailsCol)){
-
-                                        
-                                        // check if rowSpanders value are equal to the field value in the current row. // remove this function!, directly use the return values, 
-
-                                        const compareRowSpanHeaders = ()=>{
-                                            // loop through rowSpanHeaders key, check if the row's field is equal to rowSpanHeaders value. 
-
-                                            for (const [k, v] of Object.entries(rowSpanHeaders)){
-                                                if (row.cells.find(cell => cell.column.id === k)?.value !== v){
-
-                                                    return false;
-                                                }
-                                            } 
-                                            return true;
-                                        }
-                                        
-                                        if (compareRowSpanHeaders() === false){
-                                            for (const [k, v] of Object.entries(rowSpanHeaders)){
-                                                rowSpanHeaders[k] =  row.cells.find(cell => cell.column.id === k)?.value;
-                                            };
-                                        } else{
+                                    const caseDetailsCol = headerGroups[0].headers.find(
+                                        header => header.Header === 'Case Details'
+                                    );
+                                    // Display only one row per variant if Case Details Section is collapsed.
+                                    if (caseDetailsCol && !isHeaderExpanded(caseDetailsCol)) {
+                                        if (
+                                            uniqueVariantIndices.find(i => i === row?.index) ===
+                                            undefined
+                                        ) {
                                             return null;
                                         }
                                     }
-                                    
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {

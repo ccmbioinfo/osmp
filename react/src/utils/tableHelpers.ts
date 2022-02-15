@@ -22,6 +22,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
+    unique_id: number;
 }
 
 export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
@@ -45,7 +46,8 @@ export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQue
 };
 
 export const addAdditionalFieldsAndFormatNulls = (
-    results: FlattenedQueryResponse
+    results: FlattenedQueryResponse,
+    currId: number
 ): ResultTableColumns => {
     const reformatted = Object.fromEntries(
         Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
@@ -54,6 +56,7 @@ export const addAdditionalFieldsAndFormatNulls = (
         ...reformatted,
         emptyCaseDetails: '',
         emptyVariationDetails: '',
+        unique_id: currId,
         aaChange: reformatted.aaPos?.trim()
             ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
             : '',
