@@ -22,7 +22,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
-    unique_id: number;
+    uniqueId: number;
 }
 
 export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
@@ -47,7 +47,7 @@ export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQue
 
 export const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
-    currId: number
+    uniqueId: number
 ): ResultTableColumns => {
     const reformatted = Object.fromEntries(
         Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
@@ -56,7 +56,7 @@ export const addAdditionalFieldsAndFormatNulls = (
         ...reformatted,
         emptyCaseDetails: '',
         emptyVariationDetails: '',
-        unique_id: currId,
+        uniqueId,
         aaChange: reformatted.aaPos?.trim()
             ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
             : '',
@@ -91,4 +91,20 @@ export const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
         return !intersection.length;
     }
     return false;
+};
+
+export const isCaseDetailsCollapsed = (headers: HeaderGroup<ResultTableColumns>[]) => {
+    const caseDetailsCol = headers.find(header => header.Header === 'Case Details');
+    return caseDetailsCol && !isHeaderExpanded(caseDetailsCol);
+};
+
+export const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
+    const sortedQueryResult = [...queryResult].sort(
+        (a, b) =>
+            a.variant.ref.localeCompare(b.variant.ref) ||
+            a.variant.alt.localeCompare(b.variant.alt) ||
+            a.variant.start - b.variant.start ||
+            a.variant.end - b.variant.end
+    );
+    return sortedQueryResult;
 };

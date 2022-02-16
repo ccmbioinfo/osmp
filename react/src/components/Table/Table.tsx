@@ -31,8 +31,10 @@ import {
     addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
     flattenBaseResults,
+    isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    sortQueryResult,
 } from '../../utils';
 import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
@@ -59,8 +61,10 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
-    unique_id: number;
+    uniqueId: number;
 }
+
+type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
 const resolveSex = (sexPhenotype: string) => {
     if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
@@ -72,67 +76,24 @@ const resolveSex = (sexPhenotype: string) => {
     } else return 'Unknown';
 };
 
-/* 1, Sort queryResult in ascending order according to variant's chromosome, ref, alt, start,end. 
-2, flatten data and compute values as needed 
-(note that column display formatting function should not alter values for ease of export) */
+// 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
+// 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId to each row.
 const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns[], number[]] => {
-    const sortedQueryResult = [...queryResult].sort(function (a, b) {
-        if (a.variant.referenceName < b.variant.referenceName) {
-            return -1;
-        } else if (
-            a.variant.referenceName === b.variant.referenceName &&
-            a.variant.ref < b.variant.ref
-        ) {
-            return -1;
-        } else if (
-            a.variant.referenceName === b.variant.referenceName &&
-            a.variant.ref === b.variant.ref &&
-            a.variant.alt < b.variant.alt
-        ) {
-            return -1;
-        } else if (
-            a.variant.referenceName === b.variant.referenceName &&
-            a.variant.ref === b.variant.ref &&
-            a.variant.alt === b.variant.alt &&
-            a.variant.start < b.variant.start
-        ) {
-            return -1;
-        } else if (
-            a.variant.referenceName === b.variant.referenceName &&
-            a.variant.ref === b.variant.ref &&
-            a.variant.alt === b.variant.alt &&
-            a.variant.start === b.variant.start &&
-            a.variant.end < b.variant.end
-        ) {
-            return -1;
-        } else {
-            return 1;
-        }
-    });
-
+    const sortedQueryResult = sortQueryResult(queryResult);
     var result: Array<ResultTableColumns> = [];
     var uniqueVariantIndices: Array<number> = []; // contains indices of first encountered rows that represent unique variants.
     const n = sortedQueryResult.length;
-    var currVariant = { chromosome: 'temp', ref: 'temp', alt: 'temp', start: 0, end: 0 };
+    var currVariant = {} as Variant;
     var currUniqueId = 0;
     var currRowId = 0;
 
     for (let i = 0; i < n; i++) {
         const d = sortedQueryResult[i];
-        if (
-            d.variant.referenceName !== currVariant['chromosome'] ||
-            d.variant.ref !== currVariant['ref'] ||
-            d.variant.alt !== currVariant['alt'] ||
-            d.variant.start !== currVariant['start'] ||
-            d.variant.end !== currVariant['end']
-        ) {
+        const { ref, alt, start, end } = d.variant;
+        if (JSON.stringify(currVariant) !== JSON.stringify({ ref, alt, start, end })) {
             currUniqueId += 1;
             uniqueVariantIndices.push(currRowId);
-            currVariant['chromosome'] = d.variant.referenceName;
-            currVariant['ref'] = d.variant.ref;
-            currVariant['alt'] = d.variant.alt;
-            currVariant['start'] = d.variant.start;
-            currVariant['end'] = d.variant.end;
+            currVariant = { ref, alt, start, end };
         }
         const id = currUniqueId;
         if (d.variant.callsets.length) {
@@ -168,7 +129,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const sortByArray = useMemo(
         () => [
             {
-                id: 'unique_id',
+                id: 'uniqueId',
                 desc: false,
             },
         ],
@@ -213,8 +174,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: 70,
                     },
                     {
-                        accessor: 'unique_id',
-                        id: 'unique_id',
+                        accessor: 'uniqueId',
+                        id: 'uniqueId',
                         type: 'fixed',
                     },
                     {
@@ -456,7 +417,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     getChildColumns('case_details'),
                     getChildColumns('variation_details'),
                     'emptyCore',
-                    'unique_id',
+                    'uniqueId',
                 ].flat(),
             },
         },
@@ -667,17 +628,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 page.map(row => {
                                     prepareRow(row);
                                     const { key, ...restRowProps } = row.getRowProps();
-                                    const caseDetailsCol = headerGroups[0].headers.find(
-                                        header => header.Header === 'Case Details'
-                                    );
                                     // Display only one row per variant if Case Details Section is collapsed.
-                                    if (caseDetailsCol && !isHeaderExpanded(caseDetailsCol)) {
-                                        if (
-                                            uniqueVariantIndices.find(i => i === row?.index) ===
+                                    if (
+                                        isCaseDetailsCollapsed(headerGroups[0].headers) &&
+                                        uniqueVariantIndices.find(i => i === row?.index) ===
                                             undefined
-                                        ) {
-                                            return null;
-                                        }
+                                    ) {
+                                        return null;
                                     }
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
