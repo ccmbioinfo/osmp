@@ -4,26 +4,22 @@ import formatErrorMessage from './formatErrorMessage';
 import getKeys from './getKeys';
 import resolveAssembly from './resolveAssembly';
 import {
-    addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
-    flattenBaseResults,
     isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
-    sortQueryResult,
+    prepareData,
 } from './tableHelpers';
 
 export {
-    addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
     camelize,
     downloadCsv,
-    flattenBaseResults,
     formatErrorMessage,
     getKeys,
     isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    prepareData,
     resolveAssembly,
-    sortQueryResult,
 };
