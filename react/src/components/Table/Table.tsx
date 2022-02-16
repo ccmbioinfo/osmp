@@ -149,6 +149,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                         disableFilters: true,
+                        disableSortBy: true,
                     },
                     {
                         accessor: 'start',
@@ -292,7 +293,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'diseases',
                         id: 'diseases',
                         Header: 'Diseases',
-                        width: getColumnWidth(tableData, 'diseases', 'Diseases'),
+                        width: 120,
                     },
                     {
                         accessor: 'solved',
@@ -369,8 +370,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const defaultColumn = useMemo(
         () => ({
             minWidth: 10,
-            width: 60,
-            maxWidth: 300,
+            width: 110,
+            maxWidth: 400,
         }),
         []
     );
@@ -417,7 +418,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     } = tableInstance;
 
     const { filters, globalFilter } = state;
-    
+
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
@@ -505,6 +506,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                 <Flex
                                                                     alignItems="center"
                                                                     justifyContent="center"
+                                                                    nowrap
                                                                 >
                                                                     {/* 
                                                                         Filter icon for filtering individual columns

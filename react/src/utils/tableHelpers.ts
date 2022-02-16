@@ -74,7 +74,7 @@ export const calculateColumnWidth = (
         ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
         headerText.length
     );
-    return Math.min(maxWidth, cellLength * magicSpacing);
+    return Math.min(maxWidth, cellLength * magicSpacing) * 1.5;
 };
 
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
