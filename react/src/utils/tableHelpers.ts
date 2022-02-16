@@ -69,12 +69,12 @@ export const calculateColumnWidth = (
         accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
     }
     const maxWidth = 600;
-    const magicSpacing = 10;
+    const magicSpacing = 15;
     const cellLength = Math.max(
         ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
         headerText.length
     );
-    return Math.min(maxWidth, cellLength * magicSpacing) * 1.5;
+    return Math.min(maxWidth, cellLength * magicSpacing);
 };
 
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;

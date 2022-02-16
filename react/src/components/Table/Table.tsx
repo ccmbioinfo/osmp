@@ -270,6 +270,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: 'Sex',
+                        width: getColumnWidth(tableData, 'sex', 'Sex'),
                         Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
@@ -370,8 +371,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const defaultColumn = useMemo(
         () => ({
             minWidth: 10,
-            width: 110,
-            maxWidth: 400,
+            width: 60,
+            maxWidth: 300,
         }),
         []
     );
