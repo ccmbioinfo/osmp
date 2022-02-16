@@ -590,7 +590,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     {!column.disableSortBy && (
                                                                         <IconPadder>
                                                                             {column.isSortedDesc ? (
-                                                                                <BsFillCaretUpFill
+                                                                                <BsFillCaretDownFill
                                                                                     color="lightgrey"
                                                                                     onClick={() =>
                                                                                         column.toggleSortBy(
@@ -599,7 +599,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                     }
                                                                                 />
                                                                             ) : (
-                                                                                <BsFillCaretDownFill
+                                                                                <BsFillCaretUpFill
                                                                                     color="lightgrey"
                                                                                     onClick={() =>
                                                                                         column.toggleSortBy(
