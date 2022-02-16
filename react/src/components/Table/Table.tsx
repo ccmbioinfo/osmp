@@ -31,8 +31,10 @@ import {
     addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
     flattenBaseResults,
+    isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    sortQueryResult,
 } from '../../utils';
 import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
@@ -59,7 +61,10 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
+    uniqueId: number;
 }
+
+type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
 const resolveSex = (sexPhenotype: string) => {
     if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
@@ -71,34 +76,64 @@ const resolveSex = (sexPhenotype: string) => {
     } else return 'Unknown';
 };
 
-/* flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export) */
-const prepareData = (queryResult: VariantQueryDataResult[]): ResultTableColumns[] => {
-    return queryResult.flatMap(d => {
+// 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
+// 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId to each row.
+const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns[], number[]] => {
+    const sortedQueryResult = sortQueryResult(queryResult);
+
+    const result: Array<ResultTableColumns> = [];
+
+    const uniqueVariantIndices: Array<number> = []; // contains indices of first encountered rows that represent unique variants.
+
+    var currVariant = {} as Variant;
+    var currUniqueId = 0;
+    var currRowId = 0;
+
+    sortedQueryResult.forEach(d => {
+        const { ref, alt, start, end } = d.variant;
+
+        if (JSON.stringify(currVariant) !== JSON.stringify({ ref, alt, start, end })) {
+            currVariant = { ref, alt, start, end };
+            currUniqueId += 1;
+            uniqueVariantIndices.push(currRowId);
+        }
+
         if (d.variant.callsets.length) {
-            //one row per individual per callset
-            return d.variant.callsets
-                .filter(cs => cs.individualId === d.individual.individualId)
-                .map(cs =>
-                    addAdditionalFieldsAndFormatNulls({
-                        ...cs.info,
-                        ...flattenBaseResults(d),
-                    })
-                );
+            result.push.apply(
+                result,
+                d.variant.callsets
+                    .filter(cs => cs.individualId === d.individual.individualId)
+                    .map(cs =>
+                        addAdditionalFieldsAndFormatNulls(
+                            {
+                                ...cs.info,
+                                ...flattenBaseResults(d),
+                            },
+                            currUniqueId
+                        )
+                    )
+            );
+            currRowId += d.variant.callsets.length;
         } else {
-            return addAdditionalFieldsAndFormatNulls(flattenBaseResults(d));
+            result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), currUniqueId));
+            currRowId += 1;
         }
     });
+
+    return [result, uniqueVariantIndices];
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
-
-    const tableData = useMemo(() => prepareData(variantData), [variantData]);
+    const [tableData, uniqueVariantIndices] = useMemo(
+        () => prepareData(variantData),
+        [variantData]
+    );
 
     const sortByArray = useMemo(
         () => [
             {
-                id: 'ref',
+                id: 'uniqueId',
                 desc: false,
             },
         ],
@@ -141,6 +176,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: '',
                         disableSortBy: true,
                         width: 70,
+                    },
+                    {
+                        accessor: 'uniqueId',
+                        id: 'uniqueId',
+                        type: 'fixed',
                     },
                     {
                         accessor: state => state.referenceName,
@@ -381,6 +421,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     getChildColumns('case_details'),
                     getChildColumns('variation_details'),
                     'emptyCore',
+                    'uniqueId',
                 ].flat(),
             },
         },
@@ -462,9 +503,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
             <Column>
                 <br />
-                <Typography variant="h3">{tableData.length} total variants found</Typography>
+                <Typography variant="h3">
+                    {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
+                    individuals
+                </Typography>
                 {rows.length !== tableData.length && (
-                    <SummaryText>{rows.length} variants matching your filters</SummaryText>
+                    <SummaryText>{rows.length} individuals matching your filters</SummaryText>
                 )}
             </Column>
 
@@ -537,7 +581,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 : ''
                                                                         }`}
                                                                     />
-
                                                                     {isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
@@ -592,6 +635,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 page.map(row => {
                                     prepareRow(row);
                                     const { key, ...restRowProps } = row.getRowProps();
+                                    // Display only one row per variant if Case Details Section is collapsed.
+                                    if (
+                                        isCaseDetailsCollapsed(headerGroups[0].headers) &&
+                                        uniqueVariantIndices.find(i => i === row?.index) ===
+                                            undefined
+                                    ) {
+                                        return null;
+                                    }
                                     return (
                                         <motion.tr key={key} layout="position" {...restRowProps}>
                                             {row.cells.map(cell => {

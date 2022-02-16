@@ -7,8 +7,10 @@ import {
     addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
     flattenBaseResults,
+    isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    sortQueryResult,
 } from './tableHelpers';
 
 export {
@@ -19,7 +21,9 @@ export {
     flattenBaseResults,
     formatErrorMessage,
     getKeys,
+    isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
     resolveAssembly,
+    sortQueryResult,
 };
