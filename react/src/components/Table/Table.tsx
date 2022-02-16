@@ -91,12 +91,13 @@ const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns
 
     sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
+
         if (JSON.stringify(currVariant) !== JSON.stringify({ ref, alt, start, end })) {
+            currVariant = { ref, alt, start, end };
             currUniqueId += 1;
             uniqueVariantIndices.push(currRowId);
-            currVariant = { ref, alt, start, end };
         }
-        const id = currUniqueId;
+
         if (d.variant.callsets.length) {
             result.push.apply(
                 result,
@@ -108,13 +109,13 @@ const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns
                                 ...cs.info,
                                 ...flattenBaseResults(d),
                             },
-                            id
+                            currUniqueId
                         )
                     )
             );
             currRowId += d.variant.callsets.length;
         } else {
-            result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), id));
+            result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), currUniqueId));
             currRowId += 1;
         }
     });
