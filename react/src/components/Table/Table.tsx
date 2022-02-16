@@ -80,15 +80,16 @@ const resolveSex = (sexPhenotype: string) => {
 // 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId to each row.
 const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns[], number[]] => {
     const sortedQueryResult = sortQueryResult(queryResult);
-    var result: Array<ResultTableColumns> = [];
-    var uniqueVariantIndices: Array<number> = []; // contains indices of first encountered rows that represent unique variants.
-    const n = sortedQueryResult.length;
+
+    const result: Array<ResultTableColumns> = [];
+
+    const uniqueVariantIndices: Array<number> = []; // contains indices of first encountered rows that represent unique variants.
+
     var currVariant = {} as Variant;
     var currUniqueId = 0;
     var currRowId = 0;
 
-    for (let i = 0; i < n; i++) {
-        const d = sortedQueryResult[i];
+    sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
         if (JSON.stringify(currVariant) !== JSON.stringify({ ref, alt, start, end })) {
             currUniqueId += 1;
@@ -97,7 +98,8 @@ const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns
         }
         const id = currUniqueId;
         if (d.variant.callsets.length) {
-            result = result.concat(
+            result.push.apply(
+                result,
                 d.variant.callsets
                     .filter(cs => cs.individualId === d.individual.individualId)
                     .map(cs =>
@@ -112,10 +114,11 @@ const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns
             );
             currRowId += d.variant.callsets.length;
         } else {
-            result = result.concat(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), id));
+            result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), id));
             currRowId += 1;
         }
-    }
+    });
+
     return [result, uniqueVariantIndices];
 };
 
@@ -504,7 +507,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     individuals
                 </Typography>
                 {rows.length !== tableData.length && (
-                    <SummaryText>{rows.length} variants matching your filters</SummaryText>
+                    <SummaryText>{rows.length} individuals matching your filters</SummaryText>
                 )}
             </Column>
 
