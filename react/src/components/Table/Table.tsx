@@ -499,7 +499,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
             <Column>
                 <br />
-                <Typography variant="h3">{tableData.length} total variants found</Typography>
+                <Typography variant="h3">
+                    {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
+                    individuals
+                </Typography>
                 {rows.length !== tableData.length && (
                     <SummaryText>{rows.length} variants matching your filters</SummaryText>
                 )}
