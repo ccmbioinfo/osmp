@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
+import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from 'react-icons/ti';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
@@ -19,6 +19,7 @@ import {
     useTable,
 } from 'react-table';
 import HEADERS from '../../constants/headers';
+import theme from '../../constants/theme';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -629,29 +630,39 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                         ))}
 
                                                                     {/* Sorting */}
-                                                                    {!column.disableSortBy && (
-                                                                        <IconPadder>
-                                                                            {column.isSortedDesc ? (
-                                                                                <BsFillCaretDownFill
-                                                                                    color="lightgrey"
-                                                                                    onClick={() =>
-                                                                                        column.toggleSortBy(
-                                                                                            false
-                                                                                        )
-                                                                                    }
-                                                                                />
-                                                                            ) : (
-                                                                                <BsFillCaretUpFill
-                                                                                    color="lightgrey"
-                                                                                    onClick={() =>
-                                                                                        column.toggleSortBy(
-                                                                                            true
-                                                                                        )
-                                                                                    }
-                                                                                />
-                                                                            )}
-                                                                        </IconPadder>
-                                                                    )}
+                                                                    <div
+                                                                        {...column.getSortByToggleProps(
+                                                                            {
+                                                                                title: undefined,
+                                                                            }
+                                                                        )}
+                                                                    >
+                                                                        {!column.disableSortBy && (
+                                                                            <IconPadder>
+                                                                                {column.isSorted ? (
+                                                                                    column.isSortedDesc ? (
+                                                                                        <TiArrowSortedDown
+                                                                                            color={
+                                                                                                theme
+                                                                                                    .colors
+                                                                                                    .primary
+                                                                                            }
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <TiArrowSortedUp
+                                                                                            color={
+                                                                                                theme
+                                                                                                    .colors
+                                                                                                    .primary
+                                                                                            }
+                                                                                        />
+                                                                                    )
+                                                                                ) : (
+                                                                                    <TiArrowUnsorted color="lightgrey" />
+                                                                                )}
+                                                                            </IconPadder>
+                                                                        )}
+                                                                    </div>
                                                                 </Flex>
                                                             </motion.section>
                                                         )}
