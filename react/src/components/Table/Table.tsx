@@ -422,6 +422,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
+    var currColour = 'white';
+
+    const getRowColour = (uniqueId: number, previousRowUniqueId: number) => {
+        if (currColour === 'white' && uniqueId !== previousRowUniqueId) {
+            currColour = 'whitesmoke';
+        } else if (uniqueId !== previousRowUniqueId) {
+            currColour = 'white';
+        }
+        return [{ style: { background: currColour } }];
+    };
+
     return (
         <>
             <TableFilters justifyContent="space-between">
@@ -597,9 +608,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                         <tbody {...getTableBodyProps()}>
                             {page.length > 0 ? (
-                                page.map(row => {
+                                page.map((row, i) => {
                                     prepareRow(row);
-                                    const { key, ...restRowProps } = row.getRowProps();
+                                    // Alternate row's background colour.
+                                    const { key, ...restRowProps } = row.getRowProps(
+                                        i !== 0
+                                            ? getRowColour(
+                                                  row.values['uniqueId'],
+                                                  page[i - 1].values['uniqueId']
+                                              )
+                                            : [{ style: { background: 'white' } }]
+                                    );
                                     // Display only one row per variant if Case Details Section is collapsed.
                                     if (
                                         isCaseDetailsCollapsed(headerGroups[0].headers) &&
