@@ -559,11 +559,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                     */}
                                                                     {!column.disableFilters && (
                                                                         <FilterPopover
-                                                                            columns={visibleColumns.filter(
-                                                                                c =>
-                                                                                    c.id ===
-                                                                                    column.id
-                                                                            )}
+                                                                            columns={[column]}
                                                                             preFilteredRows={
                                                                                 preFilteredRows
                                                                             }
