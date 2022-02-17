@@ -8,6 +8,8 @@ import {
     isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    isHeterozygous,
+    isHomozygous,
     prepareData,
 } from './tableHelpers';
 
@@ -20,6 +22,8 @@ export {
     isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    isHeterozygous,
+    isHomozygous,
     prepareData,
     resolveAssembly,
 };

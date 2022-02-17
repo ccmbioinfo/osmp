@@ -32,6 +32,8 @@ import {
     isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
+    isHeterozygous,
+    isHomozygous,
     prepareData,
 } from '../../utils';
 import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
@@ -186,9 +188,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: state =>
-                            state.zygosity?.toLowerCase().includes('het')
+                            isHeterozygous(state.zygosity)
                                 ? 'Heterozygous'
-                                : state.zygosity?.toLowerCase().includes('hom')
+                                : isHomozygous(state.zygosity)
                                 ? 'Homozygous'
                                 : state.zygosity,
                         filter: 'multiSelect',

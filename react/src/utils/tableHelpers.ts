@@ -28,7 +28,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     uniqueId: number;
 }
 
-export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
+const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
     const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
     const { diseases, info: individualInfo, ...restIndividual } = result.individual;
@@ -48,7 +48,7 @@ export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQue
     };
 };
 
-export const addAdditionalFieldsAndFormatNulls = (
+const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
     uniqueId: number
 ): ResultTableColumns => {
@@ -101,7 +101,7 @@ export const isCaseDetailsCollapsed = (headers: HeaderGroup<ResultTableColumns>[
     return caseDetailsCol && !isHeaderExpanded(caseDetailsCol);
 };
 
-export const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
+const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
     const sortedQueryResult = [...queryResult].sort(
         (a, b) =>
             a.variant.ref.localeCompare(b.variant.ref) ||
@@ -110,6 +110,20 @@ export const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
             a.variant.end - b.variant.end
     );
     return sortedQueryResult;
+};
+
+export const isHeterozygous = (zygosity: String | null | undefined) => {
+    if (zygosity?.toLowerCase().includes('het')) {
+        return true;
+    }
+    return false;
+};
+
+export const isHomozygous = (zygosity: String | null | undefined) => {
+    if (zygosity?.toLowerCase().includes('hom')) {
+        return true;
+    }
+    return false;
 };
 
 // 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
@@ -167,9 +181,9 @@ export const prepareData = (
             );
             currRowId += d.variant.callsets.length;
             d.variant.callsets.forEach(cs =>
-                cs.info.zygosity?.toLowerCase().includes('het')
+                isHeterozygous(cs.info.zygosity)
                     ? (currHeterozygousCount += 1)
-                    : cs.info.zygosity?.toLowerCase().includes('hom')
+                    : isHomozygous(cs.info.zygosity)
                     ? (currHomozygousCount += 1)
                     : {}
             );
