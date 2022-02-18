@@ -12,22 +12,28 @@ export default function NumberRangeFilter<T extends {}>({
     filter,
     setFilter,
 }: NumberRangeFilterProps<T>) {
-    const value = useMemo(() => {
-        if (filter) {
-            return filter.value.find(v => v !== undefined)?.toString() || '';
-        } else {
-            return '';
-        }
-    }, [filter]);
+    /*
+     * For number filtering, react-table records the number range as an array of the upper and lower bound. 
+        e.g. >2, <2, and =2 is represented as [2, undefined], [undefined, 2], and [2,2] respectively.
+     */
+
+    const [lower, upper] = filter ? filter.value : [];
+
+    const value = useMemo(() => (lower || upper || '').toString(), [lower, upper]);
+
+    const comparison = useMemo(
+        () => ({
+            less: lower === undefined && upper !== undefined,
+            greater: upper === undefined && lower !== undefined,
+            equal: upper === lower,
+        }),
+        [lower, upper]
+    );
 
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState(value);
 
-    const [filterComparison, setFilterComparison] = useState<ComparisonType>({
-        less: false,
-        greater: false,
-        equal: true,
-    });
+    const [filterComparison, setFilterComparison] = useState<ComparisonType>(comparison);
 
     const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
 
@@ -79,6 +85,7 @@ export default function NumberRangeFilter<T extends {}>({
                     <InputComparisonDropdown
                         setFilterComparison={setFilterComparison}
                         setFilter={setFilter}
+                        comparison={filterComparison}
                     />
                 }
             />
