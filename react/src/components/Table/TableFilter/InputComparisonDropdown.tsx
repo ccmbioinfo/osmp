@@ -68,7 +68,7 @@ export function InputComparisonDropdown<T extends {}>({
 
     useClickAway(ref, () => setOpen(false));
 
-    // Ensure value returned is a number and not +/undefined
+    // Ensure value returned is a number and not undefined
     const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
 
     return (

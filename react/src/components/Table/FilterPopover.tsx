@@ -59,11 +59,9 @@ const FilterPopover: React.FC<FilterPopoverProps<ResultTableColumns>> = ({
                             }}
                             style={{
                                 ...style,
-                                ...{
-                                    zIndex: 999,
-                                    background: '#f8f8f8',
-                                    borderRadius: '0.5rem',
-                                },
+                                zIndex: 999,
+                                background: '#f8f8f8',
+                                borderRadius: '0.5rem',
                             }}
                         >
                             <AdvancedFilters
