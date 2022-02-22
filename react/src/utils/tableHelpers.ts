@@ -9,6 +9,7 @@ import {
 } from '../types';
 
 type Accessor = string | (() => JSX.Element) | ((state: any) => any);
+type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
 export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
     IndividualInfoFields & { contactInfo: string } & Omit<
@@ -22,10 +23,12 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
+    homozygousCount?: number;
+    heterozygousCount?: number;
     uniqueId: number;
 }
 
-export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
+const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
     const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
     const { diseases, info: individualInfo, ...restIndividual } = result.individual;
@@ -45,7 +48,7 @@ export const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQue
     };
 };
 
-export const addAdditionalFieldsAndFormatNulls = (
+const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
     uniqueId: number
 ): ResultTableColumns => {
@@ -98,7 +101,7 @@ export const isCaseDetailsCollapsed = (headers: HeaderGroup<ResultTableColumns>[
     return caseDetailsCol && !isHeaderExpanded(caseDetailsCol);
 };
 
-export const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
+const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
     const sortedQueryResult = [...queryResult].sort(
         (a, b) =>
             a.variant.ref.localeCompare(b.variant.ref) ||
@@ -107,4 +110,91 @@ export const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
             a.variant.end - b.variant.end
     );
     return sortedQueryResult;
+};
+
+export const isHeterozygous = (zygosity: string | null | undefined) => {
+    return !!zygosity?.toLowerCase().includes('het');
+};
+
+export const isHomozygous = (zygosity: string | null | undefined) => {
+    return !!zygosity?.toLowerCase().includes('hom');
+};
+
+// 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
+// 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId, homozygousCount, heterozygousCount to each row.
+export const prepareData = (
+    queryResult: VariantQueryDataResult[]
+): [ResultTableColumns[], number[]] => {
+    const sortedQueryResult = sortQueryResult(queryResult);
+
+    const result: Array<ResultTableColumns> = [];
+
+    // contains indices of first encountered rows that represent unique variants.
+    const uniqueVariantIndices: Array<number> = [];
+
+    var currVariant = {} as Variant;
+    var currUniqueId = 0;
+    var currRowId = 0;
+    var currHomozygousCount = 0;
+    var currHeterozygousCount = 0;
+
+    sortedQueryResult.forEach(d => {
+        const { ref, alt, start, end } = d.variant;
+
+        if (
+            currVariant.ref !== ref ||
+            currVariant.alt !== alt ||
+            currVariant.start !== start ||
+            currVariant.end !== end
+        ) {
+            if (uniqueVariantIndices.length) {
+                result
+                    .slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId)
+                    .forEach(row => {
+                        row.homozygousCount = currHomozygousCount;
+                        row.heterozygousCount = currHeterozygousCount;
+                    });
+            }
+
+            currHomozygousCount = 0;
+            currHeterozygousCount = 0;
+            currVariant = { ref, alt, start, end };
+            currUniqueId += 1;
+            uniqueVariantIndices.push(currRowId);
+        }
+
+        if (d.variant.callsets.length) {
+            result.push.apply(
+                result,
+                d.variant.callsets
+                    .filter(cs => cs.individualId === d.individual.individualId)
+                    .map(cs =>
+                        addAdditionalFieldsAndFormatNulls(
+                            {
+                                ...cs.info,
+                                ...flattenBaseResults(d),
+                            },
+                            currUniqueId
+                        )
+                    )
+            );
+            currRowId += d.variant.callsets.length;
+            d.variant.callsets.forEach(cs =>
+                isHeterozygous(cs.info.zygosity)
+                    ? (currHeterozygousCount += 1)
+                    : isHomozygous(cs.info.zygosity)
+                    ? (currHomozygousCount += 1)
+                    : {}
+            );
+        } else {
+            result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), currUniqueId));
+            currRowId += 1;
+        }
+    });
+    result.slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId).forEach(row => {
+        row.homozygousCount = currHomozygousCount;
+        row.heterozygousCount = currHeterozygousCount;
+    });
+
+    return [result, uniqueVariantIndices];
 };

@@ -28,13 +28,13 @@ import {
     VariantResponseInfoFields,
 } from '../../types';
 import {
-    addAdditionalFieldsAndFormatNulls,
     calculateColumnWidth,
-    flattenBaseResults,
     isCaseDetailsCollapsed,
     isHeader,
     isHeaderExpanded,
-    sortQueryResult,
+    isHeterozygous,
+    isHomozygous,
+    prepareData,
 } from '../../utils';
 import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
@@ -61,10 +61,10 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
+    homozygousCount?: number;
+    heterozygousCount?: number;
     uniqueId: number;
 }
-
-type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
 const resolveSex = (sexPhenotype: string) => {
     if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
@@ -74,53 +74,6 @@ const resolveSex = (sexPhenotype: string) => {
     } else if (sexPhenotype === 'NCIT:C46113') {
         return 'Other Sex';
     } else return 'Unknown';
-};
-
-// 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
-// 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId to each row.
-const prepareData = (queryResult: VariantQueryDataResult[]): [ResultTableColumns[], number[]] => {
-    const sortedQueryResult = sortQueryResult(queryResult);
-
-    const result: Array<ResultTableColumns> = [];
-
-    const uniqueVariantIndices: Array<number> = []; // contains indices of first encountered rows that represent unique variants.
-
-    var currVariant = {} as Variant;
-    var currUniqueId = 0;
-    var currRowId = 0;
-
-    sortedQueryResult.forEach(d => {
-        const { ref, alt, start, end } = d.variant;
-
-        if (JSON.stringify(currVariant) !== JSON.stringify({ ref, alt, start, end })) {
-            currVariant = { ref, alt, start, end };
-            currUniqueId += 1;
-            uniqueVariantIndices.push(currRowId);
-        }
-
-        if (d.variant.callsets.length) {
-            result.push.apply(
-                result,
-                d.variant.callsets
-                    .filter(cs => cs.individualId === d.individual.individualId)
-                    .map(cs =>
-                        addAdditionalFieldsAndFormatNulls(
-                            {
-                                ...cs.info,
-                                ...flattenBaseResults(d),
-                            },
-                            currUniqueId
-                        )
-                    )
-            );
-            currRowId += d.variant.callsets.length;
-        } else {
-            result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), currUniqueId));
-            currRowId += 1;
-        }
-    });
-
-    return [result, uniqueVariantIndices];
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
@@ -235,9 +188,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: state =>
-                            state.zygosity?.toLowerCase().includes('het')
+                            isHeterozygous(state.zygosity)
                                 ? 'Heterozygous'
-                                : state.zygosity?.toLowerCase().includes('hom')
+                                : isHomozygous(state.zygosity)
                                 ? 'Homozygous'
                                 : state.zygosity,
                         filter: 'multiSelect',
@@ -364,6 +317,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: 79,
                     },
                     { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
+                    {
+                        accessor: 'homozygousCount',
+                        id: 'homozygousCount',
+                        Header: 'Homozygous Count',
+                        width: getColumnWidth(tableData, 'homozygousCount', 'Homozygous Count'),
+                    },
+                    {
+                        accessor: 'heterozygousCount',
+                        id: 'heterozygousCount',
+                        Header: 'Heterozygous Count',
+                        width: getColumnWidth(tableData, 'heterozygousCount', 'Heterozygous Count'),
+                    },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
                     {
                         id: 'aaChange',
@@ -456,6 +421,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
+
+    var currColour = 'white';
+
+    const getRowColour = (uniqueId: number, previousRowUniqueId: number) => {
+        if (currColour === 'white' && uniqueId !== previousRowUniqueId) {
+            currColour = 'whitesmoke';
+        } else if (uniqueId !== previousRowUniqueId) {
+            currColour = 'white';
+        }
+        return [{ style: { background: currColour } }];
+    };
 
     return (
         <>
@@ -632,9 +608,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                         <tbody {...getTableBodyProps()}>
                             {page.length > 0 ? (
-                                page.map(row => {
+                                page.map((row, i) => {
                                     prepareRow(row);
-                                    const { key, ...restRowProps } = row.getRowProps();
+                                    // Alternate row's background colour.
+                                    const { key, ...restRowProps } = row.getRowProps(
+                                        i !== 0
+                                            ? getRowColour(
+                                                  row.values['uniqueId'],
+                                                  page[i - 1].values['uniqueId']
+                                              )
+                                            : [{ style: { background: 'white' } }]
+                                    );
                                     // Display only one row per variant if Case Details Section is collapsed.
                                     if (
                                         isCaseDetailsCollapsed(headerGroups[0].headers) &&
