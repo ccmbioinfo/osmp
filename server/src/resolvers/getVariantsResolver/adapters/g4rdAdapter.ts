@@ -163,7 +163,10 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
     return {
       id: uuidv4(),
       code: error.response?.status || 500,
-      message: error.response?.data.toString(),
+      message:
+        error.response?.status === 404
+          ? 'No variants found matching your query.'
+          : error.response?.statusText,
     };
   }
 };
