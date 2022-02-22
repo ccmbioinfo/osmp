@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAsyncDebounce, UseFiltersColumnProps } from 'react-table';
 import { Column, Input, Typography } from '../..';
 import { DefaultFilter } from './ColumnFilter';
@@ -12,14 +12,28 @@ export default function NumberRangeFilter<T extends {}>({
     filter,
     setFilter,
 }: NumberRangeFilterProps<T>) {
-    const [error, setError] = useState<boolean>(false);
-    const [text, setText] = useState('');
+    /*
+     * For number filtering, react-table records the number range as an array of the upper and lower bound. 
+        e.g. >2, <2, and =2 is represented as [2, undefined], [undefined, 2], and [2,2] respectively.
+     */
 
-    const [filterComparison, setFilterComparison] = useState<ComparisonType>({
-        less: false,
-        greater: false,
-        equal: true,
-    });
+    const [lower, upper] = filter ? filter.value : [];
+
+    const value = useMemo(() => (lower || upper || '').toString(), [lower, upper]);
+
+    const comparison = useMemo(
+        () => ({
+            less: lower === undefined && upper !== undefined,
+            greater: upper === undefined && lower !== undefined,
+            equal: upper === lower,
+        }),
+        [lower, upper]
+    );
+
+    const [error, setError] = useState<boolean>(false);
+    const [text, setText] = useState(value);
+
+    const [filterComparison, setFilterComparison] = useState<ComparisonType>(comparison);
 
     const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
 
@@ -44,12 +58,12 @@ export default function NumberRangeFilter<T extends {}>({
     useEffect(() => {
         const parsed = parseFloat(text);
 
-        if (!parsed) debouncedSetFilter([-Infinity, Infinity]);
+        if (!parsed) debouncedSetFilter([undefined, undefined]);
         else {
             if (filterComparison.less) {
-                debouncedSetFilter([-Infinity, parsed]);
+                debouncedSetFilter([undefined, parsed]);
             } else if (filterComparison.greater) {
-                debouncedSetFilter([parsed, +Infinity]);
+                debouncedSetFilter([parsed, undefined]);
             } else {
                 debouncedSetFilter([parsed, parsed]);
             }
@@ -71,6 +85,7 @@ export default function NumberRangeFilter<T extends {}>({
                     <InputComparisonDropdown
                         setFilterComparison={setFilterComparison}
                         setFilter={setFilter}
+                        comparison={filterComparison}
                     />
                 }
             />

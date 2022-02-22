@@ -57,6 +57,7 @@ export default function AdvancedFilters<T extends {}>({
                             setFilter={setFilter.bind(null, v.id as string)}
                             type={v.filter as 'text' | 'multiSelect' | 'singleSelect'}
                             columnId={v.id as IdType<ResultTableColumns>}
+                            filters={filters}
                         />
                     </Column>
                 ))}

@@ -1,6 +1,7 @@
 import Avatar from './Avatar';
 import Button from './Button';
 import Checkbox from './Checkbox';
+import Chip from './Chip';
 import ComboBox from './ComboBox';
 import Divider from './Divider';
 import ErrorProvider, {
@@ -36,6 +37,7 @@ export {
     CellText,
     clearError,
     Checkbox,
+    Chip,
     Column,
     ComboBox,
     Container,

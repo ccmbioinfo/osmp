@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
 import { UseFiltersColumnProps } from 'react-table';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
+import getKeys from '../../../utils/getKeys';
 import { IconButton } from '../../index';
 import { ResultTableColumns } from '../Table';
 
@@ -23,6 +24,7 @@ export type FilterComparison = { [K in keyof ResultTableColumns]?: ComparisonTyp
 interface InputComparisonDropdownProps<T extends {}>
     extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;
+    comparison: ComparisonType;
 }
 
 const Icons = Object.freeze({
@@ -50,17 +52,23 @@ const COMPARISON_OPTIONS: ComparisonOption[] = [
 ];
 
 export function InputComparisonDropdown<T extends {}>({
+    comparison,
     setFilterComparison,
     setFilter,
 }: InputComparisonDropdownProps<T>) {
+    const value = useMemo(
+        () => getKeys(comparison).find(key => comparison[key]) as keyof ComparisonType,
+        [comparison]
+    );
+
     const [open, setOpen] = useState(false);
-    const [sign, setSign] = useState<keyof ComparisonType>('equal');
+    const [sign, setSign] = useState<keyof ComparisonType>(value);
 
     const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
     useClickAway(ref, () => setOpen(false));
 
-    // Ensure value returned is a number and not +/-Infinity
+    // Ensure value returned is a number and not undefined
     const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
 
     return (
@@ -89,9 +97,9 @@ export function InputComparisonDropdown<T extends {}>({
                                 case 'equal':
                                     return [n, n];
                                 case 'less':
-                                    return [-Infinity, n];
+                                    return [undefined, n];
                                 case 'greater':
-                                    return [n, +Infinity];
+                                    return [n, undefined];
                             }
                         });
                     }}

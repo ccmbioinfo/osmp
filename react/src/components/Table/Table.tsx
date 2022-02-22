@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BsFillCaretDownFill, BsFillCaretUpFill, BsFilter } from 'react-icons/bs';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
+import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from 'react-icons/ti';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
     ColumnGroup,
@@ -19,6 +19,7 @@ import {
     useTable,
 } from 'react-table';
 import HEADERS from '../../constants/headers';
+import theme from '../../constants/theme';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -36,12 +37,12 @@ import {
     isHomozygous,
     prepareData,
 } from '../../utils';
-import { Button, Flex, InlineFlex, Tooltip, Typography } from '../index';
+import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
-import AdvancedFilters from './AdvancedFilters';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
+import FilterPopover from './FilterPopover';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
@@ -77,7 +78,6 @@ const resolveSex = (sexPhenotype: string) => {
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
-    const [advancedFiltersOpen, setadvancedFiltersOpen] = useState<Boolean>(false);
     const [tableData, uniqueVariantIndices] = useMemo(
         () => prepareData(variantData),
         [variantData]
@@ -122,12 +122,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Variant',
                 id: 'core',
+                disableSortBy: true,
+                disableFilters: true,
                 columns: [
                     {
                         id: 'emptyCore',
                         type: 'empty',
                         Header: '',
                         disableSortBy: true,
+                        disableFilters: true,
                         width: 70,
                     },
                     {
@@ -141,6 +144,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Chromosome',
                         width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
                         disableFilters: true,
+                        disableSortBy: true,
                     },
                     {
                         accessor: 'start',
@@ -178,12 +182,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Case Details',
                 id: 'case_details',
+                disableSortBy: true,
+                disableFilters: true,
                 columns: [
                     {
                         id: 'emptyCaseDetails',
                         type: 'empty',
                         Header: '',
                         disableSortBy: true,
+                        disableFilters: true,
                         width: 70,
                     },
                     {
@@ -258,6 +265,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: 'Sex',
+                        width: getColumnWidth(tableData, 'sex', 'Sex'),
                         Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
@@ -281,7 +289,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'diseases',
                         id: 'diseases',
                         Header: 'Diseases',
-                        width: getColumnWidth(tableData, 'diseases', 'Diseases'),
+                        width: 120,
                     },
                     {
                         accessor: 'solved',
@@ -308,12 +316,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             {
                 Header: 'Variant Details',
                 id: 'variation_details',
+                disableSortBy: true,
+                disableFilters: true,
                 columns: [
                     {
                         id: 'emptyVariationDetails',
                         type: 'empty',
                         Header: '',
                         disableSortBy: true,
+                        disableFilters: true,
                         width: 79,
                     },
                     { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
@@ -417,8 +428,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter } = state;
 
-    console.log(filters, rows);
-
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
 
@@ -438,15 +447,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             <TableFilters justifyContent="space-between">
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
-                    <Button
-                        variant="secondary"
-                        onClick={() => setadvancedFiltersOpen(prev => !prev)}
-                    >
-                        Advanced Filters{' '}
-                        <IconPadder>
-                            <BsFilter />
-                        </IconPadder>
-                    </Button>
                     <Button
                         disabled={filters.length > 0 ? false : true}
                         variant="secondary"
@@ -468,15 +468,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
             </TableFilters>
 
-            {advancedFiltersOpen && (
-                <AdvancedFilters
-                    columns={visibleColumns}
-                    preFilteredRows={preFilteredRows}
-                    filters={filters}
-                    setFilter={setFilter}
-                />
-            )}
-
             <Column>
                 <br />
                 <Typography variant="h3">
@@ -486,6 +477,16 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 {rows.length !== tableData.length && (
                     <SummaryText>{rows.length} individuals matching your filters</SummaryText>
                 )}
+                <Flex alignItems="center">
+                    <Typography variant="p" bold>
+                        Active Filters:
+                    </Typography>
+                    {filters.map((f, i) => (
+                        <div key={i}>
+                            <Chip title={f.id} onDelete={() => setFilter(f.id, undefined)} />
+                        </div>
+                    ))}
+                </Flex>
             </Column>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
@@ -500,11 +501,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     <motion.tr layout key={key} {...restHeaderGroupProps}>
                                         {headerGroup.headers.map(column => {
                                             const { key, ...restHeaderProps } =
-                                                column.getHeaderProps(
-                                                    column.getSortByToggleProps({
-                                                        title: undefined,
-                                                    })
-                                                );
+                                                column.getHeaderProps();
                                             return (
                                                 <TH key={key} {...restHeaderProps}>
                                                     <AnimatePresence initial={false}>
@@ -532,7 +529,28 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                 <Flex
                                                                     alignItems="center"
                                                                     justifyContent="center"
+                                                                    nowrap
                                                                 >
+                                                                    {/* 
+                                                                        Filter icon for filtering individual columns
+                                                                    */}
+                                                                    {!column.disableFilters && (
+                                                                        <FilterPopover
+                                                                            columns={[column]}
+                                                                            preFilteredRows={
+                                                                                preFilteredRows
+                                                                            }
+                                                                            filters={filters}
+                                                                            setFilter={setFilter}
+                                                                            active={
+                                                                                !!filters.find(
+                                                                                    c =>
+                                                                                        c.id ===
+                                                                                        column.id
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    )}
                                                                     {column.render('Header')}
                                                                     {!column.id.includes('empty') &&
                                                                         !!HEADERS[column.id] && (
@@ -548,6 +566,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 </IconPadder>
                                                                             </Tooltip>
                                                                         )}
+
                                                                     {/* Use column.getResizerProps to hook up the events correctly */}
                                                                     <div
                                                                         {...column.getResizerProps()}
@@ -557,6 +576,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 : ''
                                                                         }`}
                                                                     />
+
+                                                                    {/* Large header grouping */}
                                                                     {isHeader(column) &&
                                                                         (isHeaderExpanded(
                                                                             column
@@ -583,17 +604,41 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                                                 />
                                                                             </IconPadder>
                                                                         ))}
-                                                                    <IconPadder>
-                                                                        {column.isSorted ? (
-                                                                            column.isSortedDesc ? (
-                                                                                <BsFillCaretUpFill color="lightgrey" />
-                                                                            ) : (
-                                                                                <BsFillCaretDownFill color="lightgrey" />
-                                                                            )
-                                                                        ) : (
-                                                                            ''
+
+                                                                    {/* Sorting */}
+                                                                    <div
+                                                                        {...column.getSortByToggleProps(
+                                                                            {
+                                                                                title: undefined,
+                                                                            }
                                                                         )}
-                                                                    </IconPadder>
+                                                                    >
+                                                                        {!column.disableSortBy && (
+                                                                            <IconPadder>
+                                                                                {column.isSorted ? (
+                                                                                    column.isSortedDesc ? (
+                                                                                        <TiArrowSortedDown
+                                                                                            color={
+                                                                                                theme
+                                                                                                    .colors
+                                                                                                    .primary
+                                                                                            }
+                                                                                        />
+                                                                                    ) : (
+                                                                                        <TiArrowSortedUp
+                                                                                            color={
+                                                                                                theme
+                                                                                                    .colors
+                                                                                                    .primary
+                                                                                            }
+                                                                                        />
+                                                                                    )
+                                                                                ) : (
+                                                                                    <TiArrowUnsorted color="lightgrey" />
+                                                                                )}
+                                                                            </IconPadder>
+                                                                        )}
+                                                                    </div>
                                                                 </Flex>
                                                             </motion.section>
                                                         )}

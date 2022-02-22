@@ -24,7 +24,6 @@ const Footer: React.FC<FooterProps> = ({
         setPageSize,
     },
 }) => {
-    console.log(pageSize, pageOptions, pageCount);
     return (
         <StyledFooter>
             <span>

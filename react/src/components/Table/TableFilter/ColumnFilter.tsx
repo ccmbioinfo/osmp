@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+    Filters,
     IdType,
     useAsyncDebounce,
     UseFiltersColumnProps,
@@ -18,6 +19,7 @@ interface ColumnFilterProps<T extends {}>
     extends Pick<UseFiltersInstanceProps<T>, 'preFilteredRows'>,
         Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     columnId: IdType<T>;
+    filters: Filters<T>;
     filterModel?: DefaultFilter<string | string[] | number | number[]>;
     options?: string[];
     type?: 'singleSelect' | 'multiSelect' | 'text' | 'between';
@@ -27,11 +29,20 @@ export function ColumnFilter<T extends {}>({
     columnId,
     filterModel,
     options,
+    filters,
     preFilteredRows,
     setFilter,
     type,
 }: ColumnFilterProps<T>) {
-    const [input, setInput] = useState<string>('');
+    const value = useMemo(() => {
+        if (filters) {
+            return filters.find(filter => filter.id === columnId)?.value;
+        } else {
+            return '';
+        }
+    }, [filters, columnId]);
+
+    const [input, setInput] = useState<string>(value);
 
     useEffect(() => {
         if (!filterModel) setInput('');

@@ -15,6 +15,7 @@ export interface FlexProps {
         | 'space-around';
     variant?: 'success' | 'main' | 'light';
     fullWidth?: boolean;
+    nowrap?: boolean;
 }
 
 export const Background = styled.div<BackgroundProps>`
@@ -38,7 +39,7 @@ export const Background = styled.div<BackgroundProps>`
 export const Flex = styled.div<FlexProps>`
     align-items: ${props => props.alignItems ?? 'inherit'};
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: ${props => (props.nowrap ? 'nowrap' : 'wrap')};
     justify-content: ${props => props.justifyContent ?? 'inherit'};
     ${props => props.fullWidth && `width: 100%;`}
 `;
