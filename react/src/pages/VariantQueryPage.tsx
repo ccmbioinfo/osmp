@@ -298,22 +298,16 @@ const VariantQueryPage: React.FC<{}> = () => {
             </Background>
             {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]
                 .flat()
-                .map(e => {
-                    return (
-                        <ErrorIndicator
-                            key={e.uid}
-                            message={formatErrorMessage(
-                                e.code,
-                                e.message,
-                                data?.getVariants.errors.map(d => d.source).toString()
-                            )}
-                            handleCloseError={() => {
-                                clearCache();
-                                dispatch(clearError(e.uid));
-                            }}
-                        />
-                    );
-                })}
+                .map(e => (
+                    <ErrorIndicator
+                        key={e.uid}
+                        message={formatErrorMessage(e.code, e.message, e.source)}
+                        handleCloseError={() => {
+                            clearCache();
+                            dispatch(clearError(e.uid));
+                        }}
+                    />
+                ))}
             {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
         </Body>
     );

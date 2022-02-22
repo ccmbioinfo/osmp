@@ -6,9 +6,6 @@ const formatErrorMessage = (
     let serverMessage;
     if (code.startsWith('5') && !message) {
         switch (code) {
-            case '404':
-                serverMessage = 'No variants found matching your query.';
-                break;
             case '500':
                 serverMessage = 'Internal Server Error';
                 break;
