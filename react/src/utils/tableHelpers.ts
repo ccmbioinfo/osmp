@@ -112,18 +112,12 @@ const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
     return sortedQueryResult;
 };
 
-export const isHeterozygous = (zygosity: String | null | undefined) => {
-    if (zygosity?.toLowerCase().includes('het')) {
-        return true;
-    }
-    return false;
+export const isHeterozygous = (zygosity: string | null | undefined) => {
+    return !!zygosity?.toLowerCase().includes('het');
 };
 
-export const isHomozygous = (zygosity: String | null | undefined) => {
-    if (zygosity?.toLowerCase().includes('hom')) {
-        return true;
-    }
-    return false;
+export const isHomozygous = (zygosity: string | null | undefined) => {
+    return !!zygosity?.toLowerCase().includes('hom');
 };
 
 // 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
@@ -147,7 +141,12 @@ export const prepareData = (
     sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
 
-        if (JSON.stringify(currVariant) !== JSON.stringify({ ref, alt, start, end })) {
+        if (
+            currVariant.ref !== ref ||
+            currVariant.alt !== alt ||
+            currVariant.start !== start ||
+            currVariant.end !== end
+        ) {
             if (uniqueVariantIndices.length) {
                 result
                     .slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId)

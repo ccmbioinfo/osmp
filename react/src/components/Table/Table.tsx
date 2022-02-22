@@ -320,14 +320,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'homozygousCount',
                         id: 'homozygousCount',
-                        Header: 'homozygous count',
-                        width: 150,
+                        Header: 'Homozygous Count',
+                        width: getColumnWidth(tableData, 'homozygousCount', 'Homozygous Count'),
                     },
                     {
                         accessor: 'heterozygousCount',
                         id: 'heterozygousCount',
-                        Header: 'heterozygous count',
-                        width: 150,
+                        Header: 'Heterozygous Count',
+                        width: getColumnWidth(tableData, 'heterozygousCount', 'Heterozygous Count'),
                     },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
                     {
