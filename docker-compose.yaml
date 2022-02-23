@@ -17,7 +17,7 @@ services:
     user: "1000" #node
     entrypoint: "yarn start"
     networks:
-      - ssmp
+      - osmp
   ssmp-server:
     build:
       context: server
@@ -52,7 +52,7 @@ services:
       - ./server:/usr/app
     entrypoint: "yarn start-dev"
     networks:
-      - ssmp
+      - osmp
 
   mongo:
     image: mongo:latest
@@ -66,7 +66,7 @@ services:
     volumes:
       - ./mongo/data:/data/db
     networks:
-      - ssmp
+      - osmp
 
   test-node-1:
     image: node:16.3-buster
@@ -90,7 +90,7 @@ services:
       - ./test-node:/usr/app
     entrypoint: "yarn start-dev"
     networks:
-      - ssmp
+      - osmp
 
   stager-mysql:
     image: mysql:8.0
@@ -105,7 +105,7 @@ services:
     volumes:
       - ${STAGER_DATA_VOLUME}:/var/lib/mysql
     networks:
-      - ssmp
+      - osmp
 
   keycloak:
     image: quay.io/keycloak/keycloak:14.0.0
@@ -130,8 +130,8 @@ services:
       - ./keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli
       - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
     networks:
-      - ssmp
+      - osmp
 
 networks:
-  ssmp:
+  osmp:
     driver: bridge
