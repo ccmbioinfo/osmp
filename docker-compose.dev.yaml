@@ -19,7 +19,7 @@ services:
     logging:
       driver: journald
     networks:
-      - osmp-dev
+      - ssmp-dev
 networks:
-  osmp-dev:
+  ssmp-dev:
     driver: bridge
