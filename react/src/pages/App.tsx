@@ -3,9 +3,10 @@ import { ApolloProvider } from '@apollo/client';
 import { useKeycloak } from '@react-keycloak/web';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import { AboutPage, VariantQueryPage } from '.';
 import { client } from '../../src/apollo/client';
 import { ErrorFallback, ErrorProvider, Flex, Navbar, Spinner } from '../components';
+import AboutPage from './About';
+import VariantQueryPage from './VariantQueryPage';
 
 const App: React.FC<{}> = () => {
     const {
