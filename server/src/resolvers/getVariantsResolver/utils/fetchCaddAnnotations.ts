@@ -11,7 +11,8 @@ const ANNOTATION_URL_38 =
 const ANNOTATION_URL_37 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh37/whole_genome_SNVs_inclAnno.tsv.gz';
 
-const INDEX_37_PATH = '/home/node/cadd_wgs_ghr37_index.gz.tbi';
+const INDEX_37_PATH =
+  'https://minio.ccm.sickkids.ca/hle-cadd-wgs-ghr37-index/whole_genome_SNVs_inclAnno.tsv.gz.csi';
 const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
 
 /**
@@ -26,9 +27,10 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const annotationUrl = resolvedAssemblyId === 'GRCh38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
   const indexPath = resolvedAssemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
 
+  const nodeFetch = fetch as Fetcher;
   const tbiIndexed = new TabixIndexedFile({
-    filehandle: new RemoteFile(annotationUrl, { fetch: fetch as Fetcher }),
-    tbiPath: indexPath,
+    filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
+    csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
   });
 
   const { chromosome, start, end } = resolveChromosome(position);
@@ -82,7 +84,6 @@ const _formatAnnotations = (annotations: string[]) => {
       HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])
     ) as unknown as CaddAnnotation;
   });
-
   return result;
 };
 
