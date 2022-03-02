@@ -19,8 +19,6 @@ echo "$(cd build && find . -type f | sed 's/^\.\///' | sort)" > new.out
 mc cp --recursive --attr 'Cache-Control=public, max-age=31536000, immutable' build/static/ $MINIO_HOST_ALIAS/$DEPLOY_BUCKET/static/
 # Copy remaining files in the root that could change variably to minimize site downtime
 mc cp --attr 'Cache-Control=no-cache' build/* $MINIO_HOST_ALIAS/$DEPLOY_BUCKET
-# Copy annotation index file
-mc cp --recursive public/annotation/ $MINIO_HOST_ALIAS/$DEPLOY_BUCKET/public/annotation
 
 # Find the object names of files that are not part of the current deployment on the remote and delete them
 comm -23 old.out new.out | sed "s/^/$MINIO_HOST_ALIAS\/$DEPLOY_BUCKET\//" | mc rm --force --stdin
