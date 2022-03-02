@@ -26,8 +26,9 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const annotationUrl = resolvedAssemblyId === 'GRCh38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
   const indexPath = resolvedAssemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
 
+  const nodeFetch = fetch as Fetcher;
   const tbiIndexed = new TabixIndexedFile({
-    filehandle: new RemoteFile(annotationUrl, { fetch: fetch as Fetcher }),
+    filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
     tbiPath: indexPath,
   });
 
@@ -82,7 +83,6 @@ const _formatAnnotations = (annotations: string[]) => {
       HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])
     ) as unknown as CaddAnnotation;
   });
-
   return result;
 };
 
