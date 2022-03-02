@@ -11,7 +11,8 @@ const ANNOTATION_URL_38 =
 const ANNOTATION_URL_37 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh37/whole_genome_SNVs_inclAnno.tsv.gz';
 
-const INDEX_37_PATH = '/home/node/cadd_wgs_ghr37_index.gz.tbi';
+const INDEX_37_PATH =
+  'https://www-ssmp-dev.minio.genomics4rd.ca/whole_genome_SNVs_inclAnno_GRCh37.tsv.gz.csi';
 const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
 
 /**
@@ -29,7 +30,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const nodeFetch = fetch as Fetcher;
   const tbiIndexed = new TabixIndexedFile({
     filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
-    tbiPath: indexPath,
+    csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
   });
 
   const { chromosome, start, end } = resolveChromosome(position);
