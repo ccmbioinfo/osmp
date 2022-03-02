@@ -29,7 +29,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const nodeFetch = fetch as Fetcher;
   const tbiIndexed = new TabixIndexedFile({
     filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
-    csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
+    tbiPath: indexPath,
   });
 
   const { chromosome, start, end } = resolveChromosome(position);
