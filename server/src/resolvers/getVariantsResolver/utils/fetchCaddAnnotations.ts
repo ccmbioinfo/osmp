@@ -11,8 +11,7 @@ const ANNOTATION_URL_38 =
 const ANNOTATION_URL_37 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh37/whole_genome_SNVs_inclAnno.tsv.gz';
 
-const INDEX_37_PATH =
-  'https://minio.ccm.sickkids.ca/hle-cadd-wgs-ghr37-index/whole_genome_SNVs_inclAnno.tsv.gz.csi';
+const INDEX_37_PATH = '/home/node/cadd_wgs_ghr37_index.gz.tbi';
 const INDEX_38_PATH = '/home/node/cadd_wgs_ghr38_index.gz.tbi';
 
 /**
