@@ -153,7 +153,7 @@ jobs:
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
-          docker-compose up -d --remove-orphans 
+          docker-compose up -d --remove-orphans ssmp-server
       - name: Clean up
         if: always()
         run: |
