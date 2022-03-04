@@ -119,6 +119,7 @@ jobs:
         # Even though this is deploying to a remote Docker Engine,
         # Compose uses the registry credentials of the client
         env:
+          # Server
           COMPOSE_FILE: docker-compose.dev.yaml
           G4RD_AUTH_METHOD: ${{ secrets.G4RD_AUTH_METHOD }}
           G4RD_PASSWORD: ${{ secrets.G4RD_PASSWORD }}
@@ -130,10 +131,29 @@ jobs:
           MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
           NODE_ENV: development
           TEST_NODE_URL: ${{ secrets.TEST_NODE_URL }}
+          # Test Node
+          TEST_DATA_DB: ${{ secrets.TEST_DATA_DB }}
+          TEST_DATA_DB_PORT: ${{ secrets.TEST_DATA_DB_PORT }}
+          TEST_DATA_DB_HOST: ${{ secrets.TEST_DATA_DB_HOST }}
+          TEST_DATA_DB_USER: ${{ secrets.TEST_DATA_DB_USER }}
+          TEST_DATA_DB_PASSWORD: ${{ secrets.TEST_DATA_DB_PASSWORD }}
+          # Test Node MySQL
+          TEST_DATA_DB_ROOT_PASSWORD: ${{ secrets.TEST_DATA_DB_ROOT_PASSWORD }}
+          # Keycloak
+          KEYCLOAK_DB_ADDR: ${{ secrets.KEYCLOAK_DB_ADDR }}
+          KEYCLOAK_DB: ${{ secrets.KEYCLOAK_DB }}
+          KEYCLOAK_DB_USER: ${{ secrets.KEYCLOAK_DB_USER }}
+          KEYCLOAK_DB_PASSWORD: ${{ secrets.KEYCLOAK_DB_PASSWORD }}
+          # Mongo
+          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+          MONGO_INITDB_DATABASE: ${{ secrets.MONGO_INITDB_DATABASE }}
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+
+        # Only bring up server, as MySQL, Mongo, and Keycloak are expected to be stable. 
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
-          docker-compose up -d --remove-orphans
+          docker-compose up -d --remove-orphans ssmp-server
       - name: Clean up
         if: always()
         run: |

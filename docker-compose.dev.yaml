@@ -20,6 +20,66 @@ services:
       driver: journald
     networks:
       - osmp-dev
+  
+  test-node:
+    container_name: ssmpdev_test-node_1
+    image: node:16.3-slim
+    environment:
+      TEST_DATA_DB:
+      TEST_DATA_DB_PORT: 
+      TEST_DATA_DB_HOST: 
+      TEST_DATA_DB_USER: 
+      TEST_DATA_DB_PASSWORD:
+    user: "1000" #node
+    working_dir: /usr/app/
+    volumes:
+      - ./test-node-app:/usr/app
+    entrypoint: "yarn start"
+    networks:
+      - osmp-dev
+
+  test-node-mysql:
+    image: mysql:8.0
+    restart: on-failure
+    user: "1000"
+    environment:
+      MYSQL_DATABASE: ${TEST_DATA_DB}
+      MYSQL_USER: ${TEST_DATA_DB_USER}
+      MYSQL_PASSWORD: ${TEST_DATA_DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
+    volumes:
+      - ./test_node_db_data:/var/lib/mysql
+    networks:
+      - osmp-dev
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:14.0.0
+    environment:
+      KEYCLOAK_USER: 
+      KEYCLOAK_PASSWORD: 
+      DB_VENDOR: mysql
+      DB_ADDR: "${KEYCLOAK_DB_ADDR}"
+      DB_DATABASE: "${KEYCLOAK_DB}"
+      DB_USER: "${KEYCLOAK_DB_USER}"
+      DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_FRONTEND_URL: "https://keycloak.ccmdev.ca/auth"
+    ports:
+      - 8080:8080
+    logging:
+      driver: journald
+
+  mongo:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - ./mongo_data:/data/db
+    networks:
+      - osmp-dev
+
 networks:
   osmp-dev:
     driver: bridge
