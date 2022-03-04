@@ -22,8 +22,8 @@ services:
       - osmp-dev
   
   test-node:
-    container_name: ssmpdev_test-node_1
     image: node:16.3-slim
+    container_name: ssmpdev_test-node_1
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 
