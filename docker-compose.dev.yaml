@@ -43,9 +43,9 @@ services:
     restart: on-failure
     user: "1000"
     environment:
-      MYSQL_DATABASE: ${TEST_DATA_DB}
-      MYSQL_USER: ${TEST_DATA_DB_USER}
-      MYSQL_PASSWORD: ${TEST_DATA_DB_PASSWORD}
+      MYSQL_DATABASE: "${TEST_DATA_DB}"
+      MYSQL_USER: "${TEST_DATA_DB_USER}"
+      MYSQL_PASSWORD: "${TEST_DATA_DB_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
     volumes:
       - ./test_node_db_data:/var/lib/mysql
@@ -71,6 +71,7 @@ services:
 
   mongo:
     image: mongo:latest
+    container_name: osmpdev_mongo_1
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
