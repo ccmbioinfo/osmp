@@ -11,11 +11,6 @@ interface HitPosition {
     end: number;
 }
 
-interface HitPositions {
-    genomic_pos: HitPosition;
-    genomic_pos_hg19: HitPosition;
-}
-
 interface Gene {
     gene: string;
 }
@@ -42,12 +37,6 @@ interface GeneSearchProps {
     onChange: (geneName: string) => void;
 }
 
-const getPosition = (assembly: AssemblyId, position: HitPositions) => {
-    const is38 = /38/.test(assembly);
-    const resolvedPosition = is38 ? position.genomic_pos : position.genomic_pos_hg19;
-    return `${resolvedPosition.chr}:${resolvedPosition.start}-${resolvedPosition.end}`;
-};
-
 const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
     const [options, setOptions] = useState<SelectableListItem<SelectionValue>[]>([]);
 
@@ -57,7 +46,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
 
     const formatAutocompleteOptions = useCallback(
-        (autocompleteResults: AutocompleteResults) =>
+        (autocompleteResults: AutocompleteResults, assembly: AssemblyId) =>
             (autocompleteResults.autocompleteResults.hits || [])
                 .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
                 .map((hit, i) => {
@@ -73,21 +62,22 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                         genomic_pos_hg19,
                     };
 
-                    return genes.ensembl.map((e, eid) => ({
+                    const is38 = /38/.test(assembly);
+
+                    return (is38 ? genomic_pos : genomic_pos_hg19).map((e, eid) => ({
                         value: {
                             name: genes.symbol.toUpperCase(),
-                            ensemblId: e.gene,
-                            position: getPosition(assembly, {
-                                genomic_pos: genes.genomic_pos[eid],
-                                genomic_pos_hg19: genes.genomic_pos_hg19[eid],
-                            }),
+                            ensemblId: genes.ensembl[eid].gene,
+                            position: `${e.chr}:${e.start}-${e.end}`,
                         },
                         id: i + eid,
-                        label: Array.isArray(hit.ensembl) ? e.gene : hit.symbol.toUpperCase(),
+                        label: Array.isArray(hit.ensembl)
+                            ? `${hit.symbol.toUpperCase()} - ${genes.ensembl[eid].gene}`
+                            : hit.symbol.toUpperCase(),
                     }));
                 })
                 .flat(),
-        [assembly]
+        []
     );
 
     useEffect(() => {
@@ -103,7 +93,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
     useEffect(() => {
         if (autocompleteResults) {
-            setOptions(formatAutocompleteOptions(autocompleteResults));
+            setOptions(formatAutocompleteOptions(autocompleteResults, assembly));
         }
     }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
 
