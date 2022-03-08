@@ -37,11 +37,16 @@ interface GeneSearchProps {
     onChange: (geneName: string) => void;
 }
 
+const isCanonicalRegion = (chr: string) =>
+    ['X', 'Y', ...Array.from({ length: 22 }, (_, i) => (i + 1).toString())].includes(chr);
+
 const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
     const [options, setOptions] = useState<SelectableListItem<SelectionValue>[]>([]);
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
+
+    console.log(autocompleteResults);
 
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
 
@@ -64,17 +69,19 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
                     const is38 = /38/.test(assembly);
 
-                    return (is38 ? genomic_pos : genomic_pos_hg19).map((e, eid) => ({
-                        value: {
-                            name: genes.symbol.toUpperCase(),
-                            ensemblId: genes.ensembl[eid].gene,
-                            position: `${e.chr}:${e.start}-${e.end}`,
-                        },
-                        id: i + eid,
-                        label: Array.isArray(hit.ensembl)
-                            ? `${hit.symbol.toUpperCase()} - ${genes.ensembl[eid].gene}`
-                            : hit.symbol.toUpperCase(),
-                    }));
+                    return (is38 ? genomic_pos : genomic_pos_hg19)
+                        .filter(g => isCanonicalRegion(g.chr))
+                        .map((e, eid) => ({
+                            value: {
+                                name: genes.symbol.toUpperCase(),
+                                ensemblId: genes.ensembl[eid].gene,
+                                position: `${e.chr}:${e.start}-${e.end}`,
+                            },
+                            id: i + eid,
+                            label: Array.isArray(hit.ensembl)
+                                ? `${hit.symbol.toUpperCase()} - ${genes.ensembl[eid].gene}`
+                                : hit.symbol.toUpperCase(),
+                        }));
                 })
                 .flat(),
         []
