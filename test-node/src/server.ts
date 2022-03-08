@@ -38,14 +38,14 @@ app.get(
   '/data',
   async (
     {
-      query: { assemblyId, ensemblId, geneName },
-    }: Request<{ assemblyId: string; ensemblId: string; geneName: string }>,
+      query: { assemblyId, geneName },
+    }: Request<{ assemblyId: string; geneName: string }>,
     res
   ) => {
     // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
     // res.statusCode = 422;
     /// return res.json('invalid request');
-    if (!assemblyId || !ensemblId) {
+    if (!assemblyId || !geneName) {
       res.statusCode = 422;
       return res.json('invalid request');
     } else if (!(assemblyId as string).includes('37')) {
@@ -55,7 +55,6 @@ app.get(
 
     const result = await getStagerData(
       geneName as string,
-      ensemblId as string,
       assemblyId as string
     );
 
@@ -68,7 +67,7 @@ app.get(
   }
 );
 
-const getStagerData = async (geneName: string, ensemblId: string, assemblyId: string) => {
+const getStagerData = async (geneName: string, assemblyId: string) => {
   const connection = await mysql.createConnection({
     host: STAGER_DB_HOST,
     user: STAGER_DB_USER,
@@ -77,38 +76,14 @@ const getStagerData = async (geneName: string, ensemblId: string, assemblyId: st
     database: STAGER_DB,
   });
 
-  if (!ensemblId) {
-    try {
-      const [rows] = await connection.execute<RowDataPacket[][]>(
-        'select `ensembl_id` from `gene_alias` where `name` = ? and `kind` = "current_approved_symbol";',
-        [geneName]
-      );
-
-      if (rows.length) {
-        ensemblId = (rows[0] as any).ensembl_id;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      console.error(e);
-      connection.end();
-      return false;
-    }
-  } else if (ensemblId.startsWith('ENS')) {
-    // stager stores its ensids as integers
-    ensemblId = ensemblId.replace(/ENSG0+/, '');
-  }
 
   let result;
 
   try {
     const fetchVariantsSql = `
-    select * from variant v 
-      inner join gene g
-        on v.position between g.start and g.end and v.chromosome = g.chromosome
-      where g.ensembl_id = ?`;
+    select * from variant v where v.gene = ?`;
 
-    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [ensemblId]);
+    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [geneName]);
 
     if (!variants.length) {
       connection.end();
