@@ -188,29 +188,34 @@ const VariantQueryPage: React.FC<{}> = () => {
                     </Column>
                 </Column>
             </Flex>
+
+            <Column
+                alignItems="flex-start"
+                style={{
+                    width: '50%',
+                }}
+            >
+                <Typography variant="subtitle" bold>
+                    Gene Name
+                </Typography>
+                <GeneSearch
+                    assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
+                    geneName={queryOptionsForm.gene.value}
+                    onChange={geneName => updateQueryOptionsForm({ gene: geneName, ensemblId: '' })}
+                    onSelect={val => {
+                        const { position, ensemblId } = val;
+                        updateQueryOptionsForm({
+                            gene: val.name,
+                            ensemblId,
+                            position,
+                        });
+                    }}
+                />
+                <ErrorText error={queryOptionsForm.gene.error} />
+            </Column>
+
             <Background variant="light">
                 <Flex alignItems="center">
-                    <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold>
-                            Gene Name
-                        </Typography>
-                        <GeneSearch
-                            assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
-                            geneName={queryOptionsForm.gene.value}
-                            onChange={geneName =>
-                                updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
-                            }
-                            onSelect={val => {
-                                const { position, ensemblId } = val;
-                                updateQueryOptionsForm({
-                                    gene: val.name,
-                                    ensemblId,
-                                    position,
-                                });
-                            }}
-                        />
-                        <ErrorText error={queryOptionsForm.gene.error} />
-                    </Column>
                     <Column alignItems="flex-start">
                         <Typography variant="subtitle" bold>
                             Ensembl ID

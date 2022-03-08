@@ -4,7 +4,7 @@ import { useFetchAutocompleteQuery } from '../apollo/hooks';
 import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
-
+import { Background, Typography } from '../components';
 interface HitPosition {
     chr: string;
     start: number;
@@ -76,9 +76,9 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                                 position: `${e.chr}:${e.start}-${e.end}`,
                             },
                             id: i + eid,
-                            label: Array.isArray(hit.ensembl)
-                                ? `${hit.symbol.toUpperCase()} - ${genes.ensembl[eid].gene}`
-                                : hit.symbol.toUpperCase(),
+                            label: `${hit.symbol.toUpperCase()} (Chromosome: ${e.chr}, Start: ${
+                                e.start
+                            }, End: ${e.end})`,
                         }));
                 })
                 .flat(),
@@ -103,15 +103,29 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
 
     return (
-        <ComboBox
-            options={options}
-            loading={autocompleteLoading}
-            onChange={term => onChange(term)}
-            onSelect={(item: SelectionValue) => onSelect(item)}
-            placeholder="Gene Search"
-            searchable
-            value={geneName || ''}
-        />
+        <>
+            {options.length > 1 && (
+                <Background
+                    variant="success"
+                    style={{
+                        padding: '0rem 0.75rem',
+                    }}
+                >
+                    <Typography variant="subtitle" success bold>
+                        Multiple gene aliases are found. Please select the appropriate gene.
+                    </Typography>
+                </Background>
+            )}
+            <ComboBox
+                options={options}
+                loading={autocompleteLoading}
+                onChange={term => onChange(term)}
+                onSelect={(item: SelectionValue) => onSelect(item)}
+                placeholder="Gene Search"
+                searchable
+                value={geneName || ''}
+            />
+        </>
     );
 };
 

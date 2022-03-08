@@ -25,7 +25,6 @@ export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
     flex-grow: 0;
-    max-width: 213px;
     position: relative;
     width: 100%;
 `;
