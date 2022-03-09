@@ -4,7 +4,6 @@ import { useFetchAutocompleteQuery } from '../apollo/hooks';
 import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
-import { Background, Typography } from '../components';
 interface HitPosition {
     chr: string;
     start: number;
@@ -69,17 +68,19 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
                     return (is38 ? genomic_pos : genomic_pos_hg19)
                         .filter(g => isCanonicalRegion(g.chr))
-                        .map((e, eid) => ({
-                            value: {
-                                name: genes.symbol.toUpperCase(),
-                                ensemblId: genes.ensembl[eid].gene,
-                                position: `${e.chr}:${e.start}-${e.end}`,
-                            },
-                            id: i + eid,
-                            label: `${hit.symbol.toUpperCase()} (Chromosome: ${e.chr}, Start: ${
-                                e.start
-                            }, End: ${e.end})`,
-                        }));
+                        .map((e, eid) => {
+                            return {
+                                value: {
+                                    name: genes.symbol.toUpperCase(),
+                                    ensemblId: '',
+                                    position: `${e.chr}:${e.start}-${e.end}`,
+                                },
+                                id: i + eid,
+                                label: `${hit.symbol.toUpperCase()} (Chromosome: ${e.chr}, Start: ${
+                                    e.start
+                                }, End: ${e.end})`,
+                            };
+                        });
                 })
                 .flat(),
         []
@@ -104,18 +105,6 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
     return (
         <>
-            {options.length > 1 && (
-                <Background
-                    variant="success"
-                    style={{
-                        padding: '0rem 0.75rem',
-                    }}
-                >
-                    <Typography variant="subtitle" success bold>
-                        Multiple gene aliases are found. Please select the appropriate gene.
-                    </Typography>
-                </Background>
-            )}
             <ComboBox
                 options={options}
                 loading={autocompleteLoading}

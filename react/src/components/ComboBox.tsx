@@ -2,6 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { FaCaretDown } from 'react-icons/fa';
 import styled from 'styled-components/macro';
+import { Background, Typography } from '../components';
 import { useClickAway } from '../hooks';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
@@ -64,6 +65,8 @@ export default function ComboBox<T extends {}>({
 }: ComboBoxProps<T>) {
     const [open, setOpen] = useState<Boolean>(false);
 
+    console.log(options);
+
     if (searchable && !onChange) {
         console.error('An onChange function is required for searchable comboboxes!');
     }
@@ -97,6 +100,18 @@ export default function ComboBox<T extends {}>({
                     </>
                 )}
             </Header>
+            {options.length > 1 && typeof options[0].value !== 'string' && (
+                <Background
+                    variant="success"
+                    style={{
+                        padding: '0rem 0.75rem',
+                    }}
+                >
+                    <Typography variant="subtitle" success bold>
+                        Multiple gene aliases are found. Please select the appropriate gene.
+                    </Typography>
+                </Background>
+            )}
             {open && (
                 <SelectableList
                     ref={ref}

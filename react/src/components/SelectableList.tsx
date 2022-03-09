@@ -5,12 +5,12 @@ import { Checkbox } from './index';
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
     padding: 0;
+    margin: 0;
     list-style-type: none;
     width: inherit;
-    margin-top: ${props => props.theme.space[5]};
     max-height: 200px;
     overflow: auto;
-    position: absolute;
+    // position: absolute;
     top: 20px;
     z-index: 998;
 `;
