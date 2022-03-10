@@ -23,7 +23,7 @@ interface AutocompleteResults {
         }[];
     };
 }
-interface SelectionValue {
+export interface GeneSelectionValue {
     ensemblId?: string;
     name: string;
     position: string;
@@ -32,7 +32,7 @@ interface SelectionValue {
 interface GeneSearchProps {
     assembly: AssemblyId;
     geneName: string;
-    onSelect: (gene: SelectionValue) => void;
+    onSelect: (gene: GeneSelectionValue) => void;
     onChange: (geneName: string) => void;
 }
 
@@ -40,7 +40,7 @@ const isCanonicalRegion = (chr: string) =>
     ['X', 'Y', ...Array.from({ length: 22 }, (_, i) => (i + 1).toString())].includes(chr);
 
 const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
-    const [options, setOptions] = useState<SelectableListItem<SelectionValue>[]>([]);
+    const [options, setOptions] = useState<SelectableListItem<GeneSelectionValue>[]>([]);
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
@@ -109,7 +109,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                 options={options}
                 loading={autocompleteLoading}
                 onChange={term => onChange(term)}
-                onSelect={(item: SelectionValue) => onSelect(item)}
+                onSelect={(item: GeneSelectionValue) => onSelect(item)}
                 placeholder="Gene Search"
                 searchable
                 value={geneName || ''}

@@ -113,10 +113,6 @@ const getRemoteTestNodeQuery = async (args: QueryInput): Promise<VariantQueryRes
   let remoteTestNodeQueryError: RemoteTestNodeQueryError | null = null;
 
   try {
-    console.log(process.env.TEST_NODE_URL);
-    console.log(
-      `${process.env.TEST_NODE_URL}?geneName=${args.input.gene.geneName}&assemblyId=${args.input.variant.assemblyId}`
-    );
     remoteTestNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
       `${process.env.TEST_NODE_URL}?geneName=${args.input.gene.geneName}&assemblyId=${args.input.variant.assemblyId}`,
       {

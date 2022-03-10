@@ -4,6 +4,7 @@ import { FaCaretDown } from 'react-icons/fa';
 import styled from 'styled-components/macro';
 import { Background, Typography } from '../components';
 import { useClickAway } from '../hooks';
+import { GeneSelectionValue } from './GeneSearch';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
 import SelectableList, { SelectableListItem } from './SelectableList';
@@ -52,6 +53,10 @@ export const Header = styled(Flex)`
     flex-wrap: nowrap;
 `;
 
+/* Typeguard for type definition of option */
+const isGene = (arg: any): arg is GeneSelectionValue =>
+    typeof arg === 'object' && 'name' in arg && 'position' in arg;
+
 export default function ComboBox<T extends {}>({
     options,
     loading,
@@ -64,8 +69,6 @@ export default function ComboBox<T extends {}>({
     selection,
 }: ComboBoxProps<T>) {
     const [open, setOpen] = useState<Boolean>(false);
-
-    console.log(options);
 
     if (searchable && !onChange) {
         console.error('An onChange function is required for searchable comboboxes!');
@@ -100,7 +103,7 @@ export default function ComboBox<T extends {}>({
                     </>
                 )}
             </Header>
-            {options.length > 1 && typeof options[0].value !== 'string' && (
+            {options.length > 1 && isGene(options[0].value) && open && (
                 <Background
                     variant="success"
                     style={{
@@ -108,7 +111,7 @@ export default function ComboBox<T extends {}>({
                     }}
                 >
                     <Typography variant="subtitle" success bold>
-                        Multiple gene aliases are found. Please select the appropriate gene.
+                        {options.length} gene aliases are found. Please select the appropriate gene.
                     </Typography>
                 </Background>
             )}
