@@ -264,8 +264,8 @@ const VariantQueryPage: React.FC<{}> = () => {
                         >
                             Clear
                         </Button>
+                        <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
                     </ButtonWrapper>
-                    <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
             {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]

@@ -24,7 +24,6 @@ interface AutocompleteResults {
     };
 }
 export interface GeneSelectionValue {
-    ensemblId?: string;
     name: string;
     position: string;
 }
@@ -72,7 +71,6 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                             return {
                                 value: {
                                     name: genes.symbol.toUpperCase(),
-                                    ensemblId: '',
                                     position: `${e.chr}:${e.start}-${e.end}`,
                                 },
                                 id: i + eid,
@@ -104,17 +102,15 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
 
     return (
-        <>
-            <ComboBox
-                options={options}
-                loading={autocompleteLoading}
-                onChange={term => onChange(term)}
-                onSelect={(item: GeneSelectionValue) => onSelect(item)}
-                placeholder="Gene Search"
-                searchable
-                value={geneName || ''}
-            />
-        </>
+        <ComboBox
+            options={options}
+            loading={autocompleteLoading}
+            onChange={term => onChange(term)}
+            onSelect={(item: GeneSelectionValue) => onSelect(item)}
+            placeholder="Gene Search"
+            searchable
+            value={geneName || ''}
+        />
     );
 };
 

@@ -37,12 +37,10 @@ const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAG
 app.get(
   '/data',
   async (
-    {
-      query: { assemblyId, geneName },
-    }: Request<{ assemblyId: string; geneName: string }>,
+    { query: { assemblyId, geneName } }: Request<{ assemblyId: string; geneName: string }>,
     res
   ) => {
-    // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
+    // res.json(createTestQueryResponse(geneName)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
     // res.statusCode = 422;
     /// return res.json('invalid request');
     if (!assemblyId || !geneName) {
@@ -53,10 +51,7 @@ app.get(
       return res.json('Test node does not have hg38 variants!');
     }
 
-    const result = await getStagerData(
-      geneName as string,
-      assemblyId as string
-    );
+    const result = await getStagerData(geneName as string, assemblyId as string);
 
     if (!result) {
       res.statusCode = 404;
@@ -75,7 +70,6 @@ const getStagerData = async (geneName: string, assemblyId: string) => {
     password: STAGER_DB_PASSWORD,
     database: STAGER_DB,
   });
-
 
   let result;
 
@@ -120,7 +114,7 @@ const getStagerData = async (geneName: string, assemblyId: string) => {
 };
 
 /* create dummy data -- currently unused */
-export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
+export const createTestQueryResponse = (geneName: string) => {
   return Array(50)
     .fill(null)
     .map(() => {
@@ -150,7 +144,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
           info: {
             aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,
             cDna: 'sampleCDA value',
-            geneName: geneName || ensemblId || 'GENENAME',
+            geneName: geneName || 'GENENAME',
             gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
             gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
             transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
