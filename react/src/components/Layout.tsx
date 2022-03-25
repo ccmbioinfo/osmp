@@ -60,6 +60,7 @@ export const Column = styled(Flex)<FlexProps>`
 
 export const ButtonWrapper = styled(Flex)`
     display: inline-flex;
+    height: 125px;
     align-items: center;
 `;
 

@@ -37,15 +37,13 @@ const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAG
 app.get(
   '/data',
   async (
-    {
-      query: { assemblyId, ensemblId, geneName },
-    }: Request<{ assemblyId: string; ensemblId: string; geneName: string }>,
+    { query: { assemblyId, geneName } }: Request<{ assemblyId: string; geneName: string }>,
     res
   ) => {
-    // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
+    // res.json(createTestQueryResponse(geneName)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
     // res.statusCode = 422;
     /// return res.json('invalid request');
-    if (!assemblyId || !ensemblId) {
+    if (!assemblyId || !geneName) {
       res.statusCode = 422;
       return res.json('invalid request');
     } else if (!(assemblyId as string).includes('37')) {
@@ -53,11 +51,7 @@ app.get(
       return res.json('Test node does not have hg38 variants!');
     }
 
-    const result = await getStagerData(
-      geneName as string,
-      ensemblId as string,
-      assemblyId as string
-    );
+    const result = await getStagerData(geneName as string, assemblyId as string);
 
     if (!result) {
       res.statusCode = 404;
@@ -68,7 +62,7 @@ app.get(
   }
 );
 
-const getStagerData = async (geneName: string, ensemblId: string, assemblyId: string) => {
+const getStagerData = async (geneName: string, assemblyId: string) => {
   const connection = await mysql.createConnection({
     host: STAGER_DB_HOST,
     user: STAGER_DB_USER,
@@ -77,38 +71,13 @@ const getStagerData = async (geneName: string, ensemblId: string, assemblyId: st
     database: STAGER_DB,
   });
 
-  if (!ensemblId) {
-    try {
-      const [rows] = await connection.execute<RowDataPacket[][]>(
-        'select `ensembl_id` from `gene_alias` where `name` = ? and `kind` = "current_approved_symbol";',
-        [geneName]
-      );
-
-      if (rows.length) {
-        ensemblId = (rows[0] as any).ensembl_id;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      console.error(e);
-      connection.end();
-      return false;
-    }
-  } else if (ensemblId.startsWith('ENS')) {
-    // stager stores its ensids as integers
-    ensemblId = ensemblId.replace(/ENSG0+/, '');
-  }
-
   let result;
 
   try {
     const fetchVariantsSql = `
-    select * from variant v 
-      inner join gene g
-        on v.position between g.start and g.end and v.chromosome = g.chromosome
-      where g.ensembl_id = ?`;
+    select * from variant v where v.gene = ?`;
 
-    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [ensemblId]);
+    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [geneName]);
 
     if (!variants.length) {
       connection.end();
@@ -145,7 +114,7 @@ const getStagerData = async (geneName: string, ensemblId: string, assemblyId: st
 };
 
 /* create dummy data -- currently unused */
-export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
+export const createTestQueryResponse = (geneName: string) => {
   return Array(50)
     .fill(null)
     .map(() => {
@@ -175,7 +144,7 @@ export const createTestQueryResponse = (geneName: string, ensemblId: string) => 
           info: {
             aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,
             cDna: 'sampleCDA value',
-            geneName: geneName || ensemblId || 'GENENAME',
+            geneName: geneName || 'GENENAME',
             gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
             gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
             transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,

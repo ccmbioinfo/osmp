@@ -99,7 +99,6 @@ export interface VariantQueryInput {
 
 export interface GeneQueryInput {
   geneName: string;
-  ensemblId: string;
   position: string;
 }
 

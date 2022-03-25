@@ -2,7 +2,9 @@ import React, { ChangeEvent, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { FaCaretDown } from 'react-icons/fa';
 import styled from 'styled-components/macro';
+import { Background, Typography } from '../components';
 import { useClickAway } from '../hooks';
+import { GeneSelectionValue } from './GeneSearch';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
 import SelectableList, { SelectableListItem } from './SelectableList';
@@ -25,7 +27,6 @@ export const Wrapper = styled(Flex)`
     min-height: 38px;
     flex-wrap: wrap;
     flex-grow: 0;
-    max-width: 213px;
     position: relative;
     width: 100%;
 `;
@@ -51,6 +52,10 @@ export const Header = styled(Flex)`
     padding: 0 ${props => props.theme.space[4]};
     flex-wrap: nowrap;
 `;
+
+/* Typeguard for type definition of option */
+const isGene = (arg: any): arg is GeneSelectionValue =>
+    typeof arg === 'object' && 'name' in arg && 'position' in arg;
 
 export default function ComboBox<T extends {}>({
     options,
@@ -98,6 +103,18 @@ export default function ComboBox<T extends {}>({
                     </>
                 )}
             </Header>
+            {options.length > 1 && isGene(options[0].value) && open && (
+                <Background
+                    variant="success"
+                    style={{
+                        padding: '0rem 0.75rem',
+                    }}
+                >
+                    <Typography variant="subtitle" success bold>
+                        {options.length} gene aliases are found. Please select the appropriate gene.
+                    </Typography>
+                </Background>
+            )}
             {open && (
                 <SelectableList
                     ref={ref}
