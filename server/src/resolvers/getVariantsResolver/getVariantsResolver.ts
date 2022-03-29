@@ -74,7 +74,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     script: "#!/bin/bash echo 'Hello World!'",
   },
   {
-    baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37`,
+    baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
     // headers: { 'Authorization': `Bearer ${process.env.SLURM_JWT!}`, 'Content-Type': 'application/json', Accept: 'application/json' },
     headers: {
       'X-SLURM-USER-NAME': process.env.SLURM_USER!,
