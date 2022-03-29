@@ -9,6 +9,7 @@ import {
     HeaderGroup,
     IdType,
     Row,
+    useColumnOrder,
     useExpanded,
     useFilters,
     useFlexLayout,
@@ -40,6 +41,7 @@ import {
 import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
 import { CellPopover } from './CellPopover';
+import ColumnOrderModal from './ColumnOrderModal';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
@@ -401,6 +403,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ].flat(),
             },
         },
+        useColumnOrder,
         useFilters,
         useResizeColumns,
         useFlexLayout,
@@ -411,11 +414,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const {
+        allColumns,
         getTableProps,
         getTableBodyProps,
         headerGroups,
         page,
         state,
+        setColumnOrder,
         setFilter,
         setAllFilters,
         setGlobalFilter,
@@ -441,7 +446,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         }
         return [{ style: { background: currColour } }];
     };
-
     return (
         <>
             <TableFilters justifyContent="space-between">
@@ -457,6 +461,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
 
                 <InlineFlex>
+                    <ColumnOrderModal
+                        allColumns={allColumns}
+                        headerGroups={headerGroups}
+                        setColumnOrder={setColumnOrder}
+                    />
                     <ColumnVisibilityModal
                         rows={rows}
                         headerGroups={headerGroups}
