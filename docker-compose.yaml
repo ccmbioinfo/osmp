@@ -48,6 +48,10 @@ services:
       TEST_NODE_SSMP_TOKEN_ENDPOINT:
       TEST_NODE_TOKEN_AUDIENCE:
       MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin
+      SLURM_ENDPOINT:
+      SLURM_USER:
+      SLURM_JWT:
+
   mongo:
     image: mongo:latest
     environment:
