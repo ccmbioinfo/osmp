@@ -13,9 +13,13 @@ import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
-import { SlurmApi } from '../../slurm';
+import { SlurmApi, Configuration } from '../../slurm';
 
-const slurm = new SlurmApi();
+const slurm = new SlurmApi(
+  new Configuration({
+    basePath: process.env.SLURM_ENDPOINT!,
+  })
+);
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -45,7 +49,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   /* inspect variant results and combine if no errors */
   settled.forEach(response => {
-    console.log(response)
+    console.log(response);
 
     if (
       response.status === 'fulfilled' &&
@@ -70,17 +74,19 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   });
 
   // Send dummy hello world
-  const submittedJob = await slurm.slurmctldSubmitJob({
-    script: "#!/bin/bash echo 'Hello World!'",
-  },
-  {
-    baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
-    // headers: { 'Authorization': `Bearer ${process.env.SLURM_JWT!}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-    headers: {
-      'X-SLURM-USER-NAME': process.env.SLURM_USER!,
-      'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!
+  const submittedJob = await slurm.slurmctldSubmitJob(
+    {
+      script: '#!/bin/bash\necho Hello world\ncurl https://stager-hiraki.ccm.sickkids.ca/api',
+    },
+    {
+      baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
+      // headers: { 'Authorization': `Bearer ${process.env.SLURM_JWT!}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      headers: {
+        'X-SLURM-USER-NAME': process.env.SLURM_USER!,
+        'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
+      },
     }
-  })
+  );
 
   console.log('SUBMITTED JOB:', submittedJob);
 
