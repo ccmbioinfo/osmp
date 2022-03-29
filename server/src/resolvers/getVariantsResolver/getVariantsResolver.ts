@@ -117,7 +117,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     } else return false;
   });
   let unliftedVariants: VariantQueryDataResult[] = [];
-
+  
   // perform liftOver if needed
   if (dataForLiftover.length) {
     const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
