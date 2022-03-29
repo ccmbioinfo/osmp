@@ -77,6 +77,10 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const submittedJob = await slurm.slurmctldSubmitJob(
     {
       script: '#!/bin/bash\necho Hello world\ncurl https://stager-hiraki.ccm.sickkids.ca/api',
+      job: {
+        environment: {},
+        current_working_directory: `/home/${process.env.SLURM_USER}`
+      }
     },
     {
       baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
@@ -88,7 +92,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   );
 
-  console.log('SUBMITTED JOB:', submittedJob);
+  console.log('SUBMITTED JOB:', submittedJob.data);
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(
