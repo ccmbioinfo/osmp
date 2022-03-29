@@ -44,6 +44,9 @@ services:
       TEST_NODE_SSMP_TOKEN_ENDPOINT:
       TEST_NODE_TOKEN_AUDIENCE:
       MONGO_CONNECTION_STRING:
+      SLURM_ENDPOINT:
+      SLURM_USER:
+      SLURM_JWT:
     user: "1000" #node
     working_dir: /usr/app
     ports:

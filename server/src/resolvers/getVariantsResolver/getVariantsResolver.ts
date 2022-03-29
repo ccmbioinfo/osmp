@@ -13,6 +13,9 @@ import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
+import { SlurmApi } from '../../slurm';
+
+const slurm = new SlurmApi();
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -42,6 +45,8 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   /* inspect variant results and combine if no errors */
   settled.forEach(response => {
+    console.log(response)
+
     if (
       response.status === 'fulfilled' &&
       isVariantQuery(response.value) &&
@@ -53,7 +58,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         process.env.NODE_ENV === 'production' && response.value.error.code === 500
           ? 'Something went wrong!'
           : response.value.error.message;
-
       errors.push({
         source: response.value.source,
         error: { ...response.value.error!, message },
@@ -64,6 +68,21 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       throw new Error(response.reason);
     }
   });
+
+  // Send dummy hello world
+  const submittedJob = await slurm.slurmctldSubmitJob({
+    script: "#!/bin/bash echo 'Hello World!'",
+  },
+  {
+    baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37`,
+    // headers: { 'Authorization': `Bearer ${process.env.SLURM_JWT!}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+    headers: {
+      'X-SLURM-USER-NAME': process.env.SLURM_USER!,
+      'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!
+    }
+  })
+
+  console.log('SUBMITTED JOB:', submittedJob);
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(
