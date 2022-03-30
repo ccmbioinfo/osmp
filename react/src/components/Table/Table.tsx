@@ -41,7 +41,6 @@ import {
 import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
 import { CellPopover } from './CellPopover';
-import ColumnOrderModal from './ColumnOrderModal';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
@@ -461,17 +460,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
 
                 <InlineFlex>
-                    <ColumnOrderModal
-                        allColumns={allColumns}
-                        headerGroups={headerGroups}
-                        setColumnOrder={setColumnOrder}
-                    />
                     <ColumnVisibilityModal
-                        rows={rows}
                         headerGroups={headerGroups}
                         toggleGroupVisibility={toggleGroupVisibility}
                         toggleHideColumn={toggleHideColumn}
-                        visibleColumns={visibleColumns}
+                        allColumns={allColumns}
+                        setColumnOrder={setColumnOrder}
                     />
                     <DownloadModal rows={rows} visibleColumns={visibleColumns} />
                 </InlineFlex>
