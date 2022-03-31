@@ -73,26 +73,40 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
+  
+  const headers = {
+    'X-SLURM-USER-NAME': process.env.SLURM_USER!,
+    'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
+  }
+
   // Send dummy hello world
   const submittedJob = await slurm.slurmctldSubmitJob(
     {
-      script: '#!/bin/bash\necho Hello world\ncurl https://stager-hiraki.ccm.sickkids.ca/api',
+      script: '#!/bin/bash\ncat /home/giabaohan/annotated.json',
       job: {
         environment: {},
-        current_working_directory: `/home/${process.env.SLURM_USER}`
+        current_working_directory: `/home/${process.env.SLURM_USER}`,
+        standard_output: '2>&1'
       }
     },
     {
       baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
-      // headers: { 'Authorization': `Bearer ${process.env.SLURM_JWT!}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-      headers: {
-        'X-SLURM-USER-NAME': process.env.SLURM_USER!,
-        'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
-      },
+      headers
     }
   );
 
   console.log('SUBMITTED JOB:', submittedJob.data);
+
+  const jobId = submittedJob.data.job_id;
+
+  const jobStatus = await slurm.slurmctldGetJob(jobId!, {
+    baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/${jobId}`,
+    headers
+  })
+
+  if (jobStatus.data) {
+    console.log(jobStatus)
+  }
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(
