@@ -56,7 +56,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                 active={showModal}
                 hideModal={() => setShowModal(false)}
                 title="Customize Columns"
-                footer="Save"
+                footer="Reorder"
                 onClick={() => {
                     setColumnOrder(order.map(o => o.id));
                     setShowModal(false);
