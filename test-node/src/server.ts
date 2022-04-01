@@ -3,7 +3,6 @@ import { createServer } from 'http';
 import mysql, { RowDataPacket } from 'mysql2/promise';
 import jwt from 'express-jwt';
 import jwks from 'jwks-rsa';
-import Faker from 'faker';
 
 const app = express();
 
@@ -40,9 +39,6 @@ app.get(
     { query: { assemblyId, geneName } }: Request<{ assemblyId: string; geneName: string }>,
     res
   ) => {
-    // res.json(createTestQueryResponse(geneName)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
-    // res.statusCode = 422;
-    /// return res.json('invalid request');
     if (!assemblyId || !geneName) {
       res.statusCode = 422;
       return res.json('invalid request');
@@ -111,86 +107,6 @@ const getStagerData = async (geneName: string, assemblyId: string) => {
     connection.end();
   }
   return result;
-};
-
-/* create dummy data -- currently unused */
-export const createTestQueryResponse = (geneName: string) => {
-  return Array(50)
-    .fill(null)
-    .map(() => {
-      const individualId = Faker.random.alphaNumeric(10);
-      const bases = ['A', 'T', 'C', 'G'];
-      const end = Faker.datatype.number({ min: 1000000, max: 2000000 });
-      const ref = Faker.helpers.randomize(bases);
-      const alt = Faker.helpers.randomize(bases.filter(b => b !== ref));
-      return {
-        variant: {
-          alt,
-          assemblyId: 'GRCh37',
-          callsets: [
-            {
-              callsetId: Faker.random.alphaNumeric(10),
-              individualId,
-              info: {
-                ad: Faker.datatype.number({ min: 10000, max: 20000 }),
-                dp: Faker.datatype.number({ min: 10000, max: 20000 }),
-                gq: Faker.datatype.number({ min: 1, max: 60 }),
-                qual: Faker.datatype.number({ min: 1, max: 50 }),
-                zygosity: Faker.helpers.randomize(['het', 'het', 'het', 'hom']),
-              },
-            },
-          ],
-          end,
-          info: {
-            aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,
-            cDna: 'sampleCDA value',
-            geneName: geneName || 'GENENAME',
-            gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
-            gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
-            transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
-          },
-          ref,
-          referenceName: '19',
-          start: end - 1,
-        },
-        individual: {
-          datasetId: Faker.random.alphaNumeric(10),
-          diseases: [
-            {
-              ageOfOnset: {
-                age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
-                ageGroup: 'some group',
-              },
-              diseaseId: `ID${Faker.datatype.number(25)}`,
-              description: `Description`,
-            },
-          ],
-          ethnicity: ['eth1', 'eth2', 'eth3'][Faker.datatype.number({ min: 0, max: 2 })],
-          geographicOrigin: Faker.address.country(),
-          individualId,
-          info: {
-            solved: Faker.helpers.randomize(['solved', 'unsolved']),
-            candidateGene: 'SOME_GENE',
-            classifications: 'SOME_CLASSIFICATIONS',
-            diagnosis: 'SOME_DIAGNOSIS',
-          },
-          phenotypicFeatures: [
-            {
-              ageOfOnset: {
-                age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
-                ageGroup: 'some group',
-              },
-              dateOfOnset: Faker.date.past(),
-              levelSeverity: Faker.helpers.randomize(['high', 'moderate', 'low']),
-              onsetType: 'SOME_ONSETTYPE',
-              phenotypeId: 'SOME_PHENOTYPE',
-            },
-          ],
-          sex: Faker.helpers.randomize(['male', 'female']),
-        },
-        contactInfo: Faker.internet.exampleEmail(),
-      };
-    });
 };
 
 const server = createServer(app);
