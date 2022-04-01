@@ -66,21 +66,11 @@ const addAdditionalFieldsAndFormatNulls = (
     };
 };
 
-export const calculateColumnWidth = (
-    data: ResultTableColumns[],
-    accessor: Accessor,
-    headerText: string
-) => {
-    if (typeof accessor === 'string') {
-        accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
-    }
-    const maxWidth = 600;
-    const magicSpacing = 15;
-    const cellLength = Math.max(
-        ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
-        headerText.length
-    );
-    return Math.min(maxWidth, cellLength * magicSpacing);
+export const calculateColumnWidth = (maxDataLength: number, headerText: string) => {
+    const maxWidth = 400;
+    // const magicSpacing = 10;
+    const cellLength = Math.max(maxDataLength, headerText.length);
+    return Math.min(maxWidth, cellLength + 25);
 };
 
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;
