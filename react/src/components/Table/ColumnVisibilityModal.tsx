@@ -24,10 +24,10 @@ export default function ColumnVisibilityModal<T extends {}>({
 }: ColumnVisibilityModalProps<T>) {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [order, setOrder] = useState<ColumnInstance<T>[]>([]);
-    const reorder = (startIndex: number, endIndex: number): ColumnInstance<T>[] => {
+    const reorder = (prevPos: number, newPos: number): ColumnInstance<T>[] => {
         const result: ColumnInstance<T>[] = order;
-        const [removed] = result.splice(startIndex, 1);
-        result.splice(endIndex, 0, removed);
+        const [removed] = result.splice(prevPos, 1);
+        result.splice(newPos, 0, removed);
         return result;
     };
     const onDragEnd = (result: DropResult) => {
@@ -35,7 +35,6 @@ export default function ColumnVisibilityModal<T extends {}>({
         if (!destination) {
             return;
         }
-        console.log(source.index, destination.index);
         const columnOrder = reorder(source.index, destination.index);
         setOrder(columnOrder);
     };
@@ -56,11 +55,12 @@ export default function ColumnVisibilityModal<T extends {}>({
                 active={showModal}
                 hideModal={() => setShowModal(false)}
                 title="Customize Columns"
-                footer="Reorder"
+                footer="Apply"
                 onClick={() => {
                     setColumnOrder(order.map(o => o.id));
                     setShowModal(false);
                 }}
+                helperText="Only columns within the same group can be reordered."
             >
                 {headerGroups[0].headers.map((g, id) => (
                     <DragDropContext key={id} onDragEnd={onDragEnd}>
