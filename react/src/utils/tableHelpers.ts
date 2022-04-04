@@ -8,7 +8,6 @@ import {
     VariantResponseInfoFields,
 } from '../types';
 
-type Accessor = string | (() => JSX.Element) | ((state: any) => any);
 type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
 export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
@@ -68,9 +67,8 @@ const addAdditionalFieldsAndFormatNulls = (
 
 export const calculateColumnWidth = (maxDataLength: number, headerText: string) => {
     const maxWidth = 400;
-    // const magicSpacing = 10;
     const cellLength = Math.max(maxDataLength, headerText.length);
-    return Math.min(maxWidth, cellLength + 25);
+    return Math.min(maxWidth, cellLength * 8 + 35);
 };
 
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;

@@ -12,7 +12,6 @@ import {
     useExpanded,
     useFilters,
     useFlexLayout,
-    // useAbsoluteLayout,
     useGlobalFilter,
     usePagination,
     useResizeColumns,
@@ -174,19 +173,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.ref.toString() || '').length)),
-                            'Ref'
-                        ),
                     },
                     {
                         accessor: 'alt',
                         id: 'alt',
                         Header: 'Alt',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.alt.toString() || '').length)),
-                            'Alt'
-                        ),
                     },
                     {
                         accessor: 'source',
@@ -233,10 +224,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'ad',
                         id: 'ad',
                         Header: 'AD',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.ad?.toString() || '').length)),
-                            'AD'
-                        ),
                     },
                     {
                         accessor: 'dp',
@@ -280,6 +267,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             ></PhenotypeViewer>
                         ),
                         Header: 'Phenotypes',
+                        width: getColumnWidth(0, 'Phenotypes'),
                     },
                     {
                         accessor: 'candidateGene',
@@ -451,7 +439,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             minWidth: 10,
             width: 60,
             maxWidth: 300,
-            // disableResizing: true,
         }),
         []
     );
@@ -472,10 +459,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     'uniqueId',
                 ].flat(),
             },
-            // disableResizing: true,
         },
         useFilters,
-        // useAbsoluteLayout,
         useResizeColumns,
         useFlexLayout,
         useGlobalFilter,
@@ -564,7 +549,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             </Column>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
-                <Styles>
+                <Styles disableFullWidth={visibleColumns.length > 12}>
                     <table {...getTableProps()}>
                         <THead>
                             {headerGroups.map(headerGroup => {
