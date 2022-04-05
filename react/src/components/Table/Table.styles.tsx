@@ -28,6 +28,9 @@ interface StylesProps {
     disableFullWidth?: boolean;
 }
 
+// width: ${props => (props.disableFullWidth ? null : '100%')};
+// width: fit-content(100%);
+
 export const Styles = styled.div<StylesProps>`
     padding: 1rem;
     display: block;
@@ -35,7 +38,7 @@ export const Styles = styled.div<StylesProps>`
     max-height: 80vh;
 
     table {
-        width: ${props => (props.disableFullWidth ? null : '100%')};
+        width: fit-content(100%);
         border-spacing: 0;
         border-collapse: collapse;
 
@@ -120,6 +123,7 @@ export const TH = styled.th`
     transition: all 0.5s ease;
     border: none;
     overflow: hidden;
+    width: fit-content(20em);
 `;
 
 export const Footer = styled.div`

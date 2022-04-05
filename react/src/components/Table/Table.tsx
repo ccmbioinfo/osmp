@@ -142,10 +142,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
                         Header: 'Chr',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.referenceName || '').length)),
-                            'Chr'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.referenceName || '').length)),
+                        //     'Chr'
+                        // ),
                         disableFilters: true,
                         disableSortBy: true,
                     },
@@ -153,20 +153,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'start',
                         id: 'start',
                         Header: 'Start',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.start.toString() || '').length)),
-                            'Start'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.start.toString() || '').length)),
+                        //     'Start'
+                        // ),
                         filter: 'between',
                     },
                     {
                         accessor: 'end',
                         id: 'end',
                         Header: 'End',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.end.toString() || '').length)),
-                            'End'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.end.toString() || '').length)),
+                        //     'End'
+                        // ),
                         filter: 'between',
                     },
                     {
@@ -184,11 +184,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'singleSelect',
                         id: 'source',
                         Header: 'Source',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.source.toString() || '').length)),
-                            'Source',
-                            true
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.source.toString() || '').length)),
+                        //     'Source',
+                        //     true
+                        // ),
                     },
                 ],
             },
@@ -216,10 +216,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'multiSelect',
                         id: 'zygosity',
                         Header: 'Zygosity',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.zygosity || '').length)),
-                            'Zygosity'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.zygosity || '').length)),
+                        //     'Zygosity'
+                        // ),
                     },
                     {
                         accessor: 'ad',
@@ -240,19 +240,19 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'individualId',
                         id: 'individualId',
                         Header: 'Individual ID',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.individualId || '').length)),
-                            'Individual ID'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.individualId || '').length)),
+                        //     'Individual ID'
+                        // ),
                     },
                     {
                         accessor: 'datasetId',
                         id: 'datasetId',
                         Header: 'Dataset ID',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.datasetId || '').length)),
-                            'Dataset ID'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.datasetId || '').length)),
+                        //     'Dataset ID'
+                        // ),
                     },
                     {
                         accessor: state =>
@@ -268,36 +268,36 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             ></PhenotypeViewer>
                         ),
                         Header: 'Phenotypes',
-                        width: getColumnWidth(0, 'Phenotypes'),
+                        // width: getColumnWidth(0, 'Phenotypes'),
                     },
                     {
                         accessor: 'candidateGene',
                         id: 'candidateGene',
                         Header: 'Candidate Gene',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.candidateGene || '').length)),
-                            'Candidate Gene'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.candidateGene || '').length)),
+                        //     'Candidate Gene'
+                        // ),
                     },
                     {
                         accessor: 'classifications',
                         id: 'classifications',
                         Header: 'Classifications',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.classifications || '').length)),
-                            'Classifications'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.classifications || '').length)),
+                        //     'Classifications'
+                        // ),
                     },
                     {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: 'Sex',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.sex || '').length)),
-                            'Sex',
-                            true
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.sex || '').length)),
+                        //     'Sex',
+                        //     true
+                        // ),
                         Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
@@ -309,20 +309,20 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             </CellText>
                         ),
                         Header: 'Ethnicity',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.ethnicity || '').length)),
-                            'Ethnicity',
-                            true
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.ethnicity || '').length)),
+                        //     'Ethnicity',
+                        //     true
+                        // ),
                     },
                     {
                         accessor: 'diagnosis',
                         id: 'diagnosis',
                         Header: 'Diagnosis',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.diagnosis || '').length)),
-                            'Diagnosis'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.diagnosis || '').length)),
+                        //     'Diagnosis'
+                        // ),
                     },
                     {
                         accessor: 'diseases',
@@ -334,10 +334,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'solved',
                         id: 'solved',
                         Header: 'Case Solved',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.solved || '').length)),
-                            'Case Solved'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.solved || '').length)),
+                        //     'Case Solved'
+                        // ),
                     },
                     {
                         accessor: 'contactInfo',
@@ -351,11 +351,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'geographicOrigin',
                         id: 'geographicOrigin',
                         Header: 'Geographic Origin',
-                        width: getColumnWidth(
-                            Math.max(...tableData.map(row => (row.geographicOrigin || '').length)),
-                            'Geographic Origin',
-                            true
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(...tableData.map(row => (row.geographicOrigin || '').length)),
+                        //     'Geographic Origin',
+                        //     true
+                        // ),
                     },
                 ],
             },
@@ -378,14 +378,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'homozygousCount',
                         id: 'homozygousCount',
                         Header: 'Homo Count',
-                        width: getColumnWidth(
-                            Math.max(
-                                ...tableData.map(
-                                    row => (row.homozygousCount?.toString() || '').length
-                                )
-                            ),
-                            'Homo Count'
-                        ),
+                        // width: getColumnWidth(
+                        //     Math.max(
+                        //         ...tableData.map(
+                        //             row => (row.homozygousCount?.toString() || '').length
+                        //         )
+                        //     ),
+                        //     'Homo Count'
+                        // ),
                     },
                     {
                         accessor: 'heterozygousCount',
@@ -442,7 +442,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const defaultColumn = useMemo(
         () => ({
             minWidth: 10,
-            width: 60,
+            // width: 60,
             maxWidth: 300,
         }),
         []
