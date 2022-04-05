@@ -123,7 +123,7 @@ export const TH = styled.th`
     transition: all 0.5s ease;
     border: none;
     overflow: hidden;
-    width: fit-content(20em);
+    width: fit-content(100%);
 `;
 
 export const Footer = styled.div`
