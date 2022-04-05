@@ -60,7 +60,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                     setColumnOrder(order.map(o => o.id));
                     setShowModal(false);
                 }}
-                helperText="Only columns within the same group can be reordered."
+                helperText="Please check or uncheck the boxes next to each column to toggle the columns' visibility. To reorder the columns, please drag the columns to their desired position. Note that only columns within the same group can be reordered."
             >
                 {headerGroups[0].headers.map((g, id) => (
                     <DragDropContext key={id} onDragEnd={onDragEnd}>
