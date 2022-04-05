@@ -65,10 +65,15 @@ const addAdditionalFieldsAndFormatNulls = (
     };
 };
 
-export const calculateColumnWidth = (maxDataLength: number, headerText: string) => {
+export const calculateColumnWidth = (
+    maxDataLength: number,
+    headerText: string,
+    toolTip: boolean = false
+) => {
     const maxWidth = 400;
     const cellLength = Math.max(maxDataLength, headerText.length);
-    return Math.min(maxWidth, cellLength * 8 + 35);
+    const toolTipLength = toolTip ? 15 : 0;
+    return Math.min(maxWidth, cellLength * 7 + 41 + toolTipLength);
 };
 
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;

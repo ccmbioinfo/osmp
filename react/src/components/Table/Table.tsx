@@ -186,7 +186,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Source',
                         width: getColumnWidth(
                             Math.max(...tableData.map(row => (row.source.toString() || '').length)),
-                            'Source'
+                            'Source',
+                            true
                         ),
                     },
                 ],
@@ -294,7 +295,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Sex',
                         width: getColumnWidth(
                             Math.max(...tableData.map(row => (row.sex || '').length)),
-                            'Sex'
+                            'Sex',
+                            true
                         ),
                         Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
@@ -309,7 +311,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Ethnicity',
                         width: getColumnWidth(
                             Math.max(...tableData.map(row => (row.ethnicity || '').length)),
-                            'Ethnicity'
+                            'Ethnicity',
+                            true
                         ),
                     },
                     {
@@ -350,7 +353,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'Geographic Origin',
                         width: getColumnWidth(
                             Math.max(...tableData.map(row => (row.geographicOrigin || '').length)),
-                            'Geographic Origin'
+                            'Geographic Origin',
+                            true
                         ),
                     },
                 ],
@@ -380,7 +384,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     row => (row.homozygousCount?.toString() || '').length
                                 )
                             ),
-                            'Homozygous Count'
+                            'Homo Count'
                         ),
                     },
                     {
@@ -393,7 +397,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     row => (row.heterozygousCount?.toString() || '').length
                                 )
                             ),
-                            'Heterozygous Count'
+                            'Het Count'
                         ),
                     },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
@@ -416,7 +420,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'gnomad_exome_AF',
                         width: getColumnWidth(
                             Math.max(...tableData.map(row => (row.af?.toString() || '').length)),
-                            'gnomad_exome_AF'
+                            'gnomad_exome_AF',
+                            true
                         ),
                         filter: 'between',
                     },
@@ -425,7 +430,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'gnomadHom',
                         id: 'gnomadHom',
                         Header: 'gnomadHom',
-                        width: 105,
+                        width: 115,
                         filter: 'between',
                     },
                 ],
