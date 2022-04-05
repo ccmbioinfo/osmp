@@ -1,6 +1,9 @@
 import React, { Fragment } from 'react';
 import { BsX } from 'react-icons/bs';
-import { Button } from '../index';
+import { RiInformationFill } from 'react-icons/ri';
+import { Button, Tooltip } from '../index';
+import { InlineFlex } from '../Layout';
+import { IconPadder } from '../Table/Table.styles';
 import {
     ModalBlock,
     ModalBody,
@@ -18,9 +21,18 @@ interface ModalProps {
     onClick?: () => void;
     footer?: string;
     title?: string;
+    helperText?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModal, onClick }) => {
+const Modal: React.FC<ModalProps> = ({
+    title,
+    footer,
+    children,
+    active,
+    hideModal,
+    onClick,
+    helperText,
+}) => {
     return (
         <Fragment>
             {active && (
@@ -29,7 +41,16 @@ const Modal: React.FC<ModalProps> = ({ title, footer, children, active, hideModa
                     <ModalContainer>
                         {title && (
                             <ModalHeader>
-                                <ModalTitle>{title}</ModalTitle>
+                                <InlineFlex>
+                                    <ModalTitle>{title}</ModalTitle>
+                                    {helperText && (
+                                        <Tooltip helperText={helperText}>
+                                            <IconPadder>
+                                                <RiInformationFill color="lightgrey" />
+                                            </IconPadder>
+                                        </Tooltip>
+                                    )}
+                                </InlineFlex>
                                 <ModalClose onClick={() => hideModal()}>
                                     <BsX />
                                 </ModalClose>

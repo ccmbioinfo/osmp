@@ -9,6 +9,7 @@ import {
     HeaderGroup,
     IdType,
     Row,
+    useColumnOrder,
     useExpanded,
     useFilters,
     useFlexLayout,
@@ -401,6 +402,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ].flat(),
             },
         },
+        useColumnOrder,
         useFilters,
         useResizeColumns,
         useFlexLayout,
@@ -411,11 +413,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const {
+        allColumns,
         getTableProps,
         getTableBodyProps,
         headerGroups,
         page,
         state,
+        setColumnOrder,
         setFilter,
         setAllFilters,
         setGlobalFilter,
@@ -441,7 +445,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         }
         return [{ style: { background: currColour } }];
     };
-
     return (
         <>
             <TableFilters justifyContent="space-between">
@@ -458,11 +461,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                 <InlineFlex>
                     <ColumnVisibilityModal
-                        rows={rows}
                         headerGroups={headerGroups}
                         toggleGroupVisibility={toggleGroupVisibility}
                         toggleHideColumn={toggleHideColumn}
-                        visibleColumns={visibleColumns}
+                        allColumns={allColumns}
+                        setColumnOrder={setColumnOrder}
                     />
                     <DownloadModal rows={rows} visibleColumns={visibleColumns} />
                 </InlineFlex>
