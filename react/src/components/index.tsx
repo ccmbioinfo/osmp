@@ -4,6 +4,7 @@ import Checkbox from './Checkbox';
 import Chip from './Chip';
 import ComboBox from './ComboBox';
 import Divider from './Divider';
+import DragHandle from './DragHandle';
 import ErrorProvider, {
     clearError,
     ErrorContext,
@@ -42,6 +43,7 @@ export {
     ComboBox,
     Container,
     Divider,
+    DragHandle,
     ErrorContext,
     ErrorProvider,
     ErrorFallback,
