@@ -66,12 +66,14 @@ const addAdditionalFieldsAndFormatNulls = (
 };
 
 export const calculateColumnWidth = (
-    maxDataLength: number,
     headerText: string,
-    toolTip: boolean = false
+    toolTip: boolean = false,
+    maxDataLength?: number
 ) => {
     const maxWidth = 400;
-    const cellLength = Math.max(maxDataLength, headerText.length);
+    const cellLength = maxDataLength
+        ? Math.max(maxDataLength, headerText.length)
+        : headerText.length;
     const toolTipLength = toolTip ? 15 : 0;
     return Math.min(maxWidth, cellLength * 7 + 41 + toolTipLength);
 };
