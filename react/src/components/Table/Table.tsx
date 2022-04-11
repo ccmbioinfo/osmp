@@ -142,8 +142,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: state => state.referenceName,
                         id: 'chromosome',
-                        Header: 'Chromosome',
-                        width: getColumnWidth(tableData, 'referenceName', 'Chromosome'),
+                        Header: 'Chr',
+                        width: getColumnWidth('Chr'),
                         disableFilters: true,
                         disableSortBy: true,
                     },
@@ -151,32 +151,34 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'start',
                         id: 'start',
                         Header: 'Start',
-                        width: getColumnWidth(tableData, 'start', 'Start'),
+                        width: getColumnWidth('Start'),
                         filter: 'between',
                     },
                     {
                         accessor: 'end',
                         id: 'end',
                         Header: 'End',
-                        width: getColumnWidth(tableData, 'end', 'End'),
+                        width: getColumnWidth('End'),
                         filter: 'between',
                     },
                     {
                         accessor: 'ref',
                         id: 'ref',
                         Header: 'Ref',
+                        width: getColumnWidth('Ref'),
                     },
                     {
                         accessor: 'alt',
                         id: 'alt',
                         Header: 'Alt',
+                        width: getColumnWidth('Alt'),
                     },
                     {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
                         Header: 'Source',
-                        width: getColumnWidth(tableData, 'source', 'Source'),
+                        width: getColumnWidth('Source', true),
                     },
                 ],
             },
@@ -204,34 +206,37 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'multiSelect',
                         id: 'zygosity',
                         Header: 'Zygosity',
-                        width: getColumnWidth(tableData, 'zygosity', 'Zygosity'),
+                        width: getColumnWidth('Zygosity'),
                     },
                     {
                         accessor: 'ad',
                         id: 'ad',
                         Header: 'AD',
+                        width: getColumnWidth('AD'),
                     },
                     {
                         accessor: 'dp',
                         id: 'dp',
                         Header: 'DP',
+                        width: getColumnWidth('DP'),
                     },
                     {
                         accessor: 'gq',
                         id: 'gq',
                         Header: 'GQ',
+                        width: getColumnWidth('GQ'),
                     },
                     {
                         accessor: 'individualId',
                         id: 'individualId',
                         Header: 'Individual ID',
-                        width: getColumnWidth(tableData, 'individualId', 'Individual ID'),
+                        width: getColumnWidth('Individual ID'),
                     },
                     {
                         accessor: 'datasetId',
                         id: 'datasetId',
                         Header: 'Dataset ID',
-                        width: getColumnWidth(tableData, 'datasetId', 'Dataset ID'),
+                        width: getColumnWidth('Dataset ID'),
                     },
                     {
                         accessor: state =>
@@ -247,26 +252,26 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             ></PhenotypeViewer>
                         ),
                         Header: 'Phenotypes',
-                        width: getColumnWidth(tableData, 'phenotypes', 'Phenotypes'),
+                        width: getColumnWidth('Phenotypes'),
                     },
                     {
                         accessor: 'candidateGene',
                         id: 'candidateGene',
                         Header: 'Candidate Gene',
-                        width: getColumnWidth(tableData, 'candidateGene', 'Candidate Gene'),
+                        width: getColumnWidth('Candidate Gene'),
                     },
                     {
                         accessor: 'classifications',
                         id: 'classifications',
                         Header: 'Classifications',
-                        width: getColumnWidth(tableData, 'classifications', 'Classifications'),
+                        width: getColumnWidth('Classifications'),
                     },
                     {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
                         Header: 'Sex',
-                        width: getColumnWidth(tableData, 'sex', 'Sex'),
+                        width: getColumnWidth('Sex', true),
                         Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
@@ -278,39 +283,39 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             </CellText>
                         ),
                         Header: 'Ethnicity',
-                        width: getColumnWidth(tableData, 'ethnicity', 'Ethnicity'),
+                        width: getColumnWidth('Ethnicity', true),
                     },
                     {
                         accessor: 'diagnosis',
                         id: 'diagnosis',
                         Header: 'Diagnosis',
-                        width: getColumnWidth(tableData, 'diagnosis', 'Diagnosis'),
+                        width: getColumnWidth('Diagnosis'),
                     },
                     {
                         accessor: 'diseases',
                         id: 'diseases',
                         Header: 'Diseases',
-                        width: 120,
+                        width: getColumnWidth('Diseases', true),
                     },
                     {
                         accessor: 'solved',
                         id: 'solved',
                         Header: 'Case Solved',
-                        width: getColumnWidth(tableData, 'solvd', 'Case Solved'),
+                        width: getColumnWidth('Case Solved'),
                     },
                     {
                         accessor: 'contactInfo',
                         Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contactInfo',
                         Header: 'Contact',
-                        width: 120,
+                        width: getColumnWidth('Contact', true),
                         disableFilters: true,
                     },
                     {
                         accessor: 'geographicOrigin',
                         id: 'geographicOrigin',
                         Header: 'Geographic Origin',
-                        width: getColumnWidth(tableData, 'geographicOrigin', 'Geographic Origin'),
+                        width: getColumnWidth('Geographic Origin', true),
                     },
                 ],
             },
@@ -328,38 +333,43 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         disableFilters: true,
                         width: 79,
                     },
-                    { accessor: 'transcript', id: 'transcript', Header: 'transcript', width: 150 },
+                    {
+                        accessor: 'transcript',
+                        id: 'transcript',
+                        Header: 'transcript',
+                        width: getColumnWidth('transcript'),
+                    },
                     {
                         accessor: 'homozygousCount',
                         id: 'homozygousCount',
-                        Header: 'Homozygous Count',
-                        width: getColumnWidth(tableData, 'homozygousCount', 'Homozygous Count'),
+                        Header: 'Homo Count',
+                        width: getColumnWidth('Homo Count'),
                     },
                     {
                         accessor: 'heterozygousCount',
                         id: 'heterozygousCount',
-                        Header: 'Heterozygous Count',
-                        width: getColumnWidth(tableData, 'heterozygousCount', 'Heterozygous Count'),
+                        Header: 'Het Count',
+                        width: getColumnWidth('Het Count'),
                     },
-                    { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: 105 },
+                    { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
                     {
                         id: 'aaChange',
                         accessor: 'aaChange',
                         Header: 'aaChange',
-                        width: 105,
+                        width: getColumnWidth('aaChange'),
                     },
                     {
                         accessor: 'consequence',
                         id: 'consequence',
                         Header: 'consequence',
-                        width: 125,
+                        width: getColumnWidth('consequence'),
                         filter: 'multiSelect',
                     },
                     {
                         accessor: 'af',
                         id: 'af',
                         Header: 'gnomad_exome_AF',
-                        width: getColumnWidth(tableData, 'af', 'gnomad_exome_AF'),
+                        width: getColumnWidth('gnomad_exome_AF', true),
                         filter: 'between',
                     },
                     /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
@@ -367,13 +377,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: 'gnomadHom',
                         id: 'gnomadHom',
                         Header: 'gnomadHom',
-                        width: 105,
+                        width: getColumnWidth('gnomadHom'),
                         filter: 'between',
                     },
                 ],
             },
         ],
-        [getColumnWidth, tableData]
+        [getColumnWidth]
     );
 
     const defaultColumn = useMemo(
@@ -493,7 +503,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             </Column>
 
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
-                <Styles>
+                <Styles disableFullWidth={visibleColumns.length > 12}>
                     <table {...getTableProps()}>
                         <THead>
                             {headerGroups.map(headerGroup => {
