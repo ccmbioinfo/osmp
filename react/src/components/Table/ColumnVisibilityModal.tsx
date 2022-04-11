@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
-import { MdDragHandle } from 'react-icons/md';
 import { ColumnInstance, HeaderGroup, UseTableInstanceProps } from 'react-table';
 import { camelize } from '../../utils';
-import { Button, Checkbox, Flex, InlineFlex, Modal } from '../index';
+import { Button, Checkbox, DragHandle, Flex, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';
 
 interface ColumnVisibilityModalProps<T extends object>
@@ -94,7 +93,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                                                             alignItems="center"
                                                             fullWidth={true}
                                                         >
-                                                            <div style={{ paddingLeft: 20 }}>
+                                                            <div style={{ paddingLeft: 20, background: "white" }}>
                                                                 <Checkbox
                                                                     label={c.Header as string}
                                                                     checked={c.isVisible}
@@ -125,18 +124,12 @@ export default function ColumnVisibilityModal<T extends {}>({
                                                                 />
                                                             </div>
 
-                                                            {c.isVisible && (
-                                                                <div
-                                                                    {...provided.dragHandleProps}
-                                                                    style={{
-                                                                        justifyContent: 'flex-end',
-                                                                        display: 'flex',
-                                                                        paddingRight: '40px',
-                                                                    }}
-                                                                >
-                                                                    <MdDragHandle />
-                                                                </div>
-                                                            )}
+                                                            <DragHandle
+                                                                isVisible={c.isVisible}
+                                                                dragHandleProps={
+                                                                    provided.dragHandleProps
+                                                                }
+                                                            />
                                                         </Flex>
                                                     )}
                                                 </Draggable>
