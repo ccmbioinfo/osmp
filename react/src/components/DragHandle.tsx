@@ -19,22 +19,22 @@ interface DragHandleProps {
 }
 
 const DragHandle: React.FC<DragHandleProps> = ({ isVisible, dragHandleProps }) => {
-    return (
-        <>
-            {isVisible && (
+    if (isVisible)
+        return (
+            <div style={{ paddingRight: 40 }}>
                 <Component {...dragHandleProps} isVisible={isVisible}>
                     <RiDragMove2Fill />
                 </Component>
-            )}
-
-            {!isVisible && (
-                <Tooltip helperText="Only visible columns are draggable.">
-                    <Component {...dragHandleProps} isVisible={isVisible}>
-                        <MdDragHandle />
-                    </Component>
-                </Tooltip>
-            )}
-        </>
+            </div>
+        );
+    return (
+        <div style={{ paddingRight: 40 }}>
+            <Tooltip helperText="Only visible columns are draggable.">
+                <Component {...dragHandleProps} isVisible={isVisible}>
+                    <MdDragHandle />
+                </Component>
+            </Tooltip>
+        </div>
     );
 };
 

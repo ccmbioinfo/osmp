@@ -124,14 +124,12 @@ export default function ColumnVisibilityModal<T extends {}>({
                                                                 />
                                                             </div>
 
-                                                            <div style={{ paddingRight: 40 }}>
-                                                                <DragHandle
-                                                                    isVisible={c.isVisible}
-                                                                    dragHandleProps={
-                                                                        provided.dragHandleProps
-                                                                    }
-                                                                />
-                                                            </div>
+                                                            <DragHandle
+                                                                isVisible={c.isVisible}
+                                                                dragHandleProps={
+                                                                    provided.dragHandleProps
+                                                                }
+                                                            />
                                                         </Flex>
                                                     )}
                                                 </Draggable>
