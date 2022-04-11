@@ -149,11 +149,10 @@ jobs:
           MONGO_INITDB_DATABASE: ${{ secrets.MONGO_INITDB_DATABASE }}
           MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
 
-        # Only bring up server, as MySQL, Mongo, and Keycloak are expected to be stable. 
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
-          docker-compose up -d --remove-orphans ssmp-server
+          docker-compose up -d --remove-orphans
       - name: Clean up
         if: always()
         run: |
