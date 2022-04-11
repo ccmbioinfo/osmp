@@ -41,7 +41,7 @@ app.get(
   ) => {
     if (!assemblyId || !geneName) {
       res.statusCode = 422;
-      return res.json('invalid request');
+      return res.json(`invalid request (assemblyId: ${assemblyId}, geneName: ${geneName})`);
     } else if (!(assemblyId as string).includes('37')) {
       res.statusCode = 422;
       return res.json('Test node does not have hg38 variants!');
