@@ -37,7 +37,6 @@ services:
   test-node-mysql:
     image: mysql:8.0
     restart: on-failure
-    user: "1000"
     environment:
       MYSQL_DATABASE: "${TEST_DATA_DB}"
       MYSQL_USER: "${TEST_DATA_DB_USER}"
