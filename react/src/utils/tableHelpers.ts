@@ -8,7 +8,6 @@ import {
     VariantResponseInfoFields,
 } from '../types';
 
-type Accessor = string | (() => JSX.Element) | ((state: any) => any);
 type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
 export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
@@ -67,20 +66,16 @@ const addAdditionalFieldsAndFormatNulls = (
 };
 
 export const calculateColumnWidth = (
-    data: ResultTableColumns[],
-    accessor: Accessor,
-    headerText: string
+    headerText: string,
+    toolTip: boolean = false,
+    maxDataLength?: number
 ) => {
-    if (typeof accessor === 'string') {
-        accessor = d => d[accessor as string]; // eslint-disable-line no-param-reassign
-    }
-    const maxWidth = 600;
-    const magicSpacing = 15;
-    const cellLength = Math.max(
-        ...data.map(row => (`${(accessor as (state: any) => any)(row)}` || '').length),
-        headerText.length
-    );
-    return Math.min(maxWidth, cellLength * magicSpacing);
+    const maxWidth = 400;
+    const cellLength = maxDataLength
+        ? Math.max(maxDataLength, headerText.length)
+        : headerText.length;
+    const toolTipLength = toolTip ? 15 : 0;
+    return Math.min(maxWidth, cellLength * 7 + 41 + toolTipLength);
 };
 
 export const isHeader = (column: HeaderGroup<ResultTableColumns>) => !column.parent;

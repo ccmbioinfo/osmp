@@ -24,14 +24,18 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     margin-bottom: ${props => props.theme.space[4]};
 `;
 
-export const Styles = styled.div`
+interface StylesProps {
+    disableFullWidth?: boolean;
+}
+
+export const Styles = styled.div<StylesProps>`
     padding: 1rem;
     display: block;
     max-width: 100%;
     max-height: 80vh;
 
     table {
-        width: 100%;
+        width: ${props => (props.disableFullWidth ? null : '100%')};
         border-spacing: 0;
         border-collapse: collapse;
 
