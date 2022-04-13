@@ -42,7 +42,7 @@ services:
       MYSQL_PASSWORD: "${TEST_DATA_DB_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
     volumes:
-      - ./test_node_db_data:/var/lib/mysql
+      - ${PROJECT_ROOT:-.}/test_node_db_data:/var/lib/mysql
     <<: *common
 
   keycloak:
@@ -68,5 +68,5 @@ services:
       MONGO_INITDB_DATABASE:
       MONGO_INITDB_ROOT_PASSWORD:
     volumes:
-      - ./mongo_data:/data/db
+      - ${PROJECT_ROOT:-.}/mongo_data:/data/db
     <<: *common

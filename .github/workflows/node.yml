@@ -130,8 +130,9 @@ jobs:
         # Even though this is deploying to a remote Docker Engine,
         # Compose uses the registry credentials of the client
         env:
-          # Server
           COMPOSE_FILE: docker-compose.dev.yaml
+          PROJECT_ROOT: /home/ubuntu/osmp
+          # Server
           G4RD_AUTH_METHOD: ${{ secrets.G4RD_AUTH_METHOD }}
           G4RD_PASSWORD: ${{ secrets.G4RD_PASSWORD }}
           G4RD_URL: ${{ secrets.G4RD_URL }}
