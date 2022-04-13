@@ -55,7 +55,6 @@ services:
       MONGO_INITDB_ROOT_USERNAME:
       MONGO_INITDB_DATABASE:
       MONGO_INITDB_ROOT_PASSWORD:
-      MONGO_INITDB_PORT:
     ports:
       - ${MONGO_INITDB_PORT}:27017
     volumes:
