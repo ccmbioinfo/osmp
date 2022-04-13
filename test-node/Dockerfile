@@ -13,6 +13,7 @@ RUN yarn tsc
 # Final deployment-ready production image
 FROM base
 COPY --from=builder /usr/src/app/dist .
+ENV NODE_ENV=production
 USER node
 EXPOSE 3000
 CMD ["node", "."]

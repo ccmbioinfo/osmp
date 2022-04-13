@@ -18,7 +18,6 @@ services:
       KEYCLOAK_CLIENT_ID:
       KEYCLOAK_REALM:
       MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin
-      NODE_ENV: development
       TEST_NODE_URL:
     ports:
       - 3000:3000

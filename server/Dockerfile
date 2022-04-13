@@ -24,6 +24,7 @@ RUN yarn build
 FROM base
 COPY --from=tbi --chown=node:node /var/tmp/cadd_wgs_ghr38_index.gz.tbi /home/node
 COPY --from=builder /usr/src/app/dist .
+ENV NODE_ENV=production
 USER node
 EXPOSE 3000
 CMD ["node", "."]

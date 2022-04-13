@@ -129,7 +129,6 @@ jobs:
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
-          NODE_ENV: development
           TEST_NODE_URL: ${{ secrets.TEST_NODE_URL }}
           # Test Node
           TEST_DATA_DB: ${{ secrets.TEST_DATA_DB }}

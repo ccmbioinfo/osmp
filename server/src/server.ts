@@ -44,14 +44,14 @@ const keycloak = new Keycloak(
     realm: process.env.KEYCLOAK_REALM!,
     'auth-server-url': process.env.KEYCLOAK_AUTH_URL!,
     resource: process.env.KEYCLOAK_CLIENT_ID!,
-    'ssl-required': process.env.NODE_ENV === 'local' ? 'external' : 'all',
+    'ssl-required': process.env.NODE_ENV === 'development' ? 'external' : 'all',
     'confidential-port': 443,
     'bearer-only': true,
   }
 );
 
 // monkeypatch token validator in local environments where keycloak host is localhost
-if (process.env.NODE_ENV === 'local') {
+if (process.env.NODE_ENV === 'development') {
   keycloak.grantManager.validateToken = validateToken;
 }
 
