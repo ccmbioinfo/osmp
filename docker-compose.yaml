@@ -2,20 +2,21 @@ version: "3.9"
 services:
   react:
     image: node:16-slim
+    user: node
+    working_dir: /usr/src/app
+    init: true
+    command: yarn start
+    ports:
+      - ${STORYBOOK_PORT:-6006}:6001
+      - ${REACT_PORT}:3000
     volumes:
-      - ./react:/usr/app
+      - ./react:/usr/src/app
     environment:
       REACT_APP_GRAPHQL_URL:
       REACT_APP_KEYCLOAK_AUTH_URL: ${REACT_APP_KEYCLOAK_FRONT_END_AUTH_URL}
       REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
       REACT_APP_SOURCE_LIST:
-    ports:
-      - ${STORYBOOK_PORT:-6006}:6001
-      - ${REACT_PORT}:3000
-    working_dir: /usr/app
-    user: node
-    entrypoint: "yarn start"
   ssmp-server:
     # Tags the "dev" stage of the Dockerfile and mounts the source directory into
     # the container for local development. If GRCh38 is indexed then just use node:16-slim
