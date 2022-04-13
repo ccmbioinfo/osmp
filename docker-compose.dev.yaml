@@ -1,4 +1,10 @@
 version: "3.9"
+
+x-common: &common
+  restart: unless-stopped
+  logging:
+    driver: journald
+
 services:
   ssmp-server:
     image: ghcr.io/ccmbioinfo/ssmp:dev
@@ -16,12 +22,10 @@ services:
       TEST_NODE_URL:
     ports:
       - 3000:3000
-    logging:
-      driver: journald
+    <<: *common
   
   test-node:
     image: node:16.3-slim
-    container_name: ssmpdev_test-node_1
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 
@@ -33,6 +37,7 @@ services:
     volumes:
       - ./test-node-app:/usr/app
     entrypoint: "yarn start"
+    <<: *common
 
   test-node-mysql:
     image: mysql:8.0
@@ -44,6 +49,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
     volumes:
       - ./test_node_db_data:/var/lib/mysql
+    <<: *common
 
   keycloak:
     image: quay.io/keycloak/keycloak:14.0.0
@@ -59,15 +65,14 @@ services:
       KEYCLOAK_FRONTEND_URL: "https://keycloak.ccmdev.ca/auth"
     ports:
       - 8080:8080
-    logging:
-      driver: journald
+    <<: *common
 
   mongo:
     image: mongo:latest
-    container_name: osmpdev_mongo_1
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - ./mongo_data:/data/db
+    <<: *common
