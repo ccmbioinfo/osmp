@@ -17,13 +17,18 @@ const app = express();
 
 const memoryStore = new session.MemoryStore();
 
+const { MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_INITDB_DATABASE } =
+  process.env;
+
+const MONGO_CONNECTION_STRING = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin`;
+
 mongoose
-  .connect(process.env.MONGO_CONNECTION_STRING!)
+  .connect(MONGO_CONNECTION_STRING)
   .then(() => {
     logger.info('successfully connected to mongo!');
   })
   .catch(e => {
-    logger.error('Failed connecting to Mongo: ' + e);
+    logger.error(`Failed connecting to Mongo: ${MONGO_CONNECTION_STRING}` + e);
     throw e;
   });
 

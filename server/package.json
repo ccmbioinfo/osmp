@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc --build ./",
-    "start-prod": "nodemon dist/server.js",
+    "start-prod": "node dist/server.js",
     "start-dev": "ts-node-dev src/server.ts",
     "mongo-init": "ts-node --require dotenv/config src/scripts/seedData.ts dotenv_config_path=../.env",
     "format": "prettier --write src/",

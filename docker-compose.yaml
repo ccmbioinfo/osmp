@@ -43,7 +43,10 @@ services:
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET:
       TEST_NODE_SSMP_TOKEN_ENDPOINT:
       TEST_NODE_TOKEN_AUDIENCE:
-      MONGO_CONNECTION_STRING:
+      MONGO_INITDB_ROOT_USERNAME:
+      MONGO_INITDB_DATABASE:
+      MONGO_INITDB_ROOT_PASSWORD:
+      MONGO_INITDB_PORT:
     user: "1000" #node
     working_dir: /usr/app
     ports:
@@ -56,6 +59,7 @@ services:
 
   mongo:
     image: mongo:latest
+    container_name: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME:
       MONGO_INITDB_DATABASE:
