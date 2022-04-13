@@ -23,7 +23,6 @@ services:
   
   test-node:
     image: node:16.3-slim
-    # container_name: ssmpdev_test-node_1
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 
@@ -66,7 +65,6 @@ services:
 
   mongo:
     image: mongo:latest
-    container_name: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
