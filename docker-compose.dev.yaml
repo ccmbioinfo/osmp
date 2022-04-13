@@ -52,7 +52,7 @@ services:
     <<: *common
 
   keycloak:
-    image: quay.io/keycloak/keycloak:14.0.0
+    image: quay.io/keycloak/keycloak:17.0.0-legacy
     environment:
       KEYCLOAK_USER: 
       KEYCLOAK_PASSWORD: 

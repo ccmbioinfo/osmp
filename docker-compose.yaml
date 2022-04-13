@@ -94,7 +94,7 @@ services:
     volumes:
       - ${STAGER_DATA_VOLUME}:/var/lib/mysql
   keycloak:
-    image: quay.io/keycloak/keycloak:14.0.0
+    image: quay.io/keycloak/keycloak:17.0.0-legacy
     environment:
       KEYCLOAK_SERVER_CLIENT_ID:
       KEYCLOAK_REACT_CLIENT_ID:
