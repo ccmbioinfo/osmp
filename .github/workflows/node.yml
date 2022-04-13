@@ -6,82 +6,58 @@ on:
     paths:
       - .github/workflows/node.yml
       - server/**
+      - test-node/**
   pull_request:
     branches:
       - develop
     paths:
       - .github/workflows/node.yml
       - server/**
+      - test-node/**
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      tags: ${{ steps.meta.outputs.tags }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v1
         with:
           buildkitd-flags: --debug
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-
       - name: Build development image
         uses: docker/build-push-action@v2
         with:
           context: server
-          target: BUILD_IMAGE
+          target: dev
           load: true
-          tags: test-image
+          tags: ghcr.io/ccmbioinfo/ssmp:dev
           pull: true
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
-
-      - name: Run eslint
-        if: github.event_name == 'pull_request'
-        run: |
-          docker run --rm test-image yarn lint
-
-      - name: Run prettier
-        if: github.event_name == 'pull_request'
-        run: |
-          docker run --rm test-image yarn format
-
-      - name: Run tests
-        if: github.event_name == 'pull_request'
-        run: |
-          docker run --rm test-image yarn test
-
-      - name: Meta action
-        uses: docker/metadata-action@v3
-        id: meta
-        with:
-          images: ghcr.io/${{ github.repository }}
-          flavor: latest=${{ github.ref == 'refs/heads/master' }}
-          tags: |
-            type=ref,event=tag
-            type=sha,format=long
-
-      - name: Log in to registry
-        uses: docker/login-action@v1
+      - if: github.event_name == 'pull_request'
+        run: docker-compose run --rm ssmp-server yarn lint
+      - if: github.event_name == 'pull_request'
+        run: docker-compose run --rm ssmp-server yarn format
+      - if: github.event_name == 'pull_request'
+        run: docker-compose run --rm ssmp-server yarn test
+      - uses: docker/login-action@v1
         if: github.event_name == 'push'
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-
-      - name: Build and push development image
+      - name: Build and push production image
         if: github.event_name == 'push'
         uses: docker/build-push-action@v2
         with:
           context: server
-          target: DEPLOY_IMAGE
           push: true
-          tags: ghcr.io/ccmbioinfo/ssmp:dev
+          tags: ghcr.io/ccmbioinfo/ssmp:latest
 
   deploy:
     runs-on: [cheo-ri]
@@ -128,7 +104,6 @@ jobs:
           KEYCLOAK_AUTH_URL: ${{ secrets.KEYCLOAK_AUTH_URL }}
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
-          MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
           TEST_NODE_URL: ${{ secrets.TEST_NODE_URL }}
           # Test Node
           TEST_DATA_DB: ${{ secrets.TEST_DATA_DB }}
@@ -147,7 +122,6 @@ jobs:
           MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
           MONGO_INITDB_DATABASE: ${{ secrets.MONGO_INITDB_DATABASE }}
           MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
-
         run: |
           eval "${{ steps.configure.outputs.ssh-agent-eval }}"
           docker-compose pull
