@@ -1,4 +1,4 @@
-name: "Node: build and push development image"
+name: Build, test, and deploy backend
 on:
   push:
     branches:
