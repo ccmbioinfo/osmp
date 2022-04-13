@@ -25,7 +25,7 @@ services:
     <<: *common
   
   test-node:
-    image: node:16.3-slim
+    image: node:16-slim
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 

@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   react:
-    image: node:16.3-buster
+    image: node:16-slim
     volumes:
       - ./react:/usr/app
     environment:
@@ -61,7 +61,7 @@ services:
     volumes:
       - ./mongo/data:/data/db
   test-node-1:
-    image: node:16.3-buster
+    image: node:16-slim
     environment:
       TEST_NODE_TOKEN_ISSUER:
       TEST_NODE_TOKEN_AUDIENCE:
