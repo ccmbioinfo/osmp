@@ -61,6 +61,14 @@ services:
       - ./mongo/data:/data/db
   test-node-1:
     image: node:16-slim
+    user: node
+    working_dir: /usr/src/app
+    init: true
+    command: yarn start
+    ports:
+      - ${TEST_NODE_PORT}:3000
+    volumes:
+      - ./test-node:/usr/src/app
     environment:
       TEST_NODE_TOKEN_ISSUER:
       TEST_NODE_TOKEN_AUDIENCE:
@@ -70,13 +78,6 @@ services:
       STAGER_DB_HOST:
       STAGER_DB_USER:
       STAGER_DB_PASSWORD:
-    user: node
-    working_dir: /usr/app
-    ports:
-      - ${TEST_NODE_PORT}:3000
-    volumes:
-      - ./test-node:/usr/app
-    entrypoint: "yarn start-dev"
   stager-mysql:
     image: mysql:8.0
     restart: on-failure

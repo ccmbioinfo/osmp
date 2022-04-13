@@ -25,23 +25,18 @@ services:
     <<: *common
   
   test-node:
-    image: node:16-slim
+    build: test-node
+    image: ghcr.io/ccmbioinfo/osmp-test-node
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 
       TEST_DATA_DB_HOST: 
       TEST_DATA_DB_USER: 
       TEST_DATA_DB_PASSWORD:
-    user: node
-    working_dir: /usr/app/
-    volumes:
-      - ./test-node-app:/usr/app
-    entrypoint: "yarn start"
     <<: *common
 
   test-node-mysql:
     image: mysql:8.0
-    restart: on-failure
     environment:
       MYSQL_DATABASE: "${TEST_DATA_DB}"
       MYSQL_USER: "${TEST_DATA_DB_USER}"
