@@ -4,12 +4,11 @@
   "main": "server.js",
   "private": true,
   "scripts": {
-    "test": "jest",
-    "build": "tsc --build ./",
+    "build": "tsc --build .",
+    "format": "prettier --write src",
+    "lint": "eslint --max-warnings=0 src",
     "start": "ts-node-dev src/server.ts",
-    "format": "prettier --write src/",
-    "lint": "eslint --max-warnings=0 src/",
-    "tsc": "tsc"
+    "test": "jest"
   },
   "dependencies": {
     "@gmod/tabix": "^1.5.2",
