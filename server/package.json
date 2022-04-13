@@ -1,15 +1,12 @@
 {
   "name": "ssmp-server",
   "version": "1.0.0",
-  "main": "dist/server.js",
-  "license": "MIT",
+  "main": "server.js",
   "private": true,
   "scripts": {
     "test": "jest",
     "build": "tsc --build ./",
-    "start-prod": "nodemon dist/server.js",
-    "start-dev": "ts-node-dev src/server.ts",
-    "mongo-init": "ts-node --require dotenv/config src/scripts/seedData.ts dotenv_config_path=../.env",
+    "start": "ts-node-dev src/server.ts",
     "format": "prettier --write src/",
     "lint": "eslint --max-warnings=0 src/",
     "tsc": "tsc"
@@ -31,7 +28,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "jest": "^27.0.6",
-    "nodemon": "^2.0.9",
     "prettier": "^2.3.2",
     "ts-jest": "^27.0.3",
     "ts-node-dev": "^1.1.8",

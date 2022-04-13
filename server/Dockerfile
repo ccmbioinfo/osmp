@@ -1,17 +1,29 @@
-FROM node:16 AS BUILD_IMAGE
-LABEL org.opencontainers.image.source https://github.com/ccmbioinfo/ssmp
-RUN curl --remote-name https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz.tbi
-WORKDIR /usr/app
+# This stage will probably be removed when we index GRCh38 ourselves
+FROM curlimages/curl AS tbi
+WORKDIR /var/tmp
+RUN curl --output cadd_wgs_ghr38_index.gz.tbi https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz.tbi
+
+# This stage is tagged for local development to guarantee the index is in the container
+FROM node:16-slim AS dev
+WORKDIR /usr/src/app
+COPY --from=tbi --chown=node:node /var/tmp/cadd_wgs_ghr38_index.gz.tbi /home/node
+
+# This layer is shared between the builder and production stages
+FROM node:16-slim AS base
+WORKDIR /usr/src/app
 COPY package*.json yarn.lock ./
+RUN yarn --prod
+
+# Builder stage: install development dependencies and transpile
+FROM base AS builder
 RUN yarn
 COPY . .
 RUN yarn build
 
-FROM node:16-slim as DEPLOY_IMAGE 
-WORKDIR /usr/app
-COPY --from=BUILD_IMAGE /usr/app/dist ./dist
-COPY --from=BUILD_IMAGE /usr/app/node_modules ./node_modules
-COPY --from=BUILD_IMAGE /usr/app/package.json ./package.json
-COPY --from=BUILD_IMAGE /home/node/cadd_wgs_ghr38_index.gz.tbi /home/node/cadd_wgs_ghr38_index.gz.tbi
+# Final deployment-ready production image
+FROM base
+COPY --from=tbi --chown=node:node /var/tmp/cadd_wgs_ghr38_index.gz.tbi /home/node
+COPY --from=builder /usr/src/app/dist .
+USER node
 EXPOSE 3000
-CMD ["yarn", "run", "start-prod"]
+CMD ["node", "."]

@@ -7,8 +7,8 @@ x-common: &common
 
 services:
   ssmp-server:
-    image: ghcr.io/ccmbioinfo/ssmp:dev
-    init: true
+    build: server
+    image: ghcr.io/ccmbioinfo/ssmp:latest
     environment:
       G4RD_AUTH_METHOD:
       G4RD_PASSWORD:
