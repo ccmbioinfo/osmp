@@ -98,6 +98,12 @@ docker exec -i <keycloak-container-name> bash /usr/scripts/bootstrap-keycloak.sh
 
 The keycloak admin portal can be accessed in the browser by navigating to localhost and the port specified by the `KEYCLOAK_PORT` env var, e.g., `localhost:9821`
 
+To request an access token to Keycloak: 
+
+```bash
+curl --location --request POST 'http://localhost:9821/auth/realms/ssmp/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'password=<password>' --data-urlencode 'username=<username>' --data-urlencode 'client_id=ssmp-app' --data-urlencode 'grant_type=password'
+```
+
 ## Mongo
 
 Annotations can be imported into mongo using the following command. Note that that the headers should not be included in the csv and the order of the fields passed to the `fields` argument should match the order of the fields in the csv.
