@@ -58,7 +58,11 @@ if (process.env.NODE_ENV === 'local') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
+
+
 app.post('/graphql', keycloak.protect(), (req, res, next) => {
+  console.log(req)
+
   const grant = (req as any).kauth.grant;
   logger.info(`
   QUERY SUBMITTED:
@@ -68,6 +72,15 @@ app.post('/graphql', keycloak.protect(), (req, res, next) => {
       issuer: grant.access_token.content.iss,
       query: req.body.variables,
     })}`);
+  next();
+});
+
+app.get('/test', (req, res, next) => {
+
+  res.send('hello')
+  
+  console.log(req.headers)
+
   next();
 });
 

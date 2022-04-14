@@ -99,9 +99,15 @@ docker exec -i <keycloak-container-name> bash /usr/scripts/bootstrap-keycloak.sh
 The keycloak admin portal can be accessed in the browser by navigating to localhost and the port specified by the `KEYCLOAK_PORT` env var, e.g., `localhost:9821`
 
 To request an access token to Keycloak: 
-
 ```bash
-curl --location --request POST 'http://localhost:9821/auth/realms/ssmp/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'password=<password>' --data-urlencode 'username=<username>' --data-urlencode 'client_id=ssmp-app' --data-urlencode 'grant_type=password'
+curl --location --request POST 'http://localhost:9821/auth/realms/ssmp/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'password=secret' --data-urlencode 'username=ssmp-user' --data-urlencode 'client_id=ssmp-backend' --data-urlencode 'grant_type=password'
+```
+
+To access a protected endpoint on the backend: 
+```bash
+curl -X POST http://localhost:5862/test -H 'Authorization: Bearer <access_token>' \
+--header 'Content-Type: application/json' \
+--data-raw '<some_JSON_string>'
 ```
 
 ## Mongo

@@ -49,7 +49,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   /* inspect variant results and combine if no errors */
   settled.forEach(response => {
-    console.log(response);
 
     if (
       response.status === 'fulfilled' &&
@@ -80,7 +79,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   }
 
   // Send dummy hello world
-  const submittedJob = await slurm.slurmctldSubmitJob(
+  await slurm.slurmctldSubmitJob(
     {
       script: '#!/bin/bash\ncat /home/giabaohan/annotated.json',
       job: {
@@ -95,18 +94,12 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   );
 
-  console.log('SUBMITTED JOB:', submittedJob.data);
+  // const jobId = submittedJob.data.job_id;
 
-  const jobId = submittedJob.data.job_id;
-
-  const jobStatus = await slurm.slurmctldGetJob(jobId!, {
-    baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/${jobId}`,
-    headers
-  })
-
-  if (jobStatus.data) {
-    console.log(jobStatus)
-  }
+  // const jobStatus = await slurm.slurmctldGetJob(jobId!, {
+  //   baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/${jobId}`,
+  //   headers
+  // })
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(
