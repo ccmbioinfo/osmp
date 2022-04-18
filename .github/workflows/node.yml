@@ -32,16 +32,6 @@ jobs:
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      - name: Build development image
-        uses: docker/build-push-action@v2
-        with:
-          context: server
-          target: dev
-          load: true
-          tags: ghcr.io/ccmbioinfo/ssmp:dev
-          pull: true
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -52,7 +42,8 @@ jobs:
       - if: github.event_name == 'pull_request'
         run: yarn lint
       - if: github.event_name == 'pull_request'
-        run: yarn format
+        continue-on-error: true
+        run: yarn check-format
       - if: github.event_name == 'pull_request'
         run: yarn test
       - uses: docker/login-action@v1
@@ -68,6 +59,8 @@ jobs:
           context: server
           push: true
           tags: ghcr.io/ccmbioinfo/ssmp:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
   build-test-node:
     runs-on: ubuntu-latest
     defaults:
@@ -92,9 +85,11 @@ jobs:
       - if: github.event_name == 'pull_request'
         run: yarn
       - if: github.event_name == 'pull_request'
+        continue-on-error: true
         run: yarn lint
       - if: github.event_name == 'pull_request'
-        run: arn format
+        continue-on-error: true
+        run: yarn format
       - uses: docker/login-action@v1
         if: github.event_name == 'push'
         with:
@@ -108,6 +103,8 @@ jobs:
           context: test-node
           push: true
           tags: ghcr.io/ccmbioinfo/osmp-test-node
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
   deploy:
     runs-on: [cheo-ri]
     needs:
