@@ -100,14 +100,14 @@ The keycloak admin portal can be accessed in the browser by navigating to localh
 
 To request an access token to Keycloak: 
 ```bash
-curl --location --request POST 'http://localhost:9821/auth/realms/ssmp/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'password=secret' --data-urlencode 'username=ssmp-user' --data-urlencode 'client_id=ssmp-backend' --data-urlencode 'grant_type=password'
+export TOKEN=$(curl --location --request POST 'http://localhost:9821/auth/realms/ssmp/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'password=secret' --data-urlencode 'username=ssmp-user' --data-urlencode 'client_id=ssmp-backend' --data-urlencode 'grant_type=password' | jq -r '.access_token')
 ```
 
 To access a protected endpoint on the backend: 
 ```bash
-curl -X POST http://localhost:5862/test -H 'Authorization: Bearer <access_token>' \
+curl -X POST http://localhost:5862/test -H "Authorization: Bearer '$TOKEN'" \
 --header 'Content-Type: application/json' \
---data-raw '<some_JSON_string>'
+--data-raw '{"name":"John", "age":30, "car":null}'
 ```
 
 ## Mongo

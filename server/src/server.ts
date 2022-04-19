@@ -75,13 +75,13 @@ app.post('/graphql', keycloak.protect(), (req, res, next) => {
   next();
 });
 
-app.get('/test', (req, res, next) => {
-
-  res.send('hello')
+app.post('/test', keycloak.protect(), (req, res, next) => {
   
-  console.log(req.headers)
-
+  console.log(req.body) // req would contain data
+  // send results as a stream
   next();
+
+  return req.body;
 });
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
