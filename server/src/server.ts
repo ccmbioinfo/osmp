@@ -17,18 +17,13 @@ const app = express();
 
 const memoryStore = new session.MemoryStore();
 
-const { MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_INITDB_DATABASE } =
-  process.env;
-
-const MONGO_CONNECTION_STRING = `mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin`;
-
 mongoose
-  .connect(MONGO_CONNECTION_STRING)
+  .connect(process.env.MONGO_CONNECTION_STRING!)
   .then(() => {
     logger.info('successfully connected to mongo!');
   })
   .catch(e => {
-    logger.error(`Failed connecting to Mongo: ${MONGO_CONNECTION_STRING}` + e);
+    logger.error('Failed connecting to Mongo: ' + e);
     throw e;
   });
 
@@ -49,14 +44,14 @@ const keycloak = new Keycloak(
     realm: process.env.KEYCLOAK_REALM!,
     'auth-server-url': process.env.KEYCLOAK_AUTH_URL!,
     resource: process.env.KEYCLOAK_CLIENT_ID!,
-    'ssl-required': process.env.NODE_ENV === 'local' ? 'external' : 'all',
+    'ssl-required': process.env.NODE_ENV === 'development' ? 'external' : 'all',
     'confidential-port': 443,
     'bearer-only': true,
   }
 );
 
 // monkeypatch token validator in local environments where keycloak host is localhost
-if (process.env.NODE_ENV === 'local') {
+if (process.env.NODE_ENV === 'development') {
   keycloak.grantManager.validateToken = validateToken;
 }
 

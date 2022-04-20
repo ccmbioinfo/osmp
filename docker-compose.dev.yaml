@@ -1,8 +1,14 @@
 version: "3.9"
+
+x-common: &common
+  restart: unless-stopped
+  logging:
+    driver: journald
+
 services:
   ssmp-server:
-    image: ghcr.io/ccmbioinfo/ssmp:dev
-    init: true
+    build: server
+    image: ghcr.io/ccmbioinfo/ssmp:latest
     environment:
       G4RD_AUTH_METHOD:
       G4RD_PASSWORD:
@@ -11,43 +17,36 @@ services:
       KEYCLOAK_AUTH_URL:
       KEYCLOAK_CLIENT_ID:
       KEYCLOAK_REALM:
-      MONGO_INITDB_ROOT_USERNAME:
-      MONGO_INITDB_DATABASE:
-      MONGO_INITDB_ROOT_PASSWORD:
-      NODE_ENV: development
+      MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin
       TEST_NODE_URL:
     ports:
       - 3000:3000
-    logging:
-      driver: journald
+    <<: *common
   
   test-node:
-    image: node:16.3-slim
+    build: test-node
+    image: ghcr.io/ccmbioinfo/osmp-test-node
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 
       TEST_DATA_DB_HOST: 
       TEST_DATA_DB_USER: 
       TEST_DATA_DB_PASSWORD:
-    user: "1000" #node
-    working_dir: /usr/app/
-    volumes:
-      - ./test-node-app:/usr/app
-    entrypoint: "yarn start"
+    <<: *common
 
   test-node-mysql:
     image: mysql:8.0
-    restart: on-failure
     environment:
       MYSQL_DATABASE: "${TEST_DATA_DB}"
       MYSQL_USER: "${TEST_DATA_DB_USER}"
       MYSQL_PASSWORD: "${TEST_DATA_DB_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
     volumes:
-      - ./test_node_db_data:/var/lib/mysql
+      - ${PROJECT_ROOT:-.}/test_node_db_data:/var/lib/mysql
+    <<: *common
 
   keycloak:
-    image: quay.io/keycloak/keycloak:14.0.0
+    image: quay.io/keycloak/keycloak:17.0.0-legacy
     environment:
       KEYCLOAK_USER: 
       KEYCLOAK_PASSWORD: 
@@ -60,14 +59,14 @@ services:
       KEYCLOAK_FRONTEND_URL: "https://keycloak.ccmdev.ca/auth"
     ports:
       - 8080:8080
-    logging:
-      driver: journald
+    <<: *common
 
   mongo:
     image: mongo:latest
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME:
+      MONGO_INITDB_DATABASE:
+      MONGO_INITDB_ROOT_PASSWORD:
     volumes:
-      - ./mongo_data:/data/db
+      - ${PROJECT_ROOT:-.}/mongo_data:/data/db
+    <<: *common

@@ -9,23 +9,11 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "@graphql-eslint", "import", "node", "prettier", "promise"],
+  "plugins": ["@typescript-eslint", "import", "node", "prettier", "promise"],
   "rules": {
     "comma-dangle": "off",
     "semi": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "error"
-  },
-  "overrides": [
-    {
-      "files": ["*.ts"],
-      "processor": "@graphql-eslint/graphql"
-    },
-    {
-      "files": ["*.graphql"],
-      "parser": "@graphql-eslint/eslint-plugin",
-      "plugins": ["@graphql-eslint"],
-      "rules": {}
-    }
-  ]
+  }
 }

@@ -1,29 +1,35 @@
 version: "3.9"
 services:
   react:
-    image: node:16.3-buster
+    image: node:16-slim
+    user: node
+    working_dir: /usr/src/app
+    init: true
+    command: yarn start
+    ports:
+      - ${STORYBOOK_PORT:-6006}:6001
+      - ${REACT_PORT}:3000
     volumes:
-      - ./react:/usr/app
+      - ./react:/usr/src/app
     environment:
       REACT_APP_GRAPHQL_URL:
       REACT_APP_KEYCLOAK_AUTH_URL: ${REACT_APP_KEYCLOAK_FRONT_END_AUTH_URL}
       REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
       REACT_APP_SOURCE_LIST:
-    ports:
-      - ${STORYBOOK_PORT:-6006}:6001
-      - ${REACT_PORT}:3000
-    working_dir: /usr/app
-    user: "1000" #node
-    entrypoint: "yarn start"
-    networks:
-      - osmp
   ssmp-server:
+    # Tags the "dev" stage of the Dockerfile and mounts the source directory into
+    # the container for local development. If GRCh38 is indexed then just use node:16-slim
     build:
       context: server
-      target: BUILD_IMAGE
+      target: dev
     image: ghcr.io/ccmbioinfo/ssmp:dev
     init: true
+    command: yarn start
+    ports:
+      - ${SSMP_SERVER_PORT}:3000
+    volumes:
+      - ./server:/usr/src/app
     environment:
       G4RD_AUTH_METHOD:
       G4RD_CLIENT_ID:
@@ -36,44 +42,34 @@ services:
       KEYCLOAK_AUTH_URL:
       KEYCLOAK_REALM:
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
-      NODE_ENV: local
+      NODE_ENV: development
       TEST_NODE_URL:
       TEST_NODE_OAUTH_ACTIVE:
       TEST_NODE_SSMP_TOKEN_CLIENT_ID:
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET:
       TEST_NODE_SSMP_TOKEN_ENDPOINT:
       TEST_NODE_TOKEN_AUDIENCE:
-      MONGO_INITDB_ROOT_USERNAME:
-      MONGO_INITDB_DATABASE:
-      MONGO_INITDB_ROOT_PASSWORD:
-      MONGO_INITDB_PORT:
-    user: "1000" #node
-    working_dir: /usr/app
-    ports:
-      - ${SSMP_SERVER_PORT}:3000
-    volumes:
-      - ./server:/usr/app
-    entrypoint: "yarn start-dev"
-    networks:
-      - osmp
-
+      MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin
   mongo:
     image: mongo:latest
-    container_name: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME:
       MONGO_INITDB_DATABASE:
       MONGO_INITDB_ROOT_PASSWORD:
-      MONGO_INITDB_PORT:
     ports:
       - ${MONGO_INITDB_PORT}:27017
     volumes:
       - ./mongo/data:/data/db
-    networks:
-      - osmp
-
   test-node-1:
-    image: node:16.3-buster
+    image: node:16-slim
+    user: node
+    working_dir: /usr/src/app
+    init: true
+    command: yarn start
+    ports:
+      - ${TEST_NODE_PORT}:3000
+    volumes:
+      - ./test-node:/usr/src/app
     environment:
       TEST_NODE_TOKEN_ISSUER:
       TEST_NODE_TOKEN_AUDIENCE:
@@ -83,19 +79,6 @@ services:
       STAGER_DB_HOST:
       STAGER_DB_USER:
       STAGER_DB_PASSWORD:
-      STAGER_DB_ROOT_PASSWORD:
-      STAGER_DATA_VOLUME:
-
-    user: "1000" #node
-    working_dir: /usr/app
-    ports:
-      - ${TEST_NODE_PORT}:3000
-    volumes:
-      - ./test-node:/usr/app
-    entrypoint: "yarn start-dev"
-    networks:
-      - osmp
-
   stager-mysql:
     image: mysql:8.0
     restart: on-failure
@@ -108,11 +91,8 @@ services:
       - ${STAGER_DB_PORT}:3306 
     volumes:
       - ${STAGER_DATA_VOLUME}:/var/lib/mysql
-    networks:
-      - osmp
-
   keycloak:
-    image: quay.io/keycloak/keycloak:14.0.0
+    image: quay.io/keycloak/keycloak:17.0.0-legacy
     environment:
       KEYCLOAK_SERVER_CLIENT_ID:
       KEYCLOAK_REACT_CLIENT_ID:
@@ -133,9 +113,3 @@ services:
       - ./keycloak/scripts:/usr/scripts
       - ./keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli
       - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
-    networks:
-      - osmp
-
-networks:
-  osmp:
-    driver: bridge
