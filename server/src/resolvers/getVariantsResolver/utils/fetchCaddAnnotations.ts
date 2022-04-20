@@ -13,7 +13,7 @@ const ANNOTATION_URL_37 =
 
 const INDEX_37_PATH =
   'https://minio.genomics4rd.ca/www-ssmp-dev/whole_genome_SNVs_inclAnno_GRCh37.tsv.gz.csi';
-const INDEX_38_PATH = 'https://minio.genomics4rd.ca/www-ssmp-dev/cadd_wgs_ghr38_index.gz.tbi';
+const INDEX_38_PATH = 'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz.tbi';
 
 /**
  * The function queries CADD annotation TSV and returns a list of string, each of which represents one line in the TSV.
