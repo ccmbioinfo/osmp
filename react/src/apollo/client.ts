@@ -1,16 +1,28 @@
 import {
     ApolloClient,
+    ApolloLink,
     createHttpLink,
     from,
     InMemoryCache,
+    NextLink,
     Observable,
+    Operation,
+    QueryHookOptions,
+    SubscriptionHookOptions,
+    split,
     useLazyQuery,
+    useQuery,
+    useSubscription,
 } from '@apollo/client';
-import { onError } from '@apollo/client/link/error';
-import { ApolloLink, QueryHookOptions, useQuery } from '@apollo/react-hooks';
+
+import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+
+import { getMainDefinition, isDocumentNode } from '@apollo/client/utilities';
+import { onError } from '@apollo/link-error';
 import { RestLink } from 'apollo-link-rest';
 import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
+import { createClient } from 'graphql-ws';
 import { makeGraphQLError, makeNetworkError, makeNodeError } from '../components';
 import { useErrorContext } from '../hooks';
 import { VariantQueryResponseError } from '../types';
@@ -27,7 +39,24 @@ export const buildLink = (token?: string) => {
         headers: { accept: 'application/json' },
     });
 
-    const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
+    const wsLink = new GraphQLWsLink(
+        createClient({
+            url: 'ws://localhost:6845/test',
+        })
+    );
+
+    const splitLink = split(
+        ({ query }) => {
+            const definition = getMainDefinition(query);
+            return (
+                definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
+            );
+        },
+        wsLink,
+        httpLink
+    );
+
+    const remoteNodeErrorLink = new ApolloLink((operation: Operation, forward: NextLink) => {
         return new Observable(observer => {
             const dispatcherContext = operation.getContext();
             const sub = forward(operation).subscribe({
@@ -73,7 +102,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    const authLink = new ApolloLink((operation, forward) => {
+    const authLink = new ApolloLink((operation: Operation, forward: NextLink) => {
         operation.setContext(({ headers = {} }) => ({
             headers: {
                 ...headers,
@@ -84,7 +113,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([mygeneRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, httpLink]);
+    return from([mygeneRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, splitLink]);
 };
 
 export const client = new ApolloClient<any>({
@@ -104,6 +133,16 @@ export const useApolloQuery = <T, V>(query: DocumentNode, options: QueryHookOpti
         context: { dispatch },
         fetchPolicy: 'cache-first',
         errorPolicy: 'all',
+        ...options,
+    });
+};
+
+export const useApolloSubscription = <T, V>(
+    subscription: DocumentNode,
+    options: SubscriptionHookOptions<T, V> = {}
+) => {
+    return useSubscription<T, V>(subscription, {
+        client,
         ...options,
     });
 };

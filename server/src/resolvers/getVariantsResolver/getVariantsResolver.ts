@@ -49,7 +49,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
 
   /* inspect variant results and combine if no errors */
   settled.forEach(response => {
-
     if (
       response.status === 'fulfilled' &&
       isVariantQuery(response.value) &&
@@ -72,11 +71,10 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
-  
   const headers = {
     'X-SLURM-USER-NAME': process.env.SLURM_USER!,
     'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
-  }
+  };
 
   // Send dummy hello world
   await slurm.slurmctldSubmitJob(
@@ -85,12 +83,12 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       job: {
         environment: {},
         current_working_directory: `/home/${process.env.SLURM_USER}`,
-        standard_output: '2>&1'
-      }
+        standard_output: '2>&1',
+      },
     },
     {
       baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
-      headers
+      headers,
     }
   );
 

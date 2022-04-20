@@ -2,7 +2,7 @@ import React from 'react';
 import { useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
-import { useFetchVariantsQuery } from '../apollo/hooks';
+import { useFetchVariantsQuery, useSlurmSubscription } from '../apollo/hooks';
 import {
     Background,
     Body,
@@ -132,6 +132,10 @@ const VariantQueryPage: React.FC<{}> = () => {
         } as const);
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
+
+    const subscription = useSlurmSubscription();
+
+    console.log(subscription);
 
     const { state: errorState, dispatch } = useErrorContext();
 

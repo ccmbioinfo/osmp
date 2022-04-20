@@ -3,7 +3,10 @@ import session from 'express-session';
 import Keycloak from 'keycloak-connect';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import {
+  ApolloServerPluginLandingPageGraphQLPlayground,
+  ApolloServerPluginDrainHttpServer,
+} from 'apollo-server-core';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -12,6 +15,11 @@ import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
 import mongoose from 'mongoose';
+
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
+
+import { pubsub } from './pubsub';
 
 const app = express();
 
@@ -58,10 +66,8 @@ if (process.env.NODE_ENV === 'local') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
-
-
 app.post('/graphql', keycloak.protect(), (req, res, next) => {
-  console.log(req)
+  console.log(req.body);
 
   const grant = (req as any).kauth.grant;
   logger.info(`
@@ -75,10 +81,14 @@ app.post('/graphql', keycloak.protect(), (req, res, next) => {
   next();
 });
 
-app.post('/test', keycloak.protect(), (req, res, next) => {
-  
-  console.log(req.body) // req would contain data
+app.post('/test', (req, res, next) => {
+  console.log(req.body); // req would contain data
   // send results as a stream
+
+  const { id } = req.body;
+
+  pubsub.publish("SLURM_RESPONSE", { slurmResponse: { id } });
+
   next();
 
   return req.body;
@@ -88,11 +98,33 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const httpServer = createServer(app);
 
+// Set up WebSocket server.
+const wsServer = new WebSocketServer({
+  server: httpServer,
+  path: '/test',
+});
+const serverCleanup = useServer({ schema }, wsServer);
+
 const startServer = async () => {
   const apolloServer = new ApolloServer({
     schema,
-    context: ({ req, res }: any) => ({ req, res }),
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+    context: ({ req, res, pubsub }: any) => ({ req, res, pubsub }),
+    plugins: [
+      ApolloServerPluginLandingPageGraphQLPlayground(),
+      // Proper shutdown for the HTTP server.
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+
+      // Proper shutdown for the WebSocket server.
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose();
+            },
+          };
+        },
+      },
+    ],
   });
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
