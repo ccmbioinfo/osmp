@@ -105,9 +105,9 @@ export TOKEN=$(curl --location --request POST 'http://localhost:9821/auth/realms
 
 To access a protected endpoint on the backend: 
 ```bash
-curl -X POST http://localhost:5862/test -H "Authorization: Bearer '$TOKEN'" \
+curl -X POST http://localhost:5862/graphql -H "Authorization: Bearer '$TOKEN'" \
 --header 'Content-Type: application/json' \
---data-raw '{"name":"John", "age":30, "car":null, "id": 100}'
+--data-raw '{"name":"John", "age":30, "car":null, "id": 100, "kind": "subscription"}'
 ```
 
 ## Mongo

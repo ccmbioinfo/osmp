@@ -1,3 +1,9 @@
 import { PubSub } from 'graphql-subscriptions';
 
-export const pubsub = new PubSub();
+const pubsub = new PubSub();
+
+pubsub.subscribe('SLURM_RESPONSE', (...args) => {
+    console.log('hello subscribe', args)
+})
+
+export { pubsub };

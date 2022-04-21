@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   type Subscription {
-    slurmResponse: TestId
+    slurmResponse: TestId!
   }
 
   type TestId {

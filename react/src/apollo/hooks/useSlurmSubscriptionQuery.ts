@@ -2,8 +2,8 @@ import { gql } from '@apollo/react-hooks';
 import { useApolloSubscription } from '../client';
 
 const fetchSlurmSubscription = gql`
-    subscription OnSlurmResponse() {
-        slurmResponse() {
+    subscription OnSlurmResponse {
+        slurmResponse {
             id
         }
     }
@@ -18,6 +18,5 @@ const useSlurmSubscription = () =>
         },
         {}
     >(fetchSlurmSubscription);
-// useApolloSubscription<{ slurmResponse { id: Int }}, {}>(fetchSlurmSubscription);
 
 export default useSlurmSubscription;

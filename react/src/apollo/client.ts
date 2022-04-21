@@ -8,8 +8,8 @@ import {
     Observable,
     Operation,
     QueryHookOptions,
-    SubscriptionHookOptions,
     split,
+    SubscriptionHookOptions,
     useLazyQuery,
     useQuery,
     useSubscription,
@@ -17,7 +17,7 @@ import {
 
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 
-import { getMainDefinition, isDocumentNode } from '@apollo/client/utilities';
+import { getMainDefinition } from '@apollo/client/utilities';
 import { onError } from '@apollo/link-error';
 import { RestLink } from 'apollo-link-rest';
 import ApolloLinkTimeout from 'apollo-link-timeout';
@@ -28,6 +28,8 @@ import { useErrorContext } from '../hooks';
 import { VariantQueryResponseError } from '../types';
 
 const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_URL;
+
+console.log('graphql link', GRAPHQL_URL)
 
 export const buildLink = (token?: string) => {
     const timeoutLink = new ApolloLinkTimeout(60000); // 60 second timeout
@@ -41,12 +43,24 @@ export const buildLink = (token?: string) => {
 
     const wsLink = new GraphQLWsLink(
         createClient({
-            url: 'ws://localhost:6845/test',
+            url: `ws://localhost:6845/graphql`,
+        on: {
+            connected: (socket) => {
+                console.log(socket)
+            },
+            ping: (received) => {
+                console.log(received)
+            },
+            pong: (received) => {
+                console.log(received)
+            },
+        },
         })
     );
 
     const splitLink = split(
         ({ query }) => {
+            console.log(query)
             const definition = getMainDefinition(query);
             return (
                 definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
@@ -57,6 +71,8 @@ export const buildLink = (token?: string) => {
     );
 
     const remoteNodeErrorLink = new ApolloLink((operation: Operation, forward: NextLink) => {
+        console.log(operation.getContext())
+
         return new Observable(observer => {
             const dispatcherContext = operation.getContext();
             const sub = forward(operation).subscribe({
@@ -73,6 +89,7 @@ export const buildLink = (token?: string) => {
             });
 
             return () => {
+                console.log('hello ubsubscribing')
                 if (sub) sub.unsubscribe();
             };
         });
@@ -141,8 +158,10 @@ export const useApolloSubscription = <T, V>(
     subscription: DocumentNode,
     options: SubscriptionHookOptions<T, V> = {}
 ) => {
+    const { dispatch } = useErrorContext();
     return useSubscription<T, V>(subscription, {
         client,
+        context: { dispatch },
         ...options,
     });
 };

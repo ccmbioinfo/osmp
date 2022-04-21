@@ -13,6 +13,7 @@
         "apollo-link": "^1.2.14",
         "apollo-link-rest": "^0.9.0-rc.1",
         "apollo-link-timeout": "^4.0.0",
+        "crypto-hash": "^2.0.1",
         "framer-motion": "^4.1.17",
         "gql-tag": "^1.0.1",
         "graphql": "^15.5.1",
