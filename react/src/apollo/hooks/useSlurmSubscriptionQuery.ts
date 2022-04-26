@@ -3,8 +3,8 @@ import { TestId } from '../../types';
 import { useApolloSubscription } from '../client';
 
 const fetchSlurmSubscription = gql`
-    subscription OnSlurmResponse($input: TestId) {
-        slurmResponse(input: $input) {
+    subscription OnSlurmResponse {
+        slurmResponse {
             id
         }
     }
@@ -18,8 +18,6 @@ const useSlurmSubscription = () =>
             };
         },
         TestId
-    >(fetchSlurmSubscription, {
-        variables: { id: 100 }
-    });
+    >(fetchSlurmSubscription, {});
 
 export default useSlurmSubscription;

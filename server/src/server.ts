@@ -1,11 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import express from 'express';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { execute, subscribe } from 'graphql';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import logger from './logger/index';
 import typeDefs from './typeDefs';
@@ -13,8 +11,12 @@ import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
 import mongoose from 'mongoose';
 
-// import { WebSocketServer } from 'ws';
-// import { useServer } from 'graphql-ws/lib/use/ws';
+import {
+  ApolloServerPluginDrainHttpServer,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from 'apollo-server-core';
+import { WebSocketServer } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
 
 import { pubsub } from './pubsub';
 
@@ -49,7 +51,7 @@ const keycloak = new Keycloak(
     realm: process.env.KEYCLOAK_REALM!,
     'auth-server-url': process.env.KEYCLOAK_AUTH_URL!,
     resource: process.env.KEYCLOAK_CLIENT_ID!,
-    'ssl-required': process.env.NODE_ENV === 'local' ? 'external' : 'all',
+    'ssl-required': process.env.NODE_ENV === 'development' ? 'external' : 'all',
     'confidential-port': 443,
     'bearer-only': true,
   }
@@ -91,39 +93,76 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const httpServer = createServer(app);
 
-const startServer = async () => {
-  const apolloServer = new ApolloServer({
-    schema,
+// Creating the WebSocket server
+const wsServer = new WebSocketServer({
+  // This is the `httpServer` we created in a previous step.
+  server: httpServer,
+  // Pass a different path here if your ApolloServer serves at
+  // a different path.
+  path: '/graphql',
+});
 
-    context: ({ req, res, pubsub }: any) => ({ req, res, pubsub }),
+// Save the returned server's info so we can shutdown this server later
+const serverCleanup = useServer({ schema }, wsServer);
 
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
-  });
-  await apolloServer.start();
+const server = new ApolloServer({
+  schema,
+  plugins: [
+    // Proper shutdown for the HTTP server.
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    ApolloServerPluginLandingPageGraphQLPlayground,
 
-  apolloServer.applyMiddleware({ app });
-  // dev only! --> https://www.apollographql.com/docs/apollo-server/data/subscriptions/#operation-context
-  SubscriptionServer.create(
+    // Proper shutdown for the WebSocket server.
     {
-      schema,
-      execute,
-      subscribe,
-      onOperation: (message: any, params: any) => {
-        console.log(message, params)
-        params.schema = schema;
-        return params;
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose();
+          },
+        };
       },
     },
-    {
-      server: httpServer,
-      path: apolloServer.graphqlPath,
-    }
-  );
+  ],
+});
 
-  ['SIGINT', 'SIGTERM'].forEach(() => {
-    // this will interfere with hot-reloading without additional handling
-    // process.on(signal, () => subscriptionServer.close());
-  });
+// const startServer = async () => {
+//   const apolloServer = new ApolloServer({
+//     schema,
+
+//     context: ({ req, res, pubsub }: any) => ({ req, res, pubsub }),
+
+//     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+//   });
+//   await apolloServer.start();
+
+//   apolloServer.applyMiddleware({ app });
+//   // dev only! --> https://www.apollographql.com/docs/apollo-server/data/subscriptions/#operation-context
+//   SubscriptionServer.create(
+//     {
+//       schema,
+//       execute,
+//       subscribe,
+//       onOperation: (message: any, params: any) => {
+//         console.log(message, params)
+//         params.schema = schema;
+//         return params;
+//       },
+//     },
+//     {
+//       server: httpServer,
+//       path: apolloServer.graphqlPath,
+//     }
+//   );
+
+//   ['SIGINT', 'SIGTERM'].forEach(() => {
+//     // this will interfere with hot-reloading without additional handling
+//     // process.on(signal, () => subscriptionServer.close());
+//   });
+// };
+
+const startServer = async () => {
+  await server.start();
+  server.applyMiddleware({ app });
 };
 
 startServer();

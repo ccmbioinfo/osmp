@@ -135,27 +135,11 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const subscription = useSlurmSubscription();
 
-    console.log(subscription)
+    console.log(subscription);
 
     const { state: errorState, dispatch } = useErrorContext();
 
     const client = useApolloClient();
-
-    client.subscribe({
-        query: gql`
-        subscription OnSlurmResponse($input: TestId) {
-            slurmResponse(input: $input) {
-                id
-            }
-        }
-        `,
-        variables: {},
-        fetchPolicy: 'network-only'
-      }).subscribe({
-        next(v) { console.log("subs. result", v); }, // never printed
-        error(err) { console.log("subs. err", err); }, // never printed
-        complete() { console.log("subs. DONE"); }, // never printed
-      })
 
     const clearCache = () => {
         const cache = client.cache;

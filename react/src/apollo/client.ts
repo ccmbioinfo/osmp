@@ -41,8 +41,7 @@ export const buildLink = (token?: string) => {
 
     const wsLink = new GraphQLWsLink(
         createClient({
-            url: `ws://localhost:6845/graphql`,
-            keepAlive: 10_000, // ping server every 10 seconds
+            url: `ws://localhost:5862/graphql`, // url error
         })
     );
 
@@ -62,7 +61,7 @@ export const buildLink = (token?: string) => {
             const dispatcherContext = operation.getContext();
             const sub = forward(operation).subscribe({
                 next: response => {
-                    if (!!response?.data?.getVariants.errors.length) {
+                    if (!!response?.data?.getVariants?.errors.length) {
                         response?.data?.getVariants.errors.forEach(
                             (e: VariantQueryResponseError) => {
                                 dispatcherContext.dispatch(makeNodeError(e));
@@ -80,7 +79,7 @@ export const buildLink = (token?: string) => {
     });
 
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
-        console.log(response)
+        console.log(response);
 
         const { dispatch } = operation.getContext();
         const sources = operation.variables.input.sources;
@@ -144,10 +143,11 @@ export const useApolloSubscription = <T, V>(
     subscription: DocumentNode,
     options: SubscriptionHookOptions<T, V> = {}
 ) => {
-    const { dispatch } = useErrorContext()
+    const { dispatch } = useErrorContext();
 
     return useSubscription<T, V>(subscription, {
         client,
+        fetchPolicy: 'network-only',
         context: { dispatch },
         ...options,
     });
