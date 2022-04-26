@@ -8,7 +8,7 @@ RUN yarn --prod
 FROM base AS builder
 RUN yarn
 COPY . .
-RUN yarn build
+RUN yarn tsc
 
 # Final deployment-ready production image
 FROM base
