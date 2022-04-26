@@ -7,6 +7,18 @@ WORKDIR /usr/app
 RUN wget -O /home/node/cadd_wgs_ghr38_index.gz.tbi  https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz.tbi \ 
     && chown node:node /home/node/cadd_wgs_ghr38_index.gz.tbi
 
+RUN wget -O /usr/local/bin/liftOver https://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/liftOver  \
+    && chmod +x /usr/local/bin/liftOver
+
+WORKDIR /home/node
+
+RUN mkdir chains && \
+    wget -O ./chains/hg19ToHg38.over.chain.gz https://hgdownload.cse.ucsc.edu/goldenpath/hg19/liftOver/hg19ToHg38.over.chain.gz && \
+    wget -O ./chains/hg38ToHg19.over.chain.gz https://hgdownload.cse.ucsc.edu/goldenpath/hg38/liftOver/hg38ToHg19.over.chain.gz && \
+    gunzip ./chains/hg38ToHg19.over.chain.gz && \
+    gunzip ./chains/hg19ToHg38.over.chain.gz
+
+WORKDIR /usr/app
 COPY . . 
 
 RUN yarn && yarn run build
