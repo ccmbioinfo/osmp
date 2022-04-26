@@ -46,7 +46,6 @@ app.get(
     // res.statusCode = 422;
     /// return res.json('invalid request');
     if (!assemblyId || !ensemblId) {
-      console.log(assemblyId, ensemblId)
       res.statusCode = 422;
       return res.json(`invalid request with ${assemblyId} ${ensemblId}`);
     } else if (!(assemblyId as string).includes('37')) {

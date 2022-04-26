@@ -33,9 +33,13 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     input: {
       sources,
       variant: { assemblyId },
-      gene: { position },
+      gene: { position }, // start and end position of a WHOLE gene, not of individual variants
     },
   } = args;
+
+  // User puts in gene name -> query called fetchAutocomplete takes in 2 inputs: 1 being gene name, the other being assembly. => Returns start and end of that gene => Annotating every variant within that gene
+
+  // Proposed: Query for variants first => variants in coordinate 37 => lift over to 38 => send CADD query for variants with positions in 38
 
   // fetch CADD and data in parallel
   const caddAnnotationsPromise = fetchCaddAnnotations(position, assemblyId);
@@ -43,6 +47,8 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const queries = sources.map(source => buildSourceQuery(source, args));
 
   const settled = await Promise.allSettled([caddAnnotationsPromise, ...queries]);
+
+  // const settledVariants = await Promise.allSettled([queries]);
 
   const errors: SourceError[] = [];
   const combinedResults: VariantQueryDataResult[] = [];

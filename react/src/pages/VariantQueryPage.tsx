@@ -3,6 +3,7 @@ import { useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
 import { useFetchVariantsQuery, useSlurmSubscription } from '../apollo/hooks';
+import { gql } from '@apollo/client';
 import {
     Background,
     Body,
@@ -27,8 +28,6 @@ import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
-import { gql } from '@apollo/client';
-import { useSubscription } from '@apollo/react-hooks';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
@@ -102,21 +101,7 @@ const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
         </Typography>
     </ErrorWrapper>
 );
-
-const fetchSlurmSubscription = gql`
-    subscription OnSlurmResponse {
-        slurmResponse {
-            id
-        }
-    }
-`;
-
 const VariantQueryPage: React.FC<{}> = () => {
-
-    const result = useSubscription(fetchSlurmSubscription, { variables: {} })
-
-    console.log('react subscription', result);
-
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
@@ -150,13 +135,27 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const subscription = useSlurmSubscription();
 
-    console.log(subscription);
+    console.log(subscription)
 
     const { state: errorState, dispatch } = useErrorContext();
 
     const client = useApolloClient();
 
-    console.log(client)
+    client.subscribe({
+        query: gql`
+        subscription OnSlurmResponse($input: TestId) {
+            slurmResponse(input: $input) {
+                id
+            }
+        }
+        `,
+        variables: {},
+        fetchPolicy: 'network-only'
+      }).subscribe({
+        next(v) { console.log("subs. result", v); }, // never printed
+        error(err) { console.log("subs. err", err); }, // never printed
+        complete() { console.log("subs. DONE"); }, // never printed
+      })
 
     const clearCache = () => {
         const cache = client.cache;

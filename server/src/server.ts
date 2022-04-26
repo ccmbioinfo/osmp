@@ -3,9 +3,7 @@ import session from 'express-session';
 import Keycloak from 'keycloak-connect';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
-import {
-  ApolloServerPluginLandingPageGraphQLPlayground,
-} from 'apollo-server-core';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -66,17 +64,18 @@ app.use(keycloak.middleware());
 app.use(express.json());
 
 app.post('/graphql', (req, res, next) => {
-  console.log(req.body);
+  console.log(req.body.operationName);
 
-  if (req.body.kind === "subscription") {
-    const { id } = req.body;
+  if (req.body.operationName === 'OnSlurmResponse') {
+    const { id } = req.body.variables;
 
-    console.log(pubsub)
-    pubsub.publish("SLURM_RESPONSE", { slurmResponse: { id } });
-  }
+    console.log(pubsub);
+    pubsub.publish('SLURM_RESPONSE', { slurmResponse: { id } });
 
-  // const grant = (req as any).kauth.grant;
-  logger.info(`
+    res.send({ data: { slurmResponse: { id } } });
+  } else {
+    // const grant = (req as any).kauth.grant;
+    logger.info(`
   QUERY SUBMITTED:
     ${JSON.stringify({
       // userSub: grant.access_token.content.sub,
@@ -84,55 +83,21 @@ app.post('/graphql', (req, res, next) => {
       // issuer: grant.access_token.content.iss,
       query: req.body.variables,
     })}`);
-  next();
-});
-
-app.post('/test', (req, res, next) => {
-  console.log(req.body); // req would contain data
-  // send results as a stream
-
-  const { id } = req.body;
-
-  console.log(pubsub)
-  pubsub.publish("SLURM_RESPONSE", { slurmResponse: { id } });
-
-  next();
+    next();
+  }
 });
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const httpServer = createServer(app);
 
-// Set up WebSocket server.
-// const wsServer = new WebSocketServer({
-//   server: httpServer,
-//   path: '/graphql',
-// });
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// useServer({ schema,
-//   // As before, ctx is the graphql-ws Context where connectionParams live.
-//   onConnect: async (ctx) => {
-//     console.log('Connected!')
-//     console.log(ctx)
-//   },
-//   onDisconnect(ctx, code, reason) {
-//     console.log(ctx, code, reason)
-//     console.log('Disconnected!');
-//   },
-//   context: ({ req, res, pubsub }: any) => ({ req, res, pubsub })
-
-// }, wsServer);
-
 const startServer = async () => {
   const apolloServer = new ApolloServer({
     schema,
-    
+
     context: ({ req, res, pubsub }: any) => ({ req, res, pubsub }),
-    
-    plugins: [
-      ApolloServerPluginLandingPageGraphQLPlayground(),
-    ],
+
+    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
   });
   await apolloServer.start();
 
@@ -144,6 +109,7 @@ const startServer = async () => {
       execute,
       subscribe,
       onOperation: (message: any, params: any) => {
+        console.log(message, params)
         params.schema = schema;
         return params;
       },

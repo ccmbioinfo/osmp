@@ -1,14 +1,6 @@
 import { gql } from 'apollo-server-express';
 
 export default gql`
-  type Subscription {
-    slurmResponse: TestId!
-  }
-
-  type TestId {
-    id: Int
-  }
-
   type VariantQueryResponse {
     data: [VariantQueryDataResult!]!
     errors: [VariantQueryErrorResult]!
@@ -139,5 +131,17 @@ export default gql`
 
   type Query {
     getVariants(input: QueryInput): VariantQueryResponse!
+  }
+
+  type Subscription {
+    slurmResponse(input: TestId): TestResponse
+  }
+
+  input TestId {
+    id: Int
+  }
+
+  type TestResponse {
+    id: Int
   }
 `;

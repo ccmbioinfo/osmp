@@ -29,8 +29,6 @@ import { VariantQueryResponseError } from '../types';
 
 const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_URL;
 
-console.log('graphql link', GRAPHQL_URL)
-
 export const buildLink = (token?: string) => {
     const timeoutLink = new ApolloLinkTimeout(60000); // 60 second timeout
     const mygeneRestLink = new RestLink({
@@ -44,23 +42,12 @@ export const buildLink = (token?: string) => {
     const wsLink = new GraphQLWsLink(
         createClient({
             url: `ws://localhost:6845/graphql`,
-        on: {
-            connected: (socket) => {
-                console.log(socket)
-            },
-            ping: (received) => {
-                console.log(received)
-            },
-            pong: (received) => {
-                console.log(received)
-            },
-        },
+            keepAlive: 10_000, // ping server every 10 seconds
         })
     );
 
     const splitLink = split(
         ({ query }) => {
-            console.log(query)
             const definition = getMainDefinition(query);
             return (
                 definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
@@ -71,8 +58,6 @@ export const buildLink = (token?: string) => {
     );
 
     const remoteNodeErrorLink = new ApolloLink((operation: Operation, forward: NextLink) => {
-        console.log(operation.getContext())
-
         return new Observable(observer => {
             const dispatcherContext = operation.getContext();
             const sub = forward(operation).subscribe({
@@ -89,13 +74,14 @@ export const buildLink = (token?: string) => {
             });
 
             return () => {
-                console.log('hello ubsubscribing')
                 if (sub) sub.unsubscribe();
             };
         });
     });
 
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
+        console.log(response)
+
         const { dispatch } = operation.getContext();
         const sources = operation.variables.input.sources;
 
@@ -130,7 +116,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([mygeneRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, splitLink]);
+    return from([mygeneRestLink, authLink, errorLink, remoteNodeErrorLink, splitLink]);
 };
 
 export const client = new ApolloClient<any>({
@@ -158,7 +144,8 @@ export const useApolloSubscription = <T, V>(
     subscription: DocumentNode,
     options: SubscriptionHookOptions<T, V> = {}
 ) => {
-    const { dispatch } = useErrorContext();
+    const { dispatch } = useErrorContext()
+
     return useSubscription<T, V>(subscription, {
         client,
         context: { dispatch },

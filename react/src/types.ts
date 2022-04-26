@@ -111,6 +111,10 @@ export interface QueryInput {
     };
 }
 
+export interface TestId {
+    id: Number;
+}
+
 /* end graphql schema types */
 export interface ErrorResponse {
     id: string;
