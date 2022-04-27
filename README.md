@@ -37,18 +37,18 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm ssmp-server yarn install
+    docker-compose run --rm server yarn install
     ```
 - bring up the server using [docker-compose](https://docs.docker.com/compose/):
 
   - ```bash
-    docker-compose up ssmp-server
+    docker-compose up server
     ```
   - note that this will recompile the typescript and restart the server when changes are detected.
 
 - to run the tests:
   - ```bash
-    docker-compose run --rm ssmp-server yarn test
+    docker-compose run --rm server yarn test
     ```
 
 ### Connecting to Phenotips
@@ -71,12 +71,12 @@ Apart from Phenotips, another data source for the SSMP development instance is a
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm test-node-1 yarn install
+    docker-compose run --rm test-node yarn install
     ```
 - bring up the server using [docker-compose](https://docs.docker.com/compose/):
 
   - ```bash
-    docker-compose up test-node-1
+    docker-compose up test-node
     ```
 
 - to populate MySQL database with variants from STAGER, download this [script](https://sickkidsca.sharepoint.com/:u:/r/sites/thecenterforcomputationalmedicineworkspace/Shared%20Documents/SSMP/data/stager-local-20210716.sql?csf=1&web=1&e=fVzHIB) and run the script using one of these two options:

@@ -6,9 +6,9 @@ x-common: &common
     driver: journald
 
 services:
-  ssmp-server:
+  server:
     build: server
-    image: ghcr.io/ccmbioinfo/ssmp:latest
+    image: ghcr.io/ccmbioinfo/osmp:latest
     environment:
       G4RD_AUTH_METHOD:
       G4RD_PASSWORD:
@@ -18,7 +18,7 @@ services:
       KEYCLOAK_CLIENT_ID:
       KEYCLOAK_REALM:
       MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin
-      TEST_NODE_URL:
+      TEST_NODE_URL: http://test-node:3000/data
     ports:
       - 3000:3000
     <<: *common

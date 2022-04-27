@@ -1,5 +1,5 @@
 {
-  "name": "ssmp-server",
+  "name": "osmp-server",
   "version": "1.0.0",
   "main": "server.js",
   "private": true,

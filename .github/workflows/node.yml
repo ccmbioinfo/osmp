@@ -58,7 +58,7 @@ jobs:
         with:
           context: server
           push: true
-          tags: ghcr.io/ccmbioinfo/ssmp:latest
+          tags: ghcr.io/ccmbioinfo/osmp:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
   build-test-node:
