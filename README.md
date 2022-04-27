@@ -82,7 +82,7 @@ Apart from Phenotips, another data source for the SSMP development instance is a
 - to populate MySQL database with variants from STAGER, download this [script](https://sickkidsca.sharepoint.com/:u:/r/sites/thecenterforcomputationalmedicineworkspace/Shared%20Documents/SSMP/data/stager-local-20210716.sql?csf=1&web=1&e=fVzHIB) and run the script using one of these two options:
   - MySQLWorkbench
   - ```bash
-    docker exec -i <stager-mysql-container-name> mysql -u <env.STAGER_DB_USER> --password="<env.STAGER_DB_PASSWORD>" <env.STAGER_DB> < <filepath>.sql
+    docker exec -i <stager-mysql-container-name> mysql -u <env.TEST_DATA_DB_USER> --password="<env.TEST_DATA_DB_PASSWORD>" <env.TEST_DATA_DB> < <filepath>.sql
     ```
     where the `.sql` script is on the host machine.
 
