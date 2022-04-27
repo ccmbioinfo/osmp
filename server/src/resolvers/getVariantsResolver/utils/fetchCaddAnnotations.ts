@@ -28,11 +28,18 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const indexPath = resolvedAssemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
 
   const nodeFetch = fetch as Fetcher;
-  const tbiIndexed = new TabixIndexedFile({
-    filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
-    csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
-  });
-
+  let tbiIndexed: TabixIndexedFile;
+  if (resolvedAssemblyId === 'GRCh37'){
+    tbiIndexed = new TabixIndexedFile({
+      filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
+      csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
+    });
+  } else {
+    tbiIndexed = new TabixIndexedFile({
+      filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
+      tbiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
+    });
+  }
   const { chromosome, start, end } = resolveChromosome(position);
 
   const lines: string[] = [];
@@ -40,9 +47,8 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     // Note that tabix library uses half-open 0-based (https://www.biostars.org/p/84686/), while the index we get from position is 1-based.
     await tbiIndexed.getLines(`${chromosome}`, Number(start) - 1, Number(end) + 1, line => {
       lines.push(line);
-    });
+      });
   }
-
   return lines;
 };
 
