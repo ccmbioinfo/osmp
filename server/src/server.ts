@@ -43,6 +43,8 @@ app.use(
   })
 );
 
+console.log(memoryStore)
+
 const keycloak = new Keycloak(
   {
     store: memoryStore,
@@ -53,7 +55,7 @@ const keycloak = new Keycloak(
     resource: process.env.KEYCLOAK_CLIENT_ID!,
     'ssl-required': process.env.NODE_ENV === 'development' ? 'external' : 'all',
     'confidential-port': 443,
-    'bearer-only': true,
+    'bearer-only': true
   }
 );
 
@@ -65,7 +67,7 @@ if (process.env.NODE_ENV === 'local') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
-app.post('/graphql', (req, res, next) => {
+app.post('/graphql', keycloak.protect(), (req, res, next) => {
   console.log(req.body.operationName);
 
   if (req.body.operationName === 'OnSlurmResponse') {
@@ -76,13 +78,13 @@ app.post('/graphql', (req, res, next) => {
 
     res.send({ data: { slurmResponse: { id } } });
   } else {
-    // const grant = (req as any).kauth.grant;
+    const grant = (req as any).kauth.grant;
     logger.info(`
   QUERY SUBMITTED:
     ${JSON.stringify({
-      // userSub: grant.access_token.content.sub,
-      // username: grant.access_token.content.preferred_username,
-      // issuer: grant.access_token.content.iss,
+      userSub: grant.access_token.content.sub,
+      username: grant.access_token.content.preferred_username,
+      issuer: grant.access_token.content.iss,
       query: req.body.variables,
     })}`);
     next();
