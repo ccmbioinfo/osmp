@@ -93,7 +93,7 @@ The app uses [keycloak](https://www.keycloak.org/) as an identity provider and i
 In the dev environment, the app uses keycloak's default h2 database for storage, though in production we'll want to use MySQL or Postgres. To set up the app client and a test user, you can use the following command on your host machine with the keycloak container running:
 
 ```bash
-docker exec -i <keycloak-container-name> bash /usr/scripts/bootstrap-keycloak.sh
+docker-compose exec keycloak /usr/local/bin/bootstrap-keycloak.sh
 ```
 
 The keycloak admin portal can be accessed in the browser by navigating to localhost and the port specified by the `KEYCLOAK_PORT` env var, e.g., `localhost:9821`

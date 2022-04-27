@@ -107,6 +107,6 @@ services:
     ports:
       - ${KEYCLOAK_PORT}:8080
     volumes:
-      - ./keycloak/scripts:/usr/scripts
-      - ./keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli
+      - ./keycloak/bin:/usr/local/bin
+      - ./keycloak/startup-scripts:/opt/jboss/startup-scripts
       - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
