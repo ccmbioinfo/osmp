@@ -70,7 +70,7 @@ const getG4rdNodeQuery = async ({
       source: SOURCE_NAME,
     };
   }
-  const url = `${process.env.G4RD_URL}/rest/variants/match`;
+  const url = `${process.env.G4RD_URL}/rest/variants`;
   const { position, ...gene } = geneInput;
   try {
     G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
@@ -87,6 +87,8 @@ const getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariantQueryResponse) {
+      console.log(((G4RDVariantQueryResponse as any).data.data.map((v: any) => v.attributes)))
+      
       const individualIds = G4RDVariantQueryResponse.data.results.map(
         v => v.individual.individualId
       );
@@ -120,7 +122,7 @@ const getAuthHeader = async () => {
     G4RD_USERNAME: username,
     G4RD_PASSWORD: password,
     G4RD_TOKEN_URL,
-    G4RD_URL,
+    // G4RD_URL,
     G4RD_REALM: realm,
     G4RD_CLIENT_ID: client_id,
     G4RD_GRANT_TYPE: grant_type,
@@ -134,7 +136,6 @@ const getAuthHeader = async () => {
     }
 
     const params = new URLSearchParams({
-      audience: `${G4RD_URL}/rest/`,
       client_id: client_id,
       grant_type,
       password,
