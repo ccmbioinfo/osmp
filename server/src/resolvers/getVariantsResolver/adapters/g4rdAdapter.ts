@@ -120,7 +120,6 @@ const getAuthHeader = async () => {
     G4RD_USERNAME: username,
     G4RD_PASSWORD: password,
     G4RD_TOKEN_URL,
-    // G4RD_URL,
     G4RD_REALM: realm,
     G4RD_CLIENT_ID: client_id,
     G4RD_GRANT_TYPE: grant_type,
@@ -175,7 +174,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
   patientResponse: G4RDPatientQueryResult[]
 ) => {
   const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
-  
+
   return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { chromosome, ...restVariant } = r.variant;
