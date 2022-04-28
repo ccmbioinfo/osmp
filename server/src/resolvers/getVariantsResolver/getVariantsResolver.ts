@@ -108,6 +108,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         .map((v, i) => {
           v.variant.start = Number(lifted[i]) + 1; // Convert from BED format (half-open zero-based) to position format (1-based). We assume that the variants are SNV for now.
           v.variant.end = Number(lifted[i]) + 1;
+          v.variant.assemblyId = '38';
           return { ...v };
         })
         .concat(unliftedVariants);

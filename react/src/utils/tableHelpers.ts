@@ -25,6 +25,8 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     homozygousCount?: number;
     heterozygousCount?: number;
     uniqueId: number;
+    originalAssembly?: string;
+    currentAssembly?: string;
 }
 
 const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
@@ -148,6 +150,8 @@ export const prepareData = (
                     .forEach(row => {
                         row.homozygousCount = currHomozygousCount;
                         row.heterozygousCount = currHeterozygousCount;
+                        row.originalAssembly = 'GRCh37';
+                        row.currentAssembly = d.variant.assemblyId === '38' ? 'GRCh38' : 'GRCh37';
                     });
             }
 
@@ -186,10 +190,17 @@ export const prepareData = (
             currRowId += 1;
         }
     });
-    result.slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId).forEach(row => {
-        row.homozygousCount = currHomozygousCount;
-        row.heterozygousCount = currHeterozygousCount;
-    });
+    result
+        .slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId)
+        .forEach((row, i) => {
+            row.homozygousCount = currHomozygousCount;
+            row.heterozygousCount = currHeterozygousCount;
+            row.originalAssembly = 'GRCh37';
+            row.currentAssembly =
+                sortedQueryResult[sortedQueryResult.length - 1].variant.assemblyId === '38'
+                    ? 'GRCh38'
+                    : 'GRCh37';
+        });
 
     return [result, uniqueVariantIndices];
 };

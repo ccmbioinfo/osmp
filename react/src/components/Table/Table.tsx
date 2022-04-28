@@ -66,6 +66,8 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     homozygousCount?: number;
     heterozygousCount?: number;
     uniqueId: number;
+    originalAssembly?: string;
+    currentAssembly?: string;
 }
 
 const resolveSex = (sexPhenotype: string) => {
@@ -172,6 +174,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'alt',
                         Header: 'Alt',
                         width: getColumnWidth('Alt'),
+                    },
+                    {
+                        accessor: 'originalAssembly',
+                        id: 'originalAssembly',
+                        Header: 'Original Assembly',
+                        width: getColumnWidth('Original Assembly'),
+                    },
+                    {
+                        accessor: 'currentAssembly',
+                        id: 'currentAssembly',
+                        Header: 'Current Assembly',
+                        width: getColumnWidth('Current Assembly'),
                     },
                     {
                         accessor: 'source',
