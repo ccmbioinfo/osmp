@@ -13,7 +13,8 @@ const ANNOTATION_URL_37 =
 
 const INDEX_37_PATH =
   'https://minio.genomics4rd.ca/www-ssmp-dev/whole_genome_SNVs_inclAnno_GRCh37.tsv.gz.csi';
-const INDEX_38_PATH = 'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz.tbi';
+const INDEX_38_PATH =
+  'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz.tbi';
 
 /**
  * The function queries CADD annotation TSV and returns a list of string, each of which represents one line in the TSV.
@@ -29,7 +30,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
 
   const nodeFetch = fetch as Fetcher;
   let tbiIndexed: TabixIndexedFile;
-  if (resolvedAssemblyId === 'GRCh37'){
+  if (resolvedAssemblyId === 'GRCh37') {
     tbiIndexed = new TabixIndexedFile({
       filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
       csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
@@ -47,7 +48,7 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     // Note that tabix library uses half-open 0-based (https://www.biostars.org/p/84686/), while the index we get from position is 1-based.
     await tbiIndexed.getLines(`${chromosome}`, Number(start) - 1, Number(end) + 1, line => {
       lines.push(line);
-      });
+    });
   }
   return lines;
 };
