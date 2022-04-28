@@ -14,6 +14,10 @@ services:
       G4RD_PASSWORD:
       G4RD_URL:
       G4RD_USERNAME:
+      G4RD_REALM:
+      G4RD_GRANT_TYPE: 
+      G4RD_TOKEN_URL:
+      G4RD_CLIENT_ID:
       KEYCLOAK_AUTH_URL:
       KEYCLOAK_CLIENT_ID:
       KEYCLOAK_REALM:
