@@ -62,6 +62,7 @@
     "graphql-ws": "^5.7.0",
     "jwt-decode": "^3.1.2",
     "keycloak-connect": "17.0.0",
+    "keycloak-verify": "^0.4.0",
     "mongodb-memory-server": "^8.4.0",
     "mongoose": "^6.0.8",
     "node-cache": "^5.1.2",

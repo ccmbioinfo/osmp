@@ -31,7 +31,7 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
-const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAGER_DB } =
+const { TEST_DATA_DB_HOST, TEST_DATA_DB_PORT, TEST_DATA_DB_USER, TEST_DATA_DB_PASSWORD, TEST_DATA_DB } =
   process.env;
 
 app.get(
@@ -70,11 +70,11 @@ app.get(
 
 const getStagerData = async (geneName: string, ensemblId: string, assemblyId: string) => {
   const connection = await mysql.createConnection({
-    host: STAGER_DB_HOST,
-    user: STAGER_DB_USER,
-    port: +(STAGER_DB_PORT as string),
-    password: STAGER_DB_PASSWORD,
-    database: STAGER_DB,
+    host: TEST_DATA_DB_HOST,
+    user: TEST_DATA_DB_USER,
+    port: +(TEST_DATA_DB_PORT as string),
+    password: TEST_DATA_DB_PASSWORD,
+    database: TEST_DATA_DB,
   });
 
   if (!ensemblId) {

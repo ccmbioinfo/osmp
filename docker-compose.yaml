@@ -77,13 +77,13 @@ services:
       TEST_NODE_TOKEN_ISSUER:
       TEST_NODE_TOKEN_AUDIENCE:
       TEST_NODE_OAUTH_ACTIVE:
-      STAGER_DB:
-      STAGER_DB_PORT:
-      STAGER_DB_HOST:
-      STAGER_DB_USER:
-      STAGER_DB_PASSWORD:
-      STAGER_DB_ROOT_PASSWORD:
-      STAGER_DATA_VOLUME:
+      TEST_DATA_DB:
+      TEST_DATA_DB_PORT:
+      TEST_DATA_DB_HOST:
+      TEST_DATA_DB_USER:
+      TEST_DATA_DB_PASSWORD:
+      TEST_DATA_DB_ROOT_PASSWORD:
+      TEST_DATA_DATA_VOLUME:
 
     user: "1000" #node
     working_dir: /usr/app
@@ -99,14 +99,14 @@ services:
     image: mysql:8.0
     restart: on-failure
     environment:
-      MYSQL_DATABASE: "${STAGER_DB}"
-      MYSQL_USER: "${STAGER_DB_USER}"
-      MYSQL_PASSWORD: "${STAGER_DB_PASSWORD}"
-      MYSQL_ROOT_PASSWORD: "${STAGER_DB_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${TEST_DATA_DB}"
+      MYSQL_USER: "${TEST_DATA_DB_USER}"
+      MYSQL_PASSWORD: "${TEST_DATA_DB_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
     ports: 
-      - ${STAGER_DB_PORT}:3306 
+      - ${TEST_DATA_DB_PORT}:3306 
     volumes:
-      - ${STAGER_DATA_VOLUME}:/var/lib/mysql
+      - ${TEST_DATA_DATA_VOLUME}:/var/lib/mysql
     networks:
       - osmp
 

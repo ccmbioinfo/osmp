@@ -2,6 +2,7 @@
 import express from 'express';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
+import * as KeycloakValidator from 'keycloak-verify';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -43,8 +44,6 @@ app.use(
   })
 );
 
-console.log(memoryStore)
-
 const keycloak = new Keycloak(
   {
     store: memoryStore,
@@ -67,26 +66,33 @@ if (process.env.NODE_ENV === 'local') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
-app.post('/graphql', keycloak.protect(), (req, res, next) => {
-  console.log(req.body.operationName);
+app.post('/graphql', async (req, res, next) => {
+  const accessToken = req.headers.authorization?.split(' ')[1]!;
 
-  if (req.body.operationName === 'OnSlurmResponse') {
-    const { id } = req.body.variables;
-
-    console.log(pubsub);
-    pubsub.publish('SLURM_RESPONSE', { slurmResponse: { id } });
-
-    res.send({ data: { slurmResponse: { id } } });
-  } else {
-    const grant = (req as any).kauth.grant;
-    logger.info(`
-  QUERY SUBMITTED:
-    ${JSON.stringify({
-      userSub: grant.access_token.content.sub,
-      username: grant.access_token.content.preferred_username,
-      issuer: grant.access_token.content.iss,
-      query: req.body.variables,
-    })}`);
+  try {
+    const user = await keycloakValidator.verifyOnline(accessToken);
+    console.log(user)
+    if (req.body.operationName === 'OnSlurmResponse') {
+      const { id } = req.body.variables;
+  
+      console.log(pubsub);
+      pubsub.publish('SLURM_RESPONSE', { slurmResponse: { id } });
+  
+      res.send({ data: { slurmResponse: { id } } });
+    } else {
+      const grant = (req as any).kauth.grant;
+      logger.info(`
+    QUERY SUBMITTED:
+      ${JSON.stringify({
+        userSub: grant.access_token.content.sub,
+        username: grant.access_token.content.preferred_username,
+        issuer: grant.access_token.content.iss,
+        query: req.body.variables,
+      })}`);
+      next();
+    }
+  } catch (err) {
+    console.log(err)
     next();
   }
 });
