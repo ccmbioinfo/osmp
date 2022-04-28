@@ -70,7 +70,7 @@ const getG4rdNodeQuery = async ({
       source: SOURCE_NAME,
     };
   }
-  const url = `${process.env.G4RD_URL}/rest/variants`;
+  const url = `${process.env.G4RD_URL}/rest/variants/match`;
   const { position, ...gene } = geneInput;
   try {
     G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
@@ -87,8 +87,6 @@ const getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariantQueryResponse) {
-      console.log(((G4RDVariantQueryResponse as any).data.data.map((v: any) => v.attributes)))
-      
       const individualIds = G4RDVariantQueryResponse.data.results.map(
         v => v.individual.individualId
       );
@@ -177,7 +175,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
   patientResponse: G4RDPatientQueryResult[]
 ) => {
   const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
-
+  
   return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const { chromosome, ...restVariant } = r.variant;
