@@ -13,7 +13,7 @@ app.use(
   })
 );
 
-//https://manage.auth0.com/dashboard/us/ssmp-dev/apis/611a9d6bdbe7a6003ec01df4/quickstart
+// https://manage.auth0.com/dashboard/us/ssmp-dev/apis/611a9d6bdbe7a6003ec01df4/quickstart
 const jwtCheck = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
@@ -30,8 +30,13 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
-const { STAGER_DB_HOST, STAGER_DB_PORT, STAGER_DB_USER, STAGER_DB_PASSWORD, STAGER_DB } =
-  process.env;
+const {
+  TEST_DATA_DB_HOST,
+  TEST_DATA_DB_PORT,
+  TEST_DATA_DB_USER,
+  TEST_DATA_DB_PASSWORD,
+  TEST_DATA_DB,
+} = process.env;
 
 app.get(
   '/data',
@@ -44,7 +49,7 @@ app.get(
       return res.json(`invalid request (assemblyId: ${assemblyId}, geneName: ${geneName})`);
     }
 
-    const result = await getStagerData(geneName as string, assemblyId as string);
+    const result = await getStagerData(geneName as string);
 
     if (!result) {
       res.statusCode = 404;
@@ -55,13 +60,13 @@ app.get(
   }
 );
 
-const getStagerData = async (geneName: string, assemblyId: string) => {
+const getStagerData = async (geneName: string) => {
   const connection = await mysql.createConnection({
-    host: STAGER_DB_HOST,
-    user: STAGER_DB_USER,
-    port: +(STAGER_DB_PORT as string),
-    password: STAGER_DB_PASSWORD,
-    database: STAGER_DB,
+    host: TEST_DATA_DB_HOST,
+    user: TEST_DATA_DB_USER,
+    port: +(TEST_DATA_DB_PORT as string),
+    password: TEST_DATA_DB_PASSWORD,
+    database: TEST_DATA_DB,
   });
 
   let result;
@@ -109,5 +114,5 @@ const getStagerData = async (geneName: string, assemblyId: string) => {
 const server = createServer(app);
 
 server.listen(3000, () => {
-  console.log(`Test node is running on port 3000!`);
+  console.log('Test node is running on port 3000!');
 });

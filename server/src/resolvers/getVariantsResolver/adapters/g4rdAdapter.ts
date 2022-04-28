@@ -120,7 +120,6 @@ const getAuthHeader = async () => {
     G4RD_USERNAME: username,
     G4RD_PASSWORD: password,
     G4RD_TOKEN_URL,
-    G4RD_URL,
     G4RD_REALM: realm,
     G4RD_CLIENT_ID: client_id,
     G4RD_GRANT_TYPE: grant_type,
@@ -134,7 +133,6 @@ const getAuthHeader = async () => {
     }
 
     const params = new URLSearchParams({
-      audience: `${G4RD_URL}/rest/`,
       client_id: client_id,
       grant_type,
       password,
