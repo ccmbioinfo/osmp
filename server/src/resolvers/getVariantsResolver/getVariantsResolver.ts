@@ -73,13 +73,9 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   // Perform liftover
 
   if (resolveAssembly(assemblyId) === 'GRCh38') {
-    // Get a bedstring of all data variants in JSON format. Note that position format is 1-based and BED format is half-open 0-based: https://genome.ucsc.edu/FAQ/FAQformat.html#format1  The transformation v.variant.end-1 is only necessary if the variants are SNV because BED format is half-open.
+    // Get a bedstring of all data variants in JSON format. Note that position format is 1-based and BED format is half-open 0-based: https://genome.ucsc.edu/FAQ/FAQformat.html#format1
     const bedstring = combinedResults
-      .map(v =>
-        v.variant.start === v.variant.end
-          ? `chr${v.variant.referenceName}\t${v.variant.start - 1}\t${v.variant.end - 1}`
-          : `chr${v.variant.referenceName}\t${v.variant.start - 1}\t${v.variant.end}`
-      )
+      .map(v => `chr${v.variant.referenceName}\t${v.variant.start - 1}\t${v.variant.end}`)
       .join('\n');
 
     const createTmpFile = async () => {
@@ -88,7 +84,11 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       return path.join(dir, filename);
     };
 
-    const mergeResults = (lifted: Array<string>, unlifted: Array<string>) => {
+    const mergeResults = (
+      lifted: Array<string>,
+      unlifted: Array<string>,
+      liftedVarsEnd: Array<string>
+    ) => {
       const unliftedVariants: VariantQueryDataResult[] = [];
 
       const unliftedMap: { [key: string]: boolean } = unlifted.reduce(
@@ -107,7 +107,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         })
         .map((v, i) => {
           v.variant.start = Number(lifted[i]) + 1; // Convert from BED format (half-open zero-based) to position format (1-based). We assume that the variants are SNV for now.
-          v.variant.end = Number(lifted[i]) + 1;
+          v.variant.end = Number(liftedVarsEnd[i]);
           v.variant.assemblyId = '38';
           return { ...v };
         })
@@ -127,10 +127,16 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       bed
         .split('\n')
         .filter(l => !!l && !l.startsWith('#'))
+        .map(v => v.split('\t')[1]);
+    const parseBedEnd = (bed: String) =>
+      bed
+        .split('\n')
+        .filter(l => !!l && !l.startsWith('#'))
         .map(v => v.split('\t')[2]);
     const liftedVars = parseBed(_liftedVars.toString());
     const unliftedVars = parseBed(_unliftedVars.toString());
-    combinedResults = mergeResults(liftedVars, unliftedVars);
+    const liftedVarsEnd = parseBedEnd(_liftedVars.toString());
+    combinedResults = mergeResults(liftedVars, unliftedVars, liftedVarsEnd);
     // get position start end by looping to find min of all the "start" fields and max of all the "end" fields
     let geneStart = combinedResults[0].variant.start;
     let geneEnd = combinedResults[0].variant.end;
