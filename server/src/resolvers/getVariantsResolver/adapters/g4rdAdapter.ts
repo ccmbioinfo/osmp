@@ -72,6 +72,7 @@ const getG4rdNodeQuery = async ({
   }
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
   const { position, ...gene } = geneInput;
+  variant.assemblyId = "GRCh37";
   try {
     G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
       url,
