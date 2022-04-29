@@ -177,7 +177,7 @@ export const prepareData = (
                         )
                     )
             );
-            currRowId += d.variant.callsets.length;
+            currRowId += 1;
             d.variant.callsets.forEach(cs =>
                 isHeterozygous(cs.info.zygosity)
                     ? (currHeterozygousCount += 1)
