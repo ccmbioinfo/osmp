@@ -2,7 +2,6 @@
 import express from 'express';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
-import * as KeycloakValidator from 'keycloak-verify';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
@@ -54,7 +53,7 @@ const keycloak = new Keycloak(
     resource: process.env.KEYCLOAK_CLIENT_ID!,
     'ssl-required': process.env.NODE_ENV === 'development' ? 'external' : 'all',
     'confidential-port': 443,
-    'bearer-only': true
+    'bearer-only': true,
   }
 );
 
@@ -66,18 +65,14 @@ if (process.env.NODE_ENV === 'local') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
-app.post('/graphql', async (req, res, next) => {
-  const accessToken = req.headers.authorization?.split(' ')[1]!;
-
+app.post('/graphql', keycloak.protect(), async (req, res, next) => {
   try {
-    const user = await keycloakValidator.verifyOnline(accessToken);
-    console.log(user)
     if (req.body.operationName === 'OnSlurmResponse') {
       const { id } = req.body.variables;
-  
+
       console.log(pubsub);
       pubsub.publish('SLURM_RESPONSE', { slurmResponse: { id } });
-  
+
       res.send({ data: { slurmResponse: { id } } });
     } else {
       const grant = (req as any).kauth.grant;
@@ -92,7 +87,7 @@ app.post('/graphql', async (req, res, next) => {
       next();
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     next();
   }
 });
