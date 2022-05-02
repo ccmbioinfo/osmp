@@ -109,4 +109,4 @@ services:
     volumes:
       - ./keycloak/bin:/usr/local/bin
       - ./keycloak/startup-scripts:/opt/jboss/startup-scripts
-      - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
+      - ./keycloak/theme:/opt/jboss/keycloak/themes/osmp

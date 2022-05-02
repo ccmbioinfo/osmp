@@ -60,13 +60,13 @@ In development, for the Express server to successfully make a call to the endpoi
 If you are using CCM's VMs, you can set up local forwarding as follows:
 
 - To login into your VM: `eval $(ssh-agent -s) && ssh-add` and `ssh -A <username>@dev-<username>.ccm.sickkids.ca`. Make sure that you already have a VM allocated to you.
-- To forward your local port to ubuntu@ssmp-dev: `ssh -ANL 0.0.0.0:8443:dev.phenotips.genomics4rd.ca:443 ubuntu@ssmp.ccmdev.ca`. For now, this command would need to be run alongside `docker-compose up` when you want to bring up the app.
+- To forward your local port to ubuntu@ssmp-dev: `ssh -ANL 0.0.0.0:8443:dev.phenotips.genomics4rd.ca:443 ubuntu@osmp.ccmdev.ca`. For now, this command would need to be run alongside `docker-compose up` when you want to bring up the app.
 - Set `G4RD_URL` in your local `.env` to `https://dev-<username>.ccm.sickkids.ca:8443`.
   Now, any request sent to your `G4RD_URL` would be tunneled to `dev.phenotips.genomics4rd.ca:443` on the staging VM.
 
 ### Building the remote test server
 
-Apart from Phenotips, another data source for the SSMP development instance is a Node/Express server that queries a MySQL database that has been populated wtih variants from the STAGER application database.
+Apart from Phenotips, another data source for the staging instance is a Node/Express server that queries a MySQL database that has been populated wtih variants from the STAGER application database.
 
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
