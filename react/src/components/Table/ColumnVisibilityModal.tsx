@@ -93,7 +93,12 @@ export default function ColumnVisibilityModal<T extends {}>({
                                                             alignItems="center"
                                                             fullWidth={true}
                                                         >
-                                                            <div style={{ paddingLeft: 20, background: "white" }}>
+                                                            <div
+                                                                style={{
+                                                                    paddingLeft: 20,
+                                                                    background: 'white',
+                                                                }}
+                                                            >
                                                                 <Checkbox
                                                                     label={c.Header as string}
                                                                     checked={c.isVisible}
