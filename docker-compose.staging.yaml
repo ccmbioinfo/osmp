@@ -33,7 +33,7 @@ services:
     environment:
       TEST_DATA_DB:
       TEST_DATA_DB_PORT: 3306
-      TEST_DATA_DB_HOST: mysql
+      TEST_DATA_DB_HOST: test-node-mysql
       TEST_DATA_DB_USER: 
       TEST_DATA_DB_PASSWORD:
     <<: *common
