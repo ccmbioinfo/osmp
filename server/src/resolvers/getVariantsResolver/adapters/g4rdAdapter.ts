@@ -61,7 +61,7 @@ const getG4rdNodeQuery = async ({
   let Authorization = '';
   try {
     Authorization = await getAuthHeader();
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e);
     logger.error(e?.resoponse?.data);
     return {
@@ -99,7 +99,7 @@ const getG4rdNodeQuery = async ({
         httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       });
     }
-  } catch (e) {
+  } catch (e: any) {
     logger.error(e);
     G4RDNodeQueryError = e;
   }
