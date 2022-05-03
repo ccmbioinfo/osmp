@@ -38,30 +38,21 @@ const {
   TEST_DATA_DB,
 } = process.env;
 
-app.get(
-  '/data',
-  async (
-    { query: { assemblyId, geneName } }: Request<{ assemblyId: string; geneName: string }>,
-    res
-  ) => {
-    if (!assemblyId || !geneName) {
-      res.statusCode = 422;
-      return res.json(`invalid request (assemblyId: ${assemblyId}, geneName: ${geneName})`);
-    } else if (!(assemblyId as string).includes('37')) {
-      res.statusCode = 422;
-      return res.json('Test node does not have hg38 variants!');
-    }
-
-    const result = await getStagerData(geneName as string);
-
-    if (!result) {
-      res.statusCode = 404;
-      return res.json('There are no variants matching your search criteria.');
-    } else {
-      return res.json(result);
-    }
+app.get('/data', async ({ query: { geneName } }: Request<{ geneName: string }>, res) => {
+  if (!geneName) {
+    res.statusCode = 422;
+    return res.json(`invalid request (geneName: ${geneName})`);
   }
-);
+
+  const result = await getStagerData(geneName as string);
+
+  if (!result) {
+    res.statusCode = 404;
+    return res.json('There are no variants matching your search criteria.');
+  } else {
+    return res.json(result);
+  }
+});
 
 const getStagerData = async (geneName: string) => {
   const connection = await mysql.createConnection({
