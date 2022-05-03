@@ -5,6 +5,7 @@ import Theme from '../constants/theme';
 interface TypographyOverrides {
     bold?: boolean;
     error?: boolean;
+    success?: boolean;
 }
 
 type TagType = keyof typeof Theme.typography;
@@ -16,7 +17,12 @@ interface TypographyProps extends TypographyOverrides {
 const Component = styled.p<TypographyProps>`
     user-select: text;
     margin-inline-end: ${props => props.theme.space[2]};
-    color: ${props => (props.error ? props.theme.colors.error : 'inherit')};
+    color: ${props =>
+        props.error
+            ? props.theme.colors.error
+            : props.success
+            ? props.theme.colors.success
+            : 'inherit'};
     font-weight: ${(props: TypographyOverrides) => (props.bold ? 'bold' : 'normal')};
     font-size: ${props => {
         switch (props.variant) {

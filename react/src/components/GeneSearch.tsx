@@ -4,7 +4,6 @@ import { useFetchAutocompleteQuery } from '../apollo/hooks';
 import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
-
 interface HitPosition {
     chr: string;
     start: number;
@@ -24,8 +23,7 @@ interface AutocompleteResults {
         }[];
     };
 }
-interface SelectionValue {
-    ensemblId?: string;
+export interface GeneSelectionValue {
     name: string;
     position: string;
 }
@@ -33,12 +31,15 @@ interface SelectionValue {
 interface GeneSearchProps {
     assembly: AssemblyId;
     geneName: string;
-    onSelect: (gene: SelectionValue) => void;
+    onSelect: (gene: GeneSelectionValue) => void;
     onChange: (geneName: string) => void;
 }
 
+const isCanonicalRegion = (chr: string) =>
+    ['X', 'Y', ...Array.from({ length: 22 }, (_, i) => (i + 1).toString())].includes(chr);
+
 const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
-    const [options, setOptions] = useState<SelectableListItem<SelectionValue>[]>([]);
+    const [options, setOptions] = useState<SelectableListItem<GeneSelectionValue>[]>([]);
 
     const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
         useFetchAutocompleteQuery();
@@ -64,17 +65,20 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
 
                     const is38 = /38/.test(assembly);
 
-                    return (is38 ? genomic_pos : genomic_pos_hg19).map((e, eid) => ({
-                        value: {
-                            name: genes.symbol.toUpperCase(),
-                            ensemblId: genes.ensembl[eid].gene,
-                            position: `${e.chr}:${e.start}-${e.end}`,
-                        },
-                        id: i + eid,
-                        label: Array.isArray(hit.ensembl)
-                            ? `${hit.symbol.toUpperCase()} - ${genes.ensembl[eid].gene}`
-                            : hit.symbol.toUpperCase(),
-                    }));
+                    return (is38 ? genomic_pos : genomic_pos_hg19)
+                        .filter(g => isCanonicalRegion(g.chr))
+                        .map((e, eid) => {
+                            return {
+                                value: {
+                                    name: genes.symbol.toUpperCase(),
+                                    position: `${e.chr}:${e.start}-${e.end}`,
+                                },
+                                id: i + eid,
+                                label: `${hit.symbol.toUpperCase()} (Chromosome: ${e.chr}, Start: ${
+                                    e.start
+                                }, End: ${e.end})`,
+                            };
+                        });
                 })
                 .flat(),
         []
@@ -102,7 +106,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
             options={options}
             loading={autocompleteLoading}
             onChange={term => onChange(term)}
-            onSelect={(item: SelectionValue) => onSelect(item)}
+            onSelect={(item: GeneSelectionValue) => onSelect(item)}
             placeholder="Gene Search"
             searchable
             value={geneName || ''}

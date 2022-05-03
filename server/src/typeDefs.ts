@@ -115,7 +115,6 @@ export default gql`
 
   input GeneQueryInput {
     geneName: String!
-    ensemblId: String
     position: String
   }
 

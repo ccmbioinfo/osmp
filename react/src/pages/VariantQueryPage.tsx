@@ -33,18 +33,8 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
         required: true,
     },
-    ensemblId: {
-        required: state => !state.gene.value,
-        rules: [
-            {
-                valid: (state: FormState<QueryOptionsFormState>) =>
-                    state.ensemblId.value.startsWith('ENSG00'),
-                error: 'Invalid ensembl ID format.',
-            },
-        ],
-    },
     gene: {
-        required: state => !state.ensemblId.value,
+        required: state => !state.gene.value,
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 3,
@@ -82,7 +72,6 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
 
 interface QueryOptionsFormState {
     assemblyId: string;
-    ensemblId: string;
     gene: string;
     maxFrequency: string;
     position: string;
@@ -106,7 +95,6 @@ const VariantQueryPage: React.FC<{}> = () => {
         useFormReducer<QueryOptionsFormState>(
             {
                 assemblyId: 'GRCh37',
-                ensemblId: '',
                 gene: '',
                 maxFrequency: '0.01',
                 sources: [],
@@ -123,7 +111,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                     maxFrequency: +queryOptionsForm.maxFrequency.value,
                 },
                 gene: {
-                    ensemblId: queryOptionsForm.ensemblId.value,
                     geneName: queryOptionsForm.gene.value,
                     position: queryOptionsForm.position.value,
                 },
@@ -192,46 +179,32 @@ const VariantQueryPage: React.FC<{}> = () => {
                     </Column>
                 </Column>
             </Flex>
+
             <Background variant="light">
-                <Flex alignItems="center">
-                    <Column alignItems="flex-start">
+                <Flex alignItems="flex-start">
+                    <Column
+                        alignItems="flex-start"
+                        style={{
+                            width: '30%',
+                        }}
+                    >
                         <Typography variant="subtitle" bold>
                             Gene Name
                         </Typography>
                         <GeneSearch
                             assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
                             geneName={queryOptionsForm.gene.value}
-                            onChange={geneName =>
-                                updateQueryOptionsForm({ gene: geneName, ensemblId: '' })
-                            }
+                            onChange={geneName => updateQueryOptionsForm({ gene: geneName })}
                             onSelect={val => {
-                                const { position, ensemblId } = val;
+                                const { position } = val;
                                 updateQueryOptionsForm({
                                     gene: val.name,
-                                    ensemblId,
                                     position,
                                 });
                             }}
                         />
                         <ErrorText error={queryOptionsForm.gene.error} />
                     </Column>
-                    <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold>
-                            Ensembl ID
-                        </Typography>
-                        <Input
-                            variant="outlined"
-                            onChange={e =>
-                                updateQueryOptionsForm({
-                                    ensemblId: e.currentTarget.value,
-                                    gene: '',
-                                })
-                            }
-                            value={queryOptionsForm.ensemblId.value}
-                        />
-                        <ErrorText error={queryOptionsForm.ensemblId.error || ''} />
-                    </Column>
-
                     <Column alignItems="flex-start">
                         <Flex alignItems="center">
                             <Typography variant="subtitle" bold>
@@ -261,7 +234,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 updateQueryOptionsForm({
                                     assemblyId: val as AssemblyId,
                                     gene: '',
-                                    ensemblId: '',
                                 })
                             }
                             options={['GRCh37', 'GRCh38'].map((a, id) => ({
@@ -296,8 +268,8 @@ const VariantQueryPage: React.FC<{}> = () => {
                         >
                             Clear
                         </Button>
+                        <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
                     </ButtonWrapper>
-                    <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
                 </Flex>
             </Background>
             {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]

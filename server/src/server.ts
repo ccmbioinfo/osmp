@@ -15,7 +15,7 @@ import {
   ApolloServerPluginDrainHttpServer,
   ApolloServerPluginLandingPageGraphQLPlayground,
 } from 'apollo-server-core';
-import { WebSocketServer } from 'ws';
+import { Server } from 'ws';
 import { useServer } from 'graphql-ws/lib/use/ws';
 
 import { pubsub } from './pubsub';
@@ -58,7 +58,7 @@ const keycloak = new Keycloak(
 );
 
 // monkeypatch token validator in local environments where keycloak host is localhost
-if (process.env.NODE_ENV === 'local') {
+if (process.env.NODE_ENV === 'development') {
   keycloak.grantManager.validateToken = validateToken;
 }
 
@@ -97,7 +97,7 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const httpServer = createServer(app);
 
 // Creating the WebSocket server
-const wsServer = new WebSocketServer({
+const wsServer = new Server({
   // This is the `httpServer` we created in a previous step.
   server: httpServer,
   // Pass a different path here if your ApolloServer serves at

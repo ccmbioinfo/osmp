@@ -61,8 +61,6 @@ components:
       properties:
         geneName:
           type: string
-        ensemblId:
-          type: string
     Individual:
       properties:
         individualId:

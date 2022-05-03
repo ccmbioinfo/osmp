@@ -37,10 +37,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     },
   } = args;
 
-  // User puts in gene name -> query called fetchAutocomplete takes in 2 inputs: 1 being gene name, the other being assembly. => Returns start and end of that gene => Annotating every variant within that gene
-
-  // Proposed: Query for variants first => variants in coordinate 37 => lift over to 38 => send CADD query for variants with positions in 38
-
   // fetch CADD and data in parallel
   const caddAnnotationsPromise = fetchCaddAnnotations(position, assemblyId);
 
@@ -97,13 +93,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       headers,
     }
   );
-
-  // const jobId = submittedJob.data.job_id;
-
-  // const jobStatus = await slurm.slurmctldGetJob(jobId!, {
-  //   baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/${jobId}`,
-  //   headers
-  // })
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(

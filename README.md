@@ -14,7 +14,7 @@ The front end is a React.js SPA bootstrapped with [create-react-app](https://git
     ```
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn install' react
+    docker-compose run --rm react yarn install
     ```
 - bring up the react app using [docker-compose](https://docs.docker.com/compose/):
 
@@ -37,7 +37,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn install' ssmp-server
+    docker-compose run --rm ssmp-server yarn install
     ```
 - bring up the server using [docker-compose](https://docs.docker.com/compose/):
 
@@ -48,7 +48,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 
 - to run the tests:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn test' ssmp-server
+    docker-compose run --rm ssmp-server yarn test
     ```
 
 ### Connecting to Phenotips
@@ -71,7 +71,7 @@ Apart from Phenotips, another data source for the SSMP development instance is a
 - make sure the `.env` file exists (see above)
 - if this is your first time bringing up the app, install dependencies:
   - ```bash
-    docker-compose run --rm --entrypoint='yarn install' test-node-1
+    docker-compose run --rm test-node-1 yarn install
     ```
 - bring up the server using [docker-compose](https://docs.docker.com/compose/):
 

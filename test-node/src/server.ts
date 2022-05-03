@@ -3,7 +3,6 @@ import { createServer } from 'http';
 import mysql, { RowDataPacket } from 'mysql2/promise';
 import jwt from 'express-jwt';
 import jwks from 'jwks-rsa';
-import Faker from 'faker';
 
 const app = express();
 
@@ -14,7 +13,7 @@ app.use(
   })
 );
 
-//https://manage.auth0.com/dashboard/us/ssmp-dev/apis/611a9d6bdbe7a6003ec01df4/quickstart
+// https://manage.auth0.com/dashboard/us/ssmp-dev/apis/611a9d6bdbe7a6003ec01df4/quickstart
 const jwtCheck = jwt({
   secret: jwks.expressJwtSecret({
     cache: true,
@@ -31,33 +30,29 @@ if (process.env.TEST_NODE_OAUTH_ACTIVE === 'true') {
   app.use(jwtCheck);
 }
 
-const { TEST_DATA_DB_HOST, TEST_DATA_DB_PORT, TEST_DATA_DB_USER, TEST_DATA_DB_PASSWORD, TEST_DATA_DB } =
-  process.env;
+const {
+  TEST_DATA_DB_HOST,
+  TEST_DATA_DB_PORT,
+  TEST_DATA_DB_USER,
+  TEST_DATA_DB_PASSWORD,
+  TEST_DATA_DB,
+} = process.env;
 
 app.get(
   '/data',
   async (
-    {
-      query: { assemblyId, ensemblId, geneName },
-    }: Request<{ assemblyId: string; ensemblId: string; geneName: string }>,
+    { query: { assemblyId, geneName } }: Request<{ assemblyId: string; geneName: string }>,
     res
   ) => {
-    // res.json(createTestQueryResponse(geneName, ensemblId)); // uncomment and comment out 46 to get custom dummy data instead of querying "STAGER-like" databse
-    // res.statusCode = 422;
-    /// return res.json('invalid request');
-    if (!assemblyId || !ensemblId) {
+    if (!assemblyId || !geneName) {
       res.statusCode = 422;
-      return res.json(`invalid request with ${assemblyId} ${ensemblId}`);
+      return res.json(`invalid request (assemblyId: ${assemblyId}, geneName: ${geneName})`);
     } else if (!(assemblyId as string).includes('37')) {
       res.statusCode = 422;
       return res.json('Test node does not have hg38 variants!');
     }
 
-    const result = await getStagerData(
-      geneName as string,
-      ensemblId as string,
-      assemblyId as string
-    );
+    const result = await getStagerData(geneName as string);
 
     if (!result) {
       res.statusCode = 404;
@@ -68,7 +63,7 @@ app.get(
   }
 );
 
-const getStagerData = async (geneName: string, ensemblId: string, assemblyId: string) => {
+const getStagerData = async (geneName: string) => {
   const connection = await mysql.createConnection({
     host: TEST_DATA_DB_HOST,
     user: TEST_DATA_DB_USER,
@@ -77,38 +72,13 @@ const getStagerData = async (geneName: string, ensemblId: string, assemblyId: st
     database: TEST_DATA_DB,
   });
 
-  if (!ensemblId) {
-    try {
-      const [rows] = await connection.execute<RowDataPacket[][]>(
-        'select `ensembl_id` from `gene_alias` where `name` = ? and `kind` = "current_approved_symbol";',
-        [geneName]
-      );
-
-      if (rows.length) {
-        ensemblId = (rows[0] as any).ensembl_id;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      console.error(e);
-      connection.end();
-      return false;
-    }
-  } else if (ensemblId.startsWith('ENS')) {
-    // stager stores its ensids as integers
-    ensemblId = ensemblId.replace(/ENSG0+/, '');
-  }
-
   let result;
 
   try {
     const fetchVariantsSql = `
-    select * from variant v 
-      inner join gene g
-        on v.position between g.start and g.end and v.chromosome = g.chromosome
-      where g.ensembl_id = ?`;
+    select * from variant v where v.gene = ?`;
 
-    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [ensemblId]);
+    const [variants] = await connection.execute<RowDataPacket[]>(fetchVariantsSql, [geneName]);
 
     if (!variants.length) {
       connection.end();
@@ -144,88 +114,8 @@ const getStagerData = async (geneName: string, ensemblId: string, assemblyId: st
   return result;
 };
 
-/* create dummy data -- currently unused */
-export const createTestQueryResponse = (geneName: string, ensemblId: string) => {
-  return Array(50)
-    .fill(null)
-    .map(() => {
-      const individualId = Faker.random.alphaNumeric(10);
-      const bases = ['A', 'T', 'C', 'G'];
-      const end = Faker.datatype.number({ min: 1000000, max: 2000000 });
-      const ref = Faker.helpers.randomize(bases);
-      const alt = Faker.helpers.randomize(bases.filter(b => b !== ref));
-      return {
-        variant: {
-          alt,
-          assemblyId: 'GRCh37',
-          callsets: [
-            {
-              callsetId: Faker.random.alphaNumeric(10),
-              individualId,
-              info: {
-                ad: Faker.datatype.number({ min: 10000, max: 20000 }),
-                dp: Faker.datatype.number({ min: 10000, max: 20000 }),
-                gq: Faker.datatype.number({ min: 1, max: 60 }),
-                qual: Faker.datatype.number({ min: 1, max: 50 }),
-                zygosity: Faker.helpers.randomize(['het', 'het', 'het', 'hom']),
-              },
-            },
-          ],
-          end,
-          info: {
-            aaChanges: `Z[${ref}GC] > Y[${alt}GC]`,
-            cDna: 'sampleCDA value',
-            geneName: geneName || ensemblId || 'GENENAME',
-            gnomadHet: Faker.datatype.float({ min: 0, max: 1, precision: 5 }),
-            gnomadHom: Faker.helpers.randomize([0, 0, 0, 0, 0, 1, 2]),
-            transcript: `ENSTFAKE${Faker.datatype.number({ min: 10000, max: 20000 })}`,
-          },
-          ref,
-          referenceName: '19',
-          start: end - 1,
-        },
-        individual: {
-          datasetId: Faker.random.alphaNumeric(10),
-          diseases: [
-            {
-              ageOfOnset: {
-                age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
-                ageGroup: 'some group',
-              },
-              diseaseId: `ID${Faker.datatype.number(25)}`,
-              description: `Description`,
-            },
-          ],
-          ethnicity: ['eth1', 'eth2', 'eth3'][Faker.datatype.number({ min: 0, max: 2 })],
-          geographicOrigin: Faker.address.country(),
-          individualId,
-          info: {
-            solved: Faker.helpers.randomize(['solved', 'unsolved']),
-            candidateGene: 'SOME_GENE',
-            classifications: 'SOME_CLASSIFICATIONS',
-            diagnosis: 'SOME_DIAGNOSIS',
-          },
-          phenotypicFeatures: [
-            {
-              ageOfOnset: {
-                age: Faker.helpers.randomize([1, 2, 3, 4, 5]),
-                ageGroup: 'some group',
-              },
-              dateOfOnset: Faker.date.past(),
-              levelSeverity: Faker.helpers.randomize(['high', 'moderate', 'low']),
-              onsetType: 'SOME_ONSETTYPE',
-              phenotypeId: 'SOME_PHENOTYPE',
-            },
-          ],
-          sex: Faker.helpers.randomize(['male', 'female']),
-        },
-        contactInfo: Faker.internet.exampleEmail(),
-      };
-    });
-};
-
 const server = createServer(app);
 
 server.listen(3000, () => {
-  console.log(`Test node is running on port 3000!`);
+  console.log('Test node is running on port 3000!');
 });
