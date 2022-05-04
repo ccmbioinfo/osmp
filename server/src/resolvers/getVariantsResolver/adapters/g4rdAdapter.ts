@@ -72,6 +72,10 @@ const getG4rdNodeQuery = async ({
   }
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
   const { position, ...gene } = geneInput;
+  variant.assemblyId = 'GRCh37';
+  // For g4rd node, assemblyId is a required field as specified in this sample request:
+  // https://github.com/ccmbioinfo/report-scripts/blob/master/docs/phenotips-api.md#matching-endpoint
+  // assemblyId is set to be GRCh37 because g4rd node only contains data in assembly GRCh37.
   try {
     G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
       url,
