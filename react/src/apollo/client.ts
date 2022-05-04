@@ -41,7 +41,7 @@ export const buildLink = (token?: string) => {
 
     const wsLink = new GraphQLWsLink(
         createClient({
-            url: `ws://localhost:5862/graphql`, // url error
+            url: `ws://localhost:5862/graphql`,
         })
     );
 
@@ -114,7 +114,7 @@ export const buildLink = (token?: string) => {
         return forward(operation);
     });
 
-    return from([mygeneRestLink, authLink, errorLink, remoteNodeErrorLink, splitLink]);
+    return from([mygeneRestLink, authLink, errorLink, timeoutLink, remoteNodeErrorLink, splitLink]);
 };
 
 export const client = new ApolloClient<any>({

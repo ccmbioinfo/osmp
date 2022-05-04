@@ -69,22 +69,18 @@ app.post('/graphql', keycloak.protect(), async (req, res, next) => {
   try {
     if (req.body.operationName === 'OnSlurmResponse') {
       const slurmResponse = req.body.variables;
-
-      console.log('server response', slurmResponse);
-
       pubsub.publish('SLURM_RESPONSE', { slurmResponse });
-
       res.send({ data: { slurmResponse } });
     } else {
       const grant = (req as any).kauth.grant;
       logger.info(`
-    QUERY SUBMITTED:
-      ${JSON.stringify({
-        userSub: grant.access_token.content.sub,
-        username: grant.access_token.content.preferred_username,
-        issuer: grant.access_token.content.iss,
-        query: req.body.variables,
-      })}`);
+        QUERY SUBMITTED:
+          ${JSON.stringify({
+            userSub: grant.access_token.content.sub,
+            username: grant.access_token.content.preferred_username,
+            issuer: grant.access_token.content.iss,
+            query: req.body.variables,
+          })}`);
       next();
     }
   } catch (err) {
@@ -99,24 +95,17 @@ const httpServer = createServer(app);
 
 // Creating the WebSocket server
 const wsServer = new Server({
-  // This is the `httpServer` we created in a previous step.
   server: httpServer,
-  // Pass a different path here if your ApolloServer serves at
-  // a different path.
   path: '/graphql',
 });
 
-// Save the returned server's info so we can shutdown this server later
 const serverCleanup = useServer({ schema }, wsServer);
 
 const server = new ApolloServer({
   schema,
   plugins: [
-    // Proper shutdown for the HTTP server.
     ApolloServerPluginDrainHttpServer({ httpServer }),
     ApolloServerPluginLandingPageGraphQLPlayground,
-
-    // Proper shutdown for the WebSocket server.
     {
       async serverWillStart() {
         return {
