@@ -116,9 +116,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         data = mergeVariantAnnotations(combinedResults, response.variants);
       }
     }
-
-    // Mutate results on the backend here
-    return { errors, data }
+    // Todo: Mutate results on the backend here
   });
 
   return { errors, data };
