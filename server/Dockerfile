@@ -7,11 +7,10 @@ RUN curl -f -L -O https://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/liftOve
     gunzip ./hg19ToHg38.over.chain.gz && \
     chmod +x ./liftOver
 
-# Development image 
+# Development image. Note that libcurl4 is a dependency of liftOver.
 FROM node:16-slim AS dev
-WORKDIR /usr/src/app
-COPY --from=download /var/tmp/liftOver /usr/local/bin 
 RUN  apt-get update && apt-get install -y libcurl4 && rm -rf /var/lib/apt/lists/*
+COPY --from=download /var/tmp/liftOver /usr/local/bin 
 COPY --from=download --chown=node:node /var/tmp/*.over.chain /home/node/
 
 # This layer is shared between the builder and production stages
