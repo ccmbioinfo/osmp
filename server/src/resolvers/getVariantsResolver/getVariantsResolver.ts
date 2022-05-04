@@ -14,7 +14,6 @@ import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 import { SlurmApi, Configuration } from '../../slurm';
-
 import { pubsub } from '../../pubsub';
 import { mergeVariantAnnotations } from './adapters/slurmAdapter';
 
@@ -97,16 +96,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   );
 
-  let data;
-
-  pubsub.subscribe('SLURM_RESPONSE', (...args) => {
-    if (args.length > 0) {
-      const response = args[0].slurmResponse;
-      if (response.jobId === slurmJob.data.job_id) {
-        data = mergeVariantAnnotations(combinedResults, response.variants);
-      }
-    }
-  });
+  let data: VariantQueryDataResult[] = [];
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(
@@ -118,6 +108,18 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   }
 
   data = await annotateGnomad(data ?? combinedResults);
+
+  pubsub.subscribe('SLURM_RESPONSE', (...args) => {
+    if (args.length > 0) {
+      const response = args[0].slurmResponse;
+      if (response.jobId === slurmJob.data.job_id) {
+        data = mergeVariantAnnotations(combinedResults, response.variants);
+      }
+    }
+
+    // Mutate results on the backend here
+    return { errors, data }
+  });
 
   return { errors, data };
 };
