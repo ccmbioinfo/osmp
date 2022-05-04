@@ -133,14 +133,32 @@ export default gql`
   }
 
   type Subscription {
-    slurmResponse(input: TestId): TestResponse
+    slurmResponse: SlurmJobResponse!
   }
 
-  input TestId {
-    id: Int
+  type SlurmJobResponse {
+    variants: [SlurmVariantResponse]!
+    jobId: Int!
   }
 
-  type TestResponse {
-    id: Int
+  type SlurmVariantResponse {
+    start: Int!
+    end: Int!
+    referenceName: String!
+    ref: String!
+    alt: String!
+    Consequence: String
+    oAA: String
+    nAA: String
+    FeatureID: String
+    cDNApos: String
+    protPos: String
+    nhomalt: String
+    an: String
+    af: String
+    filter: String
+    transcript: String
+    cdna: String
+    amino_acids: String
   }
 `;

@@ -79,7 +79,6 @@ export const buildLink = (token?: string) => {
     });
 
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
-        console.log(response);
 
         const { dispatch } = operation.getContext();
         const sources = operation.variables.input.sources;

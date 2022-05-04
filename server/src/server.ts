@@ -68,12 +68,13 @@ app.use(express.json());
 app.post('/graphql', keycloak.protect(), async (req, res, next) => {
   try {
     if (req.body.operationName === 'OnSlurmResponse') {
-      const { id } = req.body.variables;
+      const slurmResponse = req.body.variables;
 
-      console.log(pubsub);
-      pubsub.publish('SLURM_RESPONSE', { slurmResponse: { id } });
+      console.log('server response', slurmResponse);
 
-      res.send({ data: { slurmResponse: { id } } });
+      pubsub.publish('SLURM_RESPONSE', { slurmResponse });
+
+      res.send({ data: { slurmResponse } });
     } else {
       const grant = (req as any).kauth.grant;
       logger.info(`
@@ -127,41 +128,6 @@ const server = new ApolloServer({
     },
   ],
 });
-
-// const startServer = async () => {
-//   const apolloServer = new ApolloServer({
-//     schema,
-
-//     context: ({ req, res, pubsub }: any) => ({ req, res, pubsub }),
-
-//     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
-//   });
-//   await apolloServer.start();
-
-//   apolloServer.applyMiddleware({ app });
-//   // dev only! --> https://www.apollographql.com/docs/apollo-server/data/subscriptions/#operation-context
-//   SubscriptionServer.create(
-//     {
-//       schema,
-//       execute,
-//       subscribe,
-//       onOperation: (message: any, params: any) => {
-//         console.log(message, params)
-//         params.schema = schema;
-//         return params;
-//       },
-//     },
-//     {
-//       server: httpServer,
-//       path: apolloServer.graphqlPath,
-//     }
-//   );
-
-//   ['SIGINT', 'SIGTERM'].forEach(() => {
-//     // this will interfere with hot-reloading without additional handling
-//     // process.on(signal, () => subscriptionServer.close());
-//   });
-// };
 
 const startServer = async () => {
   await server.start();

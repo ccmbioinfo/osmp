@@ -1,11 +1,31 @@
 import { gql } from '@apollo/react-hooks';
-import { TestId } from '../../types';
+import { SlurmVariantResponse } from '../../types';
 import { useApolloSubscription } from '../client';
 
 const fetchSlurmSubscription = gql`
     subscription OnSlurmResponse {
         slurmResponse {
-            id
+            jobId 
+            variants {
+                start
+                end
+                referenceName
+                ref
+                alt
+                Consequence
+                oAA
+                nAA
+                FeatureID
+                cDNApos
+                protPos
+                nhomalt
+                an
+                af
+                filter
+                transcript
+                cdna
+                amino_acids
+            }
         }
     }
 `;
@@ -13,11 +33,10 @@ const fetchSlurmSubscription = gql`
 const useSlurmSubscription = () =>
     useApolloSubscription<
         {
-            slurmResponse: {
-                id: number;
-            };
+            jobId: number,
+            variants: SlurmVariantResponse[]
         },
-        TestId
+        {}
     >(fetchSlurmSubscription, {});
 
 export default useSlurmSubscription;

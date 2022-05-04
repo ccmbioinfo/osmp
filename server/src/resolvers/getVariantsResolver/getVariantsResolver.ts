@@ -15,11 +15,8 @@ import annotateGnomad from './utils/annotateGnomad';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 import { SlurmApi, Configuration } from '../../slurm';
 
-const slurm = new SlurmApi(
-  new Configuration({
-    basePath: process.env.SLURM_ENDPOINT!,
-  })
-);
+import { pubsub } from '../../pubsub';
+import { mergeVariantAnnotations } from './adapters/slurmAdapter';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -73,33 +70,48 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
+  const slurm = new SlurmApi(
+    new Configuration({
+      basePath: process.env.SLURM_ENDPOINT!,
+    })
+  );
+
   const headers = {
     'X-SLURM-USER-NAME': process.env.SLURM_USER!,
     'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
   };
 
   // Send dummy hello world
-  await slurm.slurmctldSubmitJob(
+  const slurmJob = await slurm.slurmctldSubmitJob(
     {
-      script: '#!/bin/bash\ncat /home/giabaohan/annotated.json',
+      script: '#!/bin/bash\necho Hello World!',
       job: {
         environment: {},
-        current_working_directory: `/home/${process.env.SLURM_USER}`,
-        standard_output: '2>&1',
+        current_working_directory: `/home/giabaohan`,
+        standard_output: 'test.out',
       },
     },
     {
-      baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37/job/submit`,
+      url: `${process.env.SLURM_ENDPOINT}/slurm/v0.0.37/job/submit`,
       headers,
     }
   );
+
+  let data;
+
+  pubsub.subscribe('SLURM_RESPONSE', (...args) => {
+    if (args.length > 0) {
+      const response = args[0].slurmResponse;
+      if (response.jobId === slurmJob.data.job_id) {
+        data = mergeVariantAnnotations(combinedResults, response.variants);
+      }
+    }
+  });
 
   // once variants are merged, handle annotations
   const caddAannotations = settled.find(
     res => res.status === 'fulfilled' && !isVariantQuery(res.value)
   ) as PromiseFulfilledResult<CADDAnnotationQueryResponse>;
-
-  let data;
 
   if (!!caddAannotations && !caddAannotations.value.error) {
     data = annotateCadd(combinedResults, caddAannotations.value.data);
