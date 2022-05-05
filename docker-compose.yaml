@@ -22,7 +22,6 @@ services:
       context: server
       target: dev
     image: ghcr.io/ccmbioinfo/ssmp:dev
-    working_dir: /usr/src/app
     init: true
     command: yarn start
     ports:
