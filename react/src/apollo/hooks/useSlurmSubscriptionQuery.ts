@@ -5,7 +5,7 @@ import { useApolloSubscription } from '../client';
 const fetchSlurmSubscription = gql`
     subscription OnSlurmResponse {
         slurmResponse {
-            jobId 
+            jobId
             variants {
                 start
                 end
@@ -33,8 +33,8 @@ const fetchSlurmSubscription = gql`
 const useSlurmSubscription = () =>
     useApolloSubscription<
         {
-            jobId: number,
-            variants: SlurmVariantResponse[]
+            jobId: number;
+            variants: SlurmVariantResponse[];
         },
         {}
     >(fetchSlurmSubscription, {});

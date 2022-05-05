@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
-import { useFetchVariantsQuery } from '../apollo/hooks';
+import { useFetchVariantsQuery, useFetchVariantsSubscription } from '../apollo/hooks';
 import {
     Background,
     Body,
@@ -25,7 +25,7 @@ import { IconPadder } from '../components/Table/Table.styles';
 import SOURCES from '../constants/sources';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
-import { AssemblyId } from '../types';
+import { AssemblyId, VariantQueryDataResult } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
@@ -90,6 +90,10 @@ const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
     </ErrorWrapper>
 );
 const VariantQueryPage: React.FC<{}> = () => {
+    const [variants, setVariants] = useState<Array<VariantQueryDataResult> | undefined>(undefined)
+
+    console.log(variants)
+
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
@@ -118,6 +122,22 @@ const VariantQueryPage: React.FC<{}> = () => {
         } as const);
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
+
+    const { data: subscriptionData, loading: subscriptionLoading } = useFetchVariantsSubscription();
+
+    console.log(data, subscriptionData);
+
+    useEffect(() => {
+        if (data) {
+            setVariants(data.getVariants.data);
+        }
+    }, [data])
+
+    useEffect(() => {
+        if (subscriptionData) {
+            setVariants(subscriptionData.getVariantsSubscription.data);
+        }
+    }, [subscriptionData])
 
     const { state: errorState, dispatch } = useErrorContext();
 
@@ -279,7 +299,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         }}
                     />
                 ))}
-            {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
+            {variants ? <Table variantData={variants} /> : null}
         </Body>
     );
 };

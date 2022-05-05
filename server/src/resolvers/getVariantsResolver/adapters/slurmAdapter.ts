@@ -9,8 +9,6 @@ export const mergeVariantAnnotations = (
   variants: SlurmVariantResponse[]
 ): VariantQueryDataResult[] => {
   const annotationMap: { [x: string]: SlurmVariantResponse } = {};
-
-  console.log(variants);
   variants.forEach(v => {
     const coordinate = `${v.referenceName}:${v.start}-${v.end}-${v.alt}-${v.ref}`;
     if (!(coordinate in annotationMap)) {

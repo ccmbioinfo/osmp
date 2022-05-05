@@ -133,6 +133,10 @@ export default gql`
   }
 
   type Subscription {
+    getVariantsSubscription: VariantQueryResponse!
+  }
+
+  type Subscription {
     slurmResponse: SlurmJobResponse!
   }
 

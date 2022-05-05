@@ -115,24 +115,24 @@ export interface TestId {
 }
 
 export interface SlurmVariantResponse {
-    start: number,
-    end: number,
-    referenceName: string,
-    ref: string,
-    alt: string,
-    Consequence: string,
-    oAA: string,
-    nAA: string,
-    FeatureID: string,
-    cDNApos: string,
-    protPos: string,
-    nhomalt: string,
-    an: string,
-    af: string,
-    filter: string,
-    transcript: string,
-    cdna: string,
-    amino_acids: string
+    start: number;
+    end: number;
+    referenceName: string;
+    ref: string;
+    alt: string;
+    Consequence: string;
+    oAA: string;
+    nAA: string;
+    FeatureID: string;
+    cDNApos: string;
+    protPos: string;
+    nhomalt: string;
+    an: string;
+    af: string;
+    filter: string;
+    transcript: string;
+    cdna: string;
+    amino_acids: string;
 }
 
 /* end graphql schema types */

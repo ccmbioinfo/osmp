@@ -9,6 +9,9 @@ const resolvers = {
     slurmResponse: {
       subscribe: () => pubsub.asyncIterator(['SLURM_RESPONSE']),
     },
+    getVariantsSubscription: {
+      subscribe: () => pubsub.asyncIterator(['VARIANTS_SUBSCRIPTION']),
+    },
   },
 };
 

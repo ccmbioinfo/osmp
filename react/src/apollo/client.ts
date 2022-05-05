@@ -79,9 +79,8 @@ export const buildLink = (token?: string) => {
     });
 
     const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
-
         const { dispatch } = operation.getContext();
-        const sources = operation.variables.input.sources;
+        const sources = operation.variables.input.sources || [];
 
         if (graphQLErrors) {
             graphQLErrors.forEach(graphQLError => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import logger from '../../logger';
 import {
   CADDAnnotationQueryResponse,
@@ -69,56 +70,62 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
-  const slurm = new SlurmApi(
-    new Configuration({
-      basePath: process.env.SLURM_ENDPOINT!,
-    })
-  );
-
-  const headers = {
-    'X-SLURM-USER-NAME': process.env.SLURM_USER!,
-    'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
-  };
-
-  // Send dummy hello world
-  const slurmJob = await slurm.slurmctldSubmitJob(
-    {
-      script: '#!/bin/bash\necho Hello World!',
-      job: {
-        environment: {},
-        current_working_directory: `/home/giabaohan`,
-        standard_output: 'test.out',
-      },
-    },
-    {
-      url: `${process.env.SLURM_ENDPOINT}/slurm/v0.0.37/job/submit`,
-      headers,
-    }
-  );
-
   let data: VariantQueryDataResult[] = [];
 
+  const start = position.split(':')[1].split('-')[0];
+  const end = position.split(':')[1].split('-')[1];
+
   // once variants are merged, handle annotations
-  const caddAannotations = settled.find(
-    res => res.status === 'fulfilled' && !isVariantQuery(res.value)
-  ) as PromiseFulfilledResult<CADDAnnotationQueryResponse>;
+  if (Number(end) - Number(start) < 600000) {
+    const slurm = new SlurmApi(
+      new Configuration({
+        basePath: process.env.SLURM_ENDPOINT!,
+      })
+    );
 
-  if (!!caddAannotations && !caddAannotations.value.error) {
-    data = annotateCadd(combinedResults, caddAannotations.value.data);
-  }
+    const headers = {
+      'X-SLURM-USER-NAME': process.env.SLURM_USER!,
+      'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
+    };
 
-  data = await annotateGnomad(data ?? combinedResults);
-
-  pubsub.subscribe('SLURM_RESPONSE', (...args) => {
-    if (args.length > 0) {
-      const response = args[0].slurmResponse;
-      if (response.jobId === slurmJob.data.job_id) {
-        data = mergeVariantAnnotations(combinedResults, response.variants);
+    // Send dummy hello world
+    const slurmJob = await slurm.slurmctldSubmitJob(
+      {
+        script: '#!/bin/bash\necho Hello World!',
+        job: {
+          environment: {},
+          current_working_directory: `/home/giabaohan`,
+          standard_output: 'test.out',
+        },
+      },
+      {
+        url: `${process.env.SLURM_ENDPOINT}/slurm/v0.0.37/job/submit`,
+        headers,
       }
-    }
-    // Todo: Mutate results on the backend here
-  });
+    );
 
+    console.log(slurmJob);
+
+    pubsub.subscribe('SLURM_RESPONSE', (...args) => {
+      if (args.length > 0) {
+        const response = args[0].slurmResponse;
+        // if (response.jobId === slurmJob.data.job_id) {
+        data = mergeVariantAnnotations(combinedResults, response.variants);
+        pubsub.publish('VARIANTS_SUBSCRIPTION', { getVariantsSubscription: { errors, data } });
+        // }
+      }
+    });
+  } else {
+    const caddAannotations = settled.find(
+      res => res.status === 'fulfilled' && !isVariantQuery(res.value)
+    ) as PromiseFulfilledResult<CADDAnnotationQueryResponse>;
+
+    if (!!caddAannotations && !caddAannotations.value.error) {
+      data = annotateCadd(combinedResults, caddAannotations.value.data);
+    }
+
+    data = await annotateGnomad(data ?? combinedResults);
+  }
   return { errors, data };
 };
 
