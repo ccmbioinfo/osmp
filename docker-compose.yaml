@@ -22,6 +22,7 @@ services:
       context: server
       target: dev
     image: ghcr.io/ccmbioinfo/ssmp:dev
+    working_dir: /usr/src/app
     init: true
     command: yarn start
     ports:
@@ -85,8 +86,8 @@ services:
       MYSQL_USER: "${TEST_DATA_DB_USER}"
       MYSQL_PASSWORD: "${TEST_DATA_DB_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
-    ports: 
-      - ${TEST_DATA_DB_PORT}:3306 
+    ports:
+      - ${TEST_DATA_DB_PORT}:3306
     volumes:
       - ${TEST_DATA_DATA_VOLUME}:/var/lib/mysql
   keycloak:
