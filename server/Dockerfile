@@ -12,10 +12,10 @@ FROM node:16-slim AS dev
 RUN  apt-get update && apt-get install -y libcurl4 && rm -rf /var/lib/apt/lists/*
 COPY --from=download /var/tmp/liftOver /usr/local/bin 
 COPY --from=download --chown=node:node /var/tmp/*.over.chain /home/node/
+WORKDIR /usr/src/app
 
 # This layer is shared between the builder and production stages
 FROM dev AS base
-WORKDIR /usr/src/app
 COPY package*.json yarn.lock ./
 RUN yarn --prod
 
