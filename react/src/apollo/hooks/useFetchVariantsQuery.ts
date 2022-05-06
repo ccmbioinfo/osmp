@@ -9,6 +9,7 @@ const fetchVariantsQuery = gql`
                 variant {
                     alt
                     assemblyId
+                    assemblyIdCurrent
                     callsets {
                         callsetId
                         individualId
