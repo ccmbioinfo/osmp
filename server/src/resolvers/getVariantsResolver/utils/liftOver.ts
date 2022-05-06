@@ -11,14 +11,14 @@ const createTmpFile = async () => {
   return path.join(dir, filename);
 };
 
-// Get all the start positions of lifted variants.
+// Get start positions of lifted variants.
 const parseBedStart = (bed: String) =>
   bed
     .split('\n')
     .filter(l => !!l && !l.startsWith('#'))
     .map(v => v.split('\t')[1]);
 
-// Get all the end positions of lifted variants.
+// Get end positions of lifted variants.
 const parseBedEnd = (bed: String) =>
   bed
     .split('\n')

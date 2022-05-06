@@ -85,7 +85,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     dataForAnnotation = liftoverResults.dataForAnnotation;
     annotationPosition = liftoverResults.annotationPosition;
   }
-  
+
   // Cadd annotations for data in user requested assemblyId
   let data: VariantQueryDataResult[] = [];
   const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
@@ -101,6 +101,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   // gnomAD annotations TODO: gnomAD annotations for GRCh38 are not available yet.
   data = await annotateGnomad(data ?? dataForAnnotation);
 
+  // return unmapped variants if there's any
   if (unliftedVariants.length) {
     data = data.concat(unliftedVariants);
   }
