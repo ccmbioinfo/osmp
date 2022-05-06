@@ -162,7 +162,18 @@ export const prepareData = (
             result.push.apply(
                 result,
                 d.variant.callsets
-                    .filter(cs => cs.individualId === d.individual.individualId)
+                    .filter(cs => {
+                        if (cs.individualId === d.individual.individualId) {
+                            if (isHeterozygous(cs.info.zygosity)) {
+                                currHeterozygousCount += 1;
+                            } else if (isHomozygous(cs.info.zygosity)) {
+                                currHomozygousCount += 1;
+                            }
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
                     .map(cs =>
                         addAdditionalFieldsAndFormatNulls(
                             {
@@ -173,18 +184,10 @@ export const prepareData = (
                         )
                     )
             );
-            currRowId += 1;
-            d.variant.callsets.forEach(cs =>
-                isHeterozygous(cs.info.zygosity)
-                    ? (currHeterozygousCount += 1)
-                    : isHomozygous(cs.info.zygosity)
-                    ? (currHomozygousCount += 1)
-                    : {}
-            );
         } else {
             result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), currUniqueId));
-            currRowId += 1;
         }
+        currRowId += 1;
     });
     result.slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId).forEach(row => {
         row.homozygousCount = currHomozygousCount;
