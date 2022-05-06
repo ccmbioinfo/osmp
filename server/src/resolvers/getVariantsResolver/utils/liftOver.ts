@@ -1,14 +1,13 @@
+import { promises } from 'fs';
+import { tmpdir } from 'os';
+import * as path from 'path';
 import { AssemblyId, VariantQueryDataResult } from '../../../types';
 import resolveAssembly from '../utils/resolveAssembly';
-const fs = require('fs/promises');
-const tmpdir = require('os').tmpdir;
-const path = require('path');
-const promiseExec = require('util').promisify(require('child_process').exec);
+const exec = require('util').promisify(require('child_process').exec);
 
 const createTmpFile = async () => {
-  const filename = Math.random().toString(36).slice(2);
-  const dir = await fs.mkdtemp(path.join(tmpdir(), 'liftover-'));
-  return path.join(dir, filename);
+  const dir = await promises.mkdtemp(path.join(tmpdir(), 'liftover-'));
+  return path.join(dir, 'temp');
 };
 
 // Get start positions of lifted variants.
@@ -38,7 +37,7 @@ const liftover = async (
   const lifted = await createTmpFile();
   const unlifted = await createTmpFile();
   const bedfile = await createTmpFile();
-  await fs.writeFile(bedfile, bedstring);
+  await promises.writeFile(bedfile, bedstring);
 
   let chain: string;
   if (assemblyIdInput === 'GRCh37') {
@@ -46,9 +45,9 @@ const liftover = async (
   } else {
     chain = '/home/node/hg19ToHg38.over.chain';
   }
-  await promiseExec(`liftOver ${bedfile} ${chain} ${lifted} ${unlifted}`);
-  const _liftedVars = await fs.readFile(lifted);
-  const _unliftedVars = await fs.readFile(unlifted);
+  await exec(`liftOver ${bedfile} ${chain} ${lifted} ${unlifted}`);
+  const _liftedVars = await promises.readFile(lifted);
+  const _unliftedVars = await promises.readFile(unlifted);
   const liftedVars = parseBedStart(_liftedVars.toString());
   const unliftedVars = parseBedStart(_unliftedVars.toString());
   const liftedVarsEnd = parseBedEnd(_liftedVars.toString());
@@ -86,6 +85,10 @@ const liftover = async (
     }
   });
   const annotationPosition = `${dataForAnnotation[0].variant.referenceName}:${geneStart}-${geneEnd}`;
+
+  promises.rm(lifted);
+  promises.rm(unlifted);
+  promises.rm(bedfile);
 
   return { dataForAnnotation, unliftedVariants, annotationPosition };
 };
