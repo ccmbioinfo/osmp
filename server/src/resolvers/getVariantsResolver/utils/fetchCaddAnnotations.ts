@@ -29,10 +29,18 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
   const indexPath = resolvedAssemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
 
   const nodeFetch = fetch as Fetcher;
-  const tbiIndexed = new TabixIndexedFile({
-    filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
-    csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
-  });
+  let tbiIndexed: TabixIndexedFile;
+  if (resolvedAssemblyId === 'GRCh37') {
+    tbiIndexed = new TabixIndexedFile({
+      filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
+      csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
+    });
+  } else {
+    tbiIndexed = new TabixIndexedFile({
+      filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
+      tbiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
+    });
+  }
 
   const { chromosome, start, end } = resolveChromosome(position);
 
