@@ -2,9 +2,9 @@ import { gql } from '@apollo/react-hooks';
 import { CombinedVariantQueryResponse } from '../../types';
 import { useApolloSubscription } from '../client';
 
-const fetchVariantsSubscription = gql`
-    subscription GetVariantsSubscription {
-        getVariantsSubscription {
+export const fetchVariantsSubscription = gql`
+    subscription GetVariantsSubscription($id: String!) {
+        getVariantsSubscription(id: $id) {
             data {
                 variant {
                     alt

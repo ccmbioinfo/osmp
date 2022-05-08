@@ -2,7 +2,7 @@ import { gql } from '@apollo/react-hooks';
 import { SlurmVariantResponse } from '../../types';
 import { useApolloSubscription } from '../client';
 
-const fetchSlurmSubscription = gql`
+export const fetchSlurmSubscription = gql`
     subscription OnSlurmResponse {
         slurmResponse {
             jobId

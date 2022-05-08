@@ -133,7 +133,7 @@ export default gql`
   }
 
   type Subscription {
-    getVariantsSubscription: VariantQueryResponse!
+    getVariantsSubscription(id: String!): VariantQueryResponse!
   }
 
   type Subscription {

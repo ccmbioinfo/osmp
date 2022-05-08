@@ -145,7 +145,8 @@ export const useApolloSubscription = <T, V>(
 
     return useSubscription<T, V>(subscription, {
         client,
-        fetchPolicy: 'network-only',
+        shouldResubscribe: true,
+        fetchPolicy: 'no-cache',
         context: { dispatch },
         ...options,
     });

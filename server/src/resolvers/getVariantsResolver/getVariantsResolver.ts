@@ -104,10 +104,13 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       }
     );
 
-    console.log(slurmJob);
+    console.log(slurmJob.data.job_id);
 
     pubsub.subscribe('SLURM_RESPONSE', (...args) => {
       if (args.length > 0) {
+        pubsub.subscribe('VARIANTS_SUBSCRIPTION', (...args) => {
+          console.log('variants subscription', args);
+        });
         const response = args[0].slurmResponse;
         // if (response.jobId === slurmJob.data.job_id) {
         data = mergeVariantAnnotations(combinedResults, response.variants);
@@ -115,6 +118,8 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         // }
       }
     });
+
+    return { errors, data };
   } else {
     const caddAannotations = settled.find(
       res => res.status === 'fulfilled' && !isVariantQuery(res.value)
@@ -125,8 +130,8 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
 
     data = await annotateGnomad(data ?? combinedResults);
+    return { errors, data };
   }
-  return { errors, data };
 };
 
 const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {

@@ -27,6 +27,8 @@ import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId, VariantQueryDataResult } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
+import { fetchVariantsSubscription } from '../apollo/hooks/useFetchVariantsSubscription';
+import { useSubscription } from '@apollo/client';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
@@ -90,9 +92,11 @@ const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
     </ErrorWrapper>
 );
 const VariantQueryPage: React.FC<{}> = () => {
-    const [variants, setVariants] = useState<Array<VariantQueryDataResult> | undefined>(undefined)
+    const [variants, setVariants] = useState<Array<VariantQueryDataResult> | undefined>(undefined);
+    const [searchLoading, setSearchLoading] = useState<boolean>(false);
+    const [queryType, setQueryType] = useState<'slurm' | 'osmp'>('osmp');
 
-    console.log(variants)
+    const [id, setId] = useState<string>('');
 
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
@@ -123,25 +127,35 @@ const VariantQueryPage: React.FC<{}> = () => {
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
 
-    const { data: subscriptionData, loading: subscriptionLoading } = useFetchVariantsSubscription();
+    const { data: subscriptionData, loading: subscriptionLoading } = useSubscription(
+        fetchVariantsSubscription,
+        { variables: { id } }
+    );
 
-    console.log(data, subscriptionData);
+    console.log(subscriptionData, subscriptionLoading);
+
+    console.log(data, loading);
 
     useEffect(() => {
-        if (data) {
-            setVariants(data.getVariants.data);
+        switch (queryType) {
+            case 'osmp': {
+                setVariants(data?.getVariants.data);
+                setSearchLoading(loading);
+                break;
+            }
+            case 'slurm': {
+                setVariants(subscriptionData?.getVariantsSubscription.data);
+                setSearchLoading(subscriptionLoading);
+                break;
+            }
         }
-    }, [data])
-
-    useEffect(() => {
-        if (subscriptionData) {
-            setVariants(subscriptionData.getVariantsSubscription.data);
-        }
-    }, [subscriptionData])
+    }, [data, subscriptionData, loading, subscriptionLoading, queryType]);
 
     const { state: errorState, dispatch } = useErrorContext();
 
     const client = useApolloClient();
+
+    console.log(client);
 
     const clearCache = () => {
         const cache = client.cache;
@@ -269,7 +283,17 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             onClick={() => {
                                 clearAllErrors();
-                                fetchVariants({ variables: getArgs() });
+                                const variables = getArgs();
+                                fetchVariants({ variables });
+                                setVariants(undefined);
+                                setId(Math.random().toString());
+                                const position = variables.input.gene.position;
+                                const [start, end] = position.split(':')[1].split('-');
+                                if (Number(end) - Number(start) < 600000) {
+                                    setQueryType('slurm');
+                                } else {
+                                    setQueryType('osmp');
+                                }
                             }}
                             variant="primary"
                         >
@@ -283,7 +307,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         >
                             Clear
                         </Button>
-                        <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
+                        <Column justifyContent="flex-start">{searchLoading && <Spinner />}</Column>
                     </ButtonWrapper>
                 </Flex>
             </Background>
