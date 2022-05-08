@@ -132,10 +132,6 @@ const VariantQueryPage: React.FC<{}> = () => {
         { variables: { id } }
     );
 
-    console.log(subscriptionData, subscriptionLoading);
-
-    console.log(data, loading);
-
     useEffect(() => {
         switch (queryType) {
             case 'osmp': {
@@ -154,8 +150,6 @@ const VariantQueryPage: React.FC<{}> = () => {
     const { state: errorState, dispatch } = useErrorContext();
 
     const client = useApolloClient();
-
-    console.log(client);
 
     const clearCache = () => {
         const cache = client.cache;
@@ -289,7 +283,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 setId(Math.random().toString());
                                 const position = variables.input.gene.position;
                                 const [start, end] = position.split(':')[1].split('-');
-                                if (Number(end) - Number(start) < 600000) {
+                                if (Number(end) - Number(start) > 600000) {
                                     setQueryType('slurm');
                                 } else {
                                     setQueryType('osmp');

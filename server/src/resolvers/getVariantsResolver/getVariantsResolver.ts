@@ -76,7 +76,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const end = position.split(':')[1].split('-')[1];
 
   // once variants are merged, handle annotations
-  if (Number(end) - Number(start) < 600000) {
+  if (Number(end) - Number(start) > 600000) {
     const slurm = new SlurmApi(
       new Configuration({
         basePath: process.env.SLURM_ENDPOINT!,

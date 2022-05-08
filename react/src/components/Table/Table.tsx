@@ -79,8 +79,6 @@ const resolveSex = (sexPhenotype: string) => {
 };
 
 const Table: React.FC<TableProps> = ({ variantData }) => {
-    console.log('variant table data', variantData);
-
     const [tableData, uniqueVariantIndices] = useMemo(
         () => prepareData(variantData),
         [variantData]
