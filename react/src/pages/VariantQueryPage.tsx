@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useApolloClient } from '@apollo/client';
+import { useSubscription } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
-import { useFetchVariantsQuery, useFetchVariantsSubscription } from '../apollo/hooks';
+import { useFetchVariantsQuery } from '../apollo/hooks';
+import { fetchVariantsSubscription } from '../apollo/hooks/useFetchVariantsSubscription';
 import {
     Background,
     Body,
@@ -27,8 +29,6 @@ import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId, VariantQueryDataResult } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
-import { fetchVariantsSubscription } from '../apollo/hooks/useFetchVariantsSubscription';
-import { useSubscription } from '@apollo/client';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
