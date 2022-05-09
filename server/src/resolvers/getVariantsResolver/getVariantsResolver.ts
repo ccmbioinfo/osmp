@@ -81,9 +81,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   // perform liftOver if needed
   if (dataForLiftover.length) {
     const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
-    unliftedVariants = liftoverResults.unliftedVariants;
-    dataForAnnotation = liftoverResults.dataForAnnotation;
-    annotationPosition = liftoverResults.annotationPosition;
+    ({ unliftedVariants, dataForAnnotation, annotationPosition } = liftoverResults);
   }
 
   // Cadd annotations for data in user requested assemblyId
