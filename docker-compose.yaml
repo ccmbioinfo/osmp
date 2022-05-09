@@ -18,9 +18,10 @@ services:
       REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
       REACT_APP_SOURCE_LIST:
   ssmp-server:
-    image: node:16-slim
-    user: node
-    working_dir: /usr/src/app
+    build:
+      context: server
+      target: dev
+    image: ghcr.io/ccmbioinfo/ssmp:dev
     init: true
     command: yarn start
     ports:
@@ -87,8 +88,8 @@ services:
       MYSQL_USER: "${TEST_DATA_DB_USER}"
       MYSQL_PASSWORD: "${TEST_DATA_DB_PASSWORD}"
       MYSQL_ROOT_PASSWORD: "${TEST_DATA_DB_ROOT_PASSWORD}"
-    ports: 
-      - ${TEST_DATA_DB_PORT}:3306 
+    ports:
+      - ${TEST_DATA_DB_PORT}:3306
     volumes:
       - ${TEST_DATA_DATA_VOLUME}:/var/lib/mysql
   keycloak:
