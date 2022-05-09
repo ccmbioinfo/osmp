@@ -13,7 +13,6 @@ import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
 import liftover from './utils/liftOver';
-import resolveAssembly from './utils/resolveAssembly';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
@@ -70,8 +69,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const dataForLiftover = combinedResults.filter(v => v.variant.assemblyId !== assemblyId);
   // filter data that are already in user requested assemlbyId
   let dataForAnnotation = combinedResults.filter(v => {
-    if (resolveAssembly(v.variant.assemblyId) === assemblyId) {
-      v.variant.assemblyId = assemblyId;
+    if (v.variant.assemblyId === assemblyId) {
       v.variant.assemblyIdCurrent = assemblyId;
       return true;
     } else return false;
@@ -97,7 +95,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   }
 
   // gnomAD annotations TODO: gnomAD annotations for GRCh38 are not available yet.
-  if (assemblyId === 'GRCh37'){
+  if (assemblyId === 'GRCh37') {
     data = await annotateGnomad(data ?? dataForAnnotation);
   }
 

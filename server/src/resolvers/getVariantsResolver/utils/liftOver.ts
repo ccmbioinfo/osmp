@@ -2,7 +2,6 @@ import { promises } from 'fs';
 import { tmpdir } from 'os';
 import * as path from 'path';
 import { AssemblyId, VariantQueryDataResult } from '../../../types';
-import resolveAssembly from '../utils/resolveAssembly';
 const exec = require('util').promisify(require('child_process').exec);
 
 const createTmpFile = async () => {
@@ -61,13 +60,11 @@ const liftover = async (
   // Merge lifted variants with dataForAnnotation. Filter unmapped variants.
   dataForLiftover.forEach((v, i) => {
     if (unliftedMap[(v.variant.start - 1).toString()]) {
-      v.variant.assemblyId = resolveAssembly(v.variant.assemblyId);
       v.variant.assemblyIdCurrent = v.variant.assemblyId;
       unliftedVariants.push(v);
     } else {
       v.variant.start = Number(liftedVars[i]) + 1; // Convert from BED format to position format.
       v.variant.end = Number(liftedVarsEnd[i]);
-      v.variant.assemblyId = resolveAssembly(v.variant.assemblyId);
       v.variant.assemblyIdCurrent = assemblyIdInput;
       dataForAnnotation.push(v);
     }

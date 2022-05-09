@@ -15,6 +15,7 @@ import {
   IndividualInfoFields,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
+import resolveAssembly from '../utils/resolveAssembly';
 
 /* eslint-disable camelcase */
 
@@ -181,6 +182,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
 
   return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
+    r.variant.assemblyId = resolveAssembly(r.variant.assemblyId);
     const { chromosome, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
 
