@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
-  af?: Maybe<number>;
+  af?: Maybe<number | string>;
   aaAlt?: Maybe<string>;
   aaPos?: Maybe<string>;
   aaRef?: Maybe<string>;
@@ -10,7 +10,7 @@ export interface VariantResponseInfoFields {
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
   gnomadHet?: Maybe<string>;
-  gnomadHom?: Maybe<number>;
+  gnomadHom?: Maybe<number | string>;
   transcript?: Maybe<string>;
 }
 
@@ -228,3 +228,35 @@ export enum Assembly {
   GRCh38 = 38,
   hg38 = 38,
 }
+
+/* start of Slurm response */
+
+export interface SlurmVariantResponse {
+  start: number;
+  end: number;
+  referenceName: string;
+  ref: string;
+  alt: string;
+  Consequence: string;
+  oAA: string;
+  nAA: string;
+  FeatureID: string;
+  cDNApos: string;
+  protPos: string;
+  nhomalt: string;
+  an: string;
+  af: string;
+  filter: string;
+  transcript: string;
+  cdna: string;
+  amino_acids: string;
+}
+
+export interface SlurmJobResponse {
+  slurmResponse: {
+    jobId: Number;
+    variants: SlurmVariantResponse;
+  };
+}
+
+/* end of Slurm response */

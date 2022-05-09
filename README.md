@@ -98,6 +98,18 @@ docker exec -i <keycloak-container-name> bash /usr/scripts/bootstrap-keycloak.sh
 
 The keycloak admin portal can be accessed in the browser by navigating to localhost and the port specified by the `KEYCLOAK_PORT` env var, e.g., `localhost:9821`
 
+To request an access token to Keycloak: 
+```bash
+export TOKEN=$(curl --location --request POST 'http://localhost:9821/auth/realms/ssmp/protocol/openid-connect/token' --header 'Content-Type: application/x-www-form-urlencoded' --data-urlencode 'password=secret' --data-urlencode 'username=ssmp-user' --data-urlencode 'client_id=ssmp-backend' --data-urlencode 'realm=ssmp' --data-urlencode 'grant_type=password' | jq -r '.access_token')
+```
+
+To access a protected endpoint on the backend: 
+```bash
+curl -X POST http://localhost:5862/graphql -H "Authorization: Bearer '$TOKEN'" \
+--header 'Content-Type: application/json' \
+--data-raw <JSON>
+```
+
 ## Mongo
 
 Annotations can be imported into mongo using the following command. Note that that the headers should not be included in the csv and the order of the fields passed to the `fields` argument should match the order of the fields in the csv.

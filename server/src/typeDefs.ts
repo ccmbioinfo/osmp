@@ -131,4 +131,38 @@ export default gql`
   type Query {
     getVariants(input: QueryInput): VariantQueryResponse!
   }
+
+  type Subscription {
+    getVariantsSubscription(id: String!): VariantQueryResponse!
+  }
+
+  type Subscription {
+    slurmResponse: SlurmJobResponse!
+  }
+
+  type SlurmJobResponse {
+    variants: [SlurmVariantResponse]!
+    jobId: Int!
+  }
+
+  type SlurmVariantResponse {
+    start: Int!
+    end: Int!
+    referenceName: String!
+    ref: String!
+    alt: String!
+    Consequence: String
+    oAA: String
+    nAA: String
+    FeatureID: String
+    cDNApos: String
+    protPos: String
+    nhomalt: String
+    an: String
+    af: String
+    filter: String
+    transcript: String
+    cdna: String
+    amino_acids: String
+  }
 `;

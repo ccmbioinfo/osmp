@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApolloClient } from '@apollo/client';
+import { useSubscription } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
 import { useFetchVariantsQuery } from '../apollo/hooks';
+import { fetchVariantsSubscription } from '../apollo/hooks/useFetchVariantsSubscription';
 import {
     Background,
     Body,
@@ -25,7 +27,7 @@ import { IconPadder } from '../components/Table/Table.styles';
 import SOURCES from '../constants/sources';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
-import { AssemblyId } from '../types';
+import { AssemblyId, VariantQueryDataResult } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
@@ -89,8 +91,13 @@ const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
         </Typography>
     </ErrorWrapper>
 );
-
 const VariantQueryPage: React.FC<{}> = () => {
+    const [variants, setVariants] = useState<Array<VariantQueryDataResult> | undefined>(undefined);
+    const [searchLoading, setSearchLoading] = useState<boolean>(false);
+    const [queryType, setQueryType] = useState<'slurm' | 'osmp'>('osmp');
+
+    const [id, setId] = useState<string>('');
+
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
         useFormReducer<QueryOptionsFormState>(
             {
@@ -119,6 +126,26 @@ const VariantQueryPage: React.FC<{}> = () => {
         } as const);
 
     const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
+
+    const { data: subscriptionData, loading: subscriptionLoading } = useSubscription(
+        fetchVariantsSubscription,
+        { variables: { id } }
+    );
+
+    useEffect(() => {
+        switch (queryType) {
+            case 'osmp': {
+                setVariants(data?.getVariants.data);
+                setSearchLoading(loading);
+                break;
+            }
+            case 'slurm': {
+                setVariants(subscriptionData?.getVariantsSubscription.data);
+                setSearchLoading(subscriptionLoading);
+                break;
+            }
+        }
+    }, [data, subscriptionData, loading, subscriptionLoading, queryType]);
 
     const { state: errorState, dispatch } = useErrorContext();
 
@@ -250,7 +277,17 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }
                             onClick={() => {
                                 clearAllErrors();
-                                fetchVariants({ variables: getArgs() });
+                                const variables = getArgs();
+                                fetchVariants({ variables });
+                                setVariants(undefined);
+                                setId(Math.random().toString());
+                                const position = variables.input.gene.position;
+                                const [start, end] = position.split(':')[1].split('-');
+                                if (Number(end) - Number(start) > 600000) {
+                                    setQueryType('slurm');
+                                } else {
+                                    setQueryType('osmp');
+                                }
                             }}
                             variant="primary"
                         >
@@ -264,7 +301,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         >
                             Clear
                         </Button>
-                        <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
+                        <Column justifyContent="flex-start">{searchLoading && <Spinner />}</Column>
                     </ButtonWrapper>
                 </Flex>
             </Background>
@@ -280,7 +317,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         }}
                     />
                 ))}
-            {data && data.getVariants ? <Table variantData={data.getVariants.data} /> : null}
+            {variants ? <Table variantData={variants} /> : null}
         </Body>
     );
 };

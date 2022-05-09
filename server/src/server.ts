@@ -1,17 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import express from 'express';
 import session from 'express-session';
 import Keycloak from 'keycloak-connect';
 import { createServer } from 'http';
 import { ApolloServer } from 'apollo-server-express';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
-import { execute, subscribe } from 'graphql';
-import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
 import mongoose from 'mongoose';
+
+import {
+  ApolloServerPluginDrainHttpServer,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from 'apollo-server-core';
+import { Server } from 'ws';
+import { useServer } from 'graphql-ws/lib/use/ws';
+
+import { pubsub } from './pubsub';
 
 const app = express();
 
@@ -58,51 +65,62 @@ if (process.env.NODE_ENV === 'development') {
 app.use(keycloak.middleware());
 app.use(express.json());
 
-app.post('/graphql', keycloak.protect(), (req, res, next) => {
-  const grant = (req as any).kauth.grant;
-  logger.info(`
-  QUERY SUBMITTED:
-    ${JSON.stringify({
-      userSub: grant.access_token.content.sub,
-      username: grant.access_token.content.preferred_username,
-      issuer: grant.access_token.content.iss,
-      query: req.body.variables,
-    })}`);
-  next();
+app.post('/graphql', keycloak.protect(), async (req, res, next) => {
+  try {
+    if (req.body.operationName === 'OnSlurmResponse') {
+      const slurmResponse = req.body.variables;
+      pubsub.publish('SLURM_RESPONSE', { slurmResponse });
+      res.send({ data: { slurmResponse } });
+    } else {
+      const grant = (req as any).kauth.grant;
+      logger.info(`
+        QUERY SUBMITTED:
+          ${JSON.stringify({
+            userSub: grant.access_token.content.sub,
+            username: grant.access_token.content.preferred_username,
+            issuer: grant.access_token.content.iss,
+            query: req.body.variables,
+          })}`);
+      next();
+    }
+  } catch (err) {
+    console.log(err);
+    next();
+  }
 });
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const httpServer = createServer(app);
 
-const startServer = async () => {
-  const apolloServer = new ApolloServer({
-    schema,
-    context: ({ req, res }: any) => ({ req, res }),
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
-  });
-  await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
-  // dev only! --> https://www.apollographql.com/docs/apollo-server/data/subscriptions/#operation-context
-  SubscriptionServer.create(
+// Creating the WebSocket server
+const wsServer = new Server({
+  server: httpServer,
+  path: '/graphql',
+});
+
+const serverCleanup = useServer({ schema }, wsServer);
+
+const server = new ApolloServer({
+  schema,
+  plugins: [
+    ApolloServerPluginDrainHttpServer({ httpServer }),
+    ApolloServerPluginLandingPageGraphQLPlayground,
     {
-      schema,
-      execute,
-      subscribe,
-      onOperation: (message: any, params: any) => {
-        params.schema = schema;
-        return params;
+      async serverWillStart() {
+        return {
+          async drainServer() {
+            await serverCleanup.dispose();
+          },
+        };
       },
     },
-    {
-      server: httpServer,
-      path: apolloServer.graphqlPath,
-    }
-  );
-  ['SIGINT', 'SIGTERM'].forEach(() => {
-    // this will interfere with hot-reloading without additional handling
-    // process.on(signal, () => subscriptionServer.close());
-  });
+  ],
+});
+
+const startServer = async () => {
+  await server.start();
+  server.applyMiddleware({ app });
 };
 
 startServer();
