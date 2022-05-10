@@ -70,6 +70,13 @@ parser.add_argument(
     required=True,
 )
 
+parser.add_argument(
+    "--type",
+    type=str,
+    help="e.g. exome",
+    required=True,
+)
+
 
 class JobConfig(TypedDict):
     chr: str
@@ -78,6 +85,7 @@ class JobConfig(TypedDict):
     out: str
     path: str
     source: str
+    type: str
     startPosition: Optional[str]
 
 
@@ -106,7 +114,7 @@ class InsertableAnnotation(Annotation):
 
 RegionConfig = NamedTuple(
     "RegionConfig",
-    [("chr", str), ("start", int), ("end", int), ("assembly", str), ("source", str)],
+    [("chr", str), ("start", int), ("end", int), ("assembly", str), ("source", str), ("type", str)],
 )
 
 
@@ -174,6 +182,7 @@ def build_per_chromosome_configs(job_config: JobConfig) -> Iterator[RegionConfig
             get_end(job_config, chrom),
             chrom["assembly"],
             job_config["source"],
+            job_config["type"],
         )
         for chrom in chroms_to_process
     )
@@ -219,6 +228,7 @@ def fetch_and_insert(queue: JoinableQueue, path: str, outpath: str):
                 if df.size:
                     df["assembly"] = config.assembly
                     df["source"] = config.source
+                    df["type"] = config.type
                     filename = f"{outpath}/{config.source}/{config.assembly}.csv"
                     target_path = os.path.dirname(filename)
                     os.makedirs(target_path, exist_ok=True)
@@ -280,7 +290,7 @@ def chunk_region_config(
     for n in range(region_config.start, region_config.end, chunk_size):
         chunks.append(
             RegionConfig(
-                chr, n + 1, n + chunk_size, region_config.assembly, region_config.source
+                chr, n + 1, n + chunk_size, region_config.assembly, region_config.source, region_config.type
             )
         )
     return chunks
