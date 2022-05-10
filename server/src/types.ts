@@ -33,6 +33,7 @@ export type AssemblyId = 'gnomAD_GRCh37' | '38' | 'GRCh37' | 'GRCh38' | '37' | '
 export interface VariantResponseFields {
   alt: string;
   assemblyId: AssemblyId;
+  assemblyIdCurrent?: AssemblyId;
   callsets: CallSet[];
   end: number;
   info?: VariantResponseInfoFields;

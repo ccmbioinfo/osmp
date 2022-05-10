@@ -38,6 +38,7 @@ export default gql`
   type VariantResponseFields {
     alt: String!
     assemblyId: String!
+    assemblyIdCurrent: String!
     callsets: [CallSet]
     end: Int!
     info: VariantResponseInfoFields

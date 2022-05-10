@@ -174,6 +174,18 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Alt'),
                     },
                     {
+                        accessor: 'assemblyId',
+                        id: 'originalAssembly',
+                        Header: 'Original Assembly',
+                        width: getColumnWidth('Original Assembly'),
+                    },
+                    {
+                        accessor: 'assemblyIdCurrent',
+                        id: 'currentAssembly',
+                        Header: 'Current Assembly',
+                        width: getColumnWidth('Current Assembly'),
+                    },
+                    {
                         accessor: 'source',
                         filter: 'singleSelect',
                         id: 'source',
