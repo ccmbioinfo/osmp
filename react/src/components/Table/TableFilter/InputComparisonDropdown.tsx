@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
+import { FaEquals, FaGreaterThan, FaLessThan } from 'react-icons/fa';
 import { UseFiltersColumnProps } from 'react-table';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
@@ -29,8 +29,8 @@ interface InputComparisonDropdownProps<T extends {}>
 
 const Icons = Object.freeze({
     equal: <FaEquals size={7} />,
-    less: <FaLessThanEqual size={7} />,
-    greater: <FaGreaterThanEqual size={7} />,
+    less: <FaLessThan size={7} />,
+    greater: <FaGreaterThan size={7} />,
 });
 
 const COMPARISON_OPTIONS: ComparisonOption[] = [
