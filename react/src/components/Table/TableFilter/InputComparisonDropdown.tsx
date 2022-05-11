@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
 import { UseFiltersColumnProps } from 'react-table';
 import { SelectableList } from '../..';
@@ -71,6 +71,10 @@ export function InputComparisonDropdown<T extends {}>({
     // Ensure value returned is a number and not undefined
     const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
 
+    useEffect(() => {
+        setSign(value);
+    }, [value, setSign]);
+
     return (
         <div ref={ref}>
             <IconButton variant="light" onClick={() => setOpen(true)}>
@@ -81,6 +85,8 @@ export function InputComparisonDropdown<T extends {}>({
                     options={COMPARISON_OPTIONS}
                     onSelect={value => {
                         setSign(value as keyof ComparisonType);
+
+                        setOpen(false);
 
                         setFilterComparison({
                             less: false,
