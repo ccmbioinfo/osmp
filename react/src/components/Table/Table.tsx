@@ -68,16 +68,6 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     uniqueId: number;
 }
 
-const resolveSex = (sexPhenotype: string) => {
-    if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
-        return 'Male';
-    } else if (sexPhenotype.toLowerCase().startsWith('f') || sexPhenotype === 'NCIT:C46113') {
-        return 'Female';
-    } else if (sexPhenotype === 'NCIT:C46113') {
-        return 'Other Sex';
-    } else return 'Unknown';
-};
-
 const Table: React.FC<TableProps> = ({ variantData }) => {
     const [tableData, uniqueVariantIndices] = useMemo(
         () => prepareData(variantData),
@@ -284,7 +274,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'sex',
                         Header: 'Sex',
                         width: getColumnWidth('Sex', true),
-                        Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
                     },
                     {
                         accessor: 'ethnicity',
