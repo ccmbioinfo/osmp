@@ -91,26 +91,31 @@ export default function NumberRangeFilter<T extends {}>({
         setFilterComparison(comparison);
     }, [comparison, setFilterComparison]);
 
+    const ignoreRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
+
     return (
-        <Column>
-            <Input
-                variant="outlined"
-                value={text}
-                onChange={e => handleComparisonValue(e)}
-                placeholder="Search"
-                InputAdornmentStart={
-                    <InputComparisonDropdown
-                        setFilterComparison={setFilterComparison}
-                        setFilter={setFilter}
-                        comparison={filterComparison}
-                    />
-                }
-            />
-            {error && (
-                <Typography variant="subtitle" bold error>
-                    Please enter a valid number.
-                </Typography>
-            )}
-        </Column>
+        <div ref={ignoreRef}>
+            <Column>
+                <Input
+                    variant="outlined"
+                    value={text}
+                    onChange={e => handleComparisonValue(e)}
+                    placeholder="Search"
+                    InputAdornmentStart={
+                        <InputComparisonDropdown
+                            setFilterComparison={setFilterComparison}
+                            setFilter={setFilter}
+                            comparison={filterComparison}
+                            ignoreRef={ignoreRef}
+                        />
+                    }
+                />
+                {error && (
+                    <Typography variant="subtitle" bold error>
+                        Please enter a valid number.
+                    </Typography>
+                )}
+            </Column>
+        </div>
     );
 }

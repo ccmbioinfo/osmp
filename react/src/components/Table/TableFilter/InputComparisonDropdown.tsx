@@ -25,6 +25,7 @@ interface InputComparisonDropdownProps<T extends {}>
     extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;
     comparison: ComparisonType;
+    ignoreRef: React.MutableRefObject<HTMLDivElement>;
 }
 
 const Icons = Object.freeze({
@@ -52,6 +53,7 @@ const COMPARISON_OPTIONS: ComparisonOption[] = [
 ];
 
 export function InputComparisonDropdown<T extends {}>({
+    ignoreRef,
     comparison,
     setFilterComparison,
     setFilter,
@@ -66,7 +68,7 @@ export function InputComparisonDropdown<T extends {}>({
 
     const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
-    useClickAway(ref, () => setOpen(false));
+    useClickAway(ref, () => setOpen(false), ignoreRef);
 
     // Ensure value returned is a number and not undefined
     const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
