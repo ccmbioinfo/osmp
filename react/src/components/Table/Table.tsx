@@ -5,6 +5,7 @@ import { RiInformationFill } from 'react-icons/ri';
 import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from 'react-icons/ti';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
+    Cell,
     ColumnGroup,
     HeaderGroup,
     IdType,
@@ -44,6 +45,7 @@ import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
+import FlaggedGenesViewer from './FlaggedGenesViewer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
@@ -195,143 +197,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ],
             },
             {
-                Header: 'Case Details',
-                id: 'case_details',
-                disableSortBy: true,
-                disableFilters: true,
-                columns: [
-                    {
-                        id: 'emptyCaseDetails',
-                        type: 'empty',
-                        Header: '',
-                        disableSortBy: true,
-                        disableFilters: true,
-                        width: 70,
-                    },
-                    {
-                        accessor: state =>
-                            isHeterozygous(state.zygosity)
-                                ? 'Heterozygous'
-                                : isHomozygous(state.zygosity)
-                                ? 'Homozygous'
-                                : state.zygosity,
-                        filter: 'multiSelect',
-                        id: 'zygosity',
-                        Header: 'Zygosity',
-                        width: getColumnWidth('Zygosity'),
-                    },
-                    {
-                        accessor: 'ad',
-                        id: 'ad',
-                        Header: 'AD',
-                        width: getColumnWidth('AD'),
-                    },
-                    {
-                        accessor: 'dp',
-                        id: 'dp',
-                        Header: 'DP',
-                        width: getColumnWidth('DP'),
-                    },
-                    {
-                        accessor: 'gq',
-                        id: 'gq',
-                        Header: 'GQ',
-                        width: getColumnWidth('GQ'),
-                    },
-                    {
-                        accessor: 'individualId',
-                        id: 'individualId',
-                        Header: 'Individual ID',
-                        width: getColumnWidth('Individual ID'),
-                    },
-                    {
-                        accessor: 'datasetId',
-                        id: 'datasetId',
-                        Header: 'Dataset ID',
-                        width: getColumnWidth('Dataset ID'),
-                    },
-                    {
-                        accessor: state =>
-                            state.phenotypicFeatures
-                                ? state.phenotypicFeatures.map(p => p.phenotypeLabel).join(', ')
-                                : '',
-                        id: 'phenotypicFeatures',
-                        Cell: ({ row }: { row: Row<ResultTableColumns> }) => (
-                            <PhenotypeViewer
-                                phenotypes={row.original.phenotypicFeatures}
-                                expanded={row.isExpanded}
-                                onClick={() => row.toggleRowExpanded(!row.isExpanded)}
-                            ></PhenotypeViewer>
-                        ),
-                        Header: 'Phenotypes',
-                        width: getColumnWidth('Phenotypes'),
-                    },
-                    {
-                        accessor: 'candidateGene',
-                        id: 'candidateGene',
-                        Header: 'Candidate Gene',
-                        width: getColumnWidth('Candidate Gene'),
-                    },
-                    {
-                        accessor: 'classifications',
-                        id: 'classifications',
-                        Header: 'Classifications',
-                        width: getColumnWidth('Classifications'),
-                    },
-                    {
-                        accessor: 'sex',
-                        filter: 'multiSelect',
-                        id: 'sex',
-                        Header: 'Sex',
-                        width: getColumnWidth('Sex', true),
-                        Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
-                    },
-                    {
-                        accessor: 'ethnicity',
-                        id: 'ethnicity',
-                        Cell: ({ row }) => (
-                            <CellText capitalize>
-                                <CellPopover state={row.original} id="ethnicity" />
-                            </CellText>
-                        ),
-                        Header: 'Ethnicity',
-                        width: getColumnWidth('Ethnicity', true),
-                    },
-                    {
-                        accessor: 'diagnosis',
-                        id: 'diagnosis',
-                        Header: 'Diagnosis',
-                        width: getColumnWidth('Diagnosis'),
-                    },
-                    {
-                        accessor: 'diseases',
-                        id: 'diseases',
-                        Header: 'Diseases',
-                        width: getColumnWidth('Diseases', true),
-                    },
-                    {
-                        accessor: 'solved',
-                        id: 'solved',
-                        Header: 'Case Solved',
-                        width: getColumnWidth('Case Solved'),
-                    },
-                    {
-                        accessor: 'contactInfo',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
-                        id: 'contactInfo',
-                        Header: 'Contact',
-                        width: getColumnWidth('Contact', true),
-                        disableFilters: true,
-                    },
-                    {
-                        accessor: 'geographicOrigin',
-                        id: 'geographicOrigin',
-                        Header: 'Geographic Origin',
-                        width: getColumnWidth('Geographic Origin', true),
-                    },
-                ],
-            },
-            {
                 Header: 'Variant Details',
                 id: 'variation_details',
                 disableSortBy: true,
@@ -391,6 +256,138 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'gnomadHom',
                         width: getColumnWidth('gnomadHom'),
                         filter: 'between',
+                    },
+                ],
+            },
+            {
+                Header: 'Case Details',
+                id: 'case_details',
+                disableSortBy: true,
+                disableFilters: true,
+                columns: [
+                    {
+                        id: 'emptyCaseDetails',
+                        type: 'empty',
+                        Header: '',
+                        disableSortBy: true,
+                        disableFilters: true,
+                        width: 70,
+                    },
+                    {
+                        accessor: state =>
+                            isHeterozygous(state.zygosity)
+                                ? 'Heterozygous'
+                                : isHomozygous(state.zygosity)
+                                ? 'Homozygous'
+                                : state.zygosity,
+                        filter: 'multiSelect',
+                        id: 'zygosity',
+                        Header: 'Zygosity',
+                        width: getColumnWidth('Zygosity'),
+                    },
+                    {
+                        accessor: 'ad',
+                        id: 'ad',
+                        Header: 'AD',
+                        width: getColumnWidth('AD'),
+                    },
+                    {
+                        accessor: 'dp',
+                        id: 'dp',
+                        Header: 'DP',
+                        width: getColumnWidth('DP'),
+                    },
+                    {
+                        accessor: 'gq',
+                        id: 'gq',
+                        Header: 'GQ',
+                        width: getColumnWidth('GQ'),
+                    },
+                    {
+                        accessor: 'individualId',
+                        id: 'individualId',
+                        Header: 'Individual ID',
+                        width: getColumnWidth('Individual ID'),
+                    },
+                    {
+                        accessor: 'sex',
+                        filter: 'multiSelect',
+                        id: 'sex',
+                        Header: 'Sex',
+                        width: getColumnWidth('Sex', true),
+                        Cell: ({ cell: { value } }) => <>{value ? resolveSex(value) : value}</>,
+                    },
+                    {
+                        accessor: 'diseases',
+                        id: 'diseases',
+                        Header: 'Diseases',
+                        width: getColumnWidth('Diseases', true),
+                    },
+                    {
+                        accessor: 'diagnosis',
+                        filter: 'multiSelect',
+                        id: 'affectedStatus',
+                        Header: 'Affected Status',
+                        width: getColumnWidth('Affected Status'),
+                    },
+                    {
+                        accessor: state => {
+                            const genes = !!state.candidateGene
+                                ? state.candidateGene.split('\n')
+                                : []
+                            const classifications = !!state.classifications
+                                ? state.classifications.split('\n')
+                                : []
+
+                            return (genes.length > 0 && classifications.length > 0)
+                                ? genes.map((gene, index) => `${gene} - ${classifications[index]}`)
+                                : ''
+                        },
+                        id: 'flaggedGenes',
+                        Header: 'Flagged Gene(s)',
+                        width: getColumnWidth('Flagged Gene(s)'),
+                        Cell: ({ cell: { value }, row: { isExpanded, toggleRowExpanded } }: { cell: Cell<ResultTableColumns>, row: Row<ResultTableColumns> }) => (
+                            <FlaggedGenesViewer
+                                {...{toggleRowExpanded}}
+                                flaggedGenes={value}
+                                rowExpanded={isExpanded}
+                            />
+                        ),
+                    },
+                    {
+                        accessor: state =>
+                            state.phenotypicFeatures
+                                ? state.phenotypicFeatures.map(p => p.phenotypeLabel).join(', ')
+                                : '',
+                        id: 'phenotypicFeatures',
+                        Header: 'Phenotypes',
+                        width: getColumnWidth('Phenotypes'),
+                        Cell: ({ row: { isExpanded, original: { phenotypicFeatures }, toggleRowExpanded } }: { row: Row<ResultTableColumns> }) => (
+                            <PhenotypeViewer
+                                {...{toggleRowExpanded}}
+                                phenotypes={phenotypicFeatures}
+                                rowExpanded={isExpanded}
+                            />
+                        ),
+                    },
+                    {
+                        accessor: 'ethnicity',
+                        id: 'ethnicity',
+                        Cell: ({ row }) => (
+                            <CellText capitalize>
+                                <CellPopover state={row.original} id="ethnicity" />
+                            </CellText>
+                        ),
+                        Header: 'Ethnicity',
+                        width: getColumnWidth('Ethnicity', true),
+                    },
+                    {
+                        accessor: 'contactInfo',
+                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
+                        id: 'contactInfo',
+                        Header: 'Contact',
+                        width: getColumnWidth('Contact', true),
+                        disableFilters: true,
                     },
                 ],
             },
