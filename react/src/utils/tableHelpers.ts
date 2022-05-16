@@ -30,7 +30,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
 const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
     const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
-    const { diseases, info: individualInfo, ...restIndividual } = result.individual;
+    const { sex, diseases, info: individualInfo, ...restIndividual } = result.individual;
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseLabel}`,
         ''
@@ -39,6 +39,7 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
     return {
         contactInfo,
         diseases: flattenedDiseases,
+        sex: resolveSex(sex || ''),
         ...individualInfo,
         ...restIndividual,
         ...restVariant,
@@ -94,6 +95,16 @@ export const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
 export const isCaseDetailsCollapsed = (headers: HeaderGroup<ResultTableColumns>[]) => {
     const caseDetailsCol = headers.find(header => header.Header === 'Case Details');
     return caseDetailsCol && !isHeaderExpanded(caseDetailsCol);
+};
+
+const resolveSex = (sexPhenotype: string) => {
+    if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
+        return 'Male';
+    } else if (sexPhenotype.toLowerCase().startsWith('f') || sexPhenotype === 'NCIT:C46113') {
+        return 'Female';
+    } else if (sexPhenotype === 'NCIT:C46113') {
+        return 'Other Sex';
+    } else return 'Unknown';
 };
 
 const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
