@@ -11,6 +11,9 @@ export interface VariantResponseInfoFields {
   geneName?: Maybe<string>;
   gnomadHet?: Maybe<string>;
   gnomadHom?: Maybe<number>;
+  phred?: Maybe<number>;
+  spliceAIScore?: Maybe<number>;
+  spliceAIType?: Maybe<string>;
   transcript?: Maybe<string>;
 }
 
@@ -178,6 +181,9 @@ export interface CaddAnnotation extends VariantCoordinate {
   aaRef: string;
   cdna: string;
   consequence: string;
+  phred: number;
+  spliceAIScore: number;
+  spliceAIType: string;
   transcript: string;
 }
 

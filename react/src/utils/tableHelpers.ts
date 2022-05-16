@@ -62,8 +62,8 @@ const addAdditionalFieldsAndFormatNulls = (
         uniqueId,
         aaChange: reformatted.aaPos?.trim()
             ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
-            : 'N/A',
-        cdna: reformatted.cdna ? `${reformatted.cdna}` : 'N/A',
+            : 'NA',
+        cdna: reformatted.cdna ? `${reformatted.cdna}` : 'NA',
     };
 };
 

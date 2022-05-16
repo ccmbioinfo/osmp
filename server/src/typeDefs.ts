@@ -17,6 +17,9 @@ export default gql`
     geneName: String
     gnomadHet: Int
     gnomadHom: Int
+    phred: Float
+    spliceAIScore: Float
+    spliceAIType: String
     transcript: String
   }
 

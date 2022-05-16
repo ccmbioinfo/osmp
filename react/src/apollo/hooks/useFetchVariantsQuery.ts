@@ -32,6 +32,9 @@ const fetchVariantsQuery = gql`
                         geneName
                         gnomadHet
                         gnomadHom
+                        phred
+                        spliceAIScore
+                        spliceAIType
                         transcript
                     }
                     ref
