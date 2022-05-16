@@ -341,7 +341,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
                             return (genes.length > 0 && classifications.length > 0)
                                 ? genes.map((gene, index) => `${gene} - ${classifications[index]}`)
-                                : ''
+                                : null
                         },
                         id: 'flaggedGenes',
                         Header: 'Flagged Gene(s)',
