@@ -80,6 +80,7 @@ const _formatAnnotations = (annotations: string[]) => {
     ['ref', 2],
     ['alt', 3],
     ['consequence', 7],
+    ['consScore', 8],
     ['aaRef', 16],
     ['aaAlt', 17],
     ['transcript', 19],
