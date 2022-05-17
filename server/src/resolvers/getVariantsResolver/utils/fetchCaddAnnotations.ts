@@ -124,13 +124,10 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
       spliceAIMaxScore = 0;
       spliceAIType = 'NA';
     }
-
-    const x = Object.fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]]));
-    const y = {
+    return { ...Object.fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])), ...{
       spliceAIScore: spliceAIMaxScore,
       spliceAIType: spliceAIType,
-    };
-    return { ...x, ...y } as CaddAnnotation;
+    } } as unknown as CaddAnnotation;
   });
   console.log(result[0]);
   return result;
