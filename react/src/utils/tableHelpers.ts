@@ -48,17 +48,13 @@ const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
     uniqueId: number
 ): ResultTableColumns => {
-    const reformatted = Object.fromEntries(
-        Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
-    ) as FlattenedQueryResponse;
     return {
-        ...reformatted,
+        ...results,
         emptyCaseDetails: '',
         emptyVariationDetails: '',
         uniqueId,
-        aaChange: reformatted.aaPos?.trim()
-            ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
-            : '',
+        aaChange: results.aaPos || 'NA',
+        af: results.af || 0,
     };
 };
 

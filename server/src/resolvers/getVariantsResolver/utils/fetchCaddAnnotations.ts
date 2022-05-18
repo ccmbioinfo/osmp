@@ -24,13 +24,12 @@ const INDEX_38_PATH =
  */
 
 const _getAnnotations = async (position: string, assemblyId: string) => {
-  const resolvedAssemblyId = resolveAssembly(assemblyId);
-  const annotationUrl = resolvedAssemblyId === 'GRCh38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
-  const indexPath = resolvedAssemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
+  const annotationUrl = assemblyId === 'GRCh38' ? ANNOTATION_URL_38 : ANNOTATION_URL_37;
+  const indexPath = assemblyId === 'GRCh38' ? INDEX_38_PATH : INDEX_37_PATH;
 
   const nodeFetch = fetch as Fetcher;
   let tbiIndexed: TabixIndexedFile;
-  if (resolvedAssemblyId === 'GRCh37') {
+  if (assemblyId === 'GRCh37') {
     tbiIndexed = new TabixIndexedFile({
       filehandle: new RemoteFile(annotationUrl, { fetch: nodeFetch }),
       csiFilehandle: new RemoteFile(indexPath, { fetch: nodeFetch }),
@@ -58,7 +57,9 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
 /**
  * Takes in tabix query response and adapts it to @typedef CaddAnnotation
  * @param annotations: a list of tab-delimited strings from CADD annotation TSV.
- * Indexes for headers in the annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf.
+ * Indexes for headers in the GRCh38 annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf. 
+ * For GRCh37 annotation, please visit https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.4.pdf. 
+ * Note that in GRCh37 version 1.6, an addtional 9 fields for SpliceAI and MMSplice are added after the field "Grantham". 
  *  Chrom: 1
     Pos: 2
     Ref: 3
@@ -69,11 +70,20 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
     FeatureID: 20
     cDNApos: 25
     protpos: 29
+    spliceAI-acc-gain: 94 (GRCh37) 109 (GRCh38)
+    spliceAI-acc-loss: 95 (GRCh37) 110 (GRCh38)
+    spliceAI-don-gain: 96 (GRCh37) 111 (GRCh38)
+    spliceAI-don-loss: 97 (GRCh37) 112 (GRCh38)
+    PHRED: 116 (GRCh37) 134 (GRCh38)
   *
  * @returns an array of JSON of @typedef CaddAnnotation
+ * Report the maximum of the four spliceAI scores and the corresponding score type. If the maximum is 0 or NA, report 0.
  */
 
-const _formatAnnotations = (annotations: string[]) => {
+const _formatAnnotations = (annotations: string[], assemblyId: string) => {
+  let spliceAIIndex: number;
+  assemblyId === 'GRCh37' ? (spliceAIIndex = 93) : (spliceAIIndex = 108);
+
   const HEADERS_INDEX_MAP: Array<[keyof CaddAnnotation, number]> = [
     ['chrom', 0],
     ['pos', 1],
@@ -86,13 +96,41 @@ const _formatAnnotations = (annotations: string[]) => {
     ['transcript', 19],
     ['cdna', 24],
     ['aaPos', 28],
+    ['phred', assemblyId === 'GRCh37' ? 115 : 133],
+  ];
+
+  const spliceAIOrder = [
+    'SpliceAI-acc-gain',
+    'SpliceAI-acc-loss',
+    'SpliceAI-don-gain',
+    'SpliceAI-don-loss',
   ];
 
   const result = annotations.map(a => {
     const columns = a.split('\t');
-    return Object.fromEntries(
-      HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])
-    ) as unknown as CaddAnnotation;
+    // filter spliceAI score:
+    const spliceAIScores = [
+      parseFloat(columns[spliceAIIndex]),
+      parseFloat(columns[spliceAIIndex + 1]),
+      parseFloat(columns[spliceAIIndex + 2]),
+      parseFloat(columns[spliceAIIndex + 3]),
+    ];
+    let spliceAIMaxScore = Math.max(...spliceAIScores);
+    let spliceAIType;
+    if (spliceAIMaxScore > 0) {
+      const index = spliceAIScores.indexOf(spliceAIMaxScore);
+      spliceAIType = spliceAIOrder[index];
+    } else {
+      spliceAIMaxScore = 0;
+      spliceAIType = 'NA';
+    }
+    return {
+      ...Object.fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])),
+      ...{
+        spliceAIScore: spliceAIMaxScore,
+        spliceAIType: spliceAIType,
+      },
+    } as unknown as CaddAnnotation;
   });
   return result;
 };
@@ -101,6 +139,7 @@ const fetchAnnotations = (
   position: string,
   assemblyId: string
 ): Promise<CADDAnnotationQueryResponse> => {
+  const resolvedAssemblyId = resolveAssembly(assemblyId);
   const source = 'CADD annotations';
   const [start, end] = position.replace(/.+:/, '').split('-');
   const size = +end - +start;
@@ -115,8 +154,8 @@ const fetchAnnotations = (
       data: [],
     });
   } else {
-    return _getAnnotations(position, assemblyId)
-      .then(result => ({ source, data: _formatAnnotations(result) }))
+    return _getAnnotations(position, resolvedAssemblyId)
+      .then(result => ({ source, data: _formatAnnotations(result, resolvedAssemblyId) }))
       .catch(error => ({
         error: {
           id: uuidv4(),

@@ -248,6 +248,27 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('gnomadHom'),
                         filter: 'between',
                     },
+                    {
+                        accessor: 'phred',
+                        id: 'phred',
+                        Header: 'CADD score',
+                        width: getColumnWidth('CADD score'),
+                        filter: 'between',
+                    },
+                    {
+                        accessor: 'spliceAIScore',
+                        id: 'spliceAIScore',
+                        Header: 'SpliceAI score',
+                        width: getColumnWidth('SpliceAI score'),
+                        filter: 'between',
+                    },
+                    {
+                        accessor: 'spliceAIType',
+                        id: 'spliceAIType',
+                        Header: 'SpliceAI type',
+                        width: getColumnWidth('SpliceAI type'),
+                        filter: 'multiSelect',
+                    },
                 ],
             },
             {
