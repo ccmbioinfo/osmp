@@ -71,6 +71,12 @@ export function ColumnFilter<T extends {}>({
                 />
             );
         } else if (!!type && type === 'between') {
+            if (filterModel === undefined) {
+                filterModel = {
+                    id: columnId,
+                    value: [-Infinity, +Infinity],
+                };
+            }
             return (
                 <NumberRangeFilter
                     filter={filterModel as DefaultFilter<number[]>}
