@@ -320,6 +320,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'diseases',
                         id: 'diseases',
+                        filter: 'multiSelect',
                         Header: 'Diseases',
                         width: getColumnWidth('Diseases', true),
                     },
