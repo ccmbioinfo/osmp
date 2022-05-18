@@ -181,6 +181,7 @@ export interface CaddAnnotation extends VariantCoordinate {
   aaRef: string;
   cdna: string;
   consequence: string;
+  consScore: number;
   phred: number;
   spliceAIScore: number;
   spliceAIType: string;

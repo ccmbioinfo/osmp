@@ -1,4 +1,5 @@
 import { HeaderGroup } from 'react-table';
+import { ResultTableColumns } from '../components/Table/Table';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -10,6 +11,10 @@ import {
 
 type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
+interface PatientBurdenCount {
+    [x: string]: number;
+}
+
 export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
     IndividualInfoFields & { contactInfo: string } & Omit<
         VariantResponseFields,
@@ -17,15 +22,6 @@ export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'di
     > &
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; diseases: string };
-
-export interface ResultTableColumns extends FlattenedQueryResponse {
-    aaChange: string;
-    emptyCaseDetails: string;
-    emptyVariationDetails: string;
-    homozygousCount?: number;
-    heterozygousCount?: number;
-    uniqueId: number;
-}
 
 const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
     const { contactInfo, source } = result;
@@ -147,7 +143,6 @@ export const prepareData = (
 
     sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
-
         if (
             currVariant.ref !== ref ||
             currVariant.alt !== alt ||
@@ -204,6 +199,39 @@ export const prepareData = (
     result.slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId).forEach(row => {
         row.homozygousCount = currHomozygousCount;
         row.heterozygousCount = currHeterozygousCount;
+    });
+
+    // Remove duplicate variants for the same patient
+    const uniquePatientVariants = result.filter(
+        (arr, index, self) =>
+            index ===
+            self.findIndex(
+                t =>
+                    t.start === arr.start &&
+                    t.end === arr.end &&
+                    t.alt === arr.alt &&
+                    t.ref === arr.ref &&
+                    t.individualId === arr.individualId
+            )
+    );
+
+    const patientBurdenCount: PatientBurdenCount = {};
+
+    uniquePatientVariants.forEach(p => {
+        if (p.individualId) {
+            if (patientBurdenCount[p.individualId]) {
+                patientBurdenCount[p.individualId] += 1;
+            } else {
+                patientBurdenCount[p.individualId] = 1;
+            }
+        }
+    });
+
+    result.map(r => {
+        if (r.individualId) {
+            r.burdenCount = patientBurdenCount[r.individualId];
+        }
+        return r;
     });
 
     return [result, uniqueVariantIndices];

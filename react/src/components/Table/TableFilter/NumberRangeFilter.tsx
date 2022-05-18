@@ -16,23 +16,36 @@ export default function NumberRangeFilter<T extends {}>({
      * For number filtering, react-table records the number range as an array of the upper and lower bound. 
         e.g. >2, <2, and =2 is represented as [2, undefined], [undefined, 2], and [2,2] respectively.
      */
-
     const [lower, upper] = filter ? filter.value : [];
 
-    const value = useMemo(() => (lower || upper || '').toString(), [lower, upper]);
+    const resolveValue = (lower: number | undefined, upper: number | undefined) => {
+        if (lower !== undefined && upper === undefined) {
+            return lower;
+        } else if (lower === undefined && upper !== undefined) {
+            return upper;
+        } else if (
+            ![undefined, -Infinity].includes(lower) &&
+            ![undefined, +Infinity].includes(upper)
+        ) {
+            return lower;
+        } else {
+            return '';
+        }
+    };
+
+    const value = useMemo(() => (resolveValue(lower, upper) || '').toString(), [lower, upper]);
 
     const comparison = useMemo(
         () => ({
             less: lower === undefined && upper !== undefined,
             greater: upper === undefined && lower !== undefined,
-            equal: upper === lower,
+            equal: upper === lower || (upper === +Infinity && lower === -Infinity),
         }),
         [lower, upper]
     );
 
     const [error, setError] = useState<boolean>(false);
     const [text, setText] = useState(value);
-
     const [filterComparison, setFilterComparison] = useState<ComparisonType>(comparison);
 
     const debouncedSetFilter = useAsyncDebounce((filterValue: any) => setFilter(filterValue), 500);
@@ -71,29 +84,38 @@ export default function NumberRangeFilter<T extends {}>({
     }, [text, debouncedSetFilter, filterComparison.less, filterComparison.greater]);
 
     useEffect(() => {
-        if (!filter) setText('');
-    }, [filter, setText]);
+        setText(value);
+    }, [value, setText]);
+
+    useEffect(() => {
+        setFilterComparison(comparison);
+    }, [comparison, setFilterComparison]);
+
+    const ignoreRef = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
     return (
-        <Column>
-            <Input
-                variant="outlined"
-                value={text}
-                onChange={e => handleComparisonValue(e)}
-                placeholder="Search"
-                InputAdornmentStart={
-                    <InputComparisonDropdown
-                        setFilterComparison={setFilterComparison}
-                        setFilter={setFilter}
-                        comparison={filterComparison}
-                    />
-                }
-            />
-            {error && (
-                <Typography variant="subtitle" bold error>
-                    Please enter a valid number.
-                </Typography>
-            )}
-        </Column>
+        <div ref={ignoreRef}>
+            <Column>
+                <Input
+                    variant="outlined"
+                    value={text}
+                    onChange={e => handleComparisonValue(e)}
+                    placeholder="Search"
+                    InputAdornmentStart={
+                        <InputComparisonDropdown
+                            setFilterComparison={setFilterComparison}
+                            setFilter={setFilter}
+                            comparison={filterComparison}
+                            ignoreRef={ignoreRef}
+                        />
+                    }
+                />
+                {error && (
+                    <Typography variant="subtitle" bold error>
+                        Please enter a valid number.
+                    </Typography>
+                )}
+            </Column>
+        </div>
     );
 }
