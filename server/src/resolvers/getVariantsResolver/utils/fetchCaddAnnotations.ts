@@ -57,7 +57,9 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
 /**
  * Takes in tabix query response and adapts it to @typedef CaddAnnotation
  * @param annotations: a list of tab-delimited strings from CADD annotation TSV.
- * Indexes for headers in the annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf.
+ * Indexes for headers in the GRCh38 annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf. 
+ * For GRCh37 annotation, please visit https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.4.pdf. 
+ * Note that in GRCh37 version 1.6, an addtional 9 fields for SpliceAI and MMSplice are added after the field "Grantham". 
  *  Chrom: 1
     Pos: 2
     Ref: 3
@@ -125,12 +127,14 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
       spliceAIMaxScore = 0;
       spliceAIType = 'NA';
     }
-    return { ...Object.fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])), ...{
-      spliceAIScore: spliceAIMaxScore,
-      spliceAIType: spliceAIType,
-    } } as unknown as CaddAnnotation;
+    return {
+      ...Object.fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])),
+      ...{
+        spliceAIScore: spliceAIMaxScore,
+        spliceAIType: spliceAIType,
+      },
+    } as unknown as CaddAnnotation;
   });
-  console.log(result[0]);
   return result;
 };
 
