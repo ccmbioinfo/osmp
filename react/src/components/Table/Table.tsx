@@ -226,6 +226,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'burdenCount',
                         Header: 'Burden Count',
                         width: getColumnWidth('Burden Count'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'ad',
