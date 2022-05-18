@@ -5,6 +5,7 @@ import { RiInformationFill } from 'react-icons/ri';
 import { TiArrowSortedDown, TiArrowSortedUp, TiArrowUnsorted } from 'react-icons/ti';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import {
+    Cell,
     ColumnGroup,
     HeaderGroup,
     IdType,
@@ -44,6 +45,7 @@ import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
+import FlaggedGenesViewer from './FlaggedGenesViewer';
 import PhenotypeViewer from './PhenotypeViewer';
 import { CellText, IconPadder, Styles, SummaryText, TableFilters, TH, THead } from './Table.styles';
 import { GlobalFilter } from './TableFilter/GlobalFilters';
@@ -186,6 +188,69 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 ],
             },
             {
+                Header: 'Variant Details',
+                id: 'variation_details',
+                disableSortBy: true,
+                disableFilters: true,
+                columns: [
+                    {
+                        id: 'emptyVariationDetails',
+                        type: 'empty',
+                        Header: '',
+                        disableSortBy: true,
+                        disableFilters: true,
+                        width: 79,
+                    },
+                    {
+                        accessor: 'transcript',
+                        id: 'transcript',
+                        Header: 'transcript',
+                        width: getColumnWidth('transcript'),
+                    },
+                    {
+                        accessor: 'homozygousCount',
+                        id: 'homozygousCount',
+                        Header: 'Homo Count',
+                        width: getColumnWidth('Homo Count'),
+                    },
+                    {
+                        accessor: 'heterozygousCount',
+                        id: 'heterozygousCount',
+                        Header: 'Het Count',
+                        width: getColumnWidth('Het Count'),
+                    },
+                    { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
+                    {
+                        id: 'aaChange',
+                        accessor: 'aaChange',
+                        Header: 'aaChange',
+                        width: getColumnWidth('aaChange'),
+                    },
+                    {
+                        accessor: 'consequence',
+                        id: 'consequence',
+                        Header: 'consequence',
+                        width: getColumnWidth('consequence'),
+                        filter: 'multiSelect',
+                    },
+                    {
+                        accessor: 'af',
+                        id: 'af',
+                        Header: 'gnomad_exome_AF',
+                        width: getColumnWidth('gnomad_exome_AF', true),
+                        filter: 'between',
+                    },
+                    /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
+                    {
+                        accessor: 'gnomadHom',
+                        id: 'gnomadHom',
+                        Header: 'gnomadHom',
+                        width: getColumnWidth('gnomadHom'),
+                        filter: 'between',
+                    },
+                ],
+            },
+            {
                 Header: 'Case Details',
                 id: 'case_details',
                 disableSortBy: true,
@@ -246,10 +311,54 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Individual ID'),
                     },
                     {
-                        accessor: 'datasetId',
-                        id: 'datasetId',
-                        Header: 'Dataset ID',
-                        width: getColumnWidth('Dataset ID'),
+                        accessor: 'sex',
+                        filter: 'multiSelect',
+                        id: 'sex',
+                        Header: 'Sex',
+                        width: getColumnWidth('Sex', true),
+                    },
+                    {
+                        accessor: 'diseases',
+                        id: 'diseases',
+                        Header: 'Diseases',
+                        width: getColumnWidth('Diseases', true),
+                    },
+                    {
+                        accessor: 'diagnosis',
+                        filter: 'multiSelect',
+                        id: 'affectedStatus',
+                        Header: 'Affected Status',
+                        width: getColumnWidth('Affected Status'),
+                    },
+                    {
+                        accessor: state => {
+                            const genes = !!state.candidateGene
+                                ? state.candidateGene.split('\n')
+                                : [];
+                            const classifications = !!state.classifications
+                                ? state.classifications.split('\n')
+                                : [];
+
+                            return genes.length > 0 && classifications.length > 0
+                                ? genes.map((gene, index) => `${gene} - ${classifications[index]}`)
+                                : null;
+                        },
+                        id: 'flaggedGenes',
+                        Header: 'Flagged Gene(s)',
+                        width: getColumnWidth('Flagged Gene(s)'),
+                        Cell: ({
+                            cell: { value },
+                            row: { isExpanded, toggleRowExpanded },
+                        }: {
+                            cell: Cell<ResultTableColumns>;
+                            row: Row<ResultTableColumns>;
+                        }) => (
+                            <FlaggedGenesViewer
+                                {...{ toggleRowExpanded }}
+                                flaggedGenes={value}
+                                rowExpanded={isExpanded}
+                            />
+                        ),
                     },
                     {
                         accessor: state =>
@@ -257,34 +366,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 ? state.phenotypicFeatures.map(p => p.phenotypeLabel).join(', ')
                                 : '',
                         id: 'phenotypicFeatures',
-                        Cell: ({ row }: { row: Row<ResultTableColumns> }) => (
-                            <PhenotypeViewer
-                                phenotypes={row.original.phenotypicFeatures}
-                                expanded={row.isExpanded}
-                                onClick={() => row.toggleRowExpanded(!row.isExpanded)}
-                            ></PhenotypeViewer>
-                        ),
                         Header: 'Phenotypes',
                         width: getColumnWidth('Phenotypes'),
-                    },
-                    {
-                        accessor: 'candidateGene',
-                        id: 'candidateGene',
-                        Header: 'Candidate Gene',
-                        width: getColumnWidth('Candidate Gene'),
-                    },
-                    {
-                        accessor: 'classifications',
-                        id: 'classifications',
-                        Header: 'Classifications',
-                        width: getColumnWidth('Classifications'),
-                    },
-                    {
-                        accessor: 'sex',
-                        filter: 'multiSelect',
-                        id: 'sex',
-                        Header: 'Sex',
-                        width: getColumnWidth('Sex', true),
+                        Cell: ({
+                            row: {
+                                isExpanded,
+                                original: { phenotypicFeatures },
+                                toggleRowExpanded,
+                            },
+                        }: {
+                            row: Row<ResultTableColumns>;
+                        }) => (
+                            <PhenotypeViewer
+                                {...{ toggleRowExpanded }}
+                                phenotypes={phenotypicFeatures}
+                                rowExpanded={isExpanded}
+                            />
+                        ),
                     },
                     {
                         accessor: 'ethnicity',
@@ -298,101 +396,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Ethnicity', true),
                     },
                     {
-                        accessor: 'diagnosis',
-                        id: 'diagnosis',
-                        Header: 'Diagnosis',
-                        width: getColumnWidth('Diagnosis'),
-                    },
-                    {
-                        accessor: 'diseases',
-                        id: 'diseases',
-                        Header: 'Diseases',
-                        width: getColumnWidth('Diseases', true),
-                    },
-                    {
-                        accessor: 'solved',
-                        id: 'solved',
-                        Header: 'Case Solved',
-                        width: getColumnWidth('Case Solved'),
-                    },
-                    {
                         accessor: 'contactInfo',
                         Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
                         id: 'contactInfo',
                         Header: 'Contact',
                         width: getColumnWidth('Contact', true),
                         disableFilters: true,
-                    },
-                    {
-                        accessor: 'geographicOrigin',
-                        id: 'geographicOrigin',
-                        Header: 'Geographic Origin',
-                        width: getColumnWidth('Geographic Origin', true),
-                    },
-                ],
-            },
-            {
-                Header: 'Variant Details',
-                id: 'variation_details',
-                disableSortBy: true,
-                disableFilters: true,
-                columns: [
-                    {
-                        id: 'emptyVariationDetails',
-                        type: 'empty',
-                        Header: '',
-                        disableSortBy: true,
-                        disableFilters: true,
-                        width: 79,
-                    },
-                    {
-                        accessor: 'transcript',
-                        id: 'transcript',
-                        Header: 'transcript',
-                        width: getColumnWidth('transcript'),
-                    },
-                    {
-                        accessor: 'homozygousCount',
-                        id: 'homozygousCount',
-                        Header: 'Homo Count',
-                        width: getColumnWidth('Homo Count'),
-                        filter: 'between',
-                    },
-                    {
-                        accessor: 'heterozygousCount',
-                        id: 'heterozygousCount',
-                        Header: 'Het Count',
-                        width: getColumnWidth('Het Count'),
-                        filter: 'between',
-                    },
-                    { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
-                    {
-                        id: 'aaChange',
-                        accessor: 'aaChange',
-                        Header: 'aaChange',
-                        width: getColumnWidth('aaChange'),
-                    },
-                    {
-                        accessor: 'consequence',
-                        id: 'consequence',
-                        Header: 'consequence',
-                        width: getColumnWidth('consequence'),
-                        filter: 'multiSelect',
-                    },
-                    {
-                        accessor: 'af',
-                        id: 'af',
-                        Header: 'gnomad_exome_AF',
-                        width: getColumnWidth('gnomad_exome_AF', true),
-                        filter: 'between',
-                    },
-                    /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
-                    {
-                        accessor: 'gnomadHom',
-                        id: 'gnomadHom',
-                        Header: 'gnomadHom',
-                        width: getColumnWidth('gnomadHom'),
-                        filter: 'between',
                     },
                 ],
             },
