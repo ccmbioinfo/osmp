@@ -65,6 +65,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     emptyVariationDetails: string;
     homozygousCount?: number;
     heterozygousCount?: number;
+    burdenCount?: number;
     uniqueId: number;
 }
 
@@ -209,6 +210,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'zygosity',
                         Header: 'Zygosity',
                         width: getColumnWidth('Zygosity'),
+                    },
+                    {
+                        accessor: 'burdenCount',
+                        id: 'burdenCount',
+                        Header: 'Burden Count',
+                        width: getColumnWidth('Burden Count'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'ad',
