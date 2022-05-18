@@ -67,6 +67,7 @@ export interface ResultTableColumns extends FlattenedQueryResponse {
     emptyVariationDetails: string;
     homozygousCount?: number;
     heterozygousCount?: number;
+    burdenCount?: number;
     uniqueId: number;
 }
 
@@ -276,22 +277,32 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Zygosity'),
                     },
                     {
+                        accessor: 'burdenCount',
+                        id: 'burdenCount',
+                        Header: 'Burden Count',
+                        width: getColumnWidth('Burden Count'),
+                        filter: 'between',
+                    },
+                    {
                         accessor: 'ad',
                         id: 'ad',
                         Header: 'AD',
                         width: getColumnWidth('AD'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'dp',
                         id: 'dp',
                         Header: 'DP',
                         width: getColumnWidth('DP'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'gq',
                         id: 'gq',
                         Header: 'GQ',
                         width: getColumnWidth('GQ'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'individualId',
@@ -323,21 +334,27 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         accessor: state => {
                             const genes = !!state.candidateGene
                                 ? state.candidateGene.split('\n')
-                                : []
+                                : [];
                             const classifications = !!state.classifications
                                 ? state.classifications.split('\n')
-                                : []
+                                : [];
 
-                            return (genes.length > 0 && classifications.length > 0)
+                            return genes.length > 0 && classifications.length > 0
                                 ? genes.map((gene, index) => `${gene} - ${classifications[index]}`)
-                                : null
+                                : null;
                         },
                         id: 'flaggedGenes',
                         Header: 'Flagged Gene(s)',
                         width: getColumnWidth('Flagged Gene(s)'),
-                        Cell: ({ cell: { value }, row: { isExpanded, toggleRowExpanded } }: { cell: Cell<ResultTableColumns>, row: Row<ResultTableColumns> }) => (
+                        Cell: ({
+                            cell: { value },
+                            row: { isExpanded, toggleRowExpanded },
+                        }: {
+                            cell: Cell<ResultTableColumns>;
+                            row: Row<ResultTableColumns>;
+                        }) => (
                             <FlaggedGenesViewer
-                                {...{toggleRowExpanded}}
+                                {...{ toggleRowExpanded }}
                                 flaggedGenes={value}
                                 rowExpanded={isExpanded}
                             />
@@ -351,9 +368,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'phenotypicFeatures',
                         Header: 'Phenotypes',
                         width: getColumnWidth('Phenotypes'),
-                        Cell: ({ row: { isExpanded, original: { phenotypicFeatures }, toggleRowExpanded } }: { row: Row<ResultTableColumns> }) => (
+                        Cell: ({
+                            row: {
+                                isExpanded,
+                                original: { phenotypicFeatures },
+                                toggleRowExpanded,
+                            },
+                        }: {
+                            row: Row<ResultTableColumns>;
+                        }) => (
                             <PhenotypeViewer
-                                {...{toggleRowExpanded}}
+                                {...{ toggleRowExpanded }}
                                 phenotypes={phenotypicFeatures}
                                 rowExpanded={isExpanded}
                             />

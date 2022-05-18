@@ -3,18 +3,22 @@ import { Maybe } from 'graphql/jsutils/Maybe';
 import CellViewer, { ViewerProps } from './CellViewer';
 
 interface FlaggedGenesViewerProps extends ViewerProps {
-	flaggedGenes: Maybe<string[]>;
+    flaggedGenes: Maybe<string[]>;
 }
 
-const FlaggedGenesViewer: React.FC<FlaggedGenesViewerProps> = ({ flaggedGenes, rowExpanded, toggleRowExpanded }) => {
+const FlaggedGenesViewer: React.FC<FlaggedGenesViewerProps> = ({
+    flaggedGenes,
+    rowExpanded,
+    toggleRowExpanded,
+}) => {
     return (
         <CellViewer<string>
-			{...{rowExpanded, toggleRowExpanded}}
+            {...{ rowExpanded, toggleRowExpanded }}
             formatText={flaggedGene => flaggedGene}
             itemName="Flagged Gene"
             items={flaggedGenes}
         />
-    )
+    );
 };
 
 export default FlaggedGenesViewer;

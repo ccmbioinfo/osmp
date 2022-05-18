@@ -7,15 +7,19 @@ interface PhenotypeViewerProps extends ViewerProps {
     phenotypes: Maybe<PhenotypicFeaturesFields[]>;
 }
 
-const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({ phenotypes, rowExpanded, toggleRowExpanded }) => {
+const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({
+    phenotypes,
+    rowExpanded,
+    toggleRowExpanded,
+}) => {
     return (
         <CellViewer<PhenotypicFeaturesFields>
-            {...{rowExpanded, toggleRowExpanded}}
+            {...{ rowExpanded, toggleRowExpanded }}
             formatText={phenotype => phenotype.phenotypeLabel || ''}
             itemName="Phenotype"
             items={phenotypes}
         />
-    )
+    );
 };
 
 export default PhenotypeViewer;

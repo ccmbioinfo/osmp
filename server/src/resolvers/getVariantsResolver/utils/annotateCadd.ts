@@ -6,7 +6,17 @@ const annotate = (
 ): VariantQueryDataResult[] => {
   const annotationKeys: Record<string, CaddAnnotation> = {};
 
-  annotationResponse.forEach(a => (annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a));
+  /** Choose the variant annotation with the highest consScore to prioritize annotation of the most deleterious transcript. 
+  All consequence terms in CADD annotations can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.3.pdf 
+  For reference, the order of severity of the consequences can be found at https://grch37.ensembl.org/info/genome/variation/prediction/predicted_data.html 
+  */
+  annotationResponse.forEach(a => {
+    const annotation = annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`];
+
+    if (!annotation || a.consScore > annotation.consScore) {
+      annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
+    }
+  });
 
   queryResponse.forEach(response => {
     const key = `${response.variant.alt}-${response.variant.referenceName.replace(/chr/i, '')}-${

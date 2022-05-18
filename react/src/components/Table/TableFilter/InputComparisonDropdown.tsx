@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { FaEquals, FaGreaterThanEqual, FaLessThanEqual } from 'react-icons/fa';
+import React, { useEffect, useMemo, useState } from 'react';
+import { FaEquals, FaGreaterThan, FaLessThan } from 'react-icons/fa';
 import { UseFiltersColumnProps } from 'react-table';
 import { SelectableList } from '../..';
 import { useClickAway } from '../../../hooks';
@@ -25,12 +25,13 @@ interface InputComparisonDropdownProps<T extends {}>
     extends Pick<UseFiltersColumnProps<T>, 'setFilter'> {
     setFilterComparison: React.Dispatch<React.SetStateAction<ComparisonType>>;
     comparison: ComparisonType;
+    ignoreRef: React.MutableRefObject<HTMLDivElement>;
 }
 
 const Icons = Object.freeze({
     equal: <FaEquals size={7} />,
-    less: <FaLessThanEqual size={7} />,
-    greater: <FaGreaterThanEqual size={7} />,
+    less: <FaLessThan size={7} />,
+    greater: <FaGreaterThan size={7} />,
 });
 
 const COMPARISON_OPTIONS: ComparisonOption[] = [
@@ -52,6 +53,7 @@ const COMPARISON_OPTIONS: ComparisonOption[] = [
 ];
 
 export function InputComparisonDropdown<T extends {}>({
+    ignoreRef,
     comparison,
     setFilterComparison,
     setFilter,
@@ -66,10 +68,14 @@ export function InputComparisonDropdown<T extends {}>({
 
     const ref = React.useRef() as React.MutableRefObject<HTMLDivElement>;
 
-    useClickAway(ref, () => setOpen(false));
+    useClickAway(ref, () => setOpen(false), ignoreRef);
 
     // Ensure value returned is a number and not undefined
     const getFiniteNumber = (n: number) => (Number.isFinite(n) ? n : undefined);
+
+    useEffect(() => {
+        setSign(value);
+    }, [value, setSign]);
 
     return (
         <div ref={ref}>
@@ -81,6 +87,8 @@ export function InputComparisonDropdown<T extends {}>({
                     options={COMPARISON_OPTIONS}
                     onSelect={value => {
                         setSign(value as keyof ComparisonType);
+
+                        setOpen(false);
 
                         setFilterComparison({
                             less: false,

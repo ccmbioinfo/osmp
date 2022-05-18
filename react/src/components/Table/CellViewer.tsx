@@ -29,30 +29,36 @@ const Text = styled(props => <CellText {...props} />)`
     color: blue;
 `;
 
-const CellViewer = <T extends {}>({ formatText, items, itemName, rowExpanded, toggleRowExpanded }: CellViewerProps<T>) => {
-    const [cellExpanded, setCellExpanded] = useState<boolean>(false)
+const CellViewer = <T extends {}>({
+    formatText,
+    items,
+    itemName,
+    rowExpanded,
+    toggleRowExpanded,
+}: CellViewerProps<T>) => {
+    const [cellExpanded, setCellExpanded] = useState<boolean>(false);
 
     const isLastElement = (index: number, list: Array<T>) => index === list.length - 1;
 
-	const onClick = useCallback(() => {
-        toggleRowExpanded(!rowExpanded)
-		setCellExpanded(cellExpanded => !cellExpanded)
-	}, [rowExpanded, toggleRowExpanded])
+    const onClick = useCallback(() => {
+        toggleRowExpanded(!rowExpanded);
+        setCellExpanded(cellExpanded => !cellExpanded);
+    }, [rowExpanded, toggleRowExpanded]);
 
-	return !!items && !!items.length ? (
+    return !!items && !!items.length ? (
         cellExpanded ? (
             <>
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
-						<Text onClick={onClick}>
-                        	{formatText(item)}
-						</Text>
+                        <Text onClick={onClick}>{formatText(item)}</Text>
                         {!isLastElement(index, items) && <CellBorder />}
                     </React.Fragment>
                 ))}
             </>
         ) : (
-            <Text onClick={onClick}>{`${items.length} ${itemName}${items.length === 1 ? '' : 's'}`}</Text>
+            <Text onClick={onClick}>{`${items.length} ${itemName}${
+                items.length === 1 ? '' : 's'
+            }`}</Text>
         )
     ) : null;
 };
