@@ -81,12 +81,9 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
  */
 
 const _formatAnnotations = (annotations: string[], assemblyId: string) => {
-  let phredIndex = 115;
-  let spliceAIIndex = 93;
-  if (assemblyId === 'GRCh38') {
-    phredIndex = 133;
-    spliceAIIndex = 108;
-  }
+  let spliceAIIndex: number;
+  assemblyId === 'GRCh37' ? (spliceAIIndex = 93) : (spliceAIIndex = 108);
+
   const HEADERS_INDEX_MAP: Array<[keyof CaddAnnotation, number]> = [
     ['chrom', 0],
     ['pos', 1],
@@ -99,7 +96,7 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
     ['transcript', 19],
     ['cdna', 24],
     ['aaPos', 28],
-    ['phred', phredIndex],
+    ['phred', assemblyId === 'GRCh37' ? 115 : 133],
   ];
 
   const spliceAIOrder = [
