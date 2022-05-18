@@ -54,6 +54,7 @@ const addAdditionalFieldsAndFormatNulls = (
         emptyVariationDetails: '',
         uniqueId,
         aaChange: results.aaPos || 'NA',
+        af: results.af || 0,
     };
 };
 
