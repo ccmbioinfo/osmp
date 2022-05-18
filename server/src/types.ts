@@ -178,6 +178,7 @@ export interface CaddAnnotation extends VariantCoordinate {
   aaRef: string;
   cdna: string;
   consequence: string;
+  consScore: number;
   transcript: string;
 }
 
