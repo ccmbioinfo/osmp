@@ -11,10 +11,9 @@ const annotate = (
   For reference, the order of severity of the consequences can be found at https://grch37.ensembl.org/info/genome/variation/prediction/predicted_data.html 
   */
   annotationResponse.forEach(a => {
-    if (
-      !annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] ||
-      a.consScore > annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`].consScore
-    ) {
+    const annotation = annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`];
+
+    if (!annotation || a.consScore > annotation.consScore) {
       annotationKeys[`${a.alt}-${a.chrom}-${a.pos}-${a.ref}`] = a;
     }
   });
