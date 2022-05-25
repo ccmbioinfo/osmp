@@ -1,11 +1,7 @@
-import { isGroup } from '@storybook/api';
-import { check } from 'prettier';
 import { useState } from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
-import { MdOutlineTapAndPlay } from 'react-icons/md';
 import { ColumnInstance, HeaderGroup, UseTableInstanceProps } from 'react-table';
-import { camelize } from '../../utils';
 import { Button, Checkbox, DragHandle, Flex, InlineFlex, Modal } from '../index';
 import { IconPadder } from './Table.styles';
 
@@ -26,31 +22,42 @@ export default function ColumnVisibilityModal<T extends {}>({
     allColumns,
     setColumnOrder,
 }: ColumnVisibilityModalProps<T>) {
-    const columns = allColumns.filter(c => c.type !== 'fixed');
     const [showModal, setShowModal] = useState<boolean>(false);
     const [order, setOrder] = useState<ColumnInstance<T>[]>([]);
-    const [cachedVisibility, setCachedVisibility] = useState(cached); // Does not contain empty columns
+    // Cache a column's latest "check" status independent of the column's group status. Does not contain columns with type "empty".
+    const [cachedVisibility, setCachedVisibility] = useState(cached);
+    // State to represent the current "check" status.
     const [checkedColumns, setCheckedColumns] = useState(
-        // Contains empty columns
-        Object.fromEntries(columns.map(c => [c.id, c.isVisible]))
+        Object.fromEntries(allColumns.filter(c => c.type !== 'fixed').map(c => [c.id, c.isVisible]))
     );
-    const isGroupExpanded = (header: string | undefined) => {
-        if (!header) {
-            return false;
-        } else if (header === 'Variant') {
-            return !checkedColumns['emptyCore'];
-        } else if (header === 'Variant Details') {
-            return !checkedColumns['emptyVariationDetails'];
-        } else {
-            return !checkedColumns['emptyCaseDetails'];
-        }
+
+    const groupMapping: Record<string, string> = {
+        Variant: 'emptyCore',
+        'Variant Details': 'emptyVariationDetails',
+        'Case Details': 'emptyCaseDetails',
     };
+
+    const isGroupExpanded = (header: string | undefined) => {
+        if (!header) return false;
+        return !checkedColumns[groupMapping[header]];
+    };
+
+    // Find a column's group: "Variant", "Variant Details" or "Case Details".
+    const columnToGroup = (columnId: string) => {
+        let group = headerGroups[0].headers[0];
+        headerGroups[0].headers.forEach(header => {
+            if (header.columns?.find(c => c.id === columnId)) group = header;
+        });
+        return group;
+    };
+
     const reorder = (prevPos: number, newPos: number): ColumnInstance<T>[] => {
         const result: ColumnInstance<T>[] = order;
         const [removed] = result.splice(prevPos, 1);
         result.splice(newPos, 0, removed);
         return result;
     };
+
     const onDragEnd = (result: DropResult) => {
         const { source, destination } = result;
         if (!destination) {
@@ -60,87 +67,62 @@ export default function ColumnVisibilityModal<T extends {}>({
         setOrder(columnOrder);
     };
 
-    const groupClick = (g: HeaderGroup<T>) => {
-        // User makes a group invisible
+    const onGroupClick = (g: HeaderGroup<T>) => {
         const checkedColumnsCopy = Object.assign({}, checkedColumns);
+        const columnsInGroup = g.columns?.filter(c => c.type !== 'fixed');
         if (isGroupExpanded(g.Header as string)) {
-            // All column checkboxes are turned off, empty columns are turned on
-            g.columns
-                ?.filter(c => c.type !== 'fixed')
-                .map(column =>
-                    column.type !== 'empty'
-                        ? (checkedColumnsCopy[column.id] = false)
-                        : (checkedColumnsCopy[column.id] = true)
-                );
-        }
-        // User makes a group visible
-        else {
-            const cacheColumns = g.columns?.filter(
-                c => c.type !== 'fixed' && cachedVisibility[c.id] === true
+            // When user makes a group invisible, uncheck all columns in the group except the column with type "empty"
+            columnsInGroup?.map(c =>
+                c.type !== 'empty'
+                    ? (checkedColumnsCopy[c.id] = false)
+                    : (checkedColumnsCopy[c.id] = true)
             );
-            // If some columns in this group in the cache are visible
+        } else {
+            // User makes a group visible
+            const cacheColumns = columnsInGroup?.filter(c => cachedVisibility[c.id] === true);
+            // If some columns in this group are visible in the cache, only check the columns visible in the cache.
             if (cacheColumns && cacheColumns.length > 0) {
-                g.columns
-                    ?.filter(c => c.type !== 'fixed')
-                    .map(c =>
-                        c.type !== 'empty' && cachedVisibility[c.id]
-                            ? (checkedColumnsCopy[c.id] = true)
-                            : (checkedColumnsCopy[c.id] = false)
-                    );
+                columnsInGroup?.map(c =>
+                    c.type !== 'empty' && cachedVisibility[c.id]
+                        ? (checkedColumnsCopy[c.id] = true)
+                        : (checkedColumnsCopy[c.id] = false)
+                );
             } else {
-                // Else by default make all columns visible
-                g.columns
-                    ?.filter(c => c.type !== 'fixed')
-                    .map(c =>
-                        c.type !== 'empty'
-                            ? (checkedColumnsCopy[c.id] = true)
-                            : (checkedColumnsCopy[c.id] = false)
-                    );
+                // Else, check all columns by default.
+                columnsInGroup?.map(c =>
+                    c.type !== 'empty'
+                        ? (checkedColumnsCopy[c.id] = true)
+                        : (checkedColumnsCopy[c.id] = false)
+                );
             }
         }
         setCheckedColumns(checkedColumnsCopy);
     };
 
-    const columnClick = (c: ColumnInstance<T>) => {
+    const onColumnClick = (c: ColumnInstance<T>) => {
         const checkedColumnsCopy = Object.assign({}, checkedColumns);
         const cachedVisibilityCopy = Object.assign({}, cachedVisibility);
-        // If user checks a checkbox, update checkedColumns state and cachedVisibility
+        const group = columnToGroup(c.id);
+        // User checks a column.
         if (!checkedColumnsCopy[c.id]) {
             checkedColumnsCopy[c.id] = true;
             cachedVisibilityCopy[c.id] = true;
-            headerGroups[0].headers.forEach(header => {
-                if (
-                    header.columns?.find(column => column.id === c.id) &&
-                    !isGroupExpanded(header.Header as string)
-                ) {
-                    if ((header.Header as string) === 'Variant') {
-                        checkedColumnsCopy['emptyCore'] = false;
-                    } else if ((header.Header as string) === 'Variant Details') {
-                        checkedColumnsCopy['emptyVariationDetails'] = false;
-                    } else {
-                        checkedColumnsCopy['emptyCaseDetails'] = false;
-                    }
-                }
-            });
+
+            if (!isGroupExpanded(group.Header as string)) {
+                // Expand the group because a column in the group becomes visible.
+                checkedColumnsCopy[groupMapping[group.Header as string]] = false;
+            }
         } else {
-            // If user unchecks a checkbox, update checkedColumns state and cachedVisibility
+            // User unchecks a column.
             checkedColumnsCopy[c.id] = false;
             cachedVisibilityCopy[c.id] = false;
-            headerGroups[0].headers.forEach(header => {
-                if (
-                    isGroupExpanded(header.Header as string) &&
-                    header.columns?.filter(column => checkedColumnsCopy[column.id]) &&
-                    header.columns?.filter(column => checkedColumnsCopy[column.id]).length === 0
-                ) {
-                    if ((header.Header as string) === 'Variant') {
-                        checkedColumnsCopy['emptyCore'] = true;
-                    } else if ((header.Header as string) === 'Variant Details') {
-                        checkedColumnsCopy['emptyVariationDetails'] = true;
-                    } else {
-                        checkedColumnsCopy['emptyCaseDetails'] = true;
-                    }
-                }
-            });
+            if (
+                isGroupExpanded(group.Header as string) &&
+                group.columns?.filter(column => checkedColumnsCopy[column.id])?.length === 0
+            ) {
+                // Collapse the group because all columns in the group become invisible.
+                checkedColumnsCopy[groupMapping[group.Header as string]] = true;
+            }
         }
         setCachedVisibility(cachedVisibilityCopy);
         setCheckedColumns(checkedColumnsCopy);
@@ -190,7 +172,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                                         label={g.Header as string}
                                         checked={isGroupExpanded(g.Header as string)}
                                         onClick={() => {
-                                            groupClick(g);
+                                            onGroupClick(g);
                                         }}
                                     />
                                     {order.map(
@@ -224,7 +206,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                                                                     label={c.Header as string}
                                                                     checked={checkedColumns[c.id]}
                                                                     onClick={() => {
-                                                                        columnClick(c);
+                                                                        onColumnClick(c);
                                                                     }}
                                                                 />
                                                             </div>
