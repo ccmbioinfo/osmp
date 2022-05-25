@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
 import { BsFillEyeFill, BsFillEyeSlashFill } from 'react-icons/bs';
 import { ColumnInstance, HeaderGroup, UseTableInstanceProps } from 'react-table';
@@ -9,6 +9,7 @@ interface ColumnVisibilityModalProps<T extends object>
     extends Pick<UseTableInstanceProps<T>, 'toggleHideColumn'> {
     headerGroups: HeaderGroup<T>[];
     allColumns: ColumnInstance<T>[];
+    visibleColumns: ColumnInstance<T>[];
     setColumnOrder: (update: string[] | ((columnOrder: string[]) => string[])) => void;
     cached: Record<string, boolean>;
     setCached: (value: Record<string, boolean>) => void;
@@ -20,16 +21,26 @@ export default function ColumnVisibilityModal<T extends {}>({
     cached,
     setCached,
     allColumns,
+    visibleColumns,
     setColumnOrder,
 }: ColumnVisibilityModalProps<T>) {
     const [showModal, setShowModal] = useState<boolean>(false);
     const [order, setOrder] = useState<ColumnInstance<T>[]>([]);
     // Cache a column's latest "check" status independent of the column's group status. Does not contain columns with type "empty".
-    const [cachedVisibility, setCachedVisibility] = useState(cached);
+    const [cachedVisibility, setCachedVisibility] = useState<Record<string, boolean>>({});
+    useEffect(() => {
+        setCachedVisibility(cached);
+    }, [cached]);
+
     // State to represent the current "check" status.
-    const [checkedColumns, setCheckedColumns] = useState(
-        Object.fromEntries(allColumns.filter(c => c.type !== 'fixed').map(c => [c.id, c.isVisible]))
-    );
+    const [checkedColumns, setCheckedColumns] = useState<Record<string, boolean>>({});
+    useEffect(() => {
+        setCheckedColumns(
+            Object.fromEntries(
+                allColumns.filter(c => c.type !== 'fixed').map(c => [c.id, c.isVisible])
+            )
+        );
+    }, [allColumns, visibleColumns]);
 
     const groupMapping: Record<string, string> = {
         Variant: 'emptyCore',

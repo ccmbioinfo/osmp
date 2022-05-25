@@ -496,7 +496,28 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     );
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) => {
-        g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
+        const columnsInGroup = g.columns?.filter(c => c.type !== 'fixed');
+        const cacheColumns = columnsInGroup?.filter(c => cachedVisibility[c.id] === true);
+        if (!isHeaderExpanded(g)) {
+            if (cacheColumns && cacheColumns.length > 0) {
+                // If some cols in the group are cached, only make these columns visible.
+                columnsInGroup?.forEach(c =>
+                    c.type === 'empty'
+                        ? toggleHideColumn(c.id, true)
+                        : toggleHideColumn(c.id, !cachedVisibility[c.id])
+                );
+            } else {
+                columnsInGroup?.forEach(c =>
+                    c.type === 'empty'
+                        ? toggleHideColumn(c.id, true)
+                        : toggleHideColumn(c.id, false)
+                );
+            }
+        } else {
+            columnsInGroup?.forEach(c =>
+                c.type === 'empty' ? toggleHideColumn(c.id, false) : toggleHideColumn(c.id, true)
+            );
+        }
     };
 
     var currColour = 'white';
@@ -530,6 +551,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         cached={cachedVisibility}
                         setCached={setCachedVisibility}
                         allColumns={allColumns}
+                        visibleColumns={visibleColumns}
                         setColumnOrder={setColumnOrder}
                     />
                     <DownloadModal rows={rows} visibleColumns={visibleColumns} />
