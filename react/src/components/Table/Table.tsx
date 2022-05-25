@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
@@ -487,8 +487,17 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter } = state;
 
-    const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
+    const [cachedVisibility, setCachedVisibility] = useState(
+        Object.fromEntries(
+            allColumns
+                .filter(c => c.type !== 'fixed' && c.type !== 'empty')
+                .map(column => [column.id, column.isVisible])
+        )
+    );
+
+    const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) => {
         g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
+    };
 
     var currColour = 'white';
 
@@ -517,8 +526,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 <InlineFlex>
                     <ColumnVisibilityModal
                         headerGroups={headerGroups}
-                        toggleGroupVisibility={toggleGroupVisibility}
                         toggleHideColumn={toggleHideColumn}
+                        cached={cachedVisibility}
+                        setCached={setCachedVisibility}
                         allColumns={allColumns}
                         setColumnOrder={setColumnOrder}
                     />
