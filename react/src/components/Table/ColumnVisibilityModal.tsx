@@ -30,7 +30,7 @@ export default function ColumnVisibilityModal<T extends {}>({
     const [cachedVisibility, setCachedVisibility] = useState<Record<string, boolean>>({});
     useEffect(() => {
         setCachedVisibility(cached);
-    }, [cached]);
+    }, [cached, showModal]);
 
     // State to represent the current "check" status.
     const [checkedColumns, setCheckedColumns] = useState<Record<string, boolean>>({});
@@ -40,7 +40,7 @@ export default function ColumnVisibilityModal<T extends {}>({
                 allColumns.filter(c => c.type !== 'fixed').map(c => [c.id, c.isVisible])
             )
         );
-    }, [allColumns, visibleColumns]);
+    }, [allColumns, visibleColumns, showModal]);
 
     const groupMapping: Record<string, string> = {
         Variant: 'emptyCore',
@@ -81,30 +81,24 @@ export default function ColumnVisibilityModal<T extends {}>({
     const onGroupClick = (g: HeaderGroup<T>) => {
         const checkedColumnsCopy = Object.assign({}, checkedColumns);
         const columnsInGroup = g.columns?.filter(c => c.type !== 'fixed');
+        // When user makes a group invisible, uncheck all columns in the group except the column with type "empty"
         if (isGroupExpanded(g.Header as string)) {
-            // When user makes a group invisible, uncheck all columns in the group except the column with type "empty"
-            columnsInGroup?.map(c =>
-                c.type !== 'empty'
-                    ? (checkedColumnsCopy[c.id] = false)
-                    : (checkedColumnsCopy[c.id] = true)
-            );
+            columnsInGroup?.forEach(c => (checkedColumnsCopy[c.id] = c.type === 'empty'));
         } else {
-            // User makes a group visible
             const cacheColumns = columnsInGroup?.filter(c => cachedVisibility[c.id] === true);
             // If some columns in this group are visible in the cache, only check the columns visible in the cache.
             if (cacheColumns && cacheColumns.length > 0) {
-                columnsInGroup?.map(c =>
-                    c.type !== 'empty' && cachedVisibility[c.id]
-                        ? (checkedColumnsCopy[c.id] = true)
-                        : (checkedColumnsCopy[c.id] = false)
+                columnsInGroup?.forEach(
+                    c => (checkedColumnsCopy[c.id] = c.type !== 'empty' && cachedVisibility[c.id])
                 );
             } else {
-                // Else, check all columns by default.
-                columnsInGroup?.map(c =>
-                    c.type !== 'empty'
-                        ? (checkedColumnsCopy[c.id] = true)
-                        : (checkedColumnsCopy[c.id] = false)
-                );
+                // Else, check all columns by default. Update the cache.
+                const cachedVisibilityCopy = Object.assign({}, cachedVisibility);
+                columnsInGroup?.forEach(c => {
+                    checkedColumnsCopy[c.id] = c.type !== 'empty';
+                    cachedVisibilityCopy[c.id] = c.type !== 'empty';
+                });
+                setCachedVisibility(cachedVisibilityCopy);
             }
         }
         setCheckedColumns(checkedColumnsCopy);
@@ -114,26 +108,19 @@ export default function ColumnVisibilityModal<T extends {}>({
         const checkedColumnsCopy = Object.assign({}, checkedColumns);
         const cachedVisibilityCopy = Object.assign({}, cachedVisibility);
         const group = columnToGroup(c.id);
-        // User checks a column.
-        if (!checkedColumnsCopy[c.id]) {
-            checkedColumnsCopy[c.id] = true;
-            cachedVisibilityCopy[c.id] = true;
-
-            if (!isGroupExpanded(group.Header as string)) {
-                // Expand the group because a column in the group becomes visible.
-                checkedColumnsCopy[groupMapping[group.Header as string]] = false;
-            }
-        } else {
-            // User unchecks a column.
-            checkedColumnsCopy[c.id] = false;
-            cachedVisibilityCopy[c.id] = false;
-            if (
-                isGroupExpanded(group.Header as string) &&
-                group.columns?.filter(column => checkedColumnsCopy[column.id])?.length === 0
-            ) {
-                // Collapse the group because all columns in the group become invisible.
-                checkedColumnsCopy[groupMapping[group.Header as string]] = true;
-            }
+        checkedColumnsCopy[c.id] = !checkedColumns[c.id];
+        cachedVisibilityCopy[c.id] = !checkedColumns[c.id];
+        // If user checks a column and none of the other columns in the group were visible, check the group.
+        if (!checkedColumns[c.id] && !isGroupExpanded(group.Header as string)) {
+            checkedColumnsCopy[groupMapping[group.Header as string]] = false;
+        }
+        // If user unchecks a column and none of the other columns in the group were visible, uncheck the group.
+        else if (
+            checkedColumns[c.id] &&
+            isGroupExpanded(group.Header as string) &&
+            group.columns?.filter(column => checkedColumnsCopy[column.id])?.length === 0
+        ) {
+            checkedColumnsCopy[groupMapping[group.Header as string]] = true;
         }
         setCachedVisibility(cachedVisibilityCopy);
         setCheckedColumns(checkedColumnsCopy);
@@ -144,7 +131,9 @@ export default function ColumnVisibilityModal<T extends {}>({
         checkedColumns: Record<string, boolean>
     ) => {
         setCached(cachedVisibility);
-        allColumns.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, !checkedColumns[c.id]));
+        allColumns.forEach(
+            c => c.type !== 'fixed' && toggleHideColumn(c.id, !checkedColumns[c.id])
+        );
     };
 
     return (

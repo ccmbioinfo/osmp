@@ -498,6 +498,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) => {
         const columnsInGroup = g.columns?.filter(c => c.type !== 'fixed');
         const cacheColumns = columnsInGroup?.filter(c => cachedVisibility[c.id] === true);
+        const cachedVisibilityCopy = Object.assign({}, cachedVisibility);
+
+        //User expands a group
         if (!isHeaderExpanded(g)) {
             if (cacheColumns && cacheColumns.length > 0) {
                 // If some cols in the group are cached, only make these columns visible.
@@ -507,16 +510,21 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         : toggleHideColumn(c.id, !cachedVisibility[c.id])
                 );
             } else {
-                columnsInGroup?.forEach(c =>
-                    c.type === 'empty'
-                        ? toggleHideColumn(c.id, true)
-                        : toggleHideColumn(c.id, false)
-                );
+                // Display all the columns in the group and update the cache.
+                columnsInGroup?.forEach(c => {
+                    if (c.type === 'empty') {
+                        toggleHideColumn(c.id, true);
+                    } else {
+                        toggleHideColumn(c.id, false);
+                        cachedVisibilityCopy[c.id] = true;
+                    }
+                });
+                setCachedVisibility(cachedVisibilityCopy);
             }
-        } else {
-            columnsInGroup?.forEach(c =>
-                c.type === 'empty' ? toggleHideColumn(c.id, false) : toggleHideColumn(c.id, true)
-            );
+        }
+        // User collapses a group
+        else {
+            columnsInGroup?.forEach(c => toggleHideColumn(c.id, c.type !== 'empty'));
         }
     };
 
