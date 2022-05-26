@@ -11,6 +11,7 @@ import {
   ResultTransformer,
   VariantQueryResponse,
   VariantResponseFields,
+  G4RDFamilyQueryResult,
   G4RDPatientQueryResult,
   IndividualInfoFields,
 } from '../../../types';
@@ -59,6 +60,7 @@ const getG4rdNodeQuery = async ({
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
   let G4RDVariantQueryResponse: null | AxiosResponse<G4RDVariantQueryResult> = null;
   let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
+  const FamilyIds: null | Record<string, string> = {}; // <PatientId, FamilyId>
   let Authorization = '';
   try {
     Authorization = await getAuthHeader();
@@ -72,6 +74,7 @@ const getG4rdNodeQuery = async ({
     };
   }
   const url = `${process.env.G4RD_URL}/rest/variants/match`;
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const { position, ...gene } = geneInput;
   variant.assemblyId = 'GRCh37';
   // For g4rd node, assemblyId is a required field as specified in this sample request:
@@ -92,17 +95,41 @@ const getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariantQueryResponse) {
-      const individualIds = G4RDVariantQueryResponse.data.results.map(
-        v => v.individual.individualId
-      );
-      const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
-        .map(id => `id=${id}`)
-        .join('&')}`;
+      const individualIds = G4RDVariantQueryResponse.data.results.reduce(function (prev, curr) {
+        if (curr.individual.individualId) return [...prev, curr.individual.individualId];
+        else return prev;
+      }, [] as Array<string>);
+      if (individualIds.length > 0) {
+        const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
+          .map(id => `id=${id}`)
+          .join('&')}`;
 
-      G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(patientUrl, {
-        headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-      });
+        G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(patientUrl, {
+          headers: {
+            Authorization,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        });
+
+        // Get Family Id for each patient. Only send a GET request if the IndividualId is not already in dictionary "familyId".
+        for (let index = 0; index < individualIds.length; index++) {
+          const individualId = individualIds[index];
+          if (!FamilyIds[individualId]) {
+            const familyUrl = `${process.env.G4RD_URL}/rest/patients/${individualId}/family`;
+            const familyId = await axios.get<G4RDFamilyQueryResult>(familyUrl, {
+              headers: {
+                Authorization,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+              },
+              httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+            });
+            FamilyIds[individualId] = familyId.data.id;
+          }
+        }
+      }
     }
   } catch (e) {
     logger.error(e);
@@ -113,7 +140,7 @@ const getG4rdNodeQuery = async ({
     data: transformG4RDQueryResponse(
       (G4RDVariantQueryResponse?.data as G4RDVariantQueryResult) || [],
       (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
-      position
+      FamilyIds
     ),
     error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
     source: SOURCE_NAME,
@@ -176,7 +203,8 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
 
 export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = (
   variantResponse,
-  patientResponse: G4RDPatientQueryResult[]
+  patientResponse: G4RDPatientQueryResult[],
+  familyIds: Record<string, string>
 ) => {
   const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
 
@@ -216,10 +244,14 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       referenceName: chromosome, // change this to chromosome
     };
 
+    let familyId: string = '';
+    if (individual.individualId) familyId = familyIds[individual.individualId];
+
     const individualResponseFields: IndividualResponseFields = {
       ...individual,
       ethnicity,
       info,
+      familyId,
     };
     return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
   });

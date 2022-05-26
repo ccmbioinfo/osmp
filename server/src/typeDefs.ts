@@ -70,6 +70,7 @@ export default gql`
     datasetId: String
     diseases: [DiseaseFields]
     ethnicity: String
+    familyId: String
     geographicOrigin: String
     individualId: String
     info: IndividualInfoFields

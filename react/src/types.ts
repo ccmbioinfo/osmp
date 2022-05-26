@@ -82,6 +82,7 @@ export interface IndividualResponseFields {
     datasetId?: Maybe<string>;
     diseases?: Maybe<DiseaseFields[]>;
     ethnicity?: Maybe<string>;
+    familyId?: Maybe<string>;
     geographicOrigin?: Maybe<string>;
     individualId?: Maybe<string>;
     info?: Maybe<IndividualInfoFields>;
