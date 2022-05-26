@@ -487,7 +487,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter } = state;
 
-    const [cachedVisibility, setCachedVisibility] = useState(
+    const [cacheTable, setCacheTable] = useState(
         Object.fromEntries(
             allColumns
                 .filter(c => c.type !== 'fixed' && c.type !== 'empty')
@@ -497,8 +497,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) => {
         const columnsInGroup = g.columns?.filter(c => c.type !== 'fixed');
-        const cacheColumns = columnsInGroup?.filter(c => cachedVisibility[c.id] === true);
-        const cachedVisibilityCopy = Object.assign({}, cachedVisibility);
+        const cacheColumns = columnsInGroup?.filter(c => cacheTable[c.id] === true);
+        const cachedVisibilityCopy = Object.assign({}, cacheTable);
 
         //User expands a group
         if (!isHeaderExpanded(g)) {
@@ -507,7 +507,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 columnsInGroup?.forEach(c =>
                     c.type === 'empty'
                         ? toggleHideColumn(c.id, true)
-                        : toggleHideColumn(c.id, !cachedVisibility[c.id])
+                        : toggleHideColumn(c.id, !cacheTable[c.id])
                 );
             } else {
                 // Display all the columns in the group and update the cache.
@@ -519,7 +519,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         cachedVisibilityCopy[c.id] = true;
                     }
                 });
-                setCachedVisibility(cachedVisibilityCopy);
+                setCacheTable(cachedVisibilityCopy);
             }
         }
         // User collapses a group
@@ -556,8 +556,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     <ColumnVisibilityModal
                         headerGroups={headerGroups}
                         toggleHideColumn={toggleHideColumn}
-                        cached={cachedVisibility}
-                        setCached={setCachedVisibility}
+                        cached={cacheTable}
+                        setCached={setCacheTable}
                         allColumns={allColumns}
                         visibleColumns={visibleColumns}
                         setColumnOrder={setColumnOrder}
