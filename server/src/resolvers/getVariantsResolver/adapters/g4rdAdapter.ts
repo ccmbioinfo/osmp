@@ -95,10 +95,13 @@ const getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariantQueryResponse) {
+      // Get all unique individual Ids.
       const individualIds = G4RDVariantQueryResponse.data.results.reduce(function (prev, curr) {
-        if (curr.individual.individualId) return [...prev, curr.individual.individualId];
+        if (curr.individual.individualId && prev.indexOf(curr.individual.individualId) === -1)
+          return [...prev, curr.individual.individualId];
         else return prev;
       }, [] as Array<string>);
+
       if (individualIds.length > 0) {
         const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
           .map(id => `id=${id}`)
@@ -113,22 +116,30 @@ const getG4rdNodeQuery = async ({
           httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         });
 
-        // Get Family Id for each patient. Only send a GET request if the IndividualId is not already in dictionary "familyId".
-        for (let index = 0; index < individualIds.length; index++) {
-          const individualId = individualIds[index];
-          if (!FamilyIds[individualId]) {
-            const familyUrl = `${process.env.G4RD_URL}/rest/patients/${individualId}/family`;
-            const familyId = await axios.get<G4RDFamilyQueryResult>(familyUrl, {
-              headers: {
-                Authorization,
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-              },
-              httpsAgent: new https.Agent({ rejectUnauthorized: false }),
-            });
-            FamilyIds[individualId] = familyId.data.id;
+        // Get Family Id for each patient.
+
+        const patientFamily = axios.create({
+          headers: {
+            Authorization,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          httpsAgent: new https.Agent({ rejectUnauthorized: false }),
+        });
+
+        const familyResponses = await Promise.allSettled(
+          individualIds.map(id =>
+            patientFamily.get<G4RDFamilyQueryResult>(
+              `${process.env.G4RD_URL}/rest/patients/${id}/family`
+            )
+          )
+        );
+
+        familyResponses.forEach((response, index) => {
+          if (response.status === 'fulfilled' && response.value.status === 200) {
+            FamilyIds[individualIds[index]] = response.value.data.id;
           }
-        }
+        });
       }
     }
   } catch (e) {
