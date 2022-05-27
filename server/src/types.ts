@@ -154,11 +154,9 @@ export interface Notes {
   medical_history?: string;
   diagnosis_notes?: string;
 }
-
 export interface Solved {
   status: 'solved' | 'unsolved' | '';
 }
-
 export interface G4RDPatientQueryResult {
   notes: Notes;
   ethnicity: Ethnicity;
