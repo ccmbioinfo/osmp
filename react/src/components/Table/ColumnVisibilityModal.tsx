@@ -55,11 +55,11 @@ export default function ColumnVisibilityModal<T extends {}>({
 
     // Find a column's group: "Variant", "Variant Details" or "Case Details".
     const columnToGroup = (columnId: string) => {
-        let group = headerGroups[0].headers[0];
-        headerGroups[0].headers.forEach(header => {
-            if (header.columns?.find(c => c.id === columnId)) group = header;
-        });
-        return group;
+        for (let i = 0; i < headerGroups[0].headers.length; i++) {
+            if (headerGroups[0].headers[i].columns?.find(c => c.id === columnId)) {
+                return headerGroups[0].headers[i];
+            }
+        }
     };
 
     const reorder = (prevPos: number, newPos: number): ColumnInstance<T>[] => {
@@ -107,7 +107,7 @@ export default function ColumnVisibilityModal<T extends {}>({
     const onColumnClick = (c: ColumnInstance<T>) => {
         const checkedColumnsCopy = Object.assign({}, checkedColumns);
         const cachedVisibilityCopy = Object.assign({}, cachedVisibility);
-        const group = columnToGroup(c.id);
+        const group = columnToGroup(c.id)!;
         checkedColumnsCopy[c.id] = !checkedColumns[c.id];
         cachedVisibilityCopy[c.id] = !checkedColumns[c.id];
         // If user checks a column and none of the other columns in the group were visible, check the group.
