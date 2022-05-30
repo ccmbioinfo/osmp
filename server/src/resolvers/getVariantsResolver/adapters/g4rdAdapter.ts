@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import jwtDecode from 'jwt-decode';
-import https from 'https';
+// import https from 'https';
 import { URLSearchParams } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../../../logger';
@@ -89,7 +89,6 @@ const getG4rdNodeQuery = async ({
       },
       {
         headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       }
     );
 
@@ -113,7 +112,6 @@ const getG4rdNodeQuery = async ({
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
-          httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         });
 
         // Get Family Id for each patient.
@@ -124,7 +122,6 @@ const getG4rdNodeQuery = async ({
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
-          httpsAgent: new https.Agent({ rejectUnauthorized: false }),
         });
 
         const familyResponses = await Promise.allSettled(
