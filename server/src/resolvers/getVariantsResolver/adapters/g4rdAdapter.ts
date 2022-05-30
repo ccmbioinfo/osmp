@@ -94,12 +94,12 @@ const getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariantQueryResponse) {
+      let individualIds = G4RDVariantQueryResponse.data.results
+        .map(v => v.individual.individualId!)
+        .filter(Boolean); // Filter out undefined and null values.
+
       // Get all unique individual Ids.
-      const individualIds = G4RDVariantQueryResponse.data.results.reduce(function (prev, curr) {
-        if (curr.individual.individualId && prev.indexOf(curr.individual.individualId) === -1)
-          return [...prev, curr.individual.individualId];
-        else return prev;
-      }, [] as Array<string>);
+      individualIds = [...new Set(individualIds)];
 
       if (individualIds.length > 0) {
         const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
