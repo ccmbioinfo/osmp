@@ -212,12 +212,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'homozygousCount',
                         Header: 'Homo Count',
                         width: getColumnWidth('Homo Count'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'heterozygousCount',
                         id: 'heterozygousCount',
                         Header: 'Het Count',
                         width: getColumnWidth('Het Count'),
+                        filter: 'between',
                     },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
                     {
