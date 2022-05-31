@@ -75,6 +75,10 @@ export const Styles = styled.div<StylesProps>`
             }
             position: relative;
 
+            &.last-in-set {
+                border-right-color: dimgray;
+            }
+
             :last-child {
                 border-right: 0;
             }

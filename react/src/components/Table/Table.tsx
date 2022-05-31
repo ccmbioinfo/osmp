@@ -37,6 +37,8 @@ import {
     isHeaderExpanded,
     isHeterozygous,
     isHomozygous,
+    isLastCellInSet,
+    isLastHeaderInSet,
     prepareData,
 } from '../../utils';
 import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
@@ -563,7 +565,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             const { key, ...restHeaderProps } =
                                                 column.getHeaderProps();
                                             return (
-                                                <TH key={key} {...restHeaderProps}>
+                                                <TH
+                                                    key={key}
+                                                    className={isLastHeaderInSet(column) ? 'last-in-set' : ''}
+                                                    {...restHeaderProps}
+                                                >
                                                     <AnimatePresence initial={false}>
                                                         {column.isVisible && (
                                                             <motion.section
@@ -740,6 +746,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 return (
                                                     <td
                                                         key={key}
+                                                        className={isLastCellInSet(cell) ? 'last-in-set' : ''}
                                                         style={{
                                                             paddingRight: 0,
                                                             paddingLeft: 0,
