@@ -389,7 +389,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 : '',
                         id: 'phenotypicFeatures',
                         Header: 'Phenotypes',
-                        width: getColumnWidth('Phenotypes'),
+                        width: 150,
                         Cell: ({
                             row: {
                                 isExpanded,
