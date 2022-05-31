@@ -33,7 +33,6 @@ export default gql`
 
   type CallSet {
     callsetId: String
-    datasetId: String
     individualId: String
     info: CallSetInfoFields
   }
@@ -67,7 +66,6 @@ export default gql`
   }
 
   type IndividualResponseFields {
-    datasetId: String
     diseases: [DiseaseFields]
     ethnicity: String
     geographicOrigin: String
@@ -79,6 +77,7 @@ export default gql`
 
   type IndividualInfoFields {
     candidateGene: String
+    clinicalStatus: String
     solved: String
     classifications: String
     diagnosis: String
