@@ -106,16 +106,18 @@ const getG4rdNodeQuery = async ({
           .map(id => `id=${id}`)
           .join('&')}`;
 
-        G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(patientUrl, {
-          headers: {
-            Authorization,
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-        });
+        G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(
+          new URL(patientUrl).toString(),
+          {
+            headers: {
+              Authorization,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          }
+        );
 
         // Get Family Id for each patient.
-
         const patientFamily = axios.create({
           headers: {
             Authorization,
@@ -127,7 +129,7 @@ const getG4rdNodeQuery = async ({
         const familyResponses = await Promise.allSettled(
           individualIds.map(id =>
             patientFamily.get<G4RDFamilyQueryResult>(
-              `${process.env.G4RD_URL}/rest/patients/${id}/family`
+              new URL(`${process.env.G4RD_URL}/rest/patients/${id}/family`).toString()
             )
           )
         );
