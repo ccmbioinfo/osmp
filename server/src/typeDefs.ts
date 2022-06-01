@@ -17,6 +17,9 @@ export default gql`
     geneName: String
     gnomadHet: Int
     gnomadHom: Int
+    phred: Float
+    spliceAIScore: Float
+    spliceAIType: String
     transcript: String
   }
 
@@ -38,6 +41,7 @@ export default gql`
   type VariantResponseFields {
     alt: String!
     assemblyId: String!
+    assemblyIdCurrent: String!
     callsets: [CallSet]
     end: Int!
     info: VariantResponseInfoFields

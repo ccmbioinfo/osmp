@@ -1,4 +1,5 @@
 import { HeaderGroup } from 'react-table';
+import { ResultTableColumns } from '../components/Table/Table';
 import {
     CallsetInfoFields,
     IndividualInfoFields,
@@ -10,6 +11,10 @@ import {
 
 type Variant = Pick<VariantResponseFields, 'ref' | 'alt' | 'start' | 'end'>;
 
+interface PatientBurdenCount {
+    [x: string]: number;
+}
+
 export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'diseases'> &
     IndividualInfoFields & { contactInfo: string } & Omit<
         VariantResponseFields,
@@ -18,19 +23,10 @@ export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'di
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; diseases: string };
 
-export interface ResultTableColumns extends FlattenedQueryResponse {
-    aaChange: string;
-    emptyCaseDetails: string;
-    emptyVariationDetails: string;
-    homozygousCount?: number;
-    heterozygousCount?: number;
-    uniqueId: number;
-}
-
 const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryResponse => {
     const { contactInfo, source } = result;
     const { callsets, info: variantInfo, ...restVariant } = result.variant;
-    const { diseases, info: individualInfo, ...restIndividual } = result.individual;
+    const { sex, diseases, info: individualInfo, ...restIndividual } = result.individual;
     const flattenedDiseases = (diseases || []).reduce(
         (a, c, i) => `${a}${i ? ';' : ''}${c.diseaseLabel}`,
         ''
@@ -39,6 +35,7 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
     return {
         contactInfo,
         diseases: flattenedDiseases,
+        sex: resolveSex(sex || ''),
         ...individualInfo,
         ...restIndividual,
         ...restVariant,
@@ -51,17 +48,13 @@ const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
     uniqueId: number
 ): ResultTableColumns => {
-    const reformatted = Object.fromEntries(
-        Object.entries(results).map(([k, v]) => [k, v === 'NA' ? '' : v])
-    ) as FlattenedQueryResponse;
     return {
-        ...reformatted,
+        ...results,
         emptyCaseDetails: '',
         emptyVariationDetails: '',
         uniqueId,
-        aaChange: reformatted.aaPos?.trim()
-            ? `p.${reformatted.aaRef}${reformatted.aaPos}${reformatted.aaAlt}`
-            : '',
+        aaChange: results.aaPos || 'NA',
+        af: results.af || 0,
     };
 };
 
@@ -94,6 +87,16 @@ export const isHeaderExpanded = (column: HeaderGroup<ResultTableColumns>) => {
 export const isCaseDetailsCollapsed = (headers: HeaderGroup<ResultTableColumns>[]) => {
     const caseDetailsCol = headers.find(header => header.Header === 'Case Details');
     return caseDetailsCol && !isHeaderExpanded(caseDetailsCol);
+};
+
+const resolveSex = (sexPhenotype: string) => {
+    if (sexPhenotype.toLowerCase().startsWith('m') || sexPhenotype === 'NCIT:C46112') {
+        return 'Male';
+    } else if (sexPhenotype.toLowerCase().startsWith('f') || sexPhenotype === 'NCIT:C46113') {
+        return 'Female';
+    } else if (sexPhenotype === 'NCIT:C46113') {
+        return 'Other Sex';
+    } else return 'Unknown';
 };
 
 const sortQueryResult = (queryResult: VariantQueryDataResult[]) => {
@@ -135,7 +138,6 @@ export const prepareData = (
 
     sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
-
         if (
             currVariant.ref !== ref ||
             currVariant.alt !== alt ||
@@ -162,7 +164,18 @@ export const prepareData = (
             result.push.apply(
                 result,
                 d.variant.callsets
-                    .filter(cs => cs.individualId === d.individual.individualId)
+                    .filter(cs => {
+                        if (cs.individualId === d.individual.individualId) {
+                            if (isHeterozygous(cs.info.zygosity)) {
+                                currHeterozygousCount += 1;
+                            } else if (isHomozygous(cs.info.zygosity)) {
+                                currHomozygousCount += 1;
+                            }
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    })
                     .map(cs =>
                         addAdditionalFieldsAndFormatNulls(
                             {
@@ -173,22 +186,47 @@ export const prepareData = (
                         )
                     )
             );
-            currRowId += 1;
-            d.variant.callsets.forEach(cs =>
-                isHeterozygous(cs.info.zygosity)
-                    ? (currHeterozygousCount += 1)
-                    : isHomozygous(cs.info.zygosity)
-                    ? (currHomozygousCount += 1)
-                    : {}
-            );
         } else {
             result.push(addAdditionalFieldsAndFormatNulls(flattenBaseResults(d), currUniqueId));
-            currRowId += 1;
         }
+        currRowId += 1;
     });
     result.slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId).forEach(row => {
         row.homozygousCount = currHomozygousCount;
         row.heterozygousCount = currHeterozygousCount;
+    });
+
+    // Remove duplicate variants for the same patient
+    const uniquePatientVariants = result.filter(
+        (arr, index, self) =>
+            index ===
+            self.findIndex(
+                t =>
+                    t.start === arr.start &&
+                    t.end === arr.end &&
+                    t.alt === arr.alt &&
+                    t.ref === arr.ref &&
+                    t.individualId === arr.individualId
+            )
+    );
+
+    const patientBurdenCount: PatientBurdenCount = {};
+
+    uniquePatientVariants.forEach(p => {
+        if (p.individualId) {
+            if (patientBurdenCount[p.individualId]) {
+                patientBurdenCount[p.individualId] += 1;
+            } else {
+                patientBurdenCount[p.individualId] = 1;
+            }
+        }
+    });
+
+    result.map(r => {
+        if (r.individualId) {
+            r.burdenCount = patientBurdenCount[r.individualId];
+        }
+        return r;
     });
 
     return [result, uniqueVariantIndices];

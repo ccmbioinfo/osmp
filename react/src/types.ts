@@ -11,6 +11,9 @@ export interface VariantResponseInfoFields {
     geneName?: Maybe<string>;
     gnomadHet?: Maybe<string>;
     gnomadHom?: Maybe<number>;
+    phred?: Maybe<number>;
+    spliceAIScore?: Maybe<number>;
+    spliceAIType?: Maybe<string>;
     transcript?: Maybe<string>;
 }
 
@@ -33,6 +36,7 @@ export type AssemblyId = 'gnomAD_GRCh37' | '38' | 'GRCh37' | 'GRCh38' | '37' | '
 export interface VariantResponseFields {
     alt: string;
     assemblyId: AssemblyId;
+    assemblyIdCurrent: AssemblyId;
     callsets: CallSet[];
     end: number;
     info?: Maybe<VariantResponseInfoFields>;

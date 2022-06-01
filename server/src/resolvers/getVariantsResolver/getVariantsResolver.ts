@@ -12,6 +12,7 @@ import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
+import liftover from './utils/liftOver';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
@@ -30,18 +31,17 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     },
   } = args;
 
-  // fetch CADD and data in parallel
-  const caddAnnotationsPromise = fetchCaddAnnotations(position, assemblyId);
+  let annotationPosition = position;
 
+  // fetch data
   const queries = sources.map(source => buildSourceQuery(source, args));
-
-  const settled = await Promise.allSettled([caddAnnotationsPromise, ...queries]);
+  const settledQueries = await Promise.allSettled([...queries]);
 
   const errors: SourceError[] = [];
   const combinedResults: VariantQueryDataResult[] = [];
 
   /* inspect variant results and combine if no errors */
-  settled.forEach(response => {
+  settledQueries.forEach(response => {
     if (
       response.status === 'fulfilled' &&
       isVariantQuery(response.value) &&
@@ -65,19 +65,44 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     }
   });
 
-  // once variants are merged, handle annotations
-  const caddAannotations = settled.find(
+  // filter data that are not in user requested assemblyId
+  const dataForLiftover = combinedResults.filter(v => v.variant.assemblyId !== assemblyId);
+  // filter data that are already in user requested assemlbyId
+  let dataForAnnotation = combinedResults.filter(v => {
+    if (v.variant.assemblyId === assemblyId) {
+      v.variant.assemblyIdCurrent = assemblyId;
+      return true;
+    } else return false;
+  });
+  let unliftedVariants: VariantQueryDataResult[] = [];
+
+  // perform liftOver if needed
+  if (dataForLiftover.length) {
+    const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
+    ({ unliftedVariants, dataForAnnotation, annotationPosition } = liftoverResults);
+  }
+
+  // Cadd annotations for data in user requested assemblyId
+  let data: VariantQueryDataResult[] = [];
+  const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
+  const settledCadd = await Promise.allSettled([caddAnnotationsPromise]);
+  const caddAannotations = settledCadd.find(
     res => res.status === 'fulfilled' && !isVariantQuery(res.value)
   ) as PromiseFulfilledResult<CADDAnnotationQueryResponse>;
 
-  let data;
-
   if (!!caddAannotations && !caddAannotations.value.error) {
-    data = annotateCadd(combinedResults, caddAannotations.value.data);
+    data = annotateCadd(dataForAnnotation, caddAannotations.value.data);
   }
 
-  data = await annotateGnomad(data ?? combinedResults);
+  // gnomAD annotations TODO: gnomAD annotations for GRCh38 are not available yet.
+  if (assemblyId === 'GRCh37') {
+    data = await annotateGnomad(data ?? dataForAnnotation);
+  }
 
+  // return unmapped variants if there's any
+  if (unliftedVariants.length) {
+    data = data.concat(unliftedVariants);
+  }
   return { errors, data };
 };
 

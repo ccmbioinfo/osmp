@@ -36,7 +36,7 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
         required: state => !state.gene.value,
         rules: [
             {
-                valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 3,
+                valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 0,
                 error: 'Too few characters.',
             },
         ],

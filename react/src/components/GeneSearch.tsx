@@ -90,7 +90,7 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                 setOptions([]);
             }
         }
-        if (geneName.length > 2 && !options.map(o => o.value.name).includes(geneName)) {
+        if (geneName.length > 0 && !options.map(o => o.value.name).includes(geneName)) {
             debouncedAutocompleteFetch({ variables: { q: geneName.toLowerCase() } });
         }
     }, [debouncedAutocompleteFetch, geneName, options]);

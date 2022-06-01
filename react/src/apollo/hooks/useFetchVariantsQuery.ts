@@ -8,6 +8,8 @@ const fetchVariantsQuery = gql`
             data {
                 variant {
                     alt
+                    assemblyId
+                    assemblyIdCurrent
                     callsets {
                         callsetId
                         individualId
@@ -30,6 +32,9 @@ const fetchVariantsQuery = gql`
                         geneName
                         gnomadHet
                         gnomadHom
+                        phred
+                        spliceAIScore
+                        spliceAIType
                         transcript
                     }
                     ref

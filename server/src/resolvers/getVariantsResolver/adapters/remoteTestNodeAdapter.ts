@@ -114,7 +114,7 @@ const getRemoteTestNodeQuery = async (args: QueryInput): Promise<VariantQueryRes
 
   try {
     remoteTestNodeQueryResponse = await axios.get<StagerVariantQueryPayload[]>(
-      `${process.env.TEST_NODE_URL}?geneName=${args.input.gene.geneName}&assemblyId=${args.input.variant.assemblyId}`,
+      `${process.env.TEST_NODE_URL}?geneName=${args.input.gene.geneName}`,
       {
         headers: { Authorization: `Bearer ${tokenResponse.data.access_token}` },
       }
