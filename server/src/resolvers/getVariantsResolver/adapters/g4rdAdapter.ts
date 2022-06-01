@@ -196,6 +196,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
       const diagnosis = patient.clinicalStatus;
       const solved = patient.solved ? patient.solved.status : '';
+      const clinicalStatus = patient.clinicalStatus;
       ethnicity = Object.values(patient.ethnicity)
         .flat()
         .map(p => p.trim())
@@ -205,6 +206,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
         candidateGene,
         diagnosis,
         classifications,
+        clinicalStatus,
       };
     }
 

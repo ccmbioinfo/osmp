@@ -389,11 +389,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 : '',
                         id: 'phenotypicFeatures',
                         Header: 'Phenotypes',
-                        width: getColumnWidth('Phenotypes'),
+                        width: 150,
                         Cell: ({
                             row: {
                                 isExpanded,
-                                original: { phenotypicFeatures },
+                                original: { clinicalStatus, phenotypicFeatures },
                                 toggleRowExpanded,
                             },
                         }: {
@@ -403,6 +403,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 {...{ toggleRowExpanded }}
                                 phenotypes={phenotypicFeatures}
                                 rowExpanded={isExpanded}
+                                clinicalStatus={clinicalStatus}
                             />
                         ),
                     },
@@ -419,16 +420,24 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'contactInfo',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
+                        Cell: ({ row }) => (
+                            <CellText>
+                                <CellPopover state={row.original} id="contactInfo" />
+                            </CellText>
+                        ),
                         id: 'contactInfo',
                         Header: 'Contact',
-                        width: getColumnWidth('Contact', true),
+                        width: getColumnWidth(
+                            'Contact',
+                            true,
+                            Math.max(...tableData.map(row => (row.contactInfo || '').length))
+                        ),
                         disableFilters: true,
                     },
                 ],
             },
         ],
-        [getColumnWidth]
+        [getColumnWidth, tableData]
     );
 
     const defaultColumn = useMemo(
