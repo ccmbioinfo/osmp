@@ -73,15 +73,16 @@ export interface DiseaseFields {
 
 export interface IndividualInfoFields {
   candidateGene?: Maybe<string>;
+  clinicalStatus?: Maybe<string>;
   solved?: Maybe<string>;
   classifications?: Maybe<string>;
   diagnosis?: Maybe<string>;
 }
 
 export interface IndividualResponseFields {
-  datasetId?: Maybe<string>;
   diseases?: Maybe<DiseaseFields[]>;
   ethnicity?: Maybe<string>;
+  familyId?: Maybe<string>;
   geographicOrigin?: Maybe<string>;
   individualId?: Maybe<string>;
   info?: Maybe<IndividualInfoFields>;
@@ -154,7 +155,6 @@ export interface Notes {
   medical_history?: string;
   diagnosis_notes?: string;
 }
-
 export interface Solved {
   status: 'solved' | 'unsolved' | '';
 }
@@ -168,6 +168,12 @@ export interface G4RDPatientQueryResult {
 }
 
 /* End of G4RD GET patients endpoint schema */
+
+/* G4RD GET family endpoint schema */
+export interface G4RDFamilyQueryResult {
+  id: string;
+}
+
 export interface VariantCoordinate {
   alt: string;
   chrom: string;

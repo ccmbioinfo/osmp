@@ -17,15 +17,15 @@ services:
       REACT_APP_KEYCLOAK_REALM: ${KEYCLOAK_REALM}
       REACT_APP_KEYCLOAK_CLIENT_ID: ${KEYCLOAK_REACT_CLIENT_ID}
       REACT_APP_SOURCE_LIST:
-  ssmp-server:
+  server:
     build:
       context: server
       target: dev
-    image: ghcr.io/ccmbioinfo/ssmp:dev
+    image: ghcr.io/ccmbioinfo/osmp:dev
     init: true
     command: yarn start
     ports:
-      - ${SSMP_SERVER_PORT}:3000
+      - ${SERVER_PORT}:3000
     volumes:
       - ./server:/usr/src/app
     environment:
@@ -41,7 +41,7 @@ services:
       KEYCLOAK_REALM:
       KEYCLOAK_CLIENT_ID: ${KEYCLOAK_SERVER_CLIENT_ID}
       NODE_ENV: development
-      TEST_NODE_URL:
+      TEST_NODE_URL: http://test-node:3000/data
       TEST_NODE_OAUTH_ACTIVE:
       TEST_NODE_SSMP_TOKEN_CLIENT_ID:
       TEST_NODE_SSMP_TOKEN_CLIENT_SECRET:
@@ -58,7 +58,7 @@ services:
       - ${MONGO_INITDB_PORT}:27017
     volumes:
       - ./mongo/data:/data/db
-  test-node-1:
+  test-node:
     image: node:16-slim
     user: node
     working_dir: /usr/src/app
@@ -108,6 +108,6 @@ services:
     ports:
       - ${KEYCLOAK_PORT}:8080
     volumes:
-      - ./keycloak/scripts:/usr/scripts
-      - ./keycloak/scripts/disable-theme-cache.cli:/opt/jboss/startup-scripts/disable-theme-cache.cli
-      - ./keycloak/theme/ssmp:/opt/jboss/keycloak/themes/ssmp
+      - ./keycloak/bin:/usr/local/bin
+      - ./keycloak/startup-scripts:/opt/jboss/startup-scripts
+      - ./keycloak/theme:/opt/jboss/keycloak/themes/osmp

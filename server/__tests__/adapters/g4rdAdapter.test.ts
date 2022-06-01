@@ -80,7 +80,7 @@ const patientTestResponse =  [
       status: 'unsolved',
     },
     external_id: '2199_SK0445',
-    clinicalStatus: 'Hello World',
+    clinicalStatus: 'unaffected',
     disorders: [],
     features: [
       {
@@ -201,6 +201,7 @@ describe('Test g4rd query response transformer', () => {
             ethnicity
             info {
               candidateGene
+              clinicalStatus
               solved
               diagnosis
               classifications

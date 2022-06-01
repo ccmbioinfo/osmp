@@ -73,15 +73,16 @@ export interface DiseaseFields {
 
 export interface IndividualInfoFields {
     candidateGene?: Maybe<string>;
+    clinicalStatus?: Maybe<string>;
     solved?: Maybe<string>;
     classifications?: Maybe<string>;
     diagnosis?: Maybe<string>;
 }
 
 export interface IndividualResponseFields {
-    datasetId?: Maybe<string>;
     diseases?: Maybe<DiseaseFields[]>;
     ethnicity?: Maybe<string>;
+    familyId?: Maybe<string>;
     geographicOrigin?: Maybe<string>;
     individualId?: Maybe<string>;
     info?: Maybe<IndividualInfoFields>;

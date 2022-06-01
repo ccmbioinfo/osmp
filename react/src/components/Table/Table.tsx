@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
@@ -336,6 +336,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Individual ID'),
                     },
                     {
+                        accessor: 'familyId',
+                        id: 'familyId',
+                        Header: 'Family ID',
+                        width: getColumnWidth('Family ID'),
+                    },
+                    {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
@@ -393,11 +399,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 : '',
                         id: 'phenotypicFeatures',
                         Header: 'Phenotypes',
-                        width: getColumnWidth('Phenotypes'),
+                        width: 150,
                         Cell: ({
                             row: {
                                 isExpanded,
-                                original: { phenotypicFeatures },
+                                original: { clinicalStatus, phenotypicFeatures },
                                 toggleRowExpanded,
                             },
                         }: {
@@ -407,6 +413,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 {...{ toggleRowExpanded }}
                                 phenotypes={phenotypicFeatures}
                                 rowExpanded={isExpanded}
+                                clinicalStatus={clinicalStatus}
                             />
                         ),
                     },
@@ -423,16 +430,24 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     },
                     {
                         accessor: 'contactInfo',
-                        Cell: ({ row }) => <CellPopover state={row.original} id="contactInfo" />,
+                        Cell: ({ row }) => (
+                            <CellText>
+                                <CellPopover state={row.original} id="contactInfo" />
+                            </CellText>
+                        ),
                         id: 'contactInfo',
                         Header: 'Contact',
-                        width: getColumnWidth('Contact', true),
+                        width: getColumnWidth(
+                            'Contact',
+                            true,
+                            Math.max(...tableData.map(row => (row.contactInfo || '').length))
+                        ),
                         disableFilters: true,
                     },
                 ],
             },
         ],
-        [getColumnWidth]
+        [getColumnWidth, tableData]
     );
 
     const defaultColumn = useMemo(
@@ -491,8 +506,46 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
 
     const { filters, globalFilter } = state;
 
-    const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) =>
-        g.columns?.map(c => c.type !== 'fixed' && toggleHideColumn(c.id, c.isVisible));
+    const [cacheTable, setCacheTable] = useState(
+        Object.fromEntries(
+            allColumns
+                .filter(c => c.type !== 'fixed' && c.type !== 'empty')
+                .map(column => [column.id, column.isVisible])
+        )
+    );
+
+    const toggleGroupVisibility = (g: HeaderGroup<ResultTableColumns>) => {
+        const columnsInGroup = g.columns?.filter(c => c.type !== 'fixed');
+        const cacheColumns = columnsInGroup?.filter(c => cacheTable[c.id] === true);
+        const cachedVisibilityCopy = Object.assign({}, cacheTable);
+
+        //User expands a group
+        if (!isHeaderExpanded(g)) {
+            if (cacheColumns && cacheColumns.length > 0) {
+                // If some cols in the group are cached, only make these columns visible.
+                columnsInGroup?.forEach(c =>
+                    c.type === 'empty'
+                        ? toggleHideColumn(c.id, true)
+                        : toggleHideColumn(c.id, !cacheTable[c.id])
+                );
+            } else {
+                // Display all the columns in the group and update the cache.
+                columnsInGroup?.forEach(c => {
+                    if (c.type === 'empty') {
+                        toggleHideColumn(c.id, true);
+                    } else {
+                        toggleHideColumn(c.id, false);
+                        cachedVisibilityCopy[c.id] = true;
+                    }
+                });
+                setCacheTable(cachedVisibilityCopy);
+            }
+        }
+        // User collapses a group
+        else {
+            columnsInGroup?.forEach(c => toggleHideColumn(c.id, c.type !== 'empty'));
+        }
+    };
 
     var currColour = 'white';
 
@@ -521,9 +574,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 <InlineFlex>
                     <ColumnVisibilityModal
                         headerGroups={headerGroups}
-                        toggleGroupVisibility={toggleGroupVisibility}
                         toggleHideColumn={toggleHideColumn}
+                        cached={cacheTable}
+                        setCached={setCacheTable}
                         allColumns={allColumns}
+                        visibleColumns={visibleColumns}
                         setColumnOrder={setColumnOrder}
                     />
                     <DownloadModal rows={rows} visibleColumns={visibleColumns} />

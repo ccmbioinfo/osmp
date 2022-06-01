@@ -7,10 +7,9 @@ interface CellTextProps {
 }
 
 export const CellText = styled.span<CellTextProps>`
-    overflow: hidden;
-    white-space: nowrap;
     display: block;
-    text-overflow: ellipsis;
+    max-width: 100%;
+    overflow-wrap: break-word;
     ${props => props.capitalize && `text-transform: capitalize`}
 `;
 

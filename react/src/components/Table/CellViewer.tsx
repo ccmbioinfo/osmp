@@ -13,6 +13,7 @@ interface CellViewerProps<T> extends ViewerProps {
     formatText: (item: T) => React.ReactNode;
     itemName: string;
     items: Maybe<T[]>;
+    text?: string;
 }
 
 const CellBorder = styled(Divider)`
@@ -35,6 +36,7 @@ const CellViewer = <T extends {}>({
     itemName,
     rowExpanded,
     toggleRowExpanded,
+    text,
 }: CellViewerProps<T>) => {
     const [cellExpanded, setCellExpanded] = useState<boolean>(false);
 
@@ -45,8 +47,8 @@ const CellViewer = <T extends {}>({
         setCellExpanded(cellExpanded => !cellExpanded);
     }, [rowExpanded, toggleRowExpanded]);
 
-    return !!items && !!items.length ? (
-        cellExpanded ? (
+    if (!!items && !!items.length)
+        return cellExpanded ? (
             <>
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
@@ -59,8 +61,8 @@ const CellViewer = <T extends {}>({
             <Text onClick={onClick}>{`${items.length} ${itemName}${
                 items.length === 1 ? '' : 's'
             }`}</Text>
-        )
-    ) : null;
+        );
+    else return <CellText>{text}</CellText>;
 };
 
 export default CellViewer;
