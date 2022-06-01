@@ -20,7 +20,7 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({
             formatText={phenotype => phenotype.phenotypeLabel || ''}
             itemName="Phenotype"
             items={phenotypes}
-            text={clinicalStatus === 'unaffected' ? 'This patient is cilnically normal' : ''}
+            text={clinicalStatus === 'unaffected' ? 'This patient is clinically normal' : ''}
         />
     );
 };
