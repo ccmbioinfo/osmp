@@ -43,7 +43,6 @@ describe('Test minimal getVariants query', () => {
             start
           }
           individual {
-            datasetId
             diseases {
               ageOfOnset {
                 age

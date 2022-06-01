@@ -43,7 +43,6 @@ const fetchVariantsQuery = gql`
                     variantId
                 }
                 individual {
-                    datasetId
                     diseases {
                         ageOfOnset {
                             age
@@ -57,11 +56,13 @@ const fetchVariantsQuery = gql`
                         stage
                     }
                     ethnicity
+                    familyId
                     geographicOrigin
                     individualId
                     info {
                         diagnosis
                         candidateGene
+                        clinicalStatus
                         solved
                         classifications
                     }
