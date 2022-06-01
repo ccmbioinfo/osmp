@@ -8,13 +8,20 @@ export PATH=$PATH:/opt/jboss/keycloak/bin
 echo "$PATH"
 kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user "${KEYCLOAK_USER}" --password ${KEYCLOAK_PASSWORD}
 
-echo "Reading $1..."
-cat $1 | while read line; do
+file=${1:--}
+
+while IFS= read -r line; do
     # username is username section of email address (left of @)
     newusername="$line"
     newusername=${newusername%%@*}
     newpassword="$(openssl rand -hex 8)"
-    kcadm.sh create users -s username="$newusername" -s enabled=true -r "${KEYCLOAK_REALM}"
-    kcadm.sh set-password -r "${KEYCLOAK_REALM}" --username "$newusername" --new-password "$newpassword" --temporary
-    printf "email: '%s', username: '%s', temp password: '%s'\n" "$line" "$newusername" "$newpassword"
-done
+    # try to make a new user
+    printf "Adding user with email '%s'...\n" "$line"
+    set +e
+    kcadm.sh create users -s username="$newusername" -s email="$line" -s enabled=true -r "${KEYCLOAK_REALM}"
+    if [[ $? -eq 0 ]]; then
+        kcadm.sh set-password -r "${KEYCLOAK_REALM}" --username "$newusername" --new-password "$newpassword" --temporary
+        printf "User '%s' added successfully; temp password: '%s'\n" "$newusername" "$newpassword"
+    fi
+    set -e
+done < <(cat -- "$file")
