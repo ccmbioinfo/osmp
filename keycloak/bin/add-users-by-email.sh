@@ -2,6 +2,10 @@
 #
 # Add new users to osmp realm based on file of newline-separated emails.
 # Each line must end with a newline.
+
+# Example usage with Docker:
+# cat emails.txt | docker exec -i <keycloak_container> bash /usr/scripts/add-users-by-email.sh
+
 set -euo pipefail
 
 export PATH=$PATH:/opt/jboss/keycloak/bin
