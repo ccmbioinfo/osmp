@@ -68,6 +68,7 @@ export default gql`
   type IndividualResponseFields {
     diseases: [DiseaseFields]
     ethnicity: String
+    familyId: String
     geographicOrigin: String
     individualId: String
     info: IndividualInfoFields

@@ -56,6 +56,7 @@ const fetchVariantsQuery = gql`
                         stage
                     }
                     ethnicity
+                    familyId
                     geographicOrigin
                     individualId
                     info {

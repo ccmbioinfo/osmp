@@ -332,6 +332,12 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Individual ID'),
                     },
                     {
+                        accessor: 'familyId',
+                        id: 'familyId',
+                        Header: 'Family ID',
+                        width: getColumnWidth('Family ID'),
+                    },
+                    {
                         accessor: 'sex',
                         filter: 'multiSelect',
                         id: 'sex',
