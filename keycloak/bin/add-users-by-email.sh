@@ -4,12 +4,11 @@
 # Each line must end with a newline.
 
 # Example usage with Docker:
-# cat emails.txt | docker exec -i <keycloak_container> bash /usr/scripts/add-users-by-email.sh
+# cat emails.txt | docker exec -i <keycloak_container> bash /usr/local/bin/add-users-by-email.sh
 
 set -euo pipefail
 
 export PATH=$PATH:/opt/jboss/keycloak/bin
-echo "$PATH"
 kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user "${KEYCLOAK_USER}" --password ${KEYCLOAK_PASSWORD}
 
 file=${1:--}
