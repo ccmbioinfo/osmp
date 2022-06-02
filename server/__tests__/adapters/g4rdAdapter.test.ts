@@ -1,7 +1,7 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { G4RDVariantQueryResult, transformG4RDQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
+import { transformG4RDQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
 import typeDefs from '../../src/typeDefs';
-import { CombinedVariantQueryResponse } from '../../src/types';
+import { CombinedVariantQueryResponse, G4RDVariantQueryResult } from '../../src/types';
 import { addMocksToSchema } from '@graphql-tools/mock';
 import { testGraphQLQuery } from '../testGraphQLQuery';
 
@@ -26,14 +26,7 @@ const testResponse: G4RDVariantQueryResult = {
             individualId: '12345',
             info: { ad: 4, dp: 13, qual: 62.8, zygosity: 'heterozygous' },
           },
-        ],
-        info: {
-          geneName: 'SASS6',
-          aaChanges: 'NA',
-          transcript: 'ENST00000287482',
-          gnomadHom: 0,
-          cdna: 'c.361-9C>T',
-        },
+        ]
       },
       individual: {
         individualId: '12345',
@@ -176,7 +169,7 @@ describe('Test g4rd query response transformer', () => {
               transcript
             }
             ref
-            referenceName
+            chromosome
             start
             variantId
           }

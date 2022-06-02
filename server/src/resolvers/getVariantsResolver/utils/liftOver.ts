@@ -31,7 +31,7 @@ const liftover = async (
   // Convert variants from JSON format to BED format.
   // Note that position format is 1-based and BED format is half-open 0-based: https://genome.ucsc.edu/FAQ/FAQformat.html#format1
   const bedstring = dataForLiftover
-    .map(v => `chr${v.variant.referenceName}\t${v.variant.start - 1}\t${v.variant.end}`)
+    .map(v => `chr${v.variant.chromosome}\t${v.variant.start - 1}\t${v.variant.end}`)
     .join('\n');
   const lifted = await createTmpFile();
   const unlifted = await createTmpFile();
@@ -81,7 +81,7 @@ const liftover = async (
       geneEnd = result.variant.end;
     }
   });
-  const annotationPosition = `${dataForAnnotation[0].variant.referenceName}:${geneStart}-${geneEnd}`;
+  const annotationPosition = `${dataForAnnotation[0].variant.chromosome}:${geneStart}-${geneEnd}`;
 
   promises.rm(lifted);
   promises.rm(unlifted);
