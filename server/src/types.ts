@@ -202,6 +202,11 @@ export interface GnomadAnnotation extends VariantCoordinate {
   type: string;
 }
 
+export interface GnomadAnnotations {
+  exomeAnnotations: GnomadAnnotation[];
+  genomeAnnotations: GnomadAnnotation[];
+}
+
 export interface ErrorResponse {
   id: string;
   code: number | string;

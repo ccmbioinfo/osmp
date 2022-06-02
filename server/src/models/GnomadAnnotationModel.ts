@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, model } from 'mongoose';
-import { GnomadAnnotation } from '../types';
+import { GnomadAnnotation, GnomadAnnotations } from '../types';
 
 export type GnomadAnnotationId = Pick<GnomadAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
 
@@ -41,9 +41,11 @@ type AnnotationInput = {
   coordinates: GnomadAnnotationId[];
 };
 
+type AnnotationType = 'exome' | 'genome';
+
 // For model
 interface GnomadAnnotationModelMethods extends Model<GnomadAnnotation> {
-  getAnnotations(ids: AnnotationInput, assemblyId: string): Promise<GnomadAnnotation[]>;
+  getAnnotations(ids: AnnotationInput, assemblyId: string): Promise<GnomadAnnotations>;
 }
 
 gnomandAnnotationSchema.statics.getAnnotations = async function (
@@ -52,22 +54,30 @@ gnomandAnnotationSchema.statics.getAnnotations = async function (
   assemblyId: string
 ) {
   const { start, end, coordinates } = ids;
+  const getAnnotationsByType = async (type: AnnotationType) => await this.aggregate([
+    { $match: { type }},
+    { $match: { assembly: assemblyId } },
+    { $match: { pos: { $gte: start, $lte: end } } },
+    {
+      $match: {
+        $or: coordinates,
+      },
+    },
+  ]);
+  const annotations = {
+    exomeAnnotations: [] as GnomadAnnotation[],
+    genomeAnnotations: [] as GnomadAnnotation[],
+  };
 
   if (coordinates.length > 0 && assemblyId) {
-    const annotation = await this.aggregate([
-      { $match: { assembly: assemblyId } },
-      { $match: { pos: { $gte: start, $lte: end } } },
-      {
-        $match: {
-          $or: coordinates,
-        },
-      },
-    ]);
-    console.log(`${annotation.length} gnomad annots found`);
-    return annotation;
-  } else {
-    return [];
+    annotations.exomeAnnotations = await getAnnotationsByType('exome');
+    annotations.genomeAnnotations = await getAnnotationsByType('genome');
+
+    console.log(`${annotations.exomeAnnotations.length} exome gnomAD annotation(s) found`);
+    console.log(`${annotations.genomeAnnotations.length} genome gnomAD annotation(s) found`);
   }
+  
+  return annotations;
 };
 
 const GnomadAnnotationModel = model<GnomadAnnotationDocument, GnomadAnnotationModelMethods>(
