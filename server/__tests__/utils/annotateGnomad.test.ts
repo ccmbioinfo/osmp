@@ -1,23 +1,34 @@
 import { annotate } from '../../src/resolvers/getVariantsResolver/utils/annotateGnomad';
-import { GnomadAnnotation, VariantQueryDataResult } from '../../src/types';
+import { GnomadAnnotation, GnomadAnnotations, VariantQueryDataResult } from '../../src/types';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
 */
 describe('Test whether variants get annotated', () => {
-  const annotations: GnomadAnnotation[] = [
+  const annotation: Omit<GnomadAnnotation, 'af' | 'type'> = {
+    alt: 'T',
+    an: 1,
+    assembly: 'gnomAD_GRCh37',
+    chrom: '1',
+    nhomalt: 1,
+    pos: 123456,
+    ref: 'A',
+  };
+  const exomeAnnotations: GnomadAnnotation[] = [
     {
+      ...annotation,
       af: 1,
-      alt: 'T',
-      an: 1,
-      assembly: 'gnomAD_GRCh37',
-      chrom: '1',
-      nhomalt: 1,
-      pos: 123456,
-      ref: 'A',
       type: 'exome',
     },
   ];
+  const genomeAnnotations: GnomadAnnotation[] = [
+    {
+      ...annotation,
+      af: 2,
+      type: 'genome',
+    },
+  ];
+  const annotations: GnomadAnnotations = { exomeAnnotations, genomeAnnotations };
 
   it('finds the correct coordinates and returns a unique annotation', () => {
     const variants: VariantQueryDataResult[] = [
@@ -43,9 +54,9 @@ describe('Test whether variants get annotated', () => {
     // Check if the corresponding variant has info fields populated
     result.forEach(nodeData =>
       expect(nodeData.variant.info).toEqual({
-        af: annotations[0].af,
-        an: annotations[0].an,
-        gnomadHom: annotations[0].nhomalt,
+        af: Math.max(exomeAnnotations[0].af, genomeAnnotations[0].af),
+        an: exomeAnnotations[0].an,
+        gnomadHom: exomeAnnotations[0].nhomalt,
       })
     );
   });
