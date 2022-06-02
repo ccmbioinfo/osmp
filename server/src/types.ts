@@ -41,7 +41,7 @@ export interface VariantResponseFields {
   end: number;
   info?: VariantResponseInfoFields;
   ref: string;
-  referenceName: string;
+  chromosome: string;
   start: number;
   variantId?: Maybe<string>;
   variantType?: Maybe<string>;
@@ -128,6 +128,17 @@ export interface OAQueryResponse {
 }
 
 /* end OpenAPI Schema types */
+
+/* G4RD POST variants/match endpoint schema */
+export interface G4RDVariantQueryResult {
+  exists: boolean;
+  numTotalResults: number;
+  results: {
+    contactInfo: string;
+    individual: IndividualResponseFields;
+    variant: VariantResponseFields;
+  }[];
+}
 
 /* G4RD GET patients endpoint schema */
 export interface Contact {
