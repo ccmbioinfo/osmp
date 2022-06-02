@@ -17,7 +17,7 @@ const getCoordinates = (result: VariantQueryDataResult[]) => {
 
     coordinates.push({
       alt: variant.alt,
-      chrom: variant.referenceName,
+      chrom: variant.chromosome,
       pos: variant.start,
       ref: variant.ref,
     });
