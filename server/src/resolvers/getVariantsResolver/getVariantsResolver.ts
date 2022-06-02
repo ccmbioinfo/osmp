@@ -83,7 +83,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   }
 
   // Cadd annotations for data in user requested assemblyId
-  let data: VariantQueryDataResult[] = [];
+  let data: VariantQueryDataResult[] = dataForAnnotation;
   const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
   const settledCadd = await Promise.allSettled([caddAnnotationsPromise]);
   const caddAannotations = settledCadd.find(
