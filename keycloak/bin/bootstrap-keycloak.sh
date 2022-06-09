@@ -15,7 +15,7 @@ kcadm.sh set-password -r "${KEYCLOAK_REALM}" --username osmp-user --new-password
 
 kcadm.sh update realms/"${KEYCLOAK_REALM}" -s "loginTheme=osmp"
 
-kcadm.sh create identity-provider/instances -r osmp -s alias=Auth0 -s providerId=oidc \
+kcadm.sh create identity-provider/instances -r "${KEYCLOAK_REALM}" -s alias=Auth0 -s providerId=oidc \
     -s enabled=true -s 'config.useJwksUrl="true"' \
     -s config.authorizationUrl="${AUTH0_BROKER_AUTH_URL}" \
     -s config.tokenUrl="${AUTH0_BROKER_TOKEN_URL}" \
