@@ -24,8 +24,6 @@ tokenresponse=$(curl --request POST \
 accesstoken=$(
     echo "${tokenresponse}" | grep -zoP '"access_token":\s*"\K[^\s,]*(?="\s*,)'
 )
-# 3 use user info to add user to keycloak
-# 4 repeat from step 2
 
 # Get users by email
 file=${1:--}
@@ -50,7 +48,6 @@ while IFS= read -r line; do
     set +e
     kcadm.sh create users -s username="$userid" -s email="$line" -s enabled=true -r "${KEYCLOAK_REALM}"
     if [[ $? -eq 0 ]]; then
-        # kcadm.sh set-password -r "${KEYCLOAK_REALM}" --username "$newusername" --new-password "$newpassword" --temporary
         printf "User added successfully\n"
     else
         printf "Failed to add user\n"
