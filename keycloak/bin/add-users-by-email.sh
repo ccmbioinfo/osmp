@@ -2,24 +2,48 @@
 #
 # Add new users to osmp realm based on file of newline-separated emails.
 # Each line must end with a newline.
+# uses client_credentials flow by default. add --password flag to use resource owner password flow
 
 # Example usage with Docker:
-# cat emails.txt | docker exec -i <keycloak_container> bash /usr/local/bin/add-users-by-email.sh
+# cat emails.txt | docker exec -i <keycloak_container> bash /usr/local/bin/add-users-by-email.sh [--password]
 
 set -euo pipefail
+
+# get options
+granttype="client_credentials"
+while [ True ]; do
+if [ "$1" = "--password" -o "$1" = "-p" ]; then
+    granttype="password"
+    shift 1
+else
+    break
+fi
+done
 
 export PATH=$PATH:/opt/jboss/keycloak/bin
 kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user "${KEYCLOAK_USER}" --password ${KEYCLOAK_PASSWORD}
 
 # Get management API access token (assuming it's Auth0)
-tokenresponse=$(curl --request POST \
-    --url "${AUTH0_BROKER_TOKEN_URL}" \
-    --header "Content-Type: application/x-www-form-urlencoded" \
-    --data "client_id=${AUTH0_BROKER_CLIENT_ID}" \
-    --data "grant_type=client_credentials" \
-    --data "client_secret=${AUTH0_BROKER_CLIENT_SECRET}" \
-    --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}" \
-)
+if [ "$granttype" = "password" ]; then
+    tokenresponse=$(curl --request POST \
+        --url "${AUTH0_BROKER_TOKEN_URL}" \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --data "client_id=${AUTH0_BROKER_CLIENT_ID}" \
+        --data "grant_type=password" \
+        --data "username=${G4RD_USERNAME}" \
+        --data "password=${G4RD_PASSWORD}" \
+        --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}" \
+    )
+else
+    tokenresponse=$(curl --request POST \
+        --url "${AUTH0_BROKER_TOKEN_URL}" \
+        --header "Content-Type: application/x-www-form-urlencoded" \
+        --data "client_id=${AUTH0_BROKER_CLIENT_ID}" \
+        --data "grant_type=client_credentials" \
+        --data "client_secret=${AUTH0_BROKER_CLIENT_SECRET}" \
+        --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}" \
+    )
+fi
 
 accesstoken=$(
     echo "${tokenresponse}" | grep -zoP '"access_token":\s*"\K[^\s,]*(?="\s*,)'
