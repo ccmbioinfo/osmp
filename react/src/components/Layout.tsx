@@ -59,9 +59,12 @@ export const Column = styled(Flex)<FlexProps>`
 `;
 
 export const ButtonWrapper = styled(Flex)`
-    display: inline-flex;
-    height: 125px;
+    align-self: flex-start;
     align-items: center;
+    display: inline-flex;
+    height: min-content;
+    flex-shrink: 0;
+    margin-top: 2.75rem;
 `;
 
 export const Container = styled.div`

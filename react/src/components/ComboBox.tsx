@@ -53,6 +53,13 @@ export const Header = styled(Flex)`
     flex-wrap: nowrap;
 `;
 
+const SelectableListWrapper = styled.div`
+    position: absolute;
+    top: 100%;
+    z-index: 998;
+    width: 100%;
+`;
+
 /* Typeguard for type definition of option */
 const isGene = (arg: any): arg is GeneSelectionValue =>
     typeof arg === 'object' && 'name' in arg && 'position' in arg;
@@ -103,32 +110,32 @@ export default function ComboBox<T extends {}>({
                     </>
                 )}
             </Header>
-            {options.length > 1 && isGene(options[0].value) && open && (
-                <Background
-                    variant="success"
-                    style={{
-                        padding: '0rem 0.75rem',
-                    }}
-                >
-                    <Typography variant="subtitle" success bold>
-                        {options.length} gene aliases are found. Please select the appropriate gene.
-                    </Typography>
-                </Background>
-            )}
-            {open && (
-                <SelectableList
-                    ref={ref}
-                    isMulti={isMulti}
-                    selection={selection}
-                    options={options}
-                    onSelect={item => {
-                        onSelect(item as T);
-                        if (!isMulti) {
-                            setOpen(false);
-                        }
-                    }}
-                />
-            )}
+            <SelectableListWrapper>
+                {options.length > 1 && isGene(options[0].value) && open && (
+                    <Background
+                        variant="success"
+                        style={{ padding: '0 0.75rem' }}
+                    >
+                        <Typography variant="subtitle" success bold>
+                            {options.length} gene aliases are found. Please select the appropriate gene.
+                        </Typography>
+                    </Background>
+                )}
+                {open && (
+                    <SelectableList
+                        ref={ref}
+                        isMulti={isMulti}
+                        selection={selection}
+                        options={options}
+                        onSelect={item => {
+                            onSelect(item as T);
+                            if (!isMulti) {
+                                setOpen(false);
+                            }
+                        }}
+                    />
+                )}
+            </SelectableListWrapper>
         </Wrapper>
     );
 }

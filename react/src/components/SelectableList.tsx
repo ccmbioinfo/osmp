@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 import { Checkbox } from './index';
+import theme from '../constants/theme';
 
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
@@ -10,9 +11,6 @@ const StyledList = styled.ul`
     width: inherit;
     max-height: 200px;
     overflow: auto;
-    // position: absolute;
-    top: 20px;
-    z-index: 998;
 `;
 
 const StyledListItem = styled.li`        
@@ -81,7 +79,11 @@ function SelectableListInner<T>(props: ListProps<T>, ref: React.ForwardedRef<HTM
                 } else {
                     return (
                         <StyledListItem key={item.id}>
-                            <button type="button" onClick={() => onSelect(item.value)}>
+                            <button
+                                type="button"
+                                onClick={() => onSelect(item.value)}
+                                style={{ columnGap: theme.space[2] }}
+                            >
                                 <Checkbox
                                     key={index}
                                     checked={(selection || []).includes(item.value)}

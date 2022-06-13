@@ -27,7 +27,7 @@ const Tooltip: React.FC<TooltipProps> = ({ helperText, children }) => {
         backgroundColor: theme.colors.shadow,
         borderRadius: theme.radii.base,
         color: theme.background.main,
-        padding: `0 ${theme.space[1]}`,
+        padding: `0 ${theme.space[3]}`,
         width: 200,
         zIndex: 999,
     };
