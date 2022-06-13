@@ -71,9 +71,17 @@ export interface DiseaseFields {
   stage?: Maybe<string>;
 }
 
+export interface Disorder {
+  id: string;
+  label: string;
+}
+
+type DisorderAffected = Pick<Disorder, 'label'>
+
 export interface IndividualInfoFields {
   candidateGene?: Maybe<string>;
   clinicalStatus?: Maybe<string>;
+  disorders?: Maybe<Disorder[]>;
   solved?: Maybe<string>;
   classifications?: Maybe<string>;
   diagnosis?: Maybe<string>;
@@ -162,6 +170,7 @@ export interface G4RDPatientQueryResult {
   notes: Notes;
   ethnicity: Ethnicity;
   clinicalStatus?: string;
+  disorders: [DisorderAffected, ...Disorder[]];
   id: string;
   genes?: Gene[];
   solved?: Solved;

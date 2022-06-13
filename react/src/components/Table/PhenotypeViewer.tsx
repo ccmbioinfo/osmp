@@ -17,8 +17,8 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({
     return (
         <CellViewer<PhenotypicFeaturesFields>
             {...{ rowExpanded, toggleRowExpanded }}
-            formatText={phenotype => phenotype.phenotypeLabel || ''}
-            itemName="Phenotype"
+            formatItemText={phenotype => phenotype.phenotypeLabel || ''}
+            itemName={{ singular: 'Phenotype' }}
             items={phenotypes}
             text={clinicalStatus === 'unaffected' ? 'This patient is clinically normal' : ''}
         />
