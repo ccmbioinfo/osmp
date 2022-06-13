@@ -202,6 +202,10 @@ describe('Test g4rd query response transformer', () => {
             info {
               candidateGene
               clinicalStatus
+              disorders {
+                id
+                label
+              }
               solved
               diagnosis
               classifications
