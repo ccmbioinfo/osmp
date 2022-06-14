@@ -7,7 +7,6 @@ const Component = styled.button<ButtonProps>`
     align-items: center;
     justify-content: center;
     flex-grow: ${props => props.fluid && '1'};
-    min-height: 40px;
     text-align: center;
     font-family: ${props => props.theme.fontFamily.heading};
     padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
@@ -33,12 +32,14 @@ const Component = styled.button<ButtonProps>`
         switch (props.variant) {
             case 'primary':
                 return `
+                    min-height: 40px;
                     color: ${props.theme.colors.background};
                     background-color: ${props.theme.colors.primary};
                     border-color: ${props.theme.colors.primary};
                 `;
             case 'secondary':
                 return `
+                    min-height: 40px;
                     color: ${props.theme.colors.primary};
                     background-color: ${props.theme.colors.background};
                     border-color: ${props.theme.colors.primary};

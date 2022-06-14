@@ -15,7 +15,6 @@ export const ChipContainer = styled(props => <Flex {...props} />)`
 export const ChipDeleteContainer = styled(props => <Button {...props} />)`
     border-radius: ${props => props.theme.radii.round};
     height: 10px;
-    min-height: unset;
     width: 10px;
     padding: 0;
     margin: 0;
