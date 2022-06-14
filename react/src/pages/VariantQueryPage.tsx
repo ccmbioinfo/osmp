@@ -15,6 +15,7 @@ import {
     Flex,
     GeneSearch,
     Input,
+    RequiredIndicator,
     Spinner,
     Table,
     Tooltip,
@@ -177,7 +178,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                         >
                             <Typography variant="subtitle" bold>
-                                Genome Assembly <sup>*</sup>
+                                Genome Assembly <RequiredIndicator />
                             </Typography>
                             <ComboBox
                                 onSelect={val =>
@@ -202,7 +203,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                         >
                             <Typography variant="subtitle" bold>
-                                Gene Name <sup>*</sup>
+                                Gene Name <RequiredIndicator />
                             </Typography>
                             <GeneSearch
                                 assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
@@ -221,7 +222,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         }}>
                             <Flex alignItems="center">
                                 <Typography variant="subtitle" bold>
-                                    Max Frequency <sup>*</sup>
+                                    Max Frequency <RequiredIndicator />
                                 </Typography>
                                 <Tooltip helperText="The maximum allele frequency within each selected database">
                                     <IconPadder>
@@ -245,7 +246,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                         >
                             <Typography variant="subtitle" bold>
-                                Contributors <sup>*</sup>
+                                Contributors <RequiredIndicator />
                             </Typography>
                             <ComboBox
                                 isMulti

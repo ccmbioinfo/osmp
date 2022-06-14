@@ -21,6 +21,7 @@ import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } 
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Popover from './Popover/Popover';
+import RequiredIndicator from './RequiredIndicator';
 import SelectableList from './SelectableList';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
@@ -59,6 +60,7 @@ export {
     Modal,
     Navbar,
     Popover,
+    RequiredIndicator,
     SelectableList,
     Snackbar,
     Spinner,
