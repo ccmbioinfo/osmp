@@ -71,7 +71,7 @@ export default function NumberRangeFilter<T extends {}>({
     useEffect(() => {
         const parsed = parseFloat(text);
 
-        if (!parsed) debouncedSetFilter([undefined, undefined]);
+        if (parsed !== 0 && !parsed) debouncedSetFilter([undefined, undefined]);
         else {
             if (filterComparison.less) {
                 debouncedSetFilter([undefined, parsed]);
