@@ -13,7 +13,6 @@ const testResponse: G4RDVariantQueryResult = {
   results: [
     {
       variant: {
-        variantId: 'rs201202918',
         assemblyId: 'GRCh37',
         chromosome: 'NM_001304829.2',
         start: 100573569,
@@ -138,7 +137,9 @@ const patientTestResponse =  [
   },
 ];
 
-const transformed = transformG4RDQueryResponse(testResponse, patientTestResponse, '1:1234');
+const familyTestResponse = {"12345": "6789"};
+
+const transformed = transformG4RDQueryResponse(testResponse, patientTestResponse, familyTestResponse);
 
 /**
  * Confirm that variant query schema performs and validates as expected
@@ -162,16 +163,9 @@ describe('Test g4rd query response transformer', () => {
               }
             }
             end
-            info {
-              cdna
-              geneName
-              gnomadHom
-              transcript
-            }
             ref
             chromosome
             start
-            variantId
           }
           individual {
             diseases {
@@ -192,6 +186,7 @@ describe('Test g4rd query response transformer', () => {
             }
             sex
             ethnicity
+            familyId
             info {
               candidateGene
               clinicalStatus
