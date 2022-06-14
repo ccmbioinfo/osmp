@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/macro';
-import { Checkbox } from './index';
 import theme from '../constants/theme';
+import { Checkbox } from './index';
 
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
