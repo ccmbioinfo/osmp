@@ -237,7 +237,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       const diagnosis = patient.clinicalStatus;
       const solved = patient.solved ? patient.solved.status : '';
       const clinicalStatus = patient.clinicalStatus;
-      disorders = patient.disorders.splice(1) as Disorder[];
+      disorders = patient.disorders.filter(({ label }) => label !== 'affected') as Disorder[];
       ethnicity = Object.values(patient.ethnicity)
         .flat()
         .map(p => p.trim())
