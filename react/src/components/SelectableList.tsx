@@ -3,6 +3,17 @@ import styled from 'styled-components/macro';
 import theme from '../constants/theme';
 import { Checkbox } from './index';
 
+interface SelectableListWrapperProps {
+    fullWidth?: boolean;
+}
+
+export const SelectableListWrapper = styled.div<SelectableListWrapperProps>`
+    position: absolute;
+    top: 100%;
+    z-index: 998;
+    width: ${props => props.fullWidth ? '100%' : 'fit-content'};
+`;
+
 const StyledList = styled.ul`
     box-shadow: ${props => props.theme.boxShadow};
     padding: 0;

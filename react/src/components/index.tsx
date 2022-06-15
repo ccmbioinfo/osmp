@@ -22,7 +22,7 @@ import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Popover from './Popover/Popover';
 import RequiredIndicator from './RequiredIndicator';
-import SelectableList from './SelectableList';
+import SelectableList, { SelectableListWrapper } from './SelectableList';
 import Snackbar from './Snackbar/Snackbar';
 import Spinner from './Spinner';
 import Table from './Table/Table';
@@ -62,6 +62,7 @@ export {
     Popover,
     RequiredIndicator,
     SelectableList,
+    SelectableListWrapper,
     Snackbar,
     Spinner,
     Table,

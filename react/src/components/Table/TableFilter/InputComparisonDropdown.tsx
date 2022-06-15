@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaEquals, FaGreaterThan, FaLessThan } from 'react-icons/fa';
 import { UseFiltersColumnProps } from 'react-table';
-import { SelectableList } from '../..';
+import { SelectableList, SelectableListWrapper } from '../..';
 import { useClickAway } from '../../../hooks';
 import getKeys from '../../../utils/getKeys';
 import { IconButton } from '../../index';
@@ -83,35 +83,37 @@ export function InputComparisonDropdown<T extends {}>({
                 {Icons[sign]}
             </IconButton>
             {open && (
-                <SelectableList
-                    options={COMPARISON_OPTIONS}
-                    onSelect={value => {
-                        setSign(value as keyof ComparisonType);
+                <SelectableListWrapper>
+                    <SelectableList
+                        options={COMPARISON_OPTIONS}
+                        onSelect={value => {
+                            setSign(value as keyof ComparisonType);
 
-                        setOpen(false);
+                            setOpen(false);
 
-                        setFilterComparison({
-                            less: false,
-                            greater: false,
-                            equal: false,
-                            ...{ [value as keyof ComparisonType]: true },
-                        });
+                            setFilterComparison({
+                                less: false,
+                                greater: false,
+                                equal: false,
+                                ...{ [value as keyof ComparisonType]: true },
+                            });
 
-                        setFilter((old = []) => {
-                            const min = old[0] ? parseFloat(old[0]) : old[0];
-                            const max = old[1] ? parseFloat(old[1]) : old[1];
-                            const n = getFiniteNumber(min) || getFiniteNumber(max);
-                            switch (value) {
-                                case 'equal':
-                                    return [n, n];
-                                case 'less':
-                                    return [undefined, n];
-                                case 'greater':
-                                    return [n, undefined];
-                            }
-                        });
-                    }}
-                />
+                            setFilter((old = []) => {
+                                const min = old[0] ? parseFloat(old[0]) : old[0];
+                                const max = old[1] ? parseFloat(old[1]) : old[1];
+                                const n = getFiniteNumber(min) || getFiniteNumber(max);
+                                switch (value) {
+                                    case 'equal':
+                                        return [n, n];
+                                    case 'less':
+                                        return [undefined, n];
+                                    case 'greater':
+                                        return [n, undefined];
+                                }
+                            });
+                        }}
+                    />
+                </SelectableListWrapper>
             )}
         </div>
     );

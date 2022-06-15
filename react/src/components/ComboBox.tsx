@@ -7,7 +7,7 @@ import { useClickAway } from '../hooks';
 import { GeneSelectionValue } from './GeneSearch';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
-import SelectableList, { SelectableListItem } from './SelectableList';
+import SelectableList, { SelectableListItem, SelectableListWrapper } from './SelectableList';
 import Spinner from './Spinner';
 
 interface ComboBoxProps<T> {
@@ -51,13 +51,6 @@ export const Header = styled(Flex)`
     width: inherit;
     padding: 0 ${props => props.theme.space[4]};
     flex-wrap: nowrap;
-`;
-
-const SelectableListWrapper = styled.div`
-    position: absolute;
-    top: 100%;
-    z-index: 998;
-    width: 100%;
 `;
 
 /* Typeguard for type definition of option */
@@ -110,7 +103,7 @@ export default function ComboBox<T extends {}>({
                     </>
                 )}
             </Header>
-            <SelectableListWrapper>
+            <SelectableListWrapper fullWidth>
                 {options.length > 1 && isGene(options[0].value) && open && (
                     <Background
                         variant="success"
