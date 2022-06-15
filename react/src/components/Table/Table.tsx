@@ -352,7 +352,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Diseases', true),
                     },
                     {
-                        accessor: 'diagnosis',
+                        accessor: 'clinicalStatus',
                         filter: 'multiSelect',
                         id: 'affectedStatus',
                         Header: 'Affected Status',
@@ -399,7 +399,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Cell: ({
                             row: {
                                 isExpanded,
-                                original: { clinicalStatus, phenotypicFeatures },
+                                original: { phenotypicFeatures },
                                 toggleRowExpanded,
                             },
                         }: {
@@ -409,7 +409,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 {...{ toggleRowExpanded }}
                                 phenotypes={phenotypicFeatures}
                                 rowExpanded={isExpanded}
-                                clinicalStatus={clinicalStatus}
                             />
                         ),
                     },
@@ -781,7 +780,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                     if (
                                         isCaseDetailsCollapsed(headerGroups[0].headers) &&
                                         // rows are sorted by uniqueId, so if a row came before it with the same id, then it's not unique
-                                        row?.index !== 0 && row.values['uniqueId'] === page[i-1].values['uniqueId']
+                                        row?.index !== 0 &&
+                                        row.values['uniqueId'] === page[i - 1].values['uniqueId']
                                     ) {
                                         return null;
                                     }
