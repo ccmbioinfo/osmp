@@ -16,6 +16,7 @@ import {
     GeneSearch,
     Input,
     RequiredIndicator,
+    RequiredTextBox,
     Spinner,
     Table,
     Tooltip,
@@ -264,33 +265,36 @@ const VariantQueryPage: React.FC<{}> = () => {
                             />
                         </Column>
                     </Flex>
-                    <ButtonWrapper>
-                        <Button
-                            disabled={
-                                loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
-                            }
-                            onClick={() => {
-                                clearAllErrors();
-                                fetchVariants({ variables: getArgs() });
-                            }}
-                            variant="primary"
-                        >
-                            Search
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                resetQueryOptionsForm();
-                            }}
-                            variant="primary"
-                        >
-                            Clear
-                        </Button>
-                        {loading && (
-                            <Column justifyContent="flex-start">
-                                <Spinner />
-                            </Column>
-                        )}
-                    </ButtonWrapper>
+                    <Column style={{ rowGap: '0.4rem' }}>
+                        <RequiredTextBox />
+                        <ButtonWrapper>
+                            <Button
+                                disabled={
+                                    loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                                }
+                                onClick={() => {
+                                    clearAllErrors();
+                                    fetchVariants({ variables: getArgs() });
+                                }}
+                                variant="primary"
+                            >
+                                Search
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    resetQueryOptionsForm();
+                                }}
+                                variant="primary"
+                            >
+                                Clear
+                            </Button>
+                            {loading && (
+                                <Column justifyContent="flex-start">
+                                    <Spinner />
+                                </Column>
+                            )}
+                        </ButtonWrapper>
+                    </Column>
                 </Flex>
             </Background>
             {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]

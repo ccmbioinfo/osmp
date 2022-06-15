@@ -1,12 +1,22 @@
 import styled from 'styled-components/macro';
 
-const Component = styled.sup`
-  border-radius: ${props => props.theme.radii.base};
-  background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.background};
-  padding: ${props => props.theme.space[1]} ${props => props.theme.space[2]};
+const RequiredIndicatorComponent = styled.sup`
+  color: ${props => props.theme.colors.error};
 `;
 
-const RequiredIndicator = () => <Component>Required</Component>;
+const RequiredTextBoxComponent = styled.span`
+  align-self: end;
+  width: fit-content;
+  height: 1.25rem;
+  margin: ${props => props.theme.space[4]} ${props => props.theme.space[2]} 0;
+  border-radius: ${props => props.theme.radii.base};
+  background-color: ${props => props.theme.colors.error};
+  color: ${props => props.theme.colors.background};
+  font-size: ${props => props.theme.fontSizes.xs};
+  line-height: 1.25rem;
+  white-space: nowrap;
+  padding-inline: ${props => props.theme.space[3]};
+`;
 
-export default RequiredIndicator;
+export const RequiredIndicator = () => <RequiredIndicatorComponent>*</RequiredIndicatorComponent>;
+export const RequiredTextBox = () => <RequiredTextBoxComponent>* Required Field</RequiredTextBoxComponent>;

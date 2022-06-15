@@ -60,11 +60,12 @@ export const Column = styled(Flex)<FlexProps>`
 
 export const ButtonWrapper = styled(Flex)`
     align-self: flex-start;
+    justify-content: flex-end;
     align-items: center;
+    row-gap: ${props => props.theme.space[2]};
     display: inline-flex;
     height: min-content;
     flex-shrink: 0;
-    margin-top: 2.75rem;
 `;
 
 export const Container = styled.div`
