@@ -82,7 +82,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
             document.removeEventListener("keydown", listener);
             setListening(false);
         }
-    }, [props.disabled, props.keyCodes, listening]);
+    }, [props.disabled, props.keyCodes, listening, onClick]);
 
     return (
         <Component ref={ref} variant={variant} onClick={onClick} {...userStyles}>
