@@ -1,12 +1,12 @@
 import React from 'react';
-import { Body, Column, Divider, Flex, Typography } from '../components';
+import { BodyAbout, Column, Divider, Flex, Typography } from '../components';
 import { useUserInfo } from '../hooks';
 
 const AboutPage: React.FC<{}> = () => {
     const userInfo = useUserInfo();
 
     return (
-        <Body>
+        <BodyAbout>
             <Flex>
                 {userInfo && (
                     <Typography variant="subtitle" bold>
@@ -21,52 +21,64 @@ const AboutPage: React.FC<{}> = () => {
             </Flex>
             <Divider />
             <Flex>
-                <Typography variant="h4" bold>
-                    What is SSMP?
-                </Typography>
                 <Typography variant="p">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed suscipit nibh ut
-                    elementum suscipit. Quisque tristique ut leo a luctus. Sed sed nulla massa.
-                    Aenean vitae tincidunt enim, vitae venenatis nisl. Nam a mauris id risus
-                    elementum pretium. Phasellus arcu purus, convallis vel eros sed, condimentum
-                    facilisis ligula. Fusce ut sagittis neque. Suspendisse aliquam consectetur
-                    sapien, sit amet aliquet tortor congue nec. Etiam pulvinar neque nec diam
-                    tincidunt dignissim. Aliquam euismod neque eget est luctus, sit amet luctus
-                    neque feugiat. Sed imperdiet congue sodales. Praesent sodales laoreet arcu.
+                    This web-based portal supports “one-sided” matchmaking, in which variants in
+                    novel candidate genes are identified directly from the genome-wide sequencing
+                    data within RD databases. An OSMP user may query a gene of interest across
+                    participating databases. Using application programming interfaces (APIs), the
+                    OSMP returns rare variants in the gene, along with participant-level phenotypic
+                    (HPO terms) and genotypic (zygosity, inheritance, variant quality) information.
+                    The portal’s user-friendly design allows the queriors to filter and sort
+                    variant/participant information to rule matches in or out, reducing the need for
+                    time-consuming email correspondence. A pilot querying the last 6 months of new
+                    gene-disease associations in OMIM is being conducted using OSMP to explore its
+                    ability to improve the false positive ratio and identify matches of interest in
+                    the RD databases Genomics4RD (Canada) and Genomic Answers for Kids (United
+                    States). We anticipate that through robust data sharing practices, the OSMP will
+                    provide a more accessible and efficient solution to genomic matchmaking for RD
+                    researchers, and foster future connections with additional international
+                    repositories.
                 </Typography>
-                <Typography variant="h4" bold>
-                    Problems SSMP Solves
+                <Typography variant="h3" bold>
+                    Features
                 </Typography>
-                <Typography variant="p">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed suscipit nibh ut
-                    elementum suscipit. Quisque tristique ut leo a luctus. Sed sed nulla massa.
-                    Aenean vitae tincidunt enim, vitae venenatis nisl. Nam a mauris id risus
-                    elementum pretium. Phasellus arcu purus, convallis vel eros sed, condimentum
-                    facilisis ligula. Fusce ut sagittis neque. Suspendisse aliquam consectetur
-                    sapien, sit amet aliquet tortor congue nec. Etiam pulvinar neque nec diam
-                    tincidunt dignissim. Aliquam euismod neque eget est luctus, sit amet luctus
-                    neque feugiat. Sed imperdiet congue sodales. Praesent sodales laoreet arcu.
-                </Typography>
-                <Typography variant="p">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed suscipit nibh ut
-                    elementum suscipit. Quisque tristique ut leo a luctus. Sed sed nulla massa.
-                    Aenean vitae tincidunt enim, vitae venenatis nisl. Nam a mauris id risus
-                    elementum pretium. Phasellus arcu purus, convallis vel eros sed, condimentum
-                    facilisis ligula. Fusce ut sagittis neque. Suspendisse aliquam consectetur
-                    sapien, sit amet aliquet tortor congue nec. Etiam pulvinar neque nec diam
-                    tincidunt dignissim. Aliquam euismod neque eget est luctus, sit amet luctus
-                    neque feugiat. Sed imperdiet congue sodales. Praesent sodales laoreet arcu.
-                </Typography>
-                <Typography variant="p">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed suscipit nibh ut
-                    elementum suscipit. Quisque tristique ut leo a luctus. Sed sed nulla massa.
-                    Aenean vitae tincidunt enim, vitae venenatis nisl. Nam a mauris id risus
-                    elementum pretium. Phasellus arcu purus, convallis vel eros sed, condimentum
-                    facilisis ligula. Fusce ut sagittis neque. Suspendisse aliquam consectetur
-                    sapien, sit amet aliquet tortor congue nec. Etiam pulvinar neque nec diam
-                    tincidunt dignissim. Aliquam euismod neque eget est luctus, sit amet luctus
-                    neque feugiat. Sed imperdiet congue sodales. Praesent sodales laoreet arcu.
-                </Typography>
+                <ul>
+                    <li>
+                        <Typography variant="h4" bold>
+                            Search for a gene of interest
+                        </Typography>
+                        <Typography variant="p">
+                            To search for a gene of interest, please specify the gene name, maximum
+                            allele frequency, genome assembly and one or multiple contributors. The
+                            result table will display variant and patient information as well as
+                            variant annotations.
+                        </Typography>
+                    </li>
+                    <li>
+                        <Typography variant="h4" bold>
+                            Variant data annotation on the fly
+                        </Typography>
+                        <Typography variant="p">
+                            OSMP uses <a href="https://cadd.gs.washington.edu/download">CADD VEP annotations of all possible SNVs</a> 
+                            and <a href="https://gnomad.broadinstitute.org/downloads#v2-variants">gnomAD annotations</a>
+                            for both
+                            exomes and whole genomes. This is because different variant stores may
+                            use different annotation tools and versions, hindering comparison across
+                            institutions.
+                        </Typography>
+                    </li>
+                    <li>
+                        <Typography variant="h4" bold>
+                            LiftOver
+                        </Typography>
+                        <Typography variant="p">
+                            For variants that are not in the user-specified genome assembly, the
+                            OSMP "liftover" these variants from their original genome assembly to
+                            the desired one using the <a href="https://hgdownload.soe.ucsc.edu/downloads.html"> UCSC liftOver tool </a>.
+                            
+                        </Typography>
+                    </li>
+                </ul>
             </Flex>
             <Divider />
             <Flex justifyContent="space-around" alignItems="flex-start">
@@ -77,8 +89,10 @@ const AboutPage: React.FC<{}> = () => {
                     <Typography variant="subtitle">
                         The Center for Computational Medicine
                     </Typography>
-                    <Typography variant="subtitle">Connor Klamann</Typography>
-                    <Typography variant="subtitle">Hannah Le</Typography>
+                    <Typography variant="subtitle">
+                        Children’s Hospital of Eastern Ontario
+                    </Typography>
+                    <Typography variant="subtitle">PhenoTips</Typography>
                 </Column>
                 <Column>
                     <Typography variant="subtitle" bold>
@@ -97,7 +111,7 @@ const AboutPage: React.FC<{}> = () => {
                     </Typography>
                 </Column>
             </Flex>
-        </Body>
+        </BodyAbout>
     );
 };
 export default AboutPage;
