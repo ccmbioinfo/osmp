@@ -38,7 +38,7 @@ const fetchVariantsQuery = gql`
                         transcript
                     }
                     ref
-                    referenceName
+                    chromosome
                     start
                     variantId
                 }

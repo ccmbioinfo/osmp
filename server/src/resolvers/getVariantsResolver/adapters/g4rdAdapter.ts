@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import jwtDecode from 'jwt-decode';
-// import https from 'https';
 import { URLSearchParams } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../../../logger';
@@ -13,6 +12,7 @@ import {
   VariantResponseFields,
   G4RDFamilyQueryResult,
   G4RDPatientQueryResult,
+  G4RDVariantQueryResult,
   Disorder,
   IndividualInfoFields,
 } from '../../../types';
@@ -25,31 +25,6 @@ const SOURCE_NAME = 'g4rd';
 const BEARER_CACHE_KEY = 'g4rdToken';
 
 type G4RDNodeQueryError = AxiosError<string>;
-
-type G4RDVariantBaseResponseFields = Omit<VariantResponseFields, 'referenceName'>;
-
-interface G4RDVariantInfoFields {
-  geneName: string;
-  aaChanges: string;
-  transcript: string;
-  gnomadHom: number;
-  cdna: string;
-}
-
-export interface G4RDVariantQueryResult {
-  exists: boolean;
-  numTotalResults: number;
-  results: {
-    contactInfo: string;
-    individual: Pick<
-      IndividualResponseFields,
-      'individualId' | 'diseases' | 'sex' | 'phenotypicFeatures'
-    >;
-    variant: G4RDVariantBaseResponseFields & { chromosome: string } & {
-      info: G4RDVariantInfoFields;
-    };
-  }[];
-}
 
 /**
  * @param args VariantQueryInput
@@ -222,7 +197,6 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
   return (variantResponse.results || []).map(r => {
     /* eslint-disable @typescript-eslint/no-unused-vars */
     r.variant.assemblyId = resolveAssembly(r.variant.assemblyId);
-    const { chromosome, ...restVariant } = r.variant;
     const { individual, contactInfo } = r;
 
     const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
@@ -252,12 +226,14 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       };
     }
 
-    const { aaChanges, ...restVariantInfo } = restVariant.info;
-
     const variant: VariantResponseFields = {
-      ...restVariant,
-      info: restVariantInfo,
-      referenceName: chromosome, // change this to chromosome
+      alt: r.variant.alt,
+      assemblyId: r.variant.assemblyId,
+      callsets: r.variant.callsets,
+      end: r.variant.end,
+      ref: r.variant.ref,
+      start: r.variant.start,
+      chromosome: r.variant.chromosome,
     };
 
     let familyId: string = '';

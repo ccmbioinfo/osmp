@@ -25,7 +25,7 @@ export const annotate = (
 
   queryResponse.forEach(r => {
     const variantKey = `${r.variant.ref}-${r.variant.start}-${
-      r.variant.referenceName
+      r.variant.chromosome
     }-${r.variant.assemblyId.replace(/\D/g, '')}`;
 
     if (variantKey in annotationKeyMap) {

@@ -41,7 +41,7 @@ export interface VariantResponseFields {
     end: number;
     info?: Maybe<VariantResponseInfoFields>;
     ref: string;
-    referenceName: string;
+    chromosome: string;
     start: number;
     variantId?: Maybe<string>;
     variantType?: Maybe<string>;
