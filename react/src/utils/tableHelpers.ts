@@ -1,4 +1,4 @@
-import { HeaderGroup } from 'react-table';
+import { Cell, HeaderGroup } from 'react-table';
 import { ResultTableColumns } from '../components/Table/Table';
 import {
     CallsetInfoFields,
@@ -117,6 +117,25 @@ export const isHeterozygous = (zygosity: string | null | undefined) => {
 export const isHomozygous = (zygosity: string | null | undefined) => {
     return !!zygosity?.toLowerCase().includes('hom');
 };
+
+export const isLastCellInSet = (cell: Cell<ResultTableColumns>) => (
+    !!cell.column &&
+    // Check if the cell's column is the last in its set (excluding hidden columns)
+    isLastHeaderInSet(cell.column as HeaderGroup<ResultTableColumns>)
+);
+
+export const isLastHeaderInSet = (column: HeaderGroup<ResultTableColumns>) => (
+    // Check if the current column is one of the top-most headers;
+    // i.e., "Variant", "Variant Details", or "Case Details"
+    column.parent === undefined ||
+    // Check if the current column in one of the empty columns
+    column.type === 'empty' ||
+    // Check if the current column is the last in its set (excluding hidden columns)
+    column.parent.columns
+        ?.filter(column => column.isVisible && column.type !== 'empty')
+        ?.at(-1)
+        ?.id === column.id
+);
 
 // 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
 // 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId, homozygousCount, heterozygousCount to each row.

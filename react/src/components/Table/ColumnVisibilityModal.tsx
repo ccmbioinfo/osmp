@@ -138,8 +138,9 @@ export default function ColumnVisibilityModal<T extends {}>({
     };
 
     return (
-        <InlineFlex>
+        <InlineFlex style={{ flexGrow: 1 }}>
             <Button
+                fluid
                 variant="secondary"
                 onClick={() => {
                     setShowModal(!showModal);

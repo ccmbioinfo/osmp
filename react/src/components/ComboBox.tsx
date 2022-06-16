@@ -7,7 +7,7 @@ import { useClickAway } from '../hooks';
 import { GeneSelectionValue } from './GeneSearch';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
-import SelectableList, { SelectableListItem } from './SelectableList';
+import SelectableList, { SelectableListItem, SelectableListWrapper } from './SelectableList';
 import Spinner from './Spinner';
 
 interface ComboBoxProps<T> {
@@ -103,32 +103,32 @@ export default function ComboBox<T extends {}>({
                     </>
                 )}
             </Header>
-            {options.length > 1 && isGene(options[0].value) && open && (
-                <Background
-                    variant="success"
-                    style={{
-                        padding: '0rem 0.75rem',
-                    }}
-                >
-                    <Typography variant="subtitle" success bold>
-                        {options.length} gene aliases are found. Please select the appropriate gene.
-                    </Typography>
-                </Background>
-            )}
-            {open && (
-                <SelectableList
-                    ref={ref}
-                    isMulti={isMulti}
-                    selection={selection}
-                    options={options}
-                    onSelect={item => {
-                        onSelect(item as T);
-                        if (!isMulti) {
-                            setOpen(false);
-                        }
-                    }}
-                />
-            )}
+            <SelectableListWrapper fullWidth>
+                {options.length > 1 && isGene(options[0].value) && open && (
+                    <Background
+                        variant="success"
+                        style={{ padding: '0 0.75rem' }}
+                    >
+                        <Typography variant="subtitle" success bold>
+                            {options.length} gene aliases are found. Please select the appropriate gene.
+                        </Typography>
+                    </Background>
+                )}
+                {open && (
+                    <SelectableList
+                        ref={ref}
+                        isMulti={isMulti}
+                        selection={selection}
+                        options={options}
+                        onSelect={item => {
+                            onSelect(item as T);
+                            if (!isMulti) {
+                                setOpen(false);
+                            }
+                        }}
+                    />
+                )}
+            </SelectableListWrapper>
         </Wrapper>
     );
 }

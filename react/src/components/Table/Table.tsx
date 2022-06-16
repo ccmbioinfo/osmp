@@ -37,6 +37,8 @@ import {
     isHeaderExpanded,
     isHeterozygous,
     isHomozygous,
+    isLastCellInSet,
+    isLastHeaderInSet,
     prepareData,
 } from '../../utils';
 import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
@@ -213,12 +215,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'homozygousCount',
                         Header: 'Homo Count',
                         width: getColumnWidth('Homo Count'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'heterozygousCount',
                         id: 'heterozygousCount',
                         Header: 'Het Count',
                         width: getColumnWidth('Het Count'),
+                        filter: 'between',
                     },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
                     {
@@ -569,7 +573,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
     };
     return (
         <>
-            <TableFilters justifyContent="space-between">
+            <TableFilters
+                justifyContent="space-between"
+                style={{
+                    flexWrap: 'nowrap',
+                    columnGap: '0.75rem'
+                }}
+            >
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                     <Button
@@ -580,6 +590,28 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Clear all filters
                     </Button>
                 </InlineFlex>
+                
+                <Column>
+                    <Typography variant="h3" condensed>
+                        {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
+                        individuals
+                    </Typography>
+                    {rows.length !== tableData.length && (
+                        <SummaryText>{rows.length} individuals matching your filters</SummaryText>
+                    )}
+                    {filters.length > 0 && (
+                        <Flex alignItems="center" style={{ columnGap: theme.space[2] }}>
+                            <Typography variant="p" bold condensed>
+                                Active Filters:
+                            </Typography>
+                            {filters.map((f, i) => (
+                                <div key={i}>
+                                    <Chip title={f.id} onDelete={() => setFilter(f.id, undefined)} />
+                                </div>
+                            ))}
+                        </Flex>
+                    )}
+                </Column>
 
                 <InlineFlex>
                     <ColumnVisibilityModal
@@ -595,27 +627,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
             </TableFilters>
 
-            <Column>
-                <br />
-                <Typography variant="h3">
-                    {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
-                    individuals
-                </Typography>
-                {rows.length !== tableData.length && (
-                    <SummaryText>{rows.length} individuals matching your filters</SummaryText>
-                )}
-                <Flex alignItems="center">
-                    <Typography variant="p" bold>
-                        Active Filters:
-                    </Typography>
-                    {filters.map((f, i) => (
-                        <div key={i}>
-                            <Chip title={f.id} onDelete={() => setFilter(f.id, undefined)} />
-                        </div>
-                    ))}
-                </Flex>
-            </Column>
-
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
                 <Styles disableFullWidth={visibleColumns.length > 12}>
                     <table {...getTableProps()}>
@@ -630,7 +641,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             const { key, ...restHeaderProps } =
                                                 column.getHeaderProps();
                                             return (
-                                                <TH key={key} {...restHeaderProps}>
+                                                <TH
+                                                    key={key}
+                                                    className={isLastHeaderInSet(column) ? 'last-in-set' : ''}
+                                                    {...restHeaderProps}
+                                                >
                                                     <AnimatePresence initial={false}>
                                                         {column.isVisible && (
                                                             <motion.section
@@ -808,6 +823,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 return (
                                                     <td
                                                         key={key}
+                                                        className={isLastCellInSet(cell) ? 'last-in-set' : ''}
                                                         style={{
                                                             paddingRight: 0,
                                                             paddingLeft: 0,

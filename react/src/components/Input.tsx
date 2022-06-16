@@ -16,6 +16,7 @@ const Container = styled.div<Pick<InputProps, 'variant' | 'error'>>`
     align-items: center;
     justify-content: space-between;
     position: relative;
+    flex-grow: 1;
 
     ${props => {
         switch (props.variant) {
@@ -39,11 +40,15 @@ const Container = styled.div<Pick<InputProps, 'variant' | 'error'>>`
     padding: ${props => props.theme.space[0]} ${props => props.theme.space[4]};
     font-family: ${props => props.theme.fontFamily.body};
     font-size: ${props => props.theme.fontSizes.s};
-    min-height: 46px;
+    min-height: 40px;
 `;
 
 const TextInput = styled.input<InputProps>`
+    flex-grow: 1;
+    background-color: transparent;
     border: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
     &:focus {
         outline: none;
     }

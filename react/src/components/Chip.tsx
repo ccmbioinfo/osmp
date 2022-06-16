@@ -14,6 +14,7 @@ export const ChipContainer = styled(props => <Flex {...props} />)`
 `;
 export const ChipDeleteContainer = styled(props => <Button {...props} />)`
     border-radius: ${props => props.theme.radii.round};
+    color: ${props => props.theme.colors.background};
     height: 10px;
     width: 10px;
     padding: 0;
@@ -38,7 +39,7 @@ const Chip: React.FC<ChipProps> = ({ title, onDelete }) => {
     return (
         <ChipContainer justifyContent="space-between" alignItems="center">
             <ChipTitle variant="subtitle">{title}</ChipTitle>
-            <ChipDeleteContainer variant="primary" onClick={onDelete}>
+            <ChipDeleteContainer variant="light" onClick={onDelete}>
                 <BsX />
             </ChipDeleteContainer>
         </ChipContainer>

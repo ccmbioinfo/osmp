@@ -10,6 +10,8 @@ import {
     isHeaderExpanded,
     isHeterozygous,
     isHomozygous,
+    isLastCellInSet,
+    isLastHeaderInSet,
     prepareData,
 } from './tableHelpers';
 
@@ -24,6 +26,8 @@ export {
     isHeaderExpanded,
     isHeterozygous,
     isHomozygous,
+    isLastCellInSet,
+    isLastHeaderInSet,
     prepareData,
     resolveAssembly,
 };

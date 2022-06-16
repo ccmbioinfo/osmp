@@ -24,7 +24,7 @@ export const GlobalFilter: React.FC<GlobalFilterProps> = ({ filter, setFilter })
     };
 
     return (
-        <Flex>
+        <Flex style={{ flexGrow: 1 }}>
             <SearchInput
                 variant="outlined"
                 value={input}

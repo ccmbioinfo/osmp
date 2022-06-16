@@ -5,11 +5,12 @@ const Component = styled.button<ButtonProps>`
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    height: 40px;
+    justify-content: center;
+    flex-grow: ${props => props.fluid && '1'};
     text-align: center;
     font-family: ${props => props.theme.fontFamily.heading};
     padding: ${props => props.theme.space[3]} ${props => props.theme.space[4]};
-    margin: ${props => props.theme.space[3]} ${props => props.theme.space[2]};
+    margin-inline: ${props => props.theme.space[2]};
     border: ${props => props.theme.borders.thin};
     border-radius: ${props => props.theme.radii.base};
     font-size: ${props => props.theme.fontSizes.s};
@@ -31,12 +32,14 @@ const Component = styled.button<ButtonProps>`
         switch (props.variant) {
             case 'primary':
                 return `
+                    min-height: 40px;
                     color: ${props.theme.colors.background};
                     background-color: ${props.theme.colors.primary};
                     border-color: ${props.theme.colors.primary};
                 `;
             case 'secondary':
                 return `
+                    min-height: 40px;
                     color: ${props.theme.colors.primary};
                     background-color: ${props.theme.colors.background};
                     border-color: ${props.theme.colors.primary};
@@ -53,6 +56,7 @@ const Component = styled.button<ButtonProps>`
 
 export interface ButtonProps {
     variant: 'primary' | 'secondary' | 'light';
+    fluid?: boolean;
     onClick?: () => void;
     children?: React.ReactNode;
     keyCodes?: string[];  // run onClick if these keys are pressed
