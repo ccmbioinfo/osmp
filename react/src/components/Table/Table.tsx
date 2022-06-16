@@ -43,6 +43,7 @@ import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
+import DiseasesViewer from './DiseasesViewer'
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
 import FlaggedGenesViewer from './FlaggedGenesViewer';
@@ -345,11 +346,25 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Sex', true),
                     },
                     {
-                        accessor: 'diseases',
+                        accessor: state => 
+                            !!state.disorders && state.disorders.map(({ id, label }) => `${label} (${id})`),
                         id: 'diseases',
                         filter: 'multiSelect',
                         Header: 'Diseases',
                         width: getColumnWidth('Diseases', true),
+                        Cell: ({
+                            cell: { value },
+                            row: { isExpanded, toggleRowExpanded },
+                        }: {
+                            cell: Cell<ResultTableColumns>;
+                            row: Row<ResultTableColumns>;
+                        }) => (
+                            <DiseasesViewer
+                                {...{ toggleRowExpanded }}
+                                disorders={value}
+                                rowExpanded={isExpanded}
+                            />
+                        ),
                     },
                     {
                         accessor: 'clinicalStatus',

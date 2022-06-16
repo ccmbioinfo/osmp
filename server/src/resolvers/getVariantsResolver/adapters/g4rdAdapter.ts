@@ -13,6 +13,7 @@ import {
   G4RDFamilyQueryResult,
   G4RDPatientQueryResult,
   G4RDVariantQueryResult,
+  Disorder,
   IndividualInfoFields,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
@@ -202,6 +203,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
 
     let info: IndividualInfoFields = {};
     let ethnicity: string = '';
+    let disorders: Disorder[] = [];
 
     if (patient) {
       const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
@@ -209,6 +211,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       const diagnosis = patient.clinicalStatus;
       const solved = patient.solved ? patient.solved.status : '';
       const clinicalStatus = patient.clinicalStatus;
+      disorders = patient.disorders.filter(({ label }) => label !== 'affected') as Disorder[];
       ethnicity = Object.values(patient.ethnicity)
         .flat()
         .map(p => p.trim())
@@ -219,6 +222,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
         diagnosis,
         classifications,
         clinicalStatus,
+        disorders,
       };
     }
 

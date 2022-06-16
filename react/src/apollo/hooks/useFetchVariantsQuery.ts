@@ -63,6 +63,10 @@ const fetchVariantsQuery = gql`
                         diagnosis
                         candidateGene
                         clinicalStatus
+                        disorders {
+                            id
+                            label
+                        }
                         solved
                         classifications
                     }
