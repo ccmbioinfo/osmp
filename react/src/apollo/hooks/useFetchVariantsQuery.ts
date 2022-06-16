@@ -38,7 +38,7 @@ const fetchVariantsQuery = gql`
                         transcript
                     }
                     ref
-                    referenceName
+                    chromosome
                     start
                     variantId
                 }
@@ -63,6 +63,10 @@ const fetchVariantsQuery = gql`
                         diagnosis
                         candidateGene
                         clinicalStatus
+                        disorders {
+                            id
+                            label
+                        }
                         solved
                         classifications
                     }
