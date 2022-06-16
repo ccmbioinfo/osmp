@@ -202,8 +202,6 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 flexGrow: 1,
                                 minWidth: 200
                             }}
-                            variant="primary"
-                            keyCodes={["Enter", "NumpadEnter"]}
                         >
                             <Typography variant="subtitle" bold>
                                 Gene Name <RequiredIndicator />
@@ -279,6 +277,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                                     fetchVariants({ variables: getArgs() });
                                 }}
                                 variant="primary"
+                                keyCodes={["Enter", "NumpadEnter"]}
                             >
                                 Search
                             </Button>
