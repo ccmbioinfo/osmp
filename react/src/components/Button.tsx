@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components/macro';
 
 const Component = styled.button<ButtonProps>`
@@ -55,11 +55,34 @@ export interface ButtonProps {
     variant: 'primary' | 'secondary' | 'light';
     onClick?: () => void;
     children?: React.ReactNode;
+    keyCodes?: string[];  // run onClick if these keys are pressed
     disabled?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const { variant, onClick, children, ...userStyles } = props;
+    const [listening, setListening] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (
+            listening
+            || props.disabled
+            || props.keyCodes === undefined
+            || props.keyCodes.length === 0
+            || onClick === undefined
+        ) return;
+        const listener = (e: KeyboardEvent) => {
+            if (props.keyCodes!.includes(e.code)) {
+                onClick()!;
+            }
+        }
+        document.addEventListener("keydown", listener);
+        setListening(true);
+        return () => {
+            document.removeEventListener("keydown", listener);
+            setListening(false);
+        }
+    }, [props.disabled, props.keyCodes, listening, onClick]);
 
     return (
         <Component ref={ref} variant={variant} onClick={onClick} {...userStyles}>

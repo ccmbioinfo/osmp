@@ -253,6 +253,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 fetchVariants({ variables: getArgs() });
                             }}
                             variant="primary"
+                            keyCodes={["Enter", "NumpadEnter"]}
                         >
                             Search
                         </Button>
