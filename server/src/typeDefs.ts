@@ -45,7 +45,7 @@ export default gql`
     end: Int!
     info: VariantResponseInfoFields
     ref: String!
-    referenceName: String
+    chromosome: String
     start: Int!
     variantId: String
     variantType: String

@@ -1,7 +1,7 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { G4RDVariantQueryResult, transformG4RDQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
+import { transformG4RDQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
 import typeDefs from '../../src/typeDefs';
-import { CombinedVariantQueryResponse } from '../../src/types';
+import { CombinedVariantQueryResponse, G4RDVariantQueryResult } from '../../src/types';
 import { addMocksToSchema } from '@graphql-tools/mock';
 import { testGraphQLQuery } from '../testGraphQLQuery';
 
@@ -13,7 +13,6 @@ const testResponse: G4RDVariantQueryResult = {
   results: [
     {
       variant: {
-        variantId: 'rs201202918',
         assemblyId: 'GRCh37',
         chromosome: 'NM_001304829.2',
         start: 100573569,
@@ -26,14 +25,7 @@ const testResponse: G4RDVariantQueryResult = {
             individualId: '12345',
             info: { ad: 4, dp: 13, qual: 62.8, zygosity: 'heterozygous' },
           },
-        ],
-        info: {
-          geneName: 'SASS6',
-          aaChanges: 'NA',
-          transcript: 'ENST00000287482',
-          gnomadHom: 0,
-          cdna: 'c.361-9C>T',
-        },
+        ]
       },
       individual: {
         individualId: '12345',
@@ -145,7 +137,9 @@ const patientTestResponse =  [
   },
 ];
 
-const transformed = transformG4RDQueryResponse(testResponse, patientTestResponse, '1:1234');
+const familyTestResponse = {"12345": "6789"};
+
+const transformed = transformG4RDQueryResponse(testResponse, patientTestResponse, familyTestResponse);
 
 /**
  * Confirm that variant query schema performs and validates as expected
@@ -169,16 +163,9 @@ describe('Test g4rd query response transformer', () => {
               }
             }
             end
-            info {
-              cdna
-              geneName
-              gnomadHom
-              transcript
-            }
             ref
-            referenceName
+            chromosome
             start
-            variantId
           }
           individual {
             diseases {
@@ -199,6 +186,7 @@ describe('Test g4rd query response transformer', () => {
             }
             sex
             ethnicity
+            familyId
             info {
               candidateGene
               clinicalStatus

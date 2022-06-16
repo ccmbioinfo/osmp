@@ -39,7 +39,7 @@ describe('Test minimal getVariants query', () => {
               transcript
             }
             ref
-            referenceName
+            chromosome
             start
           }
           individual {

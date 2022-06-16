@@ -72,7 +72,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
         end: 50162978,
         info: {},
         ref: r.reference,
-        referenceName: '1', // this should be referenceName
+        chromosome: '1', // this should be chromosome
         start: 50162978,
       },
       contactInfo: 'DrExample@gmail.com',
