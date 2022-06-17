@@ -42,7 +42,6 @@ jobs:
       - if: github.event_name == 'pull_request'
         run: yarn lint
       - if: github.event_name == 'pull_request'
-        continue-on-error: true
         run: yarn check-format
       - if: github.event_name == 'pull_request'
         run: yarn test
