@@ -518,7 +518,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         rows,
     } = tableInstance;
 
-    const { filters, globalFilter } = state;
+    const { columnOrder, filters, globalFilter } = state;
 
     const [cacheTable, setCacheTable] = useState(
         Object.fromEntries(
@@ -643,7 +643,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             return (
                                                 <TH
                                                     key={key}
-                                                    className={isLastHeaderInSet(column) ? 'last-in-set' : ''}
+                                                    className={isLastHeaderInSet(column, columnOrder) ? 'last-in-set' : ''}
                                                     {...restHeaderProps}
                                                 >
                                                     <AnimatePresence initial={false}>
@@ -823,7 +823,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 return (
                                                     <td
                                                         key={key}
-                                                        className={isLastCellInSet(cell) ? 'last-in-set' : ''}
+                                                        className={isLastCellInSet(cell, columnOrder) ? 'last-in-set' : ''}
                                                         style={{
                                                             paddingRight: 0,
                                                             paddingLeft: 0,
