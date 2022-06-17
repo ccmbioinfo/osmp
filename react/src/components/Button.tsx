@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import styled from 'styled-components/macro';
 
 const Component = styled.button<ButtonProps>`
@@ -65,28 +65,22 @@ export interface ButtonProps {
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const { variant, onClick, children, ...userStyles } = props;
-    const [listening, setListening] = useState<boolean>(false);
+
+    const listener = useCallback(({ code }: KeyboardEvent) => {
+        if (props.keyCodes?.includes(code)) onClick!();
+    }, [onClick, props.keyCodes]);
 
     useEffect(() => {
         if (
-            listening
-            || props.disabled
-            || props.keyCodes === undefined
-            || props.keyCodes.length === 0
-            || onClick === undefined
+            !onClick ||
+            props.disabled ||
+            !props.keyCodes?.length
         ) return;
-        const listener = (e: KeyboardEvent) => {
-            if (props.keyCodes!.includes(e.code)) {
-                onClick()!;
-            }
-        }
-        document.addEventListener("keydown", listener);
-        setListening(true);
-        return () => {
-            document.removeEventListener("keydown", listener);
-            setListening(false);
-        }
-    }, [props.disabled, props.keyCodes, listening, onClick]);
+        
+        document.addEventListener('keydown', listener);
+
+        return () => document.removeEventListener('keydown', listener);
+    }, [listener, onClick, props.disabled, props.keyCodes]);
 
     return (
         <Component ref={ref} variant={variant} onClick={onClick} {...userStyles}>
