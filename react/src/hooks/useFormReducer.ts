@@ -108,17 +108,17 @@ const validateField = <S>(
         if (required && !value) {
             return {
                 displayError: !!validator[field]?.displayRequiredError,
-                errorText: `${field} is required!`
+                errorText: `${field} is required!`,
             };
         }
     }
     let error: Error | null = null;
     validator[field]?.rules?.forEach(rule => {
         if (!rule.valid(state, value) && getFieldRequired(state, field, validator)) {
-            const { displayError=true, error: errorText } = rule;
+            const { displayError = true, error: errorText } = rule;
             error = {
                 displayError,
-                errorText
+                errorText,
             };
             return;
         }

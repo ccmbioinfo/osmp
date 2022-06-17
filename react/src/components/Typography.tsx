@@ -18,7 +18,7 @@ interface TypographyProps extends TypographyOverrides {
 const Component = styled.p<TypographyProps>`
     user-select: text;
     margin-inline-end: ${props => props.theme.space[2]};
-    margin: ${props => props.condensed ? '0' : 'revert'};
+    margin: ${props => (props.condensed ? '0' : 'revert')};
     color: ${props =>
         props.error
             ? props.theme.colors.error
