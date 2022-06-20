@@ -819,7 +819,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         isCaseDetailsCollapsed(headerGroups[0].headers) &&
                                         // rows are sorted by uniqueId, so if a row came before it with the same id, then it's not unique
                                         row?.index !== 0 &&
-                                        row.values['uniqueId'] === page[i - 1].values['uniqueId']
+                                        row.values['uniqueId'] === page[i - 1]?.values['uniqueId']
                                     ) {
                                         return null;
                                     }
