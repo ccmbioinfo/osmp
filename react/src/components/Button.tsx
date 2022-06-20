@@ -59,24 +59,23 @@ export interface ButtonProps {
     fluid?: boolean;
     onClick?: () => void;
     children?: React.ReactNode;
-    keyCodes?: string[];  // run onClick if these keys are pressed
+    keyCodes?: string[]; // run onClick if these keys are pressed
     disabled?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const { variant, onClick, children, ...userStyles } = props;
 
-    const listener = useCallback(({ code }: KeyboardEvent) => {
-        if (props.keyCodes?.includes(code)) onClick!();
-    }, [onClick, props.keyCodes]);
+    const listener = useCallback(
+        ({ code }: KeyboardEvent) => {
+            if (props.keyCodes?.includes(code)) onClick!();
+        },
+        [onClick, props.keyCodes]
+    );
 
     useEffect(() => {
-        if (
-            !onClick ||
-            props.disabled ||
-            !props.keyCodes?.length
-        ) return;
-        
+        if (!onClick || props.disabled || !props.keyCodes?.length) return;
+
         document.addEventListener('keydown', listener);
 
         return () => document.removeEventListener('keydown', listener);

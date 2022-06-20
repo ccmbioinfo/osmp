@@ -38,10 +38,7 @@ const Text = styled(props => <CellText {...props} />)`
 const CellViewer = <T extends {}>({
     formatItemText,
     items,
-    itemName: {
-        singular,
-        plural
-    },
+    itemName: { singular, plural },
     rowExpanded,
     toggleRowExpanded,
     text,
@@ -69,9 +66,7 @@ const CellViewer = <T extends {}>({
             </>
         ) : (
             <Text onClick={onClick}>{`${items.length} ${
-                items.length === 1 ?
-                    singular :
-                    plural ?? `${singular}s` 
+                items.length === 1 ? singular : plural ?? `${singular}s`
             }`}</Text>
         );
     else return <CellText>{text}</CellText>;

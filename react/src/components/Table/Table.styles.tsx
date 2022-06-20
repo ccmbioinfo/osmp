@@ -23,8 +23,7 @@ export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
     margin-bottom: 1rem;
 
-    > ${Column},
-    > ${InlineFlex} {
+    > ${Column}, > ${InlineFlex} {
         align-content: center;
         row-gap: ${props => props.theme.space[2]};
     }
