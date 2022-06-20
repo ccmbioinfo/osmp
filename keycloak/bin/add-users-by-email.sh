@@ -9,16 +9,7 @@
 
 set -euo pipefail
 
-# get options
-granttype="client_credentials"
-while [ True ]; do
-if [ "$1" = "--password" -o "$1" = "-p" ]; then
-    granttype="password"
-    shift 1
-else
-    break
-fi
-done
+granttype="${AUTH0_GRANT_TYPE}"
 
 export PATH=$PATH:/opt/jboss/keycloak/bin
 kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user "${KEYCLOAK_USER}" --password ${KEYCLOAK_PASSWORD}
@@ -30,9 +21,9 @@ if [ "$granttype" = "password" ]; then
         --header "Content-Type: application/x-www-form-urlencoded" \
         --data "client_id=${AUTH0_BROKER_CLIENT_ID}" \
         --data "grant_type=password" \
-        --data "username=${G4RD_USERNAME}" \
-        --data "password=${G4RD_PASSWORD}" \
-        --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}" \
+        --data "username=${AUTH0_BROKER_USERNAME}" \
+        --data "password=${AUTH0_BROKER_PASSWORD}" \
+        --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}"
     )
 else
     tokenresponse=$(curl --request POST \
@@ -41,7 +32,7 @@ else
         --data "client_id=${AUTH0_BROKER_CLIENT_ID}" \
         --data "grant_type=client_credentials" \
         --data "client_secret=${AUTH0_BROKER_CLIENT_SECRET}" \
-        --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}" \
+        --data "audience=${AUTH0_BROKER_MANAGEMENT_API_URL}"
     )
 fi
 
