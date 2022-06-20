@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "tsc --build .",
-    "format": "prettier --write src",
+    "format": "prettier --write src __tests__",
     "check-format": "prettier --check src __tests__",
     "lint": "eslint --max-warnings=0 src",
     "start": "ts-node-dev src/server.ts",

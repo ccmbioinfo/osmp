@@ -42,8 +42,8 @@ const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     !!!state.gene.value || !!state.position.value,
-                error: 'Please select a gene from the autocomplete.'
-            }
+                error: 'Please select a gene from the autocomplete.',
+            },
         ],
     },
     maxFrequency: {
@@ -89,13 +89,14 @@ const ErrorWrapper = styled.div`
     padding: ${props => props.theme.space[4]} 0.75rem 0;
 `;
 
-const ErrorText: React.FC<{ error?: string }> = ({ error }) => error ? (
-    <ErrorWrapper>
-        <Typography error variant="subtitle" bold condensed>
-            {error}
-        </Typography>
-    </ErrorWrapper>
-) : null;
+const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
+    error ? (
+        <ErrorWrapper>
+            <Typography error variant="subtitle" bold condensed>
+                {error}
+            </Typography>
+        </ErrorWrapper>
+    ) : null;
 
 const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
@@ -164,18 +165,15 @@ const VariantQueryPage: React.FC<{}> = () => {
                 variant="light"
                 style={{
                     marginTop: 0,
-                    paddingTop: theme.space[2]
+                    paddingTop: theme.space[2],
                 }}
             >
                 <Flex style={{ flexWrap: 'nowrap' }}>
-                    <Flex
-                        alignItems="flex-start"
-                        style={{ flexGrow: 1 }}
-                    >
+                    <Flex alignItems="flex-start" style={{ flexGrow: 1 }}>
                         <Column
                             style={{
                                 width: '25%',
-                                minWidth: 150
+                                minWidth: 150,
                             }}
                         >
                             <Typography variant="subtitle" bold>
@@ -184,7 +182,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             <ComboBox
                                 onSelect={val =>
                                     updateQueryOptionsForm({
-                                        assemblyId: val as AssemblyId
+                                        assemblyId: val as AssemblyId,
                                     })
                                 }
                                 options={['GRCh37', 'GRCh38'].map((a, id) => ({
@@ -200,7 +198,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             alignItems="flex-start"
                             style={{
                                 flexGrow: 1,
-                                minWidth: 200
+                                minWidth: 200,
                             }}
                         >
                             <Typography variant="subtitle" bold>
@@ -210,17 +208,21 @@ const VariantQueryPage: React.FC<{}> = () => {
                                 assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
                                 geneName={queryOptionsForm.gene.value}
                                 onChange={geneName => updateQueryOptionsForm({ gene: geneName })}
-                                onSelect={({ name, position }) => updateQueryOptionsForm({
-                                    gene: name,
-                                    position,
-                                })}
+                                onSelect={({ name, position }) =>
+                                    updateQueryOptionsForm({
+                                        gene: name,
+                                        position,
+                                    })
+                                }
                             />
                             <ErrorText error={queryOptionsForm.gene.error} />
                         </Column>
-                        <Column style={{
-                            width: 'min-content',
-                            minWidth: 150  
-                        }}>
+                        <Column
+                            style={{
+                                width: 'min-content',
+                                minWidth: 150,
+                            }}
+                        >
                             <Flex alignItems="center">
                                 <Typography variant="subtitle" bold>
                                     Max Frequency <RequiredIndicator />
@@ -243,7 +245,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <Column
                             style={{
                                 width: '25%',
-                                minWidth: 150
+                                minWidth: 150,
                             }}
                         >
                             <Typography variant="subtitle" bold>
@@ -252,7 +254,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             <ComboBox
                                 isMulti
                                 onSelect={val => {
-                                    toggleSource(val)
+                                    toggleSource(val);
                                 }}
                                 options={SOURCES.filter(Boolean).map((a, id) => ({
                                     id,
@@ -270,14 +272,15 @@ const VariantQueryPage: React.FC<{}> = () => {
                         <ButtonWrapper>
                             <Button
                                 disabled={
-                                    loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                                    loading ||
+                                    !formIsValid(queryOptionsForm, queryOptionsFormValidator)
                                 }
                                 onClick={() => {
                                     clearAllErrors();
                                     fetchVariants({ variables: getArgs() });
                                 }}
                                 variant="primary"
-                                keyCodes={["Enter", "NumpadEnter"]}
+                                keyCodes={['Enter', 'NumpadEnter']}
                             >
                                 Search
                             </Button>

@@ -76,7 +76,7 @@ export interface Disorder {
   label: string;
 }
 
-type DisorderAffected = Pick<Disorder, 'label'>
+type DisorderAffected = Pick<Disorder, 'label'>;
 
 export interface IndividualInfoFields {
   candidateGene?: Maybe<string>;

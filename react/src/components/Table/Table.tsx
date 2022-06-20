@@ -45,7 +45,7 @@ import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
-import DiseasesViewer from './DiseasesViewer'
+import DiseasesViewer from './DiseasesViewer';
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
 import FlaggedGenesViewer from './FlaggedGenesViewer';
@@ -350,8 +350,9 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Sex', true),
                     },
                     {
-                        accessor: state => 
-                            !!state.disorders && state.disorders.map(({ id, label }) => `${label} (${id})`),
+                        accessor: state =>
+                            !!state.disorders &&
+                            state.disorders.map(({ id, label }) => `${label} (${id})`),
                         id: 'diseases',
                         filter: 'multiSelect',
                         Header: 'Diseases',
@@ -577,7 +578,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 justifyContent="space-between"
                 style={{
                     flexWrap: 'nowrap',
-                    columnGap: '0.75rem'
+                    columnGap: '0.75rem',
                 }}
             >
                 <InlineFlex>
@@ -590,7 +591,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Clear all filters
                     </Button>
                 </InlineFlex>
-                
+
                 <Column>
                     <Typography variant="h3" condensed>
                         {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
@@ -606,7 +607,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                             </Typography>
                             {filters.map((f, i) => (
                                 <div key={i}>
-                                    <Chip title={f.id} onDelete={() => setFilter(f.id, undefined)} />
+                                    <Chip
+                                        title={f.id}
+                                        onDelete={() => setFilter(f.id, undefined)}
+                                    />
                                 </div>
                             ))}
                         </Flex>
@@ -643,7 +647,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             return (
                                                 <TH
                                                     key={key}
-                                                    className={isLastHeaderInSet(column, columnOrder) ? 'last-in-set' : ''}
+                                                    className={
+                                                        isLastHeaderInSet(column, columnOrder)
+                                                            ? 'last-in-set'
+                                                            : ''
+                                                    }
                                                     {...restHeaderProps}
                                                 >
                                                     <AnimatePresence initial={false}>
@@ -823,7 +831,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 return (
                                                     <td
                                                         key={key}
-                                                        className={isLastCellInSet(cell, columnOrder) ? 'last-in-set' : ''}
+                                                        className={
+                                                            isLastCellInSet(cell, columnOrder)
+                                                                ? 'last-in-set'
+                                                                : ''
+                                                        }
                                                         style={{
                                                             paddingRight: 0,
                                                             paddingLeft: 0,

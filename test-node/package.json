@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node-dev src/server.ts",
     "format": "prettier --check src",
+    "check-format": "prettier --check src",
     "lint": "eslint --max-warnings=0 'src/**/*.ts'"
   },
   "dependencies": {

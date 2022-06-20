@@ -105,12 +105,10 @@ export default function ComboBox<T extends {}>({
             </Header>
             <SelectableListWrapper fullWidth>
                 {options.length > 1 && isGene(options[0].value) && open && (
-                    <Background
-                        variant="success"
-                        style={{ padding: '0 0.75rem' }}
-                    >
+                    <Background variant="success" style={{ padding: '0 0.75rem' }}>
                         <Typography variant="subtitle" success bold>
-                            {options.length} gene aliases are found. Please select the appropriate gene.
+                            {options.length} gene aliases are found. Please select the appropriate
+                            gene.
                         </Typography>
                     </Background>
                 )}

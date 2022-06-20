@@ -65,6 +65,7 @@
         "storybook": "start-storybook -p 6001 -s public",
         "build-storybook": "build-storybook -s public",
         "format": "prettier --write src/",
+        "check-format": "prettier --check src/",
         "lint": "eslint --max-warnings=0 src/",
         "tsc": "tsc"
     },

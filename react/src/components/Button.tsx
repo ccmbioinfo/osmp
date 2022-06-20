@@ -59,7 +59,7 @@ export interface ButtonProps {
     fluid?: boolean;
     onClick?: () => void;
     children?: React.ReactNode;
-    keyCodes?: string[];  // run onClick if these keys are pressed
+    keyCodes?: string[]; // run onClick if these keys are pressed
     disabled?: boolean;
 }
 
@@ -69,23 +69,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => 
 
     useEffect(() => {
         if (
-            listening
-            || props.disabled
-            || props.keyCodes === undefined
-            || props.keyCodes.length === 0
-            || onClick === undefined
-        ) return;
+            listening ||
+            props.disabled ||
+            props.keyCodes === undefined ||
+            props.keyCodes.length === 0 ||
+            onClick === undefined
+        )
+            return;
         const listener = (e: KeyboardEvent) => {
             if (props.keyCodes!.includes(e.code)) {
                 onClick()!;
             }
-        }
-        document.addEventListener("keydown", listener);
+        };
+        document.addEventListener('keydown', listener);
         setListening(true);
         return () => {
-            document.removeEventListener("keydown", listener);
+            document.removeEventListener('keydown', listener);
             setListening(false);
-        }
+        };
     }, [props.disabled, props.keyCodes, listening, onClick]);
 
     return (

@@ -25,7 +25,7 @@ const testResponse: G4RDVariantQueryResult = {
             individualId: '12345',
             info: { ad: 4, dp: 13, qual: 62.8, zygosity: 'heterozygous' },
           },
-        ]
+        ],
       },
       individual: {
         individualId: '12345',
@@ -42,7 +42,7 @@ const testResponse: G4RDVariantQueryResult = {
   ],
 };
 
-const patientTestResponse =  [
+const patientTestResponse = [
   {
     date: new Date('2021-12-14T19:40:50.000Z'),
     parental_names: {
@@ -137,9 +137,13 @@ const patientTestResponse =  [
   },
 ];
 
-const familyTestResponse = {"12345": "6789"};
+const familyTestResponse = { '12345': '6789' };
 
-const transformed = transformG4RDQueryResponse(testResponse, patientTestResponse, familyTestResponse);
+const transformed = transformG4RDQueryResponse(
+  testResponse,
+  patientTestResponse,
+  familyTestResponse
+);
 
 /**
  * Confirm that variant query schema performs and validates as expected

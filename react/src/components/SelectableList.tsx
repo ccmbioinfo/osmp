@@ -11,7 +11,7 @@ export const SelectableListWrapper = styled.div<SelectableListWrapperProps>`
     position: absolute;
     top: 100%;
     z-index: 998;
-    width: ${props => props.fullWidth ? '100%' : 'fit-content'};
+    width: ${props => (props.fullWidth ? '100%' : 'fit-content')};
 `;
 
 const StyledList = styled.ul`
