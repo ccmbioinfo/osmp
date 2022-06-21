@@ -41,7 +41,7 @@ accesstoken=$(
 )
 
 # Get users by email
-file=${1:--}
+file=${1:-/dev/stdin}
 
 # read line-by-line, no newline
 while IFS= read -r line; do
@@ -63,4 +63,4 @@ while IFS= read -r line; do
         printf "Failed to add user\n"
     fi
     set -e
-done < <(cat -- "$file")
+done < "$file"
