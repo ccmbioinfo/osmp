@@ -1,10 +1,4 @@
-import {
-    ApolloClient,
-    createHttpLink,
-    from,
-    InMemoryCache,
-    useLazyQuery,
-} from '@apollo/client';
+import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { ApolloLink, QueryHookOptions, useQuery } from '@apollo/react-hooks';
 import { RestLink } from 'apollo-link-rest';
@@ -27,22 +21,20 @@ export const buildLink = (token?: string) => {
     });
 
     const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
-        return forward(operation).map((result) => {
+        return forward(operation).map(result => {
             // https://github.com/apollographql/apollo-link/issues/298
             const errorDispatch = operation.getContext().dispatch;
             // const errorDispatch = result.context!.dispatch;  // Is this more 'correct'?
             if (result.data?.getVariants.errors.length) {
-                result.data?.getVariants.errors.forEach(
-                    (e: VariantQueryResponseError) => {
-                        errorDispatch(makeNodeError(e));
-                    }
-                );
+                result.data?.getVariants.errors.forEach((e: VariantQueryResponseError) => {
+                    errorDispatch(makeNodeError(e));
+                });
             }
             return result;
         });
     });
 
-    const errorLink = onError((errorResponse) => {
+    const errorLink = onError(errorResponse => {
         const { graphQLErrors, networkError, operation, /*response, */ forward } = errorResponse;
         const { dispatch } = operation.getContext();
         const sources = operation.variables.input.sources;
