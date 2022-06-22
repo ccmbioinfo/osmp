@@ -3,7 +3,6 @@ import {
     createHttpLink,
     from,
     InMemoryCache,
-    Observable,
     useLazyQuery,
 } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
@@ -18,7 +17,7 @@ import { VariantQueryResponseError } from '../types';
 const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_URL;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(60000); // 60 second timeout
+    const timeoutLink = new ApolloLinkTimeout(60_000); // 60 second timeout
     const mygeneRestLink = new RestLink({
         uri: 'https://mygene.info/v3/',
     });
@@ -28,28 +27,22 @@ export const buildLink = (token?: string) => {
     });
 
     const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
-        return new Observable(observer => {
-            const dispatcherContext = operation.getContext();
-            const sub = forward(operation).subscribe({
-                next: response => {
-                    if (!!response?.data?.getVariants.errors.length) {
-                        response?.data?.getVariants.errors.forEach(
-                            (e: VariantQueryResponseError) => {
-                                dispatcherContext.dispatch(makeNodeError(e));
-                            }
-                        );
+        return forward(operation).map((result) => {
+            const errorDispatch = operation.getContext().dispatch;
+            // const errorDispatch = result.context!.dispatch;  // Is this more 'correct'?
+            if (result.data?.getVariants.errors.length) {
+                result.data?.getVariants.errors.forEach(
+                    (e: VariantQueryResponseError) => {
+                        errorDispatch(makeNodeError(e));
                     }
-                    observer.next(response);
-                },
-            });
-
-            return () => {
-                if (sub) sub.unsubscribe();
-            };
+                );
+            }
+            return result;
         });
     });
 
-    const errorLink = onError(({ graphQLErrors, networkError, operation, response, forward }) => {
+    const errorLink = onError((errorResponse) => {
+        const { graphQLErrors, networkError, operation, /*response, */ forward } = errorResponse;
         const { dispatch } = operation.getContext();
         const sources = operation.variables.input.sources;
 
