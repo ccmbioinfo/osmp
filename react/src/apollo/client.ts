@@ -1,6 +1,6 @@
 import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import { ApolloLink, QueryHookOptions, useQuery } from '@apollo/react-hooks';
+import { ApolloLink, QueryHookOptions, ServerError, useQuery } from '@apollo/react-hooks';
 import { RestLink } from 'apollo-link-rest';
 import ApolloLinkTimeout from 'apollo-link-timeout';
 import { DocumentNode } from 'graphql';
@@ -53,6 +53,12 @@ export const buildLink = (token?: string) => {
         if (networkError) {
             console.error(`[Network error]: ${networkError}`);
             networkError.message = `${networkError.message} (Source: ${sources.join(', ')})`;
+            if ((networkError as ServerError).statusCode === 403) {
+                networkError.message = `${networkError.message} Refreshing...`;
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3_000);
+            }
             dispatch(makeNetworkError(networkError));
         }
 
