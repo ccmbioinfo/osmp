@@ -47,16 +47,15 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
 const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
     uniqueId: number
-): ResultTableColumns => {
-    return {
-        ...results,
-        emptyCaseDetails: '',
-        emptyVariationDetails: '',
-        uniqueId,
-        aaChange: results.aaPos || 'NA',
-        af: results.af || 0,
-    };
-};
+): ResultTableColumns => ({
+    ...results,
+    emptyCaseDetails: '',
+    emptyVariationDetails: '',
+    uniqueId,
+    cdna: results.cdna || 'NA',
+    aaChange: results.aaChange || 'NA',
+    af: results.af || 0,
+});
 
 export const calculateColumnWidth = (
     headerText: string,

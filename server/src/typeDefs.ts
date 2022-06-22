@@ -7,10 +7,8 @@ export default gql`
   }
 
   type VariantResponseInfoFields {
+    aaChange: String
     af: Float
-    aaAlt: String
-    aaPos: String
-    aaRef: String
     assembly: String
     cdna: String
     consequence: String
