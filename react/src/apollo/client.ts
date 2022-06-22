@@ -28,6 +28,7 @@ export const buildLink = (token?: string) => {
 
     const remoteNodeErrorLink = new ApolloLink((operation, forward) => {
         return forward(operation).map((result) => {
+            // https://github.com/apollographql/apollo-link/issues/298
             const errorDispatch = operation.getContext().dispatch;
             // const errorDispatch = result.context!.dispatch;  // Is this more 'correct'?
             if (result.data?.getVariants.errors.length) {
