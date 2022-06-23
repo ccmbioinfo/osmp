@@ -21,7 +21,6 @@ services:
       KEYCLOAK_AUTH_URL:
       KEYCLOAK_CLIENT_ID:
       KEYCLOAK_REALM:
-      MONGO_CONNECTION_STRING: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo/${MONGO_INITDB_DATABASE}?authSource=admin
       TEST_NODE_URL: http://test-node:3000/data
     ports:
       - 3000:3000
@@ -63,14 +62,4 @@ services:
       KEYCLOAK_FRONTEND_URL: "https://keycloak.ccmdev.ca/auth"
     ports:
       - 8080:8080
-    <<: *common
-
-  mongo:
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME:
-      MONGO_INITDB_DATABASE:
-      MONGO_INITDB_ROOT_PASSWORD:
-    volumes:
-      - ${PROJECT_ROOT:-.}/mongo_data:/data/db
     <<: *common

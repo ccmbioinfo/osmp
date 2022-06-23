@@ -90,21 +90,3 @@ docker-compose exec keycloak /usr/local/bin/bootstrap-keycloak.sh
 ```
 
 The keycloak admin portal can be accessed in the browser by navigating to localhost and the port specified by the `KEYCLOAK_PORT` env var, e.g., `localhost:9821`
-
-## Mongo
-
-Annotations can be imported into mongo using the following command. Note that that the headers should not be included in the csv and the order of the fields passed to the `fields` argument should match the order of the fields in the csv.
-
-```bash
-mongoimport --collection=annotations --type=csv \
-   --columnsHaveTypes \
-   --fields="pos.int32(),ref.string(),alt.string(),chrom.string(),nhomalt.int32(),an.int32(),af.double(),assembly.string()" \
-   --file=<filename>.csv \
-   --uri=mongodb://<env.MONGO_INITDB_ROOT_USERNAME>:<env.MONGO_INITDB_ROOT_PASSWORD>@mongo/<env.MONGO_INITDB_DATABASE>?authSource=admin
-```
-
-Then make sure to create the following indexes:
-
-```
-db.annotations.createIndexes([ {"pos": 1}, {"assembly":1}, {"alt": 1, "chrom": 1, "pos": 1, "ref": 1 } ])
-```

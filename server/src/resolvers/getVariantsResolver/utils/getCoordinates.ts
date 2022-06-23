@@ -1,10 +1,9 @@
-import { VariantQueryDataResult } from '../../types';
-import { GnomadAnnotationId } from '../GnomadAnnotationModel';
+import { VariantCoordinate, VariantQueryDataResult } from '../../../types';
 
 const getCoordinates = (result: VariantQueryDataResult[]) => {
   let start = +Infinity;
   let end = -Infinity;
-  const coordinates: GnomadAnnotationId[] = [];
+  const coordinates: VariantCoordinate[] = [];
   const variants = result.flat().map(d => d.variant);
   variants.forEach(variant => {
     if (variant.start < start) {

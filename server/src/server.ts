@@ -11,21 +11,10 @@ import logger from './logger/index';
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
-import mongoose from 'mongoose';
 
 const app = express();
 
 const memoryStore = new session.MemoryStore();
-
-mongoose
-  .connect(process.env.MONGO_CONNECTION_STRING!)
-  .then(() => {
-    logger.info('successfully connected to mongo!');
-  })
-  .catch(e => {
-    logger.error('Failed connecting to Mongo: ' + e);
-    throw e;
-  });
 
 app.use(
   session({

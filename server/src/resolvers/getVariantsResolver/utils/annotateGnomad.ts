@@ -1,6 +1,6 @@
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
-import getCoordinates from '../../../models/utils/getCoordinates';
+import getCoordinates from './getCoordinates';
 import { VariantQueryDataResult } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import VCF from '@gmod/vcf';
