@@ -1,4 +1,5 @@
 import { CaddAnnotation, VariantQueryDataResult } from '../../../types';
+import AMINO_ACID_MAPPING from '../../../constants/aminoAcidMapping';
 
 const annotate = (
   queryResponse: VariantQueryDataResult[],
@@ -19,29 +20,6 @@ const annotate = (
   });
 
   queryResponse.forEach(response => {
-    const aminoAcidMapping: Record<string, string> = {
-      A: 'Ala',
-      C: 'Cys',
-      D: 'Asp',
-      E: 'Glu',
-      F: 'Phe',
-      G: 'Gly',
-      H: 'His',
-      I: 'Ile',
-      K: 'Lys',
-      L: 'Leu',
-      M: 'Met',
-      N: 'Asn',
-      P: 'Pro',
-      Q: 'Gln',
-      R: 'Arg',
-      S: 'Ser',
-      T: 'Thr',
-      V: 'Val',
-      W: 'Trp',
-      Y: 'Tyr',
-    };
-
     const key = `${response.variant.alt}-${response.variant.chromosome.replace(/chr/i, '')}-${
       response.variant.start
     }-${response.variant.ref}`;
@@ -53,13 +31,13 @@ const annotate = (
         ...response.variant.info,
         aaChange:
           aaAlt &&
-          aminoAcidMapping[aaAlt] &&
+          AMINO_ACID_MAPPING[aaAlt] &&
           aaPos &&
           aaPos !== 'NA' &&
           aaRef &&
-          aminoAcidMapping[aaRef]
-            ? `p.${aminoAcidMapping[aaRef]}${aaPos}${
-                aaAlt === aaRef ? '=' : aminoAcidMapping[aaAlt]
+          AMINO_ACID_MAPPING[aaRef]
+            ? `p.${AMINO_ACID_MAPPING[aaRef]}${aaPos}${
+                aaAlt === aaRef ? '=' : AMINO_ACID_MAPPING[aaAlt]
               }`
             : 'NA',
         cdna: alt && cdnaPos && cdnaPos !== 'NA' && ref ? `c.${cdnaPos}${ref}>${alt}` : 'NA',
