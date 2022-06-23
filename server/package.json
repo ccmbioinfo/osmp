@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@gmod/tabix": "^1.5.2",
+    "@gmod/vcf": "^5.0.6",
     "@graphql-tools/schema": "^8.3.2",
     "@turf/clusters-kmeans": "^6.5.0",
     "@turf/helpers": "^6.5.0",

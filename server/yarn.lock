@@ -377,6 +377,11 @@
     long "^4.0.0"
     quick-lru "^4.0.0"
 
+"@gmod/vcf@^5.0.6":
+  version "5.0.6"
+  resolved "https://registry.yarnpkg.com/@gmod/vcf/-/vcf-5.0.6.tgz#dc3cc165bea5a7d534477264a686f83bddb18945"
+  integrity sha512-PNUGXBLJEaLzLn+AYmr3SUi+DnA+QIWz0mrT83d81tg/g3w9MVTYG33UNUtJcIFV9K/eV1C1WHo3Y0AI+R+fsg==
+
 "@graphql-eslint/eslint-plugin@^3.8.0":
   version "3.10.2"
   resolved "https://registry.yarnpkg.com/@graphql-eslint/eslint-plugin/-/eslint-plugin-3.10.2.tgz#b8b271aef219623e6a0517cfababe6063072077f"
