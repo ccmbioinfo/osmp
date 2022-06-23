@@ -23,10 +23,8 @@ const fetchVariantsQuery = gql`
                     }
                     end
                     info {
+                        aaChange
                         af
-                        aaAlt
-                        aaPos
-                        aaRef
                         cdna
                         consequence
                         geneName

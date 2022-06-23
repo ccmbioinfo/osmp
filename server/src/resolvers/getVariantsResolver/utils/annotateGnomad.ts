@@ -30,11 +30,17 @@ export const annotate = (
 
     if (variantKey in annotationKeyMap) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { alt, assembly, chrom, ref, pos, type, nhomalt, ...rest } =
+      const { alt, assembly, cdna, chrom, ref, pos, type, nhomalt, ...rest } =
         annotationKeyMap[variantKey];
       r.variant.info = {
         ...r.variant.info,
         gnomadHom: nhomalt,
+        cdna:
+          r.variant.info?.cdna && r.variant.info?.cdna !== 'NA'
+            ? r.variant.info?.cdna
+            : cdna
+            ? `c.${cdna}${ref}>${alt}`
+            : 'NA',
         ...rest,
       };
     }

@@ -94,7 +94,7 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
     ['aaRef', 16],
     ['aaAlt', 17],
     ['transcript', 19],
-    ['cdna', 24],
+    ['cdnaPos', 24],
     ['aaPos', 28],
     ['phred', assemblyId === 'GRCh37' ? 115 : 133],
   ];
@@ -126,10 +126,8 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
     }
     return {
       ...Object.fromEntries(HEADERS_INDEX_MAP.map(([key, index]) => [key, columns[index]])),
-      ...{
-        spliceAIScore: spliceAIMaxScore,
-        spliceAIType: spliceAIType,
-      },
+      spliceAIScore: spliceAIMaxScore,
+      spliceAIType: spliceAIType,
     } as unknown as CaddAnnotation;
   });
   return result;
