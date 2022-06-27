@@ -102,8 +102,10 @@ const getAnnotations = async (
           REF,
         }: GnomadVariant
       ) => {
+        const resolvedCHROM = CHROM.replace('chr', '');
+
         // Filter out annotations that have an AF > 0.02 and those that that don't belong to the given coordinates
-        if (AF > 0.02 || !coordinates.includes(`${ALT}-${CHROM}-${POS}-${REF}`))
+        if (AF > 0.02 || !coordinates.includes(`${ALT}-${resolvedCHROM}-${POS}-${REF}`))
           return currAnnotations;
 
         // Format and flatten the annotation, only keeping unique annotations
@@ -114,7 +116,7 @@ const getAnnotations = async (
           af: AF,
           alt: ALT,
           an: AN,
-          chrom: CHROM,
+          chrom: resolvedCHROM,
           nhomalt: nhomalt,
           pos: POS,
           ref: REF,
@@ -150,9 +152,10 @@ export const annotate = async (
 
   queryResponse.forEach(r => {
     const {
-      variant: { assemblyId, chromosome, info, ref, start },
+      variant: { assemblyId, assemblyIdCurrent, chromosome, info, ref, start },
     } = r;
-    const variantKey = `${assemblyId.replace(/\D/g, '')}-${chromosome}-${start}-${ref}`;
+    const resolvedAssemblyId = assemblyIdCurrent || assemblyId;
+    const variantKey = `${resolvedAssemblyId.replace(/\D/g, '')}-${chromosome}-${start}-${ref}`;
 
     if (variantKey in primaryAnnotationKeyMap) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
@@ -166,7 +169,7 @@ export const annotate = async (
         // For the GRCh38 assembly, only genome data is available,
         // so the overall allele frequency is simply the genome allele frequency
         af:
-          assemblyId === 'GRCh37'
+          resolvedAssemblyId === 'GRCh37'
             ? Math.max(secondaryAnnotationKeyMap[variantKey]?.af ?? 0, af)
             : af,
         // Ideally, the cdna value should come from the CADD annotations (if available),
