@@ -214,11 +214,12 @@ export interface CaddAnnotation extends VariantCoordinate {
 
 export interface GnomadAnnotation extends VariantCoordinate {
   af: number;
+  amino_acids?: string;
   an: number;
-  cdna: string;
+  cdna?: string;
+  gene?: string;
   nhomalt: number;
-  assembly: string;
-  type: string;
+  transcript?: string;
 }
 
 export interface ErrorResponse {

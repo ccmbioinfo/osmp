@@ -1,13 +1,13 @@
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
 import getCoordinates from './getCoordinates';
-import { VariantQueryDataResult } from '../../../types';
+import { GnomadAnnotation, VariantQueryDataResult } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import VCF from '@gmod/vcf';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
 import fetch from 'cross-fetch';
 
-interface Annotation {
+interface GnomadVariant {
   ALT: string[];
   CHROM: string;
   INFO: {
@@ -20,37 +20,31 @@ interface Annotation {
   REF: string;
 }
 
-interface FormattedAnnotation {
-  af: number;
-  alt: string;
-  amino_acids?: string;
-  an: number;
-  cdna?: string;
-  chrom: string;
-  gene?: string;
-  nhomalt: number;
-  pos: number;
-  ref: string;
-  transcript?: string;
+type ParsedVEP = Pick<GnomadAnnotation, 'amino_acids' | 'cdna' | 'gene' | 'transcript'>;
+
+interface GnomadFiles {
+  assemblyId: string;
+  tbiUrl: string;
+  vcfUrl: string;
 }
 
-type ParsedVEP = Pick<FormattedAnnotation, 'amino_acids' | 'cdna' | 'gene' | 'transcript'>;
-
-const queryAnnotations = async (position: string, TBI_URL: string, VCF_URL: string) => {
+const queryAnnotations = async (position: string, { assemblyId, tbiUrl, vcfUrl }: GnomadFiles) => {
   const { chromosome, start, end } = resolveChromosome(position);
 
   const nodeFetch = fetch as Fetcher;
   const tbiIndexed = new TabixIndexedFile({
-    filehandle: new RemoteFile(VCF_URL, { fetch: nodeFetch }),
-    tbiFilehandle: new RemoteFile(TBI_URL, { fetch: nodeFetch }),
+    filehandle: new RemoteFile(vcfUrl, { fetch: nodeFetch }),
+    tbiFilehandle: new RemoteFile(tbiUrl, { fetch: nodeFetch }),
   });
 
   const headerText = await tbiIndexed.getHeader();
   const tbiVCFParser = new VCF({ header: headerText });
+  const lines: GnomadVariant[] = [];
 
-  const lines: Annotation[] = [];
   if (chromosome && start && end) {
-    await tbiIndexed.getLines(`${chromosome}`, Number(start) - 1, Number(end) + 1, line => {
+    const refName = assemblyId === 'GRCh37' ? `${chromosome}` : `chr${chromosome}`;
+
+    await tbiIndexed.getLines(refName, Number(start) - 1, Number(end) + 1, line => {
       lines.push(tbiVCFParser.parseLine(line));
     });
   }
@@ -84,19 +78,18 @@ const parseVEP = (rows: string[]): ParsedVEP => {
 };
 
 const getAnnotations = async (
-  assemblyId: string,
   coordinates: string[],
   position: string,
-  TBI_URL: string,
-  VCF_URL: string
+  gnomadFiles: GnomadFiles
 ) => {
-  if (coordinates.length === 0 && !assemblyId) return [];
+  if (!coordinates.length) return [];
 
-  const annotations = await queryAnnotations(position, TBI_URL, VCF_URL);
+  const annotations = await queryAnnotations(position, gnomadFiles);
   const processedAnnotations = Object.values(
     annotations.reduce(
-      (currAnnotations: Record<string, FormattedAnnotation>, annotation: Annotation) => {
-        const {
+      (
+        currAnnotations: Record<string, GnomadAnnotation>,
+        {
           ALT: [ALT],
           CHROM,
           INFO: {
@@ -107,16 +100,16 @@ const getAnnotations = async (
           },
           POS,
           REF,
-        } = annotation;
-
+        }: GnomadVariant
+      ) => {
         // Filter out annotations that have an AF > 0.02 and those that that don't belong to the given coordinates
         if (AF > 0.02 || !coordinates.includes(`${ALT}-${CHROM}-${POS}-${REF}`))
           return currAnnotations;
 
         // Format and flatten the annotation, only keeping unique annotations
-        const key = `${ALT}-${CHROM}-${AN}-${nhomalt}-${AF}-${vep}-${POS}-${REF}`;
+        const key = `${AF}-${ALT}-${AN}-${CHROM}-${nhomalt}-${POS}-${REF}-${vep}`;
         currAnnotations[key] = {
-          // Parse the VEP string, pulling out the amino_acids, cdna, gene, and transcript fields
+          // Parse the VEP string, pulling out the amino_acids, cdna, gene, and transcript values
           ...parseVEP(vep),
           af: AF,
           alt: ALT,
@@ -137,36 +130,23 @@ const getAnnotations = async (
 };
 
 export const annotate = async (
-  annotations: FormattedAnnotation[],
+  annotations: {
+    primaryAnnotations: GnomadAnnotation[];
+    secondaryAnnotations: GnomadAnnotation[];
+  },
   assemblyId: string,
-  coordinates: string[],
-  position: string,
   queryResponse: VariantQueryDataResult[]
 ) => {
-  const generateAnnotationKeyMap = (annotations: FormattedAnnotation[]) =>
+  const { primaryAnnotations, secondaryAnnotations } = annotations;
+  const generateAnnotationKeyMap = (annotations: GnomadAnnotation[]) =>
     Object.fromEntries(
       annotations.map(a => [`${assemblyId.replace(/\D/g, '')}-${a.chrom}-${a.pos}-${a.ref}`, a])
     );
 
-  const annotationKeyMap = generateAnnotationKeyMap(annotations);
-  let GRCh37GenomeAnnotationKeyMap = {} as { [key: string]: FormattedAnnotation };
-
-  // For the GRCh37 assembly, the genome annotations need to be queried as well to determine the overall allele frequency
-  if (assemblyId === 'GRCh37') {
-    const GRCH37_GENOME_TBI_URL =
-      'https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.vcf.bgz.tbi';
-    const GRCH37_GENOME_VCF_URL =
-      'https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.vcf.bgz';
-    const GRCh37GenomeAnnotations = await getAnnotations(
-      assemblyId,
-      coordinates,
-      position,
-      GRCH37_GENOME_TBI_URL,
-      GRCH37_GENOME_VCF_URL
-    );
-
-    GRCh37GenomeAnnotationKeyMap = generateAnnotationKeyMap(GRCh37GenomeAnnotations);
-  }
+  // GRCh37 - exome annotations, GRCh38 - genome annotations
+  const primaryAnnotationKeyMap = generateAnnotationKeyMap(primaryAnnotations);
+  // GRCh37 - genome annotations, GRCh38 - N/A
+  const secondaryAnnotationKeyMap = generateAnnotationKeyMap(secondaryAnnotations);
 
   queryResponse.forEach(r => {
     const {
@@ -174,20 +154,23 @@ export const annotate = async (
     } = r;
     const variantKey = `${assemblyId.replace(/\D/g, '')}-${chromosome}-${start}-${ref}`;
 
-    if (variantKey in annotationKeyMap) {
+    if (variantKey in primaryAnnotationKeyMap) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { af, alt, cdna, chrom, nhomalt, pos, ref, ...rest } = annotationKeyMap[variantKey];
+      const { af, alt, cdna, chrom, nhomalt, pos, ref, ...rest } =
+        primaryAnnotationKeyMap[variantKey];
 
       r.variant.info = {
         ...info,
         // For the GRCh37 assembly,
         // the overall allele frequency is calculated as the greater value between the exome allele frequency and the genome allele frequency
         // For the GRCh38 assembly, only genome data is available,
-        // so the genome allele frequency is taken to be the overall allele frequency
+        // so the overall allele frequency is simply the genome allele frequency
         af:
           assemblyId === 'GRCh37'
-            ? Math.max(GRCh37GenomeAnnotationKeyMap[variantKey]?.af ?? 0, af)
+            ? Math.max(secondaryAnnotationKeyMap[variantKey]?.af ?? 0, af)
             : af,
+        // Ideally, the cdna value should come from the CADD annotations (if available),
+        // but it can also be determined using the values from gnomAD as a fallback
         cdna:
           r.variant.info?.cdna && r.variant.info?.cdna !== 'NA'
             ? r.variant.info?.cdna
@@ -210,28 +193,55 @@ const annotateGnomad = async (
 ) => {
   const resolvedAssemblyId = resolveAssembly(assemblyId);
   const { chromosome } = resolveChromosome(position);
-
-  const VCF_URL =
-    resolvedAssemblyId === 'GRCh37'
-      ? 'https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/exomes/gnomad.exomes.r2.1.1.sites.vcf.bgz'
-      : `https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chromosome}.vcf.bgz`;
-  const TBI_URL =
-    resolvedAssemblyId === 'GRCh37'
-      ? 'https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/exomes/gnomad.exomes.r2.1.1.sites.vcf.bgz.tbi'
-      : `https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chromosome}.vcf.bgz.tbi`;
-
   const coordinates = getCoordinates(queryResponse).coordinates.map(
     ({ alt, chrom, pos, ref }) => `${alt}-${chrom}-${pos}-${ref}`
   );
-  const annotations = await getAnnotations(
-    resolvedAssemblyId,
-    coordinates,
-    position,
-    TBI_URL,
-    VCF_URL
+
+  const PRIMARY_VCF_URL =
+    resolvedAssemblyId === 'GRCh37'
+      ? `https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/exomes/gnomad.exomes.r2.1.1.sites.${chromosome}.vcf.bgz`
+      : `https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chromosome}.vcf.bgz`;
+  const PRIMARY_TBI_URL =
+    resolvedAssemblyId === 'GRCh37'
+      ? `https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/exomes/gnomad.exomes.r2.1.1.sites.${chromosome}.vcf.bgz.tbi`
+      : `https://storage.googleapis.com/gcp-public-data--gnomad/release/3.1.2/vcf/genomes/gnomad.genomes.v3.1.2.sites.chr${chromosome}.vcf.bgz.tbi`;
+
+  const primaryAnnotations = await getAnnotations(coordinates, position, {
+    assemblyId,
+    tbiUrl: PRIMARY_TBI_URL,
+    vcfUrl: PRIMARY_VCF_URL,
+  });
+
+  console.log(
+    `${primaryAnnotations.length} gnomAD ${resolvedAssemblyId} ${
+      resolvedAssemblyId === 'GRCh37' ? 'exome' : 'genome'
+    } annotation${primaryAnnotations.length === 1 ? '' : 's'} found!`
   );
 
-  return await annotate(annotations, resolvedAssemblyId, coordinates, position, queryResponse);
+  let secondaryAnnotations: GnomadAnnotation[] = [];
+
+  // For the GRCh37 assembly, the genome annotations need to be queried as well to determine the overall allele frequency
+  if (resolvedAssemblyId === 'GRCh37') {
+    const GRCH37_GENOME_TBI_URL = `https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.${chromosome}.vcf.bgz.tbi`;
+    const GRCH37_GENOME_VCF_URL = `https://storage.googleapis.com/gcp-public-data--gnomad/release/2.1.1/vcf/genomes/gnomad.genomes.r2.1.1.sites.${chromosome}.vcf.bgz`;
+
+    secondaryAnnotations = await getAnnotations(coordinates, position, {
+      assemblyId,
+      tbiUrl: GRCH37_GENOME_TBI_URL,
+      vcfUrl: GRCH37_GENOME_VCF_URL,
+    });
+
+    console.log(
+      `${primaryAnnotations.length} gnomAD GRCh37 genome annotation${
+        primaryAnnotations.length === 1 ? '' : 's'
+      } found!`
+    );
+  }
+
+  const annotations = { primaryAnnotations, secondaryAnnotations };
+  const annotatedQueryResponse = await annotate(annotations, assemblyId, queryResponse);
+
+  return annotatedQueryResponse;
 };
 
 export default annotateGnomad;
