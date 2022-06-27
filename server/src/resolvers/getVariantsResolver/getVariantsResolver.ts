@@ -2,6 +2,7 @@ import logger from '../../logger';
 import {
   CADDAnnotationQueryResponse,
   CombinedVariantQueryResponse,
+  ErrorResponse,
   QueryInput,
   SourceError,
   VariantQueryDataResult,
@@ -87,15 +88,17 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
   const settledCadd = (await Promise.allSettled([caddAnnotationsPromise]))[0]; // wait for single promise to settle
 
-  if (settledCadd.status === 'fulfilled' && !isVariantQuery(settledCadd.value)) {
-    if (!settledCadd.value.error) {
-      data = annotateCadd(dataForAnnotation, settledCadd.value.data);
-    } else {
-      errors.push({
-        source: settledCadd.value.source,
-        error: settledCadd.value.error!,
-      });
-    }
+  if (
+    settledCadd.status === 'fulfilled' &&
+    !isVariantQuery(settledCadd.value) &&
+    !settledCadd.value.error
+  ) {
+    data = annotateCadd(dataForAnnotation, settledCadd.value.data);
+  } else if (settledCadd.status === 'fulfilled') {
+    errors.push({
+      source: settledCadd.value.source,
+      error: settledCadd.value.error as ErrorResponse,
+    });
   }
 
   // gnomAD annotations TODO: gnomAD annotations for GRCh38 are not available yet.
