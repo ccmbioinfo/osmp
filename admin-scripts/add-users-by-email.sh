@@ -23,7 +23,8 @@ if [ "${G4RD_GRANT_TYPE}" = "password" ]; then
         --data "grant_type=password" \
         --data "username=${G4RD_USERNAME}" \
         --data "password=${G4RD_PASSWORD}" \
-        --data "audience=${G4RD_AUTH0_BASE_URL}api/v2/"
+        --data "audience=${G4RD_AUTH0_BASE_URL}api/v2/" \
+        --data "scope=read:users"
     )
 else
     tokenresponse=$(curl --request POST \
@@ -32,7 +33,8 @@ else
         --data "client_id=${G4RD_CLIENT_ID}" \
         --data "grant_type=client_credentials" \
         --data "client_secret=${G4RD_CLIENT_SECRET}" \
-        --data "audience=${G4RD_AUTH0_BASE_URL}api/v2/"
+        --data "audience=${G4RD_AUTH0_BASE_URL}api/v2/" \
+        --data "scope=read:users"
     )
 fi
 
