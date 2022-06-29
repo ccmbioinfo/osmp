@@ -15,7 +15,7 @@ eval $(cat .env | grep -v '^#' | grep -v '^$' | sed 's/\r$//' | awk '/=/ {print 
 docker-compose exec keycloak /opt/jboss/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080/auth --realm master --user "${KEYCLOAK_USER}" --password ${KEYCLOAK_PASSWORD}
 
 # Get management API access token (assuming it's Auth0)
-if [ "${AUTH0_GRANT_TYPE}" = "password" ]; then
+if [ "${G4RD_GRANT_TYPE}" = "password" ]; then
     tokenresponse=$(curl --request POST \
         --url "${G4RD_TOKEN_URL}" \
         --header "Content-Type: application/x-www-form-urlencoded" \
