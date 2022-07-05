@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
@@ -571,6 +571,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         }
         return [{ style: { background: currColour } }];
     };
+
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth',
+        });
+    }, []);
+
     return (
         <>
             <TableFilters
