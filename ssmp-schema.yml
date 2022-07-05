@@ -77,8 +77,7 @@ components:
             Individual identifier (external accession or internal ID).
           type: string
           example: P0001
-        datasetId:
-          description: Reference to dataset ID.
+        familyId:
           type: string
         diseases:
           description: |
