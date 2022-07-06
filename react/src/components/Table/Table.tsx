@@ -15,7 +15,6 @@ import {
     useFilters,
     useFlexLayout,
     useGlobalFilter,
-    usePagination,
     useResizeColumns,
     useSortBy,
     useTable,
@@ -65,7 +64,6 @@ export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'di
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; diseases: string };
 export interface ResultTableColumns extends FlattenedQueryResponse {
-    aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
     homozygousCount?: number;
@@ -481,7 +479,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             filterTypes,
             initialState: {
-                pageSize: tableData.length,
                 sortBy: sortByArray,
                 hiddenColumns: [
                     getChildColumns('case_details'),
@@ -497,8 +494,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useFlexLayout,
         useGlobalFilter,
         useSortBy,
-        useExpanded,
-        usePagination
+        useExpanded
     );
 
     const {
@@ -506,7 +502,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         getTableProps,
         getTableBodyProps,
         headerGroups,
-        page,
         state,
         setColumnOrder,
         setFilter,
@@ -802,15 +797,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         </THead>
 
                         <tbody {...getTableBodyProps()}>
-                            {page.length > 0 ? (
-                                page.map((row, i) => {
+                            {rows.length > 0 ? (
+                                rows.map((row, i) => {
                                     prepareRow(row);
                                     // Alternate row's background colour.
                                     const { key, ...restRowProps } = row.getRowProps(
                                         i !== 0
                                             ? getRowColour(
                                                   row.values['uniqueId'],
-                                                  page[i - 1].values['uniqueId']
+                                                  rows[i - 1].values['uniqueId']
                                               )
                                             : [{ style: { background: 'white' } }]
                                     );
@@ -819,7 +814,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         isCaseDetailsCollapsed(headerGroups[0].headers) &&
                                         // rows are sorted by uniqueId, so if a row came before it with the same id, then it's not unique
                                         row?.index !== 0 &&
-                                        row.values['uniqueId'] === page[i - 1]?.values['uniqueId']
+                                        row.values['uniqueId'] === rows[i - 1]?.values['uniqueId']
                                     ) {
                                         return null;
                                     }

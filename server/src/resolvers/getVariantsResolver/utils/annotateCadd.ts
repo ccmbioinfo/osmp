@@ -1,4 +1,5 @@
 import { CaddAnnotation, VariantQueryDataResult } from '../../../types';
+import AMINO_ACID_MAPPING from '../../../constants/aminoAcidMapping';
 
 const annotate = (
   queryResponse: VariantQueryDataResult[],
@@ -25,8 +26,23 @@ const annotate = (
 
     if (key in annotationKeys) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { chrom, pos, alt, ref, ...rest } = annotationKeys[key];
-      response.variant.info = { ...response.variant.info, ...rest };
+      const { aaAlt, aaPos, aaRef, cdnaPos, chrom, pos, alt, ref, ...rest } = annotationKeys[key];
+      response.variant.info = {
+        ...response.variant.info,
+        aaChange:
+          aaAlt &&
+          AMINO_ACID_MAPPING[aaAlt] &&
+          aaPos &&
+          aaPos !== 'NA' &&
+          aaRef &&
+          AMINO_ACID_MAPPING[aaRef]
+            ? `p.${AMINO_ACID_MAPPING[aaRef]}${aaPos}${
+                aaAlt === aaRef ? '=' : AMINO_ACID_MAPPING[aaAlt]
+              }`
+            : 'NA',
+        cdna: alt && cdnaPos && cdnaPos !== 'NA' && ref ? `c.${cdnaPos}${ref}>${alt}` : 'NA',
+        ...rest,
+      };
     }
   });
 
