@@ -24,10 +24,15 @@ export const buildLink = (token?: string) => {
         return forward(operation).map(result => {
             // https://github.com/apollographql/apollo-link/issues/298
             const errorDispatch = operation.getContext().dispatch;
-            // const errorDispatch = result.context!.dispatch;  // Is this more 'correct'?
             if (result.data?.getVariants.errors.length) {
                 result.data?.getVariants.errors.forEach((e: VariantQueryResponseError) => {
-                    errorDispatch(makeNodeError(e));
+                    console.error(`[Node Error]: ${e.error.message}`);
+                    let formatErr = { ...e };
+                    if (e.source === 'CADD annotations' && Number(e.error.code) >= 500) {
+                        formatErr.error.message =
+                            'Failed to fetch CADD annotations. Annotating with gnomAD only!';
+                    }
+                    errorDispatch(makeNodeError(formatErr));
                 });
             }
             return result;
