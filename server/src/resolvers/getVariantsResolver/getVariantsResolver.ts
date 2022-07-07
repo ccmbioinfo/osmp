@@ -94,7 +94,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         script: '#!/bin/bash\necho Hello World!',
         job: {
           environment: {},
-          current_working_directory: `/home/giabaohan`,
+          current_working_directory: process.env.SLURM_WORKING_DIR,
           standard_output: 'test.out',
         },
       },
