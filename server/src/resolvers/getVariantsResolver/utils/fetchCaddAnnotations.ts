@@ -57,9 +57,9 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
 /**
  * Takes in tabix query response and adapts it to @typedef CaddAnnotation
  * @param annotations: a list of tab-delimited strings from CADD annotation TSV.
- * Indexes for headers in the GRCh38 annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf. 
- * For GRCh37 annotation, please visit https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.4.pdf. 
- * Note that in GRCh37 version 1.6, an addtional 9 fields for SpliceAI and MMSplice are added after the field "Grantham". 
+ * Indexes for headers in the GRCh38 annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf.
+ * For GRCh37 annotation, please visit https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.4.pdf.
+ * Note that in GRCh37 version 1.6, an addtional 9 fields for SpliceAI and MMSplice are added after the field "Grantham".
  *  Chrom: 1
     Pos: 2
     Ref: 3
@@ -141,7 +141,7 @@ const fetchAnnotations = (
   const source = 'CADD annotations';
   const [start, end] = position.replace(/.+:/, '').split('-');
   const size = +end - +start;
-  if (size > 600000) {
+  if (size > 600_000) {
     return Promise.resolve({
       error: {
         id: uuidv4(),
