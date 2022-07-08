@@ -69,14 +69,11 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const [start, end] = annotationPosition.replace(/.+:/, '').split('-');
   const size = +end - +start;
   if (size > 600000){
-    console.log("gene size is bigger than 600000");
     const slurm = new SlurmApi(
       new Configuration({
         basePath: process.env.SLURM_ENDPOINT!,
       })
     );
-
-    console.log("slurm configuration done,", slurm);
 
     const headers = {
       'X-SLURM-USER-NAME': process.env.SLURM_USER!,
@@ -88,7 +85,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
       {
         script: '#!/bin/bash\necho Hello World!',
         job: {
-          environment: {},
+          environment: {"SBATCH_DEBUG":1},
           current_working_directory: '/home/jxu',
           standard_output: 'test.out',
         },
@@ -98,9 +95,6 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
         headers,
       }
     );
-
-    console.log(slurmJob);
-
     console.log(slurmJob.data.job_id);
   }
   
