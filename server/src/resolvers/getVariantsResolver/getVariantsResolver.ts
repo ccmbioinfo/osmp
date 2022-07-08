@@ -14,9 +14,7 @@ import annotateCadd from './utils/annotateCadd';
 import annotateGnomad from './utils/annotateGnomad';
 import liftover from './utils/liftOver';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
-import { SlurmApi } from '../../slurm';
-
-const slurm = new SlurmApi();
+import { SlurmApi, Configuration } from '../../slurm';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -71,18 +69,39 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
   const [start, end] = annotationPosition.replace(/.+:/, '').split('-');
   const size = +end - +start;
   if (size > 600000){
-    const submittedJob = await slurm.slurmctldSubmitJob({
-      script: "#!/bin/bash echo 'Hello World!'",
-    },
-    {
-      baseURL: `${process.env.SLURM_ENDPOINT}slurm/v0.0.37`,
-      // headers: { 'Authorization': `Bearer ${process.env.SLURM_JWT!}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-      headers: {
-        'X-SLURM-USER-NAME': process.env.SLURM_USER!,
-        'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!
+    console.log("gene size is bigger than 600000");
+    const slurm = new SlurmApi(
+      new Configuration({
+        basePath: process.env.SLURM_ENDPOINT!,
+      })
+    );
+
+    console.log("slurm configuration done,", slurm);
+
+    const headers = {
+      'X-SLURM-USER-NAME': process.env.SLURM_USER!,
+      'X-SLURM-USER-TOKEN': process.env.SLURM_JWT!,
+    };
+
+    // Send dummy hello world
+    const slurmJob = await slurm.slurmctldSubmitJob(
+      {
+        script: '#!/bin/bash\necho Hello World!',
+        job: {
+          environment: {},
+          current_working_directory: '/home/jxu',
+          standard_output: 'test.out',
+        },
+      },
+      {
+        url: `${process.env.SLURM_ENDPOINT}/slurm/v0.0.37/job/submit`,
+        headers,
       }
-    })
-    console.log('SUBMITTED JOB:', submittedJob);
+    );
+
+    console.log(slurmJob);
+
+    console.log(slurmJob.data.job_id);
   }
   
 
