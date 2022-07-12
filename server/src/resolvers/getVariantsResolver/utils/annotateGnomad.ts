@@ -15,9 +15,10 @@ const annotateGnomad = async (
   return annotate(queryResponse, annotations);
 };
 
-const _mapToAnnotationsKeyMap = (annotations: GnomadAnnotation[]) => Object.fromEntries(
-  annotations.map(a => [`${a.ref}-${a.pos}-${a.chrom}-${a.assembly.replace(/\D/g, '')}`, a])
-);
+const _mapToAnnotationsKeyMap = (annotations: GnomadAnnotation[]) =>
+  Object.fromEntries(
+    annotations.map(a => [`${a.ref}-${a.pos}-${a.chrom}-${a.assembly.replace(/\D/g, '')}`, a])
+  );
 
 export const annotate = (
   queryResponse: VariantQueryDataResult[],
@@ -34,8 +35,18 @@ export const annotate = (
 
     if (variantKey in exomeAnnotationKeyMap) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { af: exomeAF, alt, assembly, cdna, chrom, ref, pos, type, nhomalt, ...rest } =
-        exomeAnnotationKeyMap[variantKey];
+      const {
+        af: exomeAF,
+        alt,
+        assembly,
+        cdna,
+        chrom,
+        ref,
+        pos,
+        type,
+        nhomalt,
+        ...rest
+      } = exomeAnnotationKeyMap[variantKey];
       const genomeAF = genomeAnnotationKeyMap?.[variantKey]?.af ?? 0;
 
       r.variant.info = {

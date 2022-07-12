@@ -54,16 +54,17 @@ gnomandAnnotationSchema.statics.getAnnotations = async function (
   assemblyId: string
 ) {
   const { start, end, coordinates } = ids;
-  const getAnnotationsByType = async (type: AnnotationType) => await this.aggregate([
-    { $match: { type }},
-    { $match: { assembly: assemblyId } },
-    { $match: { pos: { $gte: start, $lte: end } } },
-    {
-      $match: {
-        $or: coordinates,
+  const getAnnotationsByType = async (type: AnnotationType) =>
+    await this.aggregate([
+      { $match: { type } },
+      { $match: { assembly: assemblyId } },
+      { $match: { pos: { $gte: start, $lte: end } } },
+      {
+        $match: {
+          $or: coordinates,
+        },
       },
-    },
-  ]);
+    ]);
   const annotations = {
     exomeAnnotations: [] as GnomadAnnotation[],
     genomeAnnotations: [] as GnomadAnnotation[],
@@ -76,7 +77,7 @@ gnomandAnnotationSchema.statics.getAnnotations = async function (
     console.log(`${annotations.exomeAnnotations.length} exome gnomAD annotation(s) found`);
     console.log(`${annotations.genomeAnnotations.length} genome gnomAD annotation(s) found`);
   }
-  
+
   return annotations;
 };
 
