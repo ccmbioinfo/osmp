@@ -34,7 +34,7 @@ export const annotate = (
     }-${r.variant.assemblyId.replace(/\D/g, '')}`;
 
     if (variantKey in exomeAnnotationKeyMap) {
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+      /* eslint-disable @typescript-eslint/no-unused-vars */
       const {
         af: exomeAF,
         alt,
@@ -47,6 +47,7 @@ export const annotate = (
         nhomalt,
         ...rest
       } = exomeAnnotationKeyMap[variantKey];
+      /* eslint-enable @typescript-eslint/no-unused-vars */
       const genomeAF = genomeAnnotationKeyMap?.[variantKey]?.af ?? 0;
 
       r.variant.info = {
