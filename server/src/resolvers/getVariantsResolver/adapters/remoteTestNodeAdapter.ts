@@ -167,7 +167,7 @@ const transformStagerQueryResponse: ResultTransformer<StagerVariantQueryPayload[
       })),
       end: r.position,
       ref: r.reference_allele,
-      referenceName: r.chromosome,
+      chromosome: r.chromosome,
       start: r.position,
       variantType: r.variation,
     },

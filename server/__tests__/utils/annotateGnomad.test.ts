@@ -9,6 +9,7 @@ describe('Test whether variants get annotated', () => {
     alt: 'T',
     an: 1,
     assembly: 'gnomAD_GRCh37',
+    cdna: '1234',
     chrom: '1',
     nhomalt: 1,
     pos: 123456,
@@ -42,7 +43,7 @@ describe('Test whether variants get annotated', () => {
           end: 123456,
           info: {},
           ref: 'A',
-          referenceName: '1',
+          chromosome: '1',
           start: 123456,
         },
         contactInfo: 'DrExample@gmail.com',
@@ -56,6 +57,7 @@ describe('Test whether variants get annotated', () => {
       expect(nodeData.variant.info).toEqual({
         af: Math.max(exomeAnnotations[0].af, genomeAnnotations[0].af),
         an: exomeAnnotations[0].an,
+        cdna: `c.${exomeAnnotations[0].cdna}${exomeAnnotations[0].ref}>${exomeAnnotations[0].alt}`,
         gnomadHom: exomeAnnotations[0].nhomalt,
       })
     );
@@ -80,7 +82,7 @@ describe('Test whether variants get annotated', () => {
           end: 999999999999,
           info: {},
           ref: 'A',
-          referenceName: '1',
+          chromosome: '1',
           start: 999999999999,
         },
         contactInfo: 'DrExample@gmail.com',

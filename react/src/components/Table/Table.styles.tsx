@@ -1,6 +1,7 @@
 import { BsFillSkipEndFill, BsFillSkipStartFill } from 'react-icons/bs';
 import styled from 'styled-components/macro';
 import { Flex } from '../index';
+import { Column, InlineFlex } from '../Layout';
 
 interface CellTextProps {
     capitalize?: boolean;
@@ -14,13 +15,32 @@ export const CellText = styled.span<CellTextProps>`
 `;
 
 export const SummaryText = styled.p`
-    margin-top: 0px;
+    margin-block: ${props => props.theme.space[2]};
     color: grey;
 `;
 
 export const TableFilters = styled(props => <Flex {...props} />)`
     padding: 0;
-    margin-bottom: ${props => props.theme.space[4]};
+    margin-bottom: 1rem;
+
+    > ${Column}, > ${InlineFlex} {
+        align-content: center;
+        row-gap: ${props => props.theme.space[2]};
+    }
+
+    > ${Column} {
+        justify-content: center;
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    > ${InlineFlex} {
+        flex-wrap: wrap;
+
+        &:last-child {
+            justify-content: flex-end;
+        }
+    }
 `;
 
 interface StylesProps {
@@ -28,7 +48,6 @@ interface StylesProps {
 }
 
 export const Styles = styled.div<StylesProps>`
-    padding: 1rem;
     display: block;
     max-width: 100%;
     max-height: 80vh;
@@ -73,6 +92,10 @@ export const Styles = styled.div<StylesProps>`
             so this is required. */
             }
             position: relative;
+
+            &.last-in-set {
+                border-right-color: dimgray;
+            }
 
             :last-child {
                 border-right: 0;

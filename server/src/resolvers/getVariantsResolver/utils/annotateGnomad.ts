@@ -29,12 +29,12 @@ export const annotate = (
 
   queryResponse.forEach(r => {
     const variantKey = `${r.variant.ref}-${r.variant.start}-${
-      r.variant.referenceName
+      r.variant.chromosome
     }-${r.variant.assemblyId.replace(/\D/g, '')}`;
 
     if (variantKey in exomeAnnotationKeyMap) {
       /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { af: exomeAF, alt, assembly, chrom, ref, pos, type, nhomalt, ...rest } =
+      const { af: exomeAF, alt, assembly, cdna, chrom, ref, pos, type, nhomalt, ...rest } =
         exomeAnnotationKeyMap[variantKey];
       const genomeAF = genomeAnnotationKeyMap?.[variantKey]?.af ?? 0;
 
@@ -43,6 +43,12 @@ export const annotate = (
         // The gnomAD allele frequency is calculated as the highest value between the gnomAD exome allele frequency and the gnomAD genome allele frequency
         af: Math.max(exomeAF, genomeAF),
         gnomadHom: nhomalt,
+        cdna:
+          r.variant.info?.cdna && r.variant.info?.cdna !== 'NA'
+            ? r.variant.info?.cdna
+            : cdna
+            ? `c.${cdna}${ref}>${alt}`
+            : 'NA',
         ...rest,
       };
     }

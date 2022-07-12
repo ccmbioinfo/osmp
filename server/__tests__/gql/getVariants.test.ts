@@ -27,10 +27,8 @@ describe('Test minimal getVariants query', () => {
             }
             end
             info {
+              aaChange
               af
-              aaAlt
-              aaPos
-              aaRef
               cdna
               consequence
               geneName
@@ -39,7 +37,7 @@ describe('Test minimal getVariants query', () => {
               transcript
             }
             ref
-            referenceName
+            chromosome
             start
           }
           individual {

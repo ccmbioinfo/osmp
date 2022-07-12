@@ -9,6 +9,9 @@ services:
   server:
     build: server
     image: ghcr.io/ccmbioinfo/osmp:latest
+    cpus: 1.0
+    mem_limit: 5G
+    restart: always
     environment:
       G4RD_AUTH_METHOD:
       G4RD_PASSWORD:

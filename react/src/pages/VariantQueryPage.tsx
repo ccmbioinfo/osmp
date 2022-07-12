@@ -8,7 +8,6 @@ import {
     Body,
     Button,
     ButtonWrapper,
-    Checkbox,
     clearError,
     Column,
     ComboBox,
@@ -16,6 +15,8 @@ import {
     Flex,
     GeneSearch,
     Input,
+    RequiredIndicator,
+    RequiredTextBox,
     Spinner,
     Table,
     Tooltip,
@@ -23,6 +24,7 @@ import {
 } from '../components';
 import { IconPadder } from '../components/Table/Table.styles';
 import SOURCES from '../constants/sources';
+import theme from '../constants/theme';
 import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
@@ -31,34 +33,39 @@ import { formatErrorMessage, resolveAssembly } from '../utils';
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
         required: true,
+        displayRequiredError: false,
     },
     gene: {
-        required: state => !state.gene.value,
+        required: true,
+        displayRequiredError: false,
         rules: [
             {
-                valid: (state: FormState<QueryOptionsFormState>) => state.gene.value.length > 0,
-                error: 'Too few characters.',
+                valid: (state: FormState<QueryOptionsFormState>) =>
+                    !!!state.gene.value || !!state.position.value,
+                error: 'Please select a gene from the autocomplete.',
             },
         ],
     },
     maxFrequency: {
         required: true,
+        displayRequiredError: false,
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) => !!+state.maxFrequency.value,
-                error: 'Value must be a number!',
+                error: 'Value must be a number.',
             },
 
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
                     +state.maxFrequency.value <= 0.05,
-                error: 'Value must be <= .05.',
+                error: 'Value must be ≤ 0.05.',
             },
         ],
     },
 
     sources: {
         required: true,
+        displayRequiredError: false,
         rules: [
             {
                 valid: (state: FormState<QueryOptionsFormState>) =>
@@ -77,18 +84,19 @@ interface QueryOptionsFormState {
     sources: string[];
 }
 
-/* ensure consistent height regardless of error visibility */
 const ErrorWrapper = styled.div`
-    min-height: 2.5rem;
+    margin: 0 0 ${props => props.theme.space[2]};
+    padding: ${props => props.theme.space[4]} 0.75rem 0;
 `;
 
-const ErrorText: React.FC<{ error?: string }> = ({ error }) => (
-    <ErrorWrapper>
-        <Typography error variant="subtitle" bold>
-            {error}
-        </Typography>
-    </ErrorWrapper>
-);
+const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
+    error ? (
+        <ErrorWrapper>
+            <Typography error variant="subtitle" bold condensed>
+                {error}
+            </Typography>
+        </ErrorWrapper>
+    ) : null;
 
 const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
@@ -152,120 +160,145 @@ const VariantQueryPage: React.FC<{}> = () => {
             : updateQueryOptionsForm({ sources: queryOptionsForm.sources.value.concat(source) });
 
     return (
-        <Body>
-            <Flex alignItems="center">
-                <Column alignItems="flex-start">
-                    <Column alignItems="center">
-                        <Typography variant="h4" bold>
-                            Select Contributors
-                        </Typography>
-                        <Flex>
-                            {SOURCES.filter(Boolean).map(source => (
-                                <Checkbox
-                                    key={source}
-                                    checked={queryOptionsForm.sources.value.includes(source)}
-                                    label={source.toLocaleLowerCase()}
-                                    onClick={toggleSource.bind(null, source)}
-                                />
-                            ))}
-                        </Flex>
-                        {!!queryOptionsForm.sources.error.length && (
-                            <ErrorText error={queryOptionsForm.sources.error} />
-                        )}
-                    </Column>
-                </Column>
-            </Flex>
-
-            <Background variant="light">
-                <Flex alignItems="flex-start">
-                    <Column
-                        alignItems="flex-start"
-                        style={{
-                            width: '30%',
-                        }}
-                    >
-                        <Typography variant="subtitle" bold>
-                            Gene Name
-                        </Typography>
-                        <GeneSearch
-                            assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
-                            geneName={queryOptionsForm.gene.value}
-                            onChange={geneName => updateQueryOptionsForm({ gene: geneName })}
-                            onSelect={val => {
-                                const { position } = val;
-                                updateQueryOptionsForm({
-                                    gene: val.name,
-                                    position,
-                                });
+        <Body style={{ paddingTop: theme.space[4] }}>
+            <Background
+                variant="light"
+                style={{
+                    marginTop: 0,
+                    paddingTop: theme.space[2],
+                }}
+            >
+                <Flex style={{ flexWrap: 'nowrap' }}>
+                    <Flex alignItems="flex-start" style={{ flexGrow: 1 }}>
+                        <Column
+                            style={{
+                                width: '25%',
+                                minWidth: 150,
                             }}
-                        />
-                        <ErrorText error={queryOptionsForm.gene.error} />
-                    </Column>
-                    <Column alignItems="flex-start">
-                        <Flex alignItems="center">
+                        >
                             <Typography variant="subtitle" bold>
-                                Max Frequency
+                                Genome Assembly <RequiredIndicator />
                             </Typography>
-                            <Tooltip helperText="The maximum allele frequency within each selected database">
-                                <IconPadder>
-                                    <RiInformationFill color="grey" />
-                                </IconPadder>
-                            </Tooltip>
-                        </Flex>
-                        <Input
-                            variant="outlined"
-                            onChange={e =>
-                                updateQueryOptionsForm({ maxFrequency: e.currentTarget.value })
-                            }
-                            value={queryOptionsForm.maxFrequency.value}
-                        />
-                        <ErrorText error={queryOptionsForm.maxFrequency.error} />
-                    </Column>
-                    <Column alignItems="flex-start">
-                        <Typography variant="subtitle" bold>
-                            Genome Assembly
-                        </Typography>
-                        <ComboBox
-                            onSelect={val =>
-                                updateQueryOptionsForm({
-                                    assemblyId: val as AssemblyId,
-                                    gene: '',
-                                })
-                            }
-                            options={['GRCh37', 'GRCh38'].map((a, id) => ({
-                                id,
-                                value: a,
-                                label: a,
-                            }))}
-                            placeholder="Select"
-                            value={queryOptionsForm.assemblyId.value}
-                        />
-                        <ErrorText error={queryOptionsForm.assemblyId.error} />
-                    </Column>
-
-                    <ButtonWrapper>
-                        <Button
-                            disabled={
-                                loading || !formIsValid(queryOptionsForm, queryOptionsFormValidator)
-                            }
-                            onClick={() => {
-                                clearAllErrors();
-                                fetchVariants({ variables: getArgs() });
+                            <ComboBox
+                                onSelect={val =>
+                                    updateQueryOptionsForm({
+                                        assemblyId: val as AssemblyId,
+                                    })
+                                }
+                                options={['GRCh37', 'GRCh38'].map((a, id) => ({
+                                    id,
+                                    value: a,
+                                    label: a,
+                                }))}
+                                placeholder="Select"
+                                value={queryOptionsForm.assemblyId.value}
+                            />
+                        </Column>
+                        <Column
+                            alignItems="flex-start"
+                            style={{
+                                flexGrow: 1,
+                                minWidth: 200,
                             }}
-                            variant="primary"
                         >
-                            Search
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                resetQueryOptionsForm();
+                            <Typography variant="subtitle" bold>
+                                Gene Name <RequiredIndicator />
+                            </Typography>
+                            <GeneSearch
+                                assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
+                                geneName={queryOptionsForm.gene.value}
+                                onChange={geneName => updateQueryOptionsForm({ gene: geneName })}
+                                onSelect={({ name, position }) =>
+                                    updateQueryOptionsForm({
+                                        gene: name,
+                                        position,
+                                    })
+                                }
+                            />
+                            <ErrorText error={queryOptionsForm.gene.error} />
+                        </Column>
+                        <Column
+                            style={{
+                                width: 'min-content',
+                                minWidth: 150,
                             }}
-                            variant="primary"
                         >
-                            Clear
-                        </Button>
-                        <Column justifyContent="flex-start">{loading && <Spinner />}</Column>
-                    </ButtonWrapper>
+                            <Flex alignItems="center">
+                                <Typography variant="subtitle" bold>
+                                    Max Frequency <RequiredIndicator />
+                                </Typography>
+                                <Tooltip helperText="The maximum allele frequency within each selected database">
+                                    <IconPadder>
+                                        <RiInformationFill color="grey" />
+                                    </IconPadder>
+                                </Tooltip>
+                            </Flex>
+                            <Input
+                                variant="outlined"
+                                onChange={e =>
+                                    updateQueryOptionsForm({ maxFrequency: e.currentTarget.value })
+                                }
+                                value={queryOptionsForm.maxFrequency.value}
+                            />
+                            <ErrorText error={queryOptionsForm.maxFrequency.error} />
+                        </Column>
+                        <Column
+                            style={{
+                                width: '25%',
+                                minWidth: 150,
+                            }}
+                        >
+                            <Typography variant="subtitle" bold>
+                                Contributors <RequiredIndicator />
+                            </Typography>
+                            <ComboBox
+                                isMulti
+                                onSelect={val => {
+                                    toggleSource(val);
+                                }}
+                                options={SOURCES.filter(Boolean).map((a, id) => ({
+                                    id,
+                                    value: a,
+                                    label: a,
+                                }))}
+                                placeholder="Select Contributors"
+                                selection={queryOptionsForm.sources.value}
+                                value={queryOptionsForm.sources.value.join(', ')}
+                            />
+                        </Column>
+                    </Flex>
+                    <Column style={{ rowGap: '0.4rem' }}>
+                        <RequiredTextBox />
+                        <ButtonWrapper>
+                            <Button
+                                disabled={
+                                    loading ||
+                                    !formIsValid(queryOptionsForm, queryOptionsFormValidator)
+                                }
+                                onClick={() => {
+                                    clearAllErrors();
+                                    fetchVariants({ variables: getArgs() });
+                                }}
+                                variant="primary"
+                                keyCodes={['Enter', 'NumpadEnter']}
+                            >
+                                Search
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    resetQueryOptionsForm();
+                                }}
+                                variant="primary"
+                            >
+                                Clear
+                            </Button>
+                            {loading && (
+                                <Column justifyContent="flex-start">
+                                    <Spinner />
+                                </Column>
+                            )}
+                        </ButtonWrapper>
+                    </Column>
                 </Flex>
             </Background>
             {[errorState.nodeErrors, errorState.networkErrors, errorState.graphQLErrors]

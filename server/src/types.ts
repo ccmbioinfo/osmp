@@ -2,10 +2,8 @@
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
+  aaChange?: Maybe<string>;
   af?: Maybe<number>;
-  aaAlt?: Maybe<string>;
-  aaPos?: Maybe<string>;
-  aaRef?: Maybe<string>;
   cdna?: Maybe<string>;
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
@@ -41,7 +39,7 @@ export interface VariantResponseFields {
   end: number;
   info?: VariantResponseInfoFields;
   ref: string;
-  referenceName: string;
+  chromosome: string;
   start: number;
   variantId?: Maybe<string>;
   variantType?: Maybe<string>;
@@ -71,9 +69,17 @@ export interface DiseaseFields {
   stage?: Maybe<string>;
 }
 
+export interface Disorder {
+  id: string;
+  label: string;
+}
+
+type DisorderAffected = Pick<Disorder, 'label'>;
+
 export interface IndividualInfoFields {
   candidateGene?: Maybe<string>;
   clinicalStatus?: Maybe<string>;
+  disorders?: Maybe<Disorder[]>;
   solved?: Maybe<string>;
   classifications?: Maybe<string>;
   diagnosis?: Maybe<string>;
@@ -129,6 +135,17 @@ export interface OAQueryResponse {
 
 /* end OpenAPI Schema types */
 
+/* G4RD POST variants/match endpoint schema */
+export interface G4RDVariantQueryResult {
+  exists: boolean;
+  numTotalResults: number;
+  results: {
+    contactInfo: string;
+    individual: IndividualResponseFields;
+    variant: VariantResponseFields;
+  }[];
+}
+
 /* G4RD GET patients endpoint schema */
 export interface Contact {
   institution?: string;
@@ -162,6 +179,7 @@ export interface G4RDPatientQueryResult {
   notes: Notes;
   ethnicity: Ethnicity;
   clinicalStatus?: string;
+  disorders: [DisorderAffected, ...Disorder[]];
   id: string;
   genes?: Gene[];
   solved?: Solved;
@@ -185,7 +203,7 @@ export interface CaddAnnotation extends VariantCoordinate {
   aaAlt: string;
   aaPos: string;
   aaRef: string;
-  cdna: string;
+  cdnaPos: string;
   consequence: string;
   consScore: number;
   phred: number;
@@ -197,6 +215,7 @@ export interface CaddAnnotation extends VariantCoordinate {
 export interface GnomadAnnotation extends VariantCoordinate {
   af: number;
   an: number;
+  cdna: string;
   nhomalt: number;
   assembly: string;
   type: string;

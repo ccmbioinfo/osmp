@@ -40,7 +40,7 @@ describe('Test local query adapter', () => {
           end: 50162978,
           info: {},
           ref: 'A',
-          referenceName: '1',
+          chromosome: '1',
           start: 50162978,
         },
         contactInfo: 'DrExample@gmail.com',
