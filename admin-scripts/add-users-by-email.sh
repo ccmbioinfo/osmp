@@ -58,7 +58,7 @@ while IFS= read -r line; do
     # try to add user to keycloak with this id
     printf "Adding user with email '%s' and id '%s'... " "$line" "$userid"
     set +e
-    docker-compose exec keycloak /opt/jboss/keycloak/bin/kcadm.sh create users -s username="$userid" -s email="$line" -s enabled=true -r "${KEYCLOAK_REALM}"
+    docker-compose exec -T keycloak /opt/jboss/keycloak/bin/kcadm.sh create users -s username="$userid" -s email="$line" -s enabled=true -r "${KEYCLOAK_REALM}"
     if [[ $? -eq 0 ]]; then
         printf "User added successfully\n"
     else
