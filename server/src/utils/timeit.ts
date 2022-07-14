@@ -13,7 +13,7 @@ const DEFAULT_TIMEIT_OPTIONS: TimeitOptions = {
   precision: 4,
 };
 
-var timeitDepth = 0;
+let timeitDepth = 0;
 
 const formatExecTime = (
   execTime: [number, number],
@@ -60,7 +60,7 @@ export const timeit = (name?: string, options?: TimeitOptions) => {
     const wrapped_func = (...args: Parameters<Func>): ReturnType<Func> => {
       const t = process.hrtime();
       timeitDepth += 1;
-      var result: ReturnType<Func>;
+      let result: ReturnType<Func>;
       try {
         result = func(...args); // call original function
       } catch (error) {
@@ -120,7 +120,7 @@ export const timeitAsync = (name?: string, options?: TimeitOptions) => {
     const wrapped_func = async (...args: Parameters<AsyncFunc>): ReturnType<AsyncFunc> => {
       const t = process.hrtime();
       timeitDepth += 1;
-      var result: ReturnType<AsyncFunc>;
+      let result: ReturnType<AsyncFunc>;
       try {
         result = await func(...args); // call original function
       } catch (error) {
