@@ -93,12 +93,11 @@ export const timeit = (name?: string, options?: TimeitOptions) => {
  * wrapped function.
  *
  * @example
- * const slow_function = (num: number): number => {
- *   // ...
- *   return num + 1;
+ * const slow_function = async (num: number): number => {
+ *   return setTimeout(() => num + 1, 1e5);
  * };
- * const wrapped_slow_function = timeit("slow")(slow_function);  // wrapped_slow_function: (number) => number
- * wrapped_slow_function(0);  // returns 1
+ * const wrapped_slow_function = timeitAsync("slow")(slow_function);  // wrapped_slow_function: async (number) => number
+ * wrapped_slow_function(0).then(alert);  // alerts 1
  * @param name Optional name to log alongside the function execution time.
  * @param options Other factory options, see TimeitOptions interface
  */
