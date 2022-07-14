@@ -21,7 +21,7 @@ const formatExecTime = (
   options: TimeitOptions,
   async?: boolean
 ): string => {
-  const logString = `[${async ? 'async ' : ''}${name}] ${execTime[0].toLocaleString()}${
+  const logString = `[${async ? 'async ' : ''}${name + ''}] ${execTime[0].toLocaleString()}${
     options && options.precision && options.precision > 0
       ? `.${execTime[1].toString().substring(0, options.precision)}`
       : ''
@@ -52,12 +52,12 @@ export const timeit = (name?: string, options?: TimeitOptions) => {
   };
 
   // https://stackoverflow.com/a/61212868 to preserve function type
-  const timeit_wrapper = <Func extends AnyFunction>(
+  const timeitWrapper = <Func extends AnyFunction>(
     func: Func
   ): ((...args: Parameters<Func>) => ReturnType<Func>) => {
-    const _name = name ? name : func.name ? func.name : 'undefined';
+    const _name = name || func.name;
 
-    const wrapped_func = (...args: Parameters<Func>): ReturnType<Func> => {
+    const wrappedFunc = (...args: Parameters<Func>): ReturnType<Func> => {
       const t = process.hrtime();
       timeitDepth += 1;
       let result: ReturnType<Func>;
@@ -75,10 +75,10 @@ export const timeit = (name?: string, options?: TimeitOptions) => {
       return result;
     };
 
-    return wrapped_func;
+    return wrappedFunc;
   };
 
-  return timeit_wrapper;
+  return timeitWrapper;
 };
 
 /**
@@ -108,16 +108,16 @@ export const timeitAsync = (name?: string, options?: TimeitOptions) => {
   };
 
   // https://stackoverflow.com/a/61212868 to preserve function type
-  const timeit_wrapper = <AsyncFunc extends AnyAsyncFunction>(
+  const timeitWrapper = <AsyncFunc extends AnyAsyncFunction>(
     func: AsyncFunc
   ): ((...args: Parameters<AsyncFunc>) => ReturnType<AsyncFunc>) => {
-    const _name = name ? name : func.name ? func.name : 'undefined';
+    const _name = name || func.name;
 
-    // TS expects wrapped_func to have return type Promise<T>,
+    // TS expects wrappedFunc to have return type Promise<T>,
     // but it's implied by ReturnType<AsyncFunc>
     // And we also don't use any weird custom promises https://github.com/microsoft/TypeScript/issues/35191#issuecomment-557230996
     // @ts-ignore: ts(1064)
-    const wrapped_func = async (...args: Parameters<AsyncFunc>): ReturnType<AsyncFunc> => {
+    const wrappedFunc = async (...args: Parameters<AsyncFunc>): ReturnType<AsyncFunc> => {
       const t = process.hrtime();
       timeitDepth += 1;
       let result: ReturnType<AsyncFunc>;
@@ -135,8 +135,8 @@ export const timeitAsync = (name?: string, options?: TimeitOptions) => {
       return result;
     };
 
-    return wrapped_func;
+    return wrappedFunc;
   };
 
-  return timeit_wrapper;
+  return timeitWrapper;
 };
