@@ -13,6 +13,8 @@ const DEFAULT_TIMEIT_OPTIONS: TimeitOptions = {
   precision: 4,
 };
 
+var timeitDepth = 0;
+
 const formatExecTime = (
   execTime: [number, number],
   name: string,
@@ -23,7 +25,7 @@ const formatExecTime = (
     options && options.precision && options.precision > 0
       ? `.${execTime[1].toString().substring(0, options.precision)}`
       : ''
-  }s`;
+  }s (depth: ${timeitDepth})`;
   return logString;
 };
 
@@ -57,16 +59,19 @@ export const timeit = (name?: string, options?: TimeitOptions) => {
 
     const wrapped_func = (...args: Parameters<Func>): ReturnType<Func> => {
       const t = process.hrtime();
+      timeitDepth += 1;
       var result: ReturnType<Func>;
       try {
         result = func(...args); // call original function
       } catch (error) {
         const execTime = process.hrtime(t);
         logger.error(formatExecTime(execTime, _name, _options));
+        timeitDepth -= 1;
         throw error;
       }
       const execTime = process.hrtime(t);
       logger.debug(formatExecTime(execTime, _name, _options));
+      timeitDepth -= 1;
       return result;
     };
 
@@ -115,16 +120,19 @@ export const timeitAsync = (name?: string, options?: TimeitOptions) => {
     // @ts-ignore: ts(1064)
     const wrapped_func = async (...args: Parameters<AsyncFunc>): ReturnType<AsyncFunc> => {
       const t = process.hrtime();
+      timeitDepth += 1;
       var result: ReturnType<AsyncFunc>;
       try {
         result = await func(...args); // call original function
       } catch (error) {
         const execTime = process.hrtime(t);
         logger.error(formatExecTime(execTime, _name, _options, true));
+        timeitDepth -= 1;
         throw error;
       }
       const execTime = process.hrtime(t);
       logger.debug(formatExecTime(execTime, _name, _options, true));
+      timeitDepth -= 1;
       return result;
     };
 
