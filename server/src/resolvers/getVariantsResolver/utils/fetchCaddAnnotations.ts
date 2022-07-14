@@ -5,6 +5,7 @@ import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
 import fetch from 'cross-fetch';
+import { timeitAsync } from '../../../utils/timeit';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -133,37 +134,36 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
   return result;
 };
 
-const fetchAnnotations = (
-  position: string,
-  assemblyId: string
-): Promise<CADDAnnotationQueryResponse> => {
-  const resolvedAssemblyId = resolveAssembly(assemblyId);
-  const source = 'CADD annotations';
-  const [start, end] = position.replace(/.+:/, '').split('-');
-  const size = +end - +start;
-  if (size > 600_000) {
-    return Promise.resolve({
-      error: {
-        id: uuidv4(),
-        code: 422,
-        message: `Gene of size ${size.toLocaleString()}bp is too large to annotate with VEP. Annotating with gnomAD only!`,
-      },
-      source,
-      data: [],
-    });
-  } else {
-    return _getAnnotations(position, resolvedAssemblyId)
-      .then(result => ({ source, data: _formatAnnotations(result, resolvedAssemblyId) }))
-      .catch(error => ({
+const fetchAnnotations = timeitAsync('fetchCaddAnnotations')(
+  (position: string, assemblyId: string): Promise<CADDAnnotationQueryResponse> => {
+    const resolvedAssemblyId = resolveAssembly(assemblyId);
+    const source = 'CADD annotations';
+    const [start, end] = position.replace(/.+:/, '').split('-');
+    const size = +end - +start;
+    if (size > 600_000) {
+      return Promise.resolve({
         error: {
           id: uuidv4(),
-          code: 500,
-          message: `Error fetching annotations: ${error}`,
+          code: 422,
+          message: `Gene of size ${size.toLocaleString()}bp is too large to annotate with VEP. Annotating with gnomAD only!`,
         },
         source,
         data: [],
-      }));
+      });
+    } else {
+      return _getAnnotations(position, resolvedAssemblyId)
+        .then(result => ({ source, data: _formatAnnotations(result, resolvedAssemblyId) }))
+        .catch(error => ({
+          error: {
+            id: uuidv4(),
+            code: 500,
+            message: `Error fetching annotations: ${error}`,
+          },
+          source,
+          data: [],
+        }));
+    }
   }
-};
+);
 
 export default fetchAnnotations;

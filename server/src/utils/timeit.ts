@@ -6,7 +6,7 @@ type AnyFunction = (...args: any[]) => any;
 type AnyAsyncFunction = (...args: any[]) => Promise<any>;
 
 interface TimeitOptions {
-  precision?: number;
+  precision?: number; // between 0 and 9; number of decimal places for time
 }
 
 const DEFAULT_TIMEIT_OPTIONS: TimeitOptions = {
@@ -19,11 +19,11 @@ const formatExecTime = (
   options: TimeitOptions,
   async?: boolean
 ): string => {
-  const logString = `[${async ? 'async ' : ''}${name}] exec_time: ${execTime[0].toLocaleString()}${
+  const logString = `[${async ? 'async ' : ''}${name}] ${execTime[0].toLocaleString()}${
     options && options.precision && options.precision > 0
-      ? `.${execTime[1].toLocaleString().substring(0, options.precision)}`
+      ? `.${execTime[1].toString().substring(0, options.precision)}`
       : ''
-  }`;
+  }s`;
   return logString;
 };
 
@@ -53,7 +53,7 @@ export const timeit = (name?: string, options?: TimeitOptions) => {
   const timeit_wrapper = <Func extends AnyFunction>(
     func: Func
   ): ((...args: Parameters<Func>) => ReturnType<Func>) => {
-    const _name = name ? name : func.name;
+    const _name = name ? name : func.name ? func.name : 'undefined';
 
     const wrapped_func = (...args: Parameters<Func>): ReturnType<Func> => {
       const t = process.hrtime();
@@ -107,7 +107,7 @@ export const timeitAsync = (name?: string, options?: TimeitOptions) => {
   const timeit_wrapper = <AsyncFunc extends AnyAsyncFunction>(
     func: AsyncFunc
   ): ((...args: Parameters<AsyncFunc>) => ReturnType<AsyncFunc>) => {
-    const _name = name ? name : func.name;
+    const _name = name ? name : func.name ? func.name : 'undefined';
 
     // TS expects wrapped_func to have return type Promise<T>,
     // but it's implied by ReturnType<AsyncFunc>
