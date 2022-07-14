@@ -68,6 +68,8 @@ const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
       }
     });
 
+    logger.debug(`${combinedResults.length} partipants found from queries`);
+
     // filter data that are not in user requested assemblyId
     const dataForLiftover = combinedResults.filter(v => v.variant.assemblyId !== assemblyId);
     // filter data that are already in user requested assemlbyId
