@@ -141,7 +141,7 @@ const fetchAnnotations = (
   const source = 'CADD annotations';
   const [start, end] = position.replace(/.+:/, '').split('-');
   const size = +end - +start;
-  if (size > 600_000) {
+  if (size > 200_000) {
     return Promise.resolve({
       error: {
         id: uuidv4(),
