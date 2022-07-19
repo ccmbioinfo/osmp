@@ -3,15 +3,28 @@ on:
   push:
     branches:
       - develop
+      - production
     paths:
       - .github/workflows/react.yml
       - react/**/*
   pull_request:
     branches:
       - develop
+      - production
     paths:
       - .github/workflows/react.yml
       - react/**/*
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
 
 jobs:
   build-react:
@@ -47,7 +60,7 @@ jobs:
         run: |
           yarn tsc
 
-  deploy:
+  deploy-staging:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -55,7 +68,7 @@ jobs:
         working-directory: react
     needs: build-react
     environment: SSMP_BUILD
-    if: github.event_name == 'push'
+    if: ${{ github.event_name == 'push' && github.ref_name == 'develop' && github.ref_type == 'branch' }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -92,3 +105,48 @@ jobs:
           sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
           sudo chmod +x /usr/local/bin/mc
           ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
+
+ deploy-production:
+  runs-on: ubuntu-latest
+  defaults:
+    run:
+      shell: bash
+      working-directory: react
+  needs: build-react
+  environment: OSMP_PROD
+  if: ${{ github.event_name == 'push' && github.ref_name == 'production' && github.ref_type == 'branch' }}
+  steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 16
+    - name: Get yarn cache path
+      id: yarn-cache-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+    - uses: actions/cache@v2
+      id: restore
+      with:
+        path: |
+          ${{ steps.yarn-cache-path.outputs.dir }}
+          react/node_modules
+        key: ${{ runner.os }}-yarn-${{ hashFiles('react/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: yarn install # should never happen due to build job
+      if: steps.restore.outputs.cache-hit != 'true'
+    # End setup
+    - run: yarn build
+      env:
+        REACT_APP_GRAPHQL_URL: ${{ secrets.REACT_APP_GRAPHQL_URL }}
+        REACT_APP_KEYCLOAK_AUTH_URL: ${{ secrets.REACT_APP_KEYCLOAK_AUTH_URL }}
+        REACT_APP_KEYCLOAK_REALM: ${{ secrets.REACT_APP_KEYCLOAK_REALM }}
+        REACT_APP_KEYCLOAK_CLIENT_ID: ${{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
+        REACT_APP_SOURCE_LIST: ${{ secrets.REACT_APP_SOURCE_LIST }}
+    - name: Upload to Minio bucket
+      env:
+        MC_HOST_minio: ${{ secrets.MC_HOST }}
+      run: |
+        sudo curl --output /usr/local/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+        sudo chmod +x /usr/local/bin/mc
+        ./deploy.sh minio ${{ secrets.MINIO_BUCKET }}
+ 
