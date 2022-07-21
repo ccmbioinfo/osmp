@@ -17,6 +17,7 @@ import {
   IndividualInfoFields,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
+import { timeit } from '../../../utils/timeit';
 import resolveAssembly from '../utils/resolveAssembly';
 
 /* eslint-disable camelcase */
@@ -187,66 +188,70 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
   }
 };
 
-export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = (
-  variantResponse,
-  patientResponse: G4RDPatientQueryResult[],
-  familyIds: Record<string, string>
-) => {
-  const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
+export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = timeit(
+  'transformG4RDQueryResponse'
+)(
+  (
+    variantResponse: G4RDVariantQueryResult,
+    patientResponse: G4RDPatientQueryResult[],
+    familyIds: Record<string, string>
+  ) => {
+    const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
 
-  return (variantResponse.results || []).map(r => {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    r.variant.assemblyId = resolveAssembly(r.variant.assemblyId);
-    const { individual, contactInfo } = r;
+    return (variantResponse.results || []).map(r => {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      r.variant.assemblyId = resolveAssembly(r.variant.assemblyId);
+      const { individual, contactInfo } = r;
 
-    const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
+      const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
 
-    let info: IndividualInfoFields = {};
-    let ethnicity: string = '';
-    let disorders: Disorder[] = [];
+      let info: IndividualInfoFields = {};
+      let ethnicity: string = '';
+      let disorders: Disorder[] = [];
 
-    if (patient) {
-      const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
-      const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
-      const diagnosis = patient.clinicalStatus;
-      const solved = patient.solved ? patient.solved.status : '';
-      const clinicalStatus = patient.clinicalStatus;
-      disorders = patient.disorders.filter(({ label }) => label !== 'affected') as Disorder[];
-      ethnicity = Object.values(patient.ethnicity)
-        .flat()
-        .map(p => p.trim())
-        .join(', ');
-      info = {
-        solved,
-        candidateGene,
-        diagnosis,
-        classifications,
-        clinicalStatus,
-        disorders,
+      if (patient) {
+        const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
+        const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
+        const diagnosis = patient.clinicalStatus;
+        const solved = patient.solved ? patient.solved.status : '';
+        const clinicalStatus = patient.clinicalStatus;
+        disorders = patient.disorders.filter(({ label }) => label !== 'affected') as Disorder[];
+        ethnicity = Object.values(patient.ethnicity)
+          .flat()
+          .map(p => p.trim())
+          .join(', ');
+        info = {
+          solved,
+          candidateGene,
+          diagnosis,
+          classifications,
+          clinicalStatus,
+          disorders,
+        };
+      }
+
+      const variant: VariantResponseFields = {
+        alt: r.variant.alt,
+        assemblyId: r.variant.assemblyId,
+        callsets: r.variant.callsets,
+        end: r.variant.end,
+        ref: r.variant.ref,
+        start: r.variant.start,
+        chromosome: r.variant.chromosome,
       };
-    }
 
-    const variant: VariantResponseFields = {
-      alt: r.variant.alt,
-      assemblyId: r.variant.assemblyId,
-      callsets: r.variant.callsets,
-      end: r.variant.end,
-      ref: r.variant.ref,
-      start: r.variant.start,
-      chromosome: r.variant.chromosome,
-    };
+      let familyId: string = '';
+      if (individual.individualId) familyId = familyIds[individual.individualId];
 
-    let familyId: string = '';
-    if (individual.individualId) familyId = familyIds[individual.individualId];
-
-    const individualResponseFields: IndividualResponseFields = {
-      ...individual,
-      ethnicity,
-      info,
-      familyId,
-    };
-    return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
-  });
-};
+      const individualResponseFields: IndividualResponseFields = {
+        ...individual,
+        ethnicity,
+        info,
+        familyId,
+      };
+      return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
+    });
+  }
+);
 
 export default getG4rdNodeQuery;
