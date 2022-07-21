@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+PROVIDER=Auth0
+
 # adapted from https://gist.github.com/mihow/9c7f559807069a03e302605691f85572?permalink_comment_id=3770333#gistcomment-3770333
 # evaluate all "VAR=value" lines in .env; accounts for nested variables
 eval $(cat .env | grep -v '^#' | grep -v '^$' | sed 's/\r$//' | awk '/=/ {print $1}' )
@@ -80,9 +82,26 @@ do
         set -e
         continue
     fi
-    # TODO: add federated identity link to new user
+    kcuserid=$(
+        docker-compose exec -T keycloak /opt/jboss/keycloak/bin/kcadm.sh get users -r "${KEYCLOAK_REALM}" -q email="$line" \
+        | jq -r '.[0]["id"]'
+    )
+    # Add new federated identity link to user (uses PROVIDER variable as provider name)
+    # use jq to validate
+    newlink=$(
+        echo "{\"identityProvider\": \"Auth0\", \"userId\": \"$userid\", \"userName\": \"$userid\"}" | jq -rc '.'
+    )
 
-    echo "Done doing the thing for '$line'"
+    docker-compose exec -T keycloak /opt/jboss/keycloak/bin/kcadm.sh create users/"$kcuserid"/federated-identity/"$PROVIDER" -r "${KEYCLOAK_REALM}" -b "$newlink"
+    if [[ $? -eq 0 ]]; then
+        printf "Identity link added successfully\n"
+        echo $newlink
+    else
+        printf "Failed to add identity link\n"
+        set -e
+        continue
+    fi
+
     set -e
 
 done
