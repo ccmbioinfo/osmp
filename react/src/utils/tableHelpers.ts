@@ -1,4 +1,4 @@
-import { HeaderGroup } from 'react-table';
+import { Cell, HeaderGroup } from 'react-table';
 import { ResultTableColumns } from '../components/Table/Table';
 import {
     CallsetInfoFields,
@@ -47,16 +47,15 @@ const flattenBaseResults = (result: VariantQueryDataResult): FlattenedQueryRespo
 const addAdditionalFieldsAndFormatNulls = (
     results: FlattenedQueryResponse,
     uniqueId: number
-): ResultTableColumns => {
-    return {
-        ...results,
-        emptyCaseDetails: '',
-        emptyVariationDetails: '',
-        uniqueId,
-        aaChange: results.aaPos || 'NA',
-        af: results.af || 0,
-    };
-};
+): ResultTableColumns => ({
+    ...results,
+    emptyCaseDetails: '',
+    emptyVariationDetails: '',
+    uniqueId,
+    cdna: results.cdna || 'NA',
+    aaChange: results.aaChange || 'NA',
+    af: results.af || 0,
+});
 
 export const calculateColumnWidth = (
     headerText: string,
@@ -117,6 +116,34 @@ export const isHeterozygous = (zygosity: string | null | undefined) => {
 export const isHomozygous = (zygosity: string | null | undefined) => {
     return !!zygosity?.toLowerCase().includes('hom');
 };
+
+export const isLastCellInSet = (cell: Cell<ResultTableColumns>, columnOrder: string[]) =>
+    !!cell.column &&
+    // Check if the cell's column is the last in its set (excluding hidden columns)
+    isLastHeaderInSet(cell.column as HeaderGroup<ResultTableColumns>, columnOrder);
+
+export const isLastHeaderInSet = (column: HeaderGroup<ResultTableColumns>, columnOrder: string[]) =>
+    // Check if the current column is one of the top-most headers;
+    // i.e., "Variant", "Variant Details", or "Case Details"
+    column.parent === undefined ||
+    // Check if the current column in one of the empty columns
+    column.type === 'empty' ||
+    // columnOrder is an empty array if none of the columns have been reordered
+    (columnOrder.length === 0
+        ? // If none of the columns have been reordered, check if the current column is the last in its set
+          // (excluding hidden and empty-typed columns)
+          column.parent.columns
+              ?.filter(column => column.isVisible && column.type !== 'empty')
+              .at(-1)?.id === column.id
+        : // Otherwise, check if the column's next non-hidden and non-empty-typed column (according to columnOrder)
+          // belongs to the same group to determine if the column is the last in its set
+          column.parent.columns
+              ?.filter(column => column.isVisible && column.type !== 'empty')
+              .findIndex(c => {
+                  const nextColumn = columnOrder[columnOrder.indexOf(column.id) + 1];
+
+                  return !!nextColumn && c.id === nextColumn;
+              }) === -1);
 
 // 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
 // 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId, homozygousCount, heterozygousCount to each row.

@@ -42,12 +42,12 @@ jobs:
           yarn lint
       - name: run prettier
         run: |
-          yarn format
+          yarn check-format
       - name: compile typescript
         run: |
           yarn tsc
 
-  deploy: 
+  deploy:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -85,7 +85,7 @@ jobs:
           REACT_APP_SOURCE_LIST: ${{ secrets.REACT_APP_SOURCE_LIST }}
       - name: Upload to Minio bucket
         # Uncomment during actual deploy to dev server
-        if: github.event_name == 'push'  
+        if: github.event_name == 'push'
         env:
           MC_HOST_minio: ${{ secrets.MC_HOST }}
         run: |

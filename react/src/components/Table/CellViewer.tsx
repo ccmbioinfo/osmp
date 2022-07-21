@@ -9,9 +9,14 @@ export interface ViewerProps {
     toggleRowExpanded: (value?: boolean) => void;
 }
 
+interface ItemName {
+    singular: string;
+    plural?: string;
+}
+
 interface CellViewerProps<T> extends ViewerProps {
-    formatText: (item: T) => React.ReactNode;
-    itemName: string;
+    formatItemText?: (item: T) => React.ReactNode;
+    itemName: ItemName;
     items: Maybe<T[]>;
     text?: string;
 }
@@ -31,9 +36,9 @@ const Text = styled(props => <CellText {...props} />)`
 `;
 
 const CellViewer = <T extends {}>({
-    formatText,
+    formatItemText,
     items,
-    itemName,
+    itemName: { singular, plural },
     rowExpanded,
     toggleRowExpanded,
     text,
@@ -52,14 +57,16 @@ const CellViewer = <T extends {}>({
             <>
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
-                        <Text onClick={onClick}>{formatText(item)}</Text>
+                        <Text onClick={onClick}>
+                            {!!formatItemText ? formatItemText(item) : item}
+                        </Text>
                         {!isLastElement(index, items) && <CellBorder />}
                     </React.Fragment>
                 ))}
             </>
         ) : (
-            <Text onClick={onClick}>{`${items.length} ${itemName}${
-                items.length === 1 ? '' : 's'
+            <Text onClick={onClick}>{`${items.length} ${
+                items.length === 1 ? singular : plural ?? `${singular}s`
             }`}</Text>
         );
     else return <CellText>{text}</CellText>;

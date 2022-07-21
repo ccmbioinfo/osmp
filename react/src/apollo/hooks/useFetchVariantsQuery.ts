@@ -23,10 +23,8 @@ const fetchVariantsQuery = gql`
                     }
                     end
                     info {
+                        aaChange
                         af
-                        aaAlt
-                        aaPos
-                        aaRef
                         cdna
                         consequence
                         geneName
@@ -38,7 +36,7 @@ const fetchVariantsQuery = gql`
                         transcript
                     }
                     ref
-                    referenceName
+                    chromosome
                     start
                     variantId
                 }
@@ -63,6 +61,10 @@ const fetchVariantsQuery = gql`
                         diagnosis
                         candidateGene
                         clinicalStatus
+                        disorders {
+                            id
+                            label
+                        }
                         solved
                         classifications
                     }

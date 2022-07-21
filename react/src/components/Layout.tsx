@@ -63,9 +63,13 @@ export const Column = styled(Flex)<FlexProps>`
 `;
 
 export const ButtonWrapper = styled(Flex)`
-    display: inline-flex;
-    height: 125px;
+    align-self: flex-start;
+    justify-content: flex-end;
     align-items: center;
+    row-gap: ${props => props.theme.space[2]};
+    display: inline-flex;
+    height: min-content;
+    flex-shrink: 0;
 `;
 
 export const Container = styled.div`

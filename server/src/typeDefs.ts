@@ -7,10 +7,8 @@ export default gql`
   }
 
   type VariantResponseInfoFields {
+    aaChange: String
     af: Float
-    aaAlt: String
-    aaPos: String
-    aaRef: String
     assembly: String
     cdna: String
     consequence: String
@@ -45,7 +43,7 @@ export default gql`
     end: Int!
     info: VariantResponseInfoFields
     ref: String!
-    referenceName: String
+    chromosome: String
     start: Int!
     variantId: String
     variantType: String
@@ -65,6 +63,11 @@ export default gql`
     phenotypeLabel: String
   }
 
+  type Disorder {
+    id: String
+    label: String
+  }
+
   type IndividualResponseFields {
     diseases: [DiseaseFields]
     ethnicity: String
@@ -79,6 +82,7 @@ export default gql`
   type IndividualInfoFields {
     candidateGene: String
     clinicalStatus: String
+    disorders: [Disorder!]
     solved: String
     classifications: String
     diagnosis: String

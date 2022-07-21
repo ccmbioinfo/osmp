@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CgArrowsMergeAltH, CgArrowsShrinkH } from 'react-icons/cg';
 import { RiInformationFill } from 'react-icons/ri';
@@ -15,7 +15,6 @@ import {
     useFilters,
     useFlexLayout,
     useGlobalFilter,
-    usePagination,
     useResizeColumns,
     useSortBy,
     useTable,
@@ -37,12 +36,15 @@ import {
     isHeaderExpanded,
     isHeterozygous,
     isHomozygous,
+    isLastCellInSet,
+    isLastHeaderInSet,
     prepareData,
 } from '../../utils';
 import { Button, Chip, Flex, InlineFlex, Tooltip, Typography } from '../index';
 import { Column } from '../Layout';
 import { CellPopover } from './CellPopover';
 import ColumnVisibilityModal from './ColumnVisibilityModal';
+import DiseasesViewer from './DiseasesViewer';
 import DownloadModal from './DownloadModal';
 import FilterPopover from './FilterPopover';
 import FlaggedGenesViewer from './FlaggedGenesViewer';
@@ -62,7 +64,6 @@ export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'di
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; diseases: string };
 export interface ResultTableColumns extends FlattenedQueryResponse {
-    aaChange: string;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
     homozygousCount?: number;
@@ -133,7 +134,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         type: 'fixed',
                     },
                     {
-                        accessor: state => state.referenceName,
+                        accessor: 'chromosome',
                         id: 'chromosome',
                         Header: 'Chr',
                         width: getColumnWidth('Chr'),
@@ -212,12 +213,14 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         id: 'homozygousCount',
                         Header: 'Homo Count',
                         width: getColumnWidth('Homo Count'),
+                        filter: 'between',
                     },
                     {
                         accessor: 'heterozygousCount',
                         id: 'heterozygousCount',
                         Header: 'Het Count',
                         width: getColumnWidth('Het Count'),
+                        filter: 'between',
                     },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
                     {
@@ -345,11 +348,26 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Sex', true),
                     },
                     {
-                        accessor: 'diseases',
+                        accessor: state =>
+                            !!state.disorders &&
+                            state.disorders.map(({ id, label }) => `${label} (${id})`),
                         id: 'diseases',
                         filter: 'multiSelect',
                         Header: 'Diseases',
                         width: getColumnWidth('Diseases', true),
+                        Cell: ({
+                            cell: { value },
+                            row: { isExpanded, toggleRowExpanded },
+                        }: {
+                            cell: Cell<ResultTableColumns>;
+                            row: Row<ResultTableColumns>;
+                        }) => (
+                            <DiseasesViewer
+                                {...{ toggleRowExpanded }}
+                                disorders={value}
+                                rowExpanded={isExpanded}
+                            />
+                        ),
                     },
                     {
                         accessor: 'clinicalStatus',
@@ -461,7 +479,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
             data: tableData,
             filterTypes,
             initialState: {
-                pageSize: tableData.length,
                 sortBy: sortByArray,
                 hiddenColumns: [
                     getChildColumns('case_details'),
@@ -477,8 +494,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         useFlexLayout,
         useGlobalFilter,
         useSortBy,
-        useExpanded,
-        usePagination
+        useExpanded
     );
 
     const {
@@ -486,7 +502,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         getTableProps,
         getTableBodyProps,
         headerGroups,
-        page,
         state,
         setColumnOrder,
         setFilter,
@@ -499,7 +514,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         rows,
     } = tableInstance;
 
-    const { filters, globalFilter } = state;
+    const { columnOrder, filters, globalFilter } = state;
 
     const [cacheTable, setCacheTable] = useState(
         Object.fromEntries(
@@ -552,9 +567,23 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
         }
         return [{ style: { background: currColour } }];
     };
+
+    useEffect(() => {
+        window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth',
+        });
+    }, []);
+
     return (
         <>
-            <TableFilters justifyContent="space-between">
+            <TableFilters
+                justifyContent="space-between"
+                style={{
+                    flexWrap: 'nowrap',
+                    columnGap: '0.75rem',
+                }}
+            >
                 <InlineFlex>
                     <GlobalFilter filter={globalFilter} setFilter={setGlobalFilter} />
                     <Button
@@ -565,6 +594,31 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Clear all filters
                     </Button>
                 </InlineFlex>
+
+                <Column>
+                    <Typography variant="h3" condensed>
+                        {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
+                        individuals
+                    </Typography>
+                    {rows.length !== tableData.length && (
+                        <SummaryText>{rows.length} individuals matching your filters</SummaryText>
+                    )}
+                    {filters.length > 0 && (
+                        <Flex alignItems="center" style={{ columnGap: theme.space[2] }}>
+                            <Typography variant="p" bold condensed>
+                                Active Filters:
+                            </Typography>
+                            {filters.map((f, i) => (
+                                <div key={i}>
+                                    <Chip
+                                        title={f.id}
+                                        onDelete={() => setFilter(f.id, undefined)}
+                                    />
+                                </div>
+                            ))}
+                        </Flex>
+                    )}
+                </Column>
 
                 <InlineFlex>
                     <ColumnVisibilityModal
@@ -580,27 +634,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                 </InlineFlex>
             </TableFilters>
 
-            <Column>
-                <br />
-                <Typography variant="h3">
-                    {uniqueVariantIndices.length} unique variants found in {tableData.length}{' '}
-                    individuals
-                </Typography>
-                {rows.length !== tableData.length && (
-                    <SummaryText>{rows.length} individuals matching your filters</SummaryText>
-                )}
-                <Flex alignItems="center">
-                    <Typography variant="p" bold>
-                        Active Filters:
-                    </Typography>
-                    {filters.map((f, i) => (
-                        <div key={i}>
-                            <Chip title={f.id} onDelete={() => setFilter(f.id, undefined)} />
-                        </div>
-                    ))}
-                </Flex>
-            </Column>
-
             <ScrollContainer ignoreElements="p, th" hideScrollbars={false} vertical={false}>
                 <Styles disableFullWidth={visibleColumns.length > 12}>
                     <table {...getTableProps()}>
@@ -615,7 +648,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                             const { key, ...restHeaderProps } =
                                                 column.getHeaderProps();
                                             return (
-                                                <TH key={key} {...restHeaderProps}>
+                                                <TH
+                                                    key={key}
+                                                    className={
+                                                        isLastHeaderInSet(column, columnOrder)
+                                                            ? 'last-in-set'
+                                                            : ''
+                                                    }
+                                                    {...restHeaderProps}
+                                                >
                                                     <AnimatePresence initial={false}>
                                                         {column.isVisible && (
                                                             <motion.section
@@ -764,15 +805,15 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         </THead>
 
                         <tbody {...getTableBodyProps()}>
-                            {page.length > 0 ? (
-                                page.map((row, i) => {
+                            {rows.length > 0 ? (
+                                rows.map((row, i) => {
                                     prepareRow(row);
                                     // Alternate row's background colour.
                                     const { key, ...restRowProps } = row.getRowProps(
                                         i !== 0
                                             ? getRowColour(
                                                   row.values['uniqueId'],
-                                                  page[i - 1].values['uniqueId']
+                                                  rows[i - 1].values['uniqueId']
                                               )
                                             : [{ style: { background: 'white' } }]
                                     );
@@ -781,7 +822,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                         isCaseDetailsCollapsed(headerGroups[0].headers) &&
                                         // rows are sorted by uniqueId, so if a row came before it with the same id, then it's not unique
                                         row?.index !== 0 &&
-                                        row.values['uniqueId'] === page[i - 1].values['uniqueId']
+                                        row.values['uniqueId'] === rows[i - 1]?.values['uniqueId']
                                     ) {
                                         return null;
                                     }
@@ -793,6 +834,11 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                                 return (
                                                     <td
                                                         key={key}
+                                                        className={
+                                                            isLastCellInSet(cell, columnOrder)
+                                                                ? 'last-in-set'
+                                                                : ''
+                                                        }
                                                         style={{
                                                             paddingRight: 0,
                                                             paddingLeft: 0,

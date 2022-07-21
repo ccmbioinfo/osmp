@@ -57,6 +57,15 @@ components:
           type: number
         zygosity:
           type: string
+    Disorder:
+      description: |
+        Description pending
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
     GeneFilters:
       properties:
         geneName:
@@ -68,8 +77,7 @@ components:
             Individual identifier (external accession or internal ID).
           type: string
           example: P0001
-        datasetId:
-          description: Reference to dataset ID.
+        familyId:
           type: string
         diseases:
           description: |
@@ -78,18 +86,25 @@ components:
             onset, stage and the presence of family history.
           type: array
           items:
-            $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/Disease"
+            allOf:
+              - $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/Disease"
+              - type: object
+                properties:
+                  description:
+                    type: string
+                  diseaseLabel:
+                    type: string
         ethnicity:
           description: |
-            Ethnic background of the individual. Value from NCIT Race ontology 
+            Ethnic background of the individual. Value from NCIT Race ontology
             (NCIT:C17049), e.g. NCIT:C126531 (Latin American).
           type: string
           example: "NCIT:C126531"
         geographicOrigin:
           description: |
-            Individual's country or region of origin (birthplace or residence 
-            place regardless of ethnic origin). Value from GAZ Geographic 
-            Location ontology (GAZ:00000448), e.g. GAZ:00002459 (United States 
+            Individual's country or region of origin (birthplace or residence
+            place regardless of ethnic origin). Value from GAZ Geographic
+            Location ontology (GAZ:00000448), e.g. GAZ:00002459 (United States
             of America).
           type: string
           example: "GAZ:00002459"
@@ -98,12 +113,20 @@ components:
         phenotypicFeatures:
           type: array
           items:
-            $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/PhenotypicFeature"
+            allOf:
+              - $ref: "https://raw.githubusercontent.com/ga4gh-beacon/specification-v2-default-schemas/draft.3/default_individual_schema.yaml#/components/schemas/PhenotypicFeature"
+              - type: object
+                properties:
+                  phenotypeLabel:
+                    description: |
+                      todo
+                    type: string
+                    example: "Xxx"
         sex:
           description: |
             Sex of the individual.
-            Value from NCIT General Qualifier (NCIT:C27993) ontology: UNKNOWN 
-            (not assessed or not available) (NCIT:C17998), FEMALE (NCIT:C46113), 
+            Value from NCIT General Qualifier (NCIT:C27993) ontology: UNKNOWN
+            (not assessed or not available) (NCIT:C17998), FEMALE (NCIT:C46113),
             MALE, (NCIT:C46112) or OTHER SEX (NCIT:C45908).
           type: string
           enum:
@@ -123,8 +146,14 @@ components:
           type: string
         classifications:
           type: string
-        solved: 
+        solved:
           type: string
+        clinicalStatus:
+          type: string
+        disorders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Disorder"
     Query:
       description: |
         A request to the variants endpoint
@@ -164,6 +193,9 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Callset"
+            chromosome:
+              type: string
+              example: "X"
     VariantFilters:
       description: |
         All the required fields to query any kind of variant (e.g. SNP, DUP,
@@ -191,3 +223,7 @@ components:
           type: string
           description: Contact information for the record owner
           example: "DrExample@example.ca"
+        source:
+          type: string
+          description: Institution or other origin of this result
+          example: "sickkids"

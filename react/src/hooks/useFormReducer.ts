@@ -10,6 +10,7 @@ interface RequiredFunc<S> {
     (state: FormState<S>): boolean;
 }
 interface Rule<S> {
+    displayError?: boolean;
     valid: RuleFunc<S>;
     error: string;
 }
@@ -17,9 +18,15 @@ interface Rule<S> {
 export type Validator<S> = {
     [K in keyof S]?: {
         required?: boolean | RequiredFunc<S>;
+        displayRequiredError?: boolean;
         rules?: Rule<S>[];
     };
 };
+
+interface Error {
+    displayError: boolean;
+    errorText: string;
+}
 
 const makeFreshState = <S>(state: S): FormState<S> =>
     Object.entries(state)
@@ -92,20 +99,27 @@ const validateField = <S>(
     validator: Validator<S> | undefined,
     field: keyof S,
     value: S[keyof S] | undefined
-) => {
+): Error | null => {
     if (!validator || !validator[field]) {
-        return '';
+        return null;
     }
     if (!!validator[field]?.required) {
         const required = getFieldRequired(state, field, validator);
         if (required && !value) {
-            return `${field} is required!`;
+            return {
+                displayError: !!validator[field]?.displayRequiredError,
+                errorText: `${field} is required!`,
+            };
         }
     }
-    let error = '';
+    let error: Error | null = null;
     validator[field]?.rules?.forEach(rule => {
         if (!rule.valid(state, value) && getFieldRequired(state, field, validator)) {
-            error = rule.error;
+            const { displayError = true, error: errorText } = rule;
+            error = {
+                displayError,
+                errorText,
+            };
             return;
         }
     });
@@ -114,7 +128,8 @@ const validateField = <S>(
 
 export const setErrors = <S>(form: FormState<S>, validator?: Validator<S>) => {
     for (let field in form) {
-        form[field]['error'] = validateField(form, validator, field, form[field].value);
+        const fieldValidation = validateField(form, validator, field, form[field].value);
+        form[field]['error'] = !!fieldValidation?.displayError ? fieldValidation.errorText : '';
     }
     return form;
 };
@@ -122,7 +137,7 @@ export const setErrors = <S>(form: FormState<S>, validator?: Validator<S>) => {
 export const formIsValid = <S>(form: FormState<S>, validator: Validator<S>) => {
     let error;
     for (let field in form) {
-        error = validateField(form, validator, field, form[field].value);
+        error = validateField(form, validator, field, form[field].value)?.errorText;
         if (error) break;
     }
     return !!error ? false : true;
