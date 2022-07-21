@@ -17,6 +17,7 @@ docker-compose exec keycloak /opt/jboss/keycloak/bin/kcadm.sh config credentials
 # Get management API access token (assuming it's Auth0)
 if [ "${G4RD_GRANT_TYPE}" = "password" ]; then
     tokenresponse=$(curl --request POST \
+        --silent \
         --url "${G4RD_TOKEN_URL}" \
         --header "Content-Type: application/x-www-form-urlencoded" \
         --data "client_id=${G4RD_CLIENT_ID}" \
@@ -28,6 +29,7 @@ if [ "${G4RD_GRANT_TYPE}" = "password" ]; then
     )
 else
     tokenresponse=$(curl --request POST \
+        --silent \
         --url "${G4RD_TOKEN_URL}" \
         --header "Content-Type: application/x-www-form-urlencoded" \
         --data "client_id=${G4RD_CLIENT_ID}" \
@@ -42,27 +44,45 @@ accesstoken=$(
     echo "${tokenresponse}" | jq -r '."access_token"'
 )
 
+if [[ "$accesstoken" == "null" ]]; then
+    echo "Failed to gain access token"
+    exit 1
+fi
+
 # Get users by email
 file=${1:-/dev/stdin}
 
 # read line-by-line, no newline
-while IFS= read -r line; do
+set +e
+for line in $(cat $file)
+do
     # lookup email using token
     userobj=$(
         curl --request GET \
+            --silent \
             --url "${G4RD_AUTH0_BASE_URL}api/v2/users-by-email?email=${line}" \
             --header "Authorization: Bearer $accesstoken"
     )
-    userid=$(echo "$userobj" | jq -r '.[]["user_id"]')
-
+    if [[ `echo "$userobj" | jq '.[0] | has("user_id")'` == "false" ]]; then
+        # userid is missing
+        printf "user_id for '$line' is missing\nFailed to add user\n"
+        continue
+    fi
+    userid=$(echo "$userobj" | jq -r '.[0]["user_id"]')
     # try to add user to keycloak with this id
-    printf "Adding user with email '%s' and id '%s'... " "$line" "$userid"
+    printf "Adding user with email '%s' and id '%s'...\n" "$line" "$userid"
     set +e
-    docker-compose exec -T keycloak /opt/jboss/keycloak/bin/kcadm.sh create users -s username="$userid" -s email="$line" -s enabled=true -r "${KEYCLOAK_REALM}"
+    docker-compose exec -T keycloak /opt/jboss/keycloak/bin/kcadm.sh create users -r "${KEYCLOAK_REALM}" -s username="$userid" -s email="$line" -s enabled=true
     if [[ $? -eq 0 ]]; then
         printf "User added successfully\n"
     else
         printf "Failed to add user\n"
+        set -e
+        continue
     fi
+    # TODO: add federated identity link to new user
+
+    echo "Done doing the thing for '$line'"
     set -e
-done < "$file"
+
+done
