@@ -1,12 +1,14 @@
-import { VariantQueryDataResult } from '../../types';
-import { GnomadAnnotationId } from '../GnomadAnnotationModel';
+import resolveAssembly from '../../resolvers/getVariantsResolver/utils/resolveAssembly';
+import { VariantCoordinate, VariantQueryDataResult } from '../../types';
 
 const getCoordinates = (result: VariantQueryDataResult[]) => {
   let start = +Infinity;
   let end = -Infinity;
-  const coordinates: GnomadAnnotationId[] = [];
+  const coordinates: VariantCoordinate[] = [];
   const variants = result.flat().map(d => d.variant);
   variants.forEach(variant => {
+    const resolvedAssemblyId = resolveAssembly(variant.assemblyIdCurrent ?? 'GRCh37');
+
     if (variant.start < start) {
       start = variant.start;
     }
@@ -17,7 +19,7 @@ const getCoordinates = (result: VariantQueryDataResult[]) => {
 
     coordinates.push({
       alt: variant.alt,
-      chrom: variant.chromosome,
+      chrom: `${resolvedAssemblyId === 'GRCh38' ? 'chr' : ''}${variant.chromosome}`,
       pos: variant.start,
       ref: variant.ref,
     });

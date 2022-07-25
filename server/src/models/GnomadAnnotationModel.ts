@@ -1,11 +1,35 @@
-import mongoose, { Document, Model, model } from 'mongoose';
-import { GnomadAnnotation, GnomadAnnotations } from '../types';
+import mongoose, { Model, model } from 'mongoose';
+import {
+  GnomadBaseAnnotation,
+  GnomadGenomeAnnotation,
+  GnomadGRCh37ExomeAnnotation,
+  VariantCoordinate,
+} from '../types';
 
-export type GnomadAnnotationId = Pick<GnomadAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
+type AnnotationInput = {
+  start: number;
+  end: number;
+  coordinates: VariantCoordinate[];
+};
 
-interface GnomadAnnotationDocument extends Document, GnomadAnnotation {}
+interface GnomadAnnotations<T> {
+  primaryAnnotations: T[];
+  secondaryAnnotations: GnomadGenomeAnnotation[];
+}
 
-const gnomandAnnotationSchema = new mongoose.Schema({
+interface GnomadAnnotationStaticMethods<T> {
+  getAnnotations(ids: AnnotationInput): Promise<GnomadAnnotations<T>>;
+}
+
+type GnomadGRCh37ExomeAnnotationModel = Model<GnomadGRCh37ExomeAnnotation> &
+  GnomadAnnotationStaticMethods<GnomadGRCh37ExomeAnnotation>;
+type GnomadGenomeAnnotationModel = Model<GnomadGenomeAnnotation> &
+  GnomadAnnotationStaticMethods<GnomadGenomeAnnotation>;
+
+const gnomadAnnotationBaseSchema = new mongoose.Schema<
+  GnomadBaseAnnotation,
+  Model<GnomadBaseAnnotation>
+>({
   chrom: {
     type: String,
   },
@@ -19,72 +43,126 @@ const gnomandAnnotationSchema = new mongoose.Schema({
     type: String,
   },
   nhomalt: {
-    type: String,
-  },
-  an: {
     type: Number,
   },
   af: {
     type: Number,
   },
-  assembly: {
+});
+
+const gnomadGenomeBaseSchema = new mongoose.Schema<
+  GnomadGenomeAnnotation,
+  Model<GnomadGenomeAnnotation>
+>({
+  ...gnomadAnnotationBaseSchema.obj,
+  ac: {
+    type: Number,
+  },
+});
+
+const GnomadGRCh37AnnotationSchema = new mongoose.Schema<
+  GnomadGRCh37ExomeAnnotation,
+  GnomadGRCh37ExomeAnnotationModel
+>({
+  ...gnomadAnnotationBaseSchema.obj,
+  an: {
+    type: Number,
+  },
+  cdna: {
     type: String,
   },
-  type: {
+  transcript: {
     type: String,
   },
 });
 
-type AnnotationInput = {
-  start: number;
-  end: number;
-  coordinates: GnomadAnnotationId[];
-};
+const GnomadGRCh37GenomeAnnotationSchema = new mongoose.Schema<
+  GnomadGenomeAnnotation,
+  GnomadGenomeAnnotationModel
+>({ ...gnomadGenomeBaseSchema.obj });
 
-type AnnotationType = 'exome' | 'genome';
+const GnomadGRCh38AnnotationSchema = new mongoose.Schema<
+  GnomadGenomeAnnotation,
+  GnomadGenomeAnnotationModel
+>({ ...gnomadGenomeBaseSchema.obj });
 
-// For model
-interface GnomadAnnotationModelMethods extends Model<GnomadAnnotation> {
-  getAnnotations(ids: AnnotationInput, assemblyId: string): Promise<GnomadAnnotations>;
-}
-
-gnomandAnnotationSchema.statics.getAnnotations = async function (
-  this: Model<GnomadAnnotationDocument>,
+const getAnnotations = async (
+  model: GnomadGenomeAnnotationModel | GnomadGRCh37ExomeAnnotationModel,
   ids: AnnotationInput,
-  assemblyId: string
-) {
+  omittedFields: string[]
+) => {
   const { start, end, coordinates } = ids;
-  const getAnnotationsByType = async (type: AnnotationType) =>
-    await this.aggregate([
-      { $match: { type } },
-      { $match: { assembly: assemblyId } },
-      { $match: { pos: { $gte: start, $lte: end } } },
-      {
-        $match: {
-          $or: coordinates,
-        },
-      },
-    ]);
-  const annotations = {
-    exomeAnnotations: [] as GnomadAnnotation[],
-    genomeAnnotations: [] as GnomadAnnotation[],
-  };
 
-  if (coordinates.length > 0 && assemblyId) {
-    annotations.exomeAnnotations = await getAnnotationsByType('exome');
-    annotations.genomeAnnotations = await getAnnotationsByType('genome');
+  if (!coordinates.length) return [];
 
-    console.log(`${annotations.exomeAnnotations.length} exome gnomAD annotation(s) found`);
-    console.log(`${annotations.genomeAnnotations.length} genome gnomAD annotation(s) found`);
-  }
-
-  return annotations;
+  return await model.aggregate([
+    { $match: { pos: { $gte: start, $lte: end } } },
+    { $match: { $or: coordinates } },
+    {
+      $project: Object.fromEntries([...omittedFields, '_id', 'assembly', 'type'].map(f => [f, 0])),
+    },
+  ]);
 };
 
-const GnomadAnnotationModel = model<GnomadAnnotationDocument, GnomadAnnotationModelMethods>(
-  'GnomadAnnotation',
-  gnomandAnnotationSchema,
-  'annotations'
-);
+GnomadGRCh37AnnotationSchema.statics.getAnnotations = async function (ids: AnnotationInput) {
+  const exomeAnnotations = await getAnnotations(this, ids, ['filter', 'gene']);
+  const genomeAnnotations = await getAnnotations(GnomadGRCh37GenomeAnnotationModel, ids, [
+    'gene',
+    'source',
+  ]);
 
-export default GnomadAnnotationModel;
+  console.log(
+    `${exomeAnnotations.length} GRCh37 exome gnomAD annotation${
+      exomeAnnotations.length === 1 ? '' : 's'
+    } found`
+  );
+  console.log(
+    `${genomeAnnotations.length} GRCh37 genome gnomAD annotation${
+      genomeAnnotations.length === 1 ? '' : 's'
+    } found`
+  );
+
+  return {
+    primaryAnnotations: exomeAnnotations,
+    secondaryAnnotations: genomeAnnotations,
+  };
+};
+
+GnomadGRCh38AnnotationSchema.statics.getAnnotations = async function (ids: AnnotationInput) {
+  const genomeAnnotations = await getAnnotations(this, ids, ['source']);
+
+  console.log(
+    `${genomeAnnotations.length} GRCh38 genome gnomAD annotation${
+      genomeAnnotations.length === 1 ? '' : 's'
+    } found`
+  );
+
+  return {
+    primaryAnnotations: genomeAnnotations,
+    secondaryAnnotations: [],
+  };
+};
+
+export const GnomadGRCh37AnnotationModel = model<
+  GnomadGRCh37ExomeAnnotation,
+  GnomadGRCh37ExomeAnnotationModel
+>('GnomadGRCh37ExomeAnnotation', GnomadGRCh37AnnotationSchema, 'GRCh37ExomeAnnotations');
+
+const GnomadGRCh37GenomeAnnotationModel = model<
+  GnomadGenomeAnnotation,
+  GnomadGenomeAnnotationModel
+>('GnomadGRCh37GenomeAnnotation', GnomadGRCh37GenomeAnnotationSchema, 'GRCh37GenomeAnnotations');
+
+export const GnomadGRCh38AnnotationModels = [
+  ...Array.from({ length: 22 }, (_, i) => `${i + 1}`),
+  'X',
+  'Y',
+].reduce((modelMapping, chr) => {
+  modelMapping[chr] = model<GnomadGenomeAnnotation, GnomadGenomeAnnotationModel>(
+    `GnomadGRCh38GenomeAnnotation_chr${chr}`,
+    GnomadGRCh38AnnotationSchema,
+    `GRCh38GenomeAnnotations_chr${chr}`
+  );
+
+  return modelMapping;
+}, {} as { [key: string]: GnomadGenomeAnnotationModel });

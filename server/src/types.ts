@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { Request, Response } from 'express';
 import { Maybe } from 'graphql/jsutils/Maybe';
+
 export interface VariantResponseInfoFields {
   aaChange?: Maybe<string>;
   af?: Maybe<number>;
@@ -212,18 +213,24 @@ export interface CaddAnnotation extends VariantCoordinate {
   transcript: string;
 }
 
-export interface GnomadAnnotation extends VariantCoordinate {
+export interface GnomadBaseAnnotation extends VariantCoordinate {
   af: number;
-  an: number;
-  cdna: string;
+  cdna?: string;
   nhomalt: number;
-  assembly: string;
-  type: string;
+  transcript?: string;
+}
+
+export interface GnomadGRCh37ExomeAnnotation extends GnomadBaseAnnotation {
+  an: number;
+}
+
+export interface GnomadGenomeAnnotation extends GnomadBaseAnnotation {
+  ac: number;
 }
 
 export interface GnomadAnnotations {
-  exomeAnnotations: GnomadAnnotation[];
-  genomeAnnotations: GnomadAnnotation[];
+  primaryAnnotations: (GnomadGRCh37ExomeAnnotation | GnomadGenomeAnnotation)[];
+  secondaryAnnotations: GnomadGenomeAnnotation[];
 }
 
 export interface ErrorResponse {
