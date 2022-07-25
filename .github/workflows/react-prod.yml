@@ -1,17 +1,28 @@
-name: "Build react app and deploy to staging"
+name: "Build react app and deploy to production"
 on:
   push:
     branches:
-      - develop
+      - production
     paths:
-      - .github/workflows/react.yml
+      - .github/workflows/react-prod.yml
       - react/**/*
   pull_request:
     branches:
-      - develop
+      - production
     paths:
-      - .github/workflows/react.yml
+      - .github/workflows/react-prod.yml
       - react/**/*
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        required: true
+        default: "warning"
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
 
 jobs:
   build-react:
@@ -47,15 +58,15 @@ jobs:
         run: |
           yarn tsc
 
-  deploy:
+  deploy-production:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
         working-directory: react
     needs: build-react
-    environment: SSMP_BUILD
-    concurrency: SSMP_BUILD
+    environment: OSMP_PROD
+    concurrency: OSMP_PROD
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
@@ -85,8 +96,6 @@ jobs:
           REACT_APP_KEYCLOAK_CLIENT_ID: ${{ secrets.REACT_APP_KEYCLOAK_CLIENT_ID }}
           REACT_APP_SOURCE_LIST: ${{ secrets.REACT_APP_SOURCE_LIST }}
       - name: Upload to Minio bucket
-        # Uncomment during actual deploy to dev server
-        if: github.event_name == 'push'
         env:
           MC_HOST_minio: ${{ secrets.MC_HOST }}
         run: |
