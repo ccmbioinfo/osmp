@@ -130,7 +130,7 @@ export const isLastHeaderInSet = (
     const visibleNonEmptyColumnIds = (
         column.parent?.columns?.filter(c => c.isVisible && c.type !== 'empty') ?? []
     ).map(c => c.id);
-    
+
     return (
         // Check if the current column is one of the top-most headers;
         // i.e., "Variant", "Variant Details", or "Case Details"
