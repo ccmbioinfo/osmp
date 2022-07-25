@@ -8,24 +8,27 @@ import {
 } from '../../../types';
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
+import { timeitAsync } from '../../../utils/timeit';
 
-const annotateGnomad = async (
-  assemblyId: string,
-  position: string,
-  queryResponse: VariantQueryDataResult[]
-): Promise<VariantQueryDataResult[]> => {
-  const resolvedAssemblyId = resolveAssembly(assemblyId);
-  const { chromosome } = resolveChromosome(position);
-  const annotationCoordinates = getCoordinates(queryResponse);
-  const GnomadAnnotationModel =
-    resolvedAssemblyId === 'GRCh37'
-      ? GnomadGRCh37AnnotationModel
-      : GnomadGRCh38AnnotationModels[chromosome];
+const annotateGnomad = timeitAsync('annotateGnomad')(
+  async (
+    assemblyId: string,
+    position: string,
+    queryResponse: VariantQueryDataResult[]
+  ): Promise<VariantQueryDataResult[]> => {
+    const resolvedAssemblyId = resolveAssembly(assemblyId);
+    const { chromosome } = resolveChromosome(position);
+    const annotationCoordinates = getCoordinates(queryResponse);
+    const GnomadAnnotationModel =
+      resolvedAssemblyId === 'GRCh37'
+        ? GnomadGRCh37AnnotationModel
+        : GnomadGRCh38AnnotationModels[chromosome];
 
-  const annotations = await GnomadAnnotationModel.getAnnotations(annotationCoordinates);
+    const annotations = await GnomadAnnotationModel.getAnnotations(annotationCoordinates);
 
-  return annotate(queryResponse, annotations);
-};
+    return annotate(queryResponse, annotations);
+  }
+);
 
 const _mapToAnnotationsKeyMap = (
   annotations: (GnomadGRCh37ExomeAnnotation | GnomadGenomeAnnotation)[]

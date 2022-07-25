@@ -1,4 +1,5 @@
 import mongoose, { Model, model } from 'mongoose';
+import logger from '../logger';
 import {
   GnomadBaseAnnotation,
   GnomadGenomeAnnotation,
@@ -111,12 +112,12 @@ GnomadGRCh37AnnotationSchema.statics.getAnnotations = async function (ids: Annot
     'source',
   ]);
 
-  console.log(
+  logger.debug(
     `${exomeAnnotations.length} GRCh37 exome gnomAD annotation${
       exomeAnnotations.length === 1 ? '' : 's'
     } found`
   );
-  console.log(
+  logger.debug(
     `${genomeAnnotations.length} GRCh37 genome gnomAD annotation${
       genomeAnnotations.length === 1 ? '' : 's'
     } found`
@@ -131,7 +132,7 @@ GnomadGRCh37AnnotationSchema.statics.getAnnotations = async function (ids: Annot
 GnomadGRCh38AnnotationSchema.statics.getAnnotations = async function (ids: AnnotationInput) {
   const genomeAnnotations = await getAnnotations(this, ids, ['source']);
 
-  console.log(
+  logger.debug(
     `${genomeAnnotations.length} GRCh38 genome gnomAD annotation${
       genomeAnnotations.length === 1 ? '' : 's'
     } found`
