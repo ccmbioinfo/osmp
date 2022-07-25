@@ -122,28 +122,34 @@ export const isLastCellInSet = (cell: Cell<ResultTableColumns>, columnOrder: str
     // Check if the cell's column is the last in its set (excluding hidden columns)
     isLastHeaderInSet(cell.column as HeaderGroup<ResultTableColumns>, columnOrder);
 
-export const isLastHeaderInSet = (column: HeaderGroup<ResultTableColumns>, columnOrder: string[]) =>
-    // Check if the current column is one of the top-most headers;
-    // i.e., "Variant", "Variant Details", or "Case Details"
-    column.parent === undefined ||
-    // Check if the current column in one of the empty columns
-    column.type === 'empty' ||
-    // columnOrder is an empty array if none of the columns have been reordered
-    (columnOrder.length === 0
-        ? // If none of the columns have been reordered, check if the current column is the last in its set
-          // (excluding hidden and empty-typed columns)
-          column.parent.columns
-              ?.filter(column => column.isVisible && column.type !== 'empty')
-              .at(-1)?.id === column.id
-        : // Otherwise, check if the column's next non-hidden and non-empty-typed column (according to columnOrder)
-          // belongs to the same group to determine if the column is the last in its set
-          column.parent.columns
-              ?.filter(column => column.isVisible && column.type !== 'empty')
-              .findIndex(c => {
-                  const nextColumn = columnOrder[columnOrder.indexOf(column.id) + 1];
+export const isLastHeaderInSet = (
+    column: HeaderGroup<ResultTableColumns>,
+    columnOrder: string[]
+) => {
+    // Filter out the hidden and empty-typed columns from the current column's set
+    const visibleNonEmptyColumnIds = (
+        column.parent?.columns?.filter(c => c.isVisible && c.type !== 'empty') ?? []
+    ).map(c => c.id);
 
-                  return !!nextColumn && c.id === nextColumn;
-              }) === -1);
+    return (
+        // Check if the current column is one of the top-most headers;
+        // i.e., "Variant", "Variant Details", or "Case Details"
+        column.parent === undefined ||
+        // Check if the current column in one of the empty columns
+        column.type === 'empty' ||
+        // columnOrder is an empty array if none of the columns have been reordered
+        (columnOrder.length === 0
+            ? // If none of the columns have been reordered, check if the current column is the last in its set
+              // (excluding hidden and empty-typed columns)
+              visibleNonEmptyColumnIds.at(-1) === column.id
+            : // Otherwise, check if any of the current column's subsequent (visible and non-empty-typed) columns, according to columnOrder,
+              // belongs to the same set
+              columnOrder
+                  // There's no need to check the columns that precede the current column
+                  .slice(columnOrder.indexOf(column.id) + 1)
+                  .findIndex(cId => visibleNonEmptyColumnIds.includes(cId)) === -1)
+    );
+};
 
 // 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
 // 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId, homozygousCount, heterozygousCount to each row.
