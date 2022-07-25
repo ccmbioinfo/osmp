@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, model } from 'mongoose';
+import logger from '../logger';
 import { GnomadAnnotation } from '../types';
 
 export type GnomadAnnotationId = Pick<GnomadAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
@@ -63,7 +64,7 @@ gnomandAnnotationSchema.statics.getAnnotations = async function (
         },
       },
     ]);
-    console.log(`${annotation.length} gnomad annots found`);
+    logger.debug(`${annotation.length} gnomad annots found`);
     return annotation;
   } else {
     return [];
