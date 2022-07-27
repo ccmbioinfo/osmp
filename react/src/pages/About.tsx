@@ -32,13 +32,25 @@ const AboutPage: React.FC<{}> = () => {
                     </Typography>
                 </Container>
                 <Container>
-                    <img src={portal} alt="OSMP portal" width="80%" height="80%" />
+                    <figure>
+                        <img src={portal} alt="OSMP portal" width="90%" height="90%" />
+                        <figcaption>Figure 1: OSMP viewer</figcaption>
+                    </figure>
                 </Container>
             </InlineFlex>
 
             <InlineFlex>
-                <Container display="block" width="20%">
-                    <img src={workflow} alt="OSMP portal" />
+                <Container display="block" width="25%">
+                    <figure>
+                        <img src={workflow} alt="OSMP workflow" />
+                        <figcaption>
+                            Figure 2: OSMP server workflow. 1, variant data are queried from the
+                            specified variant stores. 2, the columns are standardized and liftOver
+                            is performed if necessary to transform the variant data into the
+                            user-specified genome assembly. 3, variant annotations are performed on
+                            the fly.
+                        </figcaption>
+                    </figure>
                 </Container>
                 <Container>
                     <Typography variant="h3" bold>
