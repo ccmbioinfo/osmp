@@ -17,7 +17,16 @@ import ErrorIndicator from './ErrorIndicator';
 import GeneSearch from './GeneSearch';
 import IconButton from './IconButton';
 import Input from './Input';
-import { Background, Body, BodyAbout, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
+import {
+    Background,
+    Body,
+    BodyAbout,
+    ButtonWrapper,
+    Column,
+    Container,
+    Flex,
+    InlineFlex,
+} from './Layout';
 import Modal from './Modal/Modal';
 import Navbar from './Navbar/Navbar';
 import Popover from './Popover/Popover';

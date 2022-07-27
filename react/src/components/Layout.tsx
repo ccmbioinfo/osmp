@@ -72,8 +72,17 @@ export const ButtonWrapper = styled(Flex)`
     flex-shrink: 0;
 `;
 
-export const Container = styled.div`
+export interface ContainerProps {
+    paddingRight?: string;
+    display?: string;
+    width?: string;
+}
+
+export const Container = styled.div<ContainerProps>`
     margin: 0 auto;
     padding: 0 ${props => props.theme.space[6]};
-    width: 100%;
+    padding-right: ${props => props.paddingRight};
+    width: ${props => props.width || '100%'};
+    display: ${props => props.display};
+    ${props => props.display && `margin-left: auto; margin-right: auto;`}
 `;
