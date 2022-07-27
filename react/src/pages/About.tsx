@@ -1,11 +1,11 @@
 import React from 'react';
 import portal from '../assets/osmp_1.png';
 import workflow from '../assets/osmp_2.png';
-import { BodyAbout, Container, Divider, Flex, InlineFlex, Typography } from '../components';
+import { Body, Container, Divider, Flex, InlineFlex, Typography } from '../components';
 
 const AboutPage: React.FC<{}> = () => {
     return (
-        <BodyAbout>
+        <Body>
             <Flex justifyContent="center">
                 <Typography variant="h3" bold>
                     Welcome to the One-sided Matching Portal.
@@ -56,7 +56,6 @@ const AboutPage: React.FC<{}> = () => {
                     <Typography variant="h3" bold>
                         Features
                     </Typography>
-
                     <ul>
                         <li>
                             <Typography variant="h4" bold>
@@ -121,7 +120,7 @@ const AboutPage: React.FC<{}> = () => {
                 <Typography variant="p">Children’s Hospital of Eastern Ontario</Typography>
                 <Typography variant="p">PhenoTips</Typography>
             </Container>
-        </BodyAbout>
+        </Body>
     );
 };
 export default AboutPage;

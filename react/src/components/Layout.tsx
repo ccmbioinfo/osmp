@@ -53,10 +53,6 @@ export const Body = styled.div`
     padding: ${props => props.theme.space[5]};
 `;
 
-export const BodyAbout = styled.div`
-    padding: ${props => props.theme.space[6]};
-`;
-
 export const Column = styled(Flex)<FlexProps>`
     flex-direction: column;
     margin: 0 ${props => props.theme.space[2]};
@@ -71,8 +67,7 @@ export const ButtonWrapper = styled(Flex)`
     height: min-content;
     flex-shrink: 0;
 `;
-
-export interface ContainerProps {
+interface ContainerProps {
     paddingRight?: string;
     display?: string;
     width?: string;
