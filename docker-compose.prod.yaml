@@ -1,0 +1,54 @@
+version: "3.9"
+
+x-common:
+  &common
+  restart: unless-stopped
+  logging:
+    driver: journald
+
+services:
+  server:
+    build: server
+    image: ghcr.io/ccmbioinfo/osmp:stable
+    cpus: 1.0
+    mem_limit: 5G # To be changed later. 
+    restart: always
+    environment:
+      G4RD_AUTH_METHOD:
+      G4RD_PASSWORD:
+      G4RD_URL:
+      G4RD_USERNAME:
+      G4RD_REALM:
+      G4RD_GRANT_TYPE:
+      G4RD_TOKEN_URL:
+      G4RD_CLIENT_ID:
+      KEYCLOAK_AUTH_URL:
+      KEYCLOAK_CLIENT_ID:
+      KEYCLOAK_REALM:
+      MONGO_CONNECTION_STRING:
+    ports:
+      - 3000:3000
+    <<: *common
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:17.0.0-legacy
+    environment:
+      KEYCLOAK_USER:
+      KEYCLOAK_PASSWORD:
+      KEYCLOAK_REALM:
+      DB_VENDOR: mysql
+      DB_ADDR: "${KEYCLOAK_DB_ADDR}"
+      DB_DATABASE: "${KEYCLOAK_DB}"
+      DB_USER: "${KEYCLOAK_DB_USER}"
+      DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
+      PROXY_ADDRESS_FORWARDING: "true"
+      KEYCLOAK_FRONTEND_URL: "https://keycloak.osmp.genomics4rd.ca/auth"
+      AUTH0_BROKER_TOKEN_URL: ${G4RD_TOKEN_URL}
+      AUTH0_BROKER_MANAGEMENT_API_URL: ${G4RD_AUTH0_BASE_URL}api/v2/
+      AUTH0_BROKER_CLIENT_ID: ${G4RD_CLIENT_ID} # use same creds as osmp server backend
+      AUTH0_BROKER_USERNAME: ${G4RD_USERNAME}
+      AUTH0_BROKER_PASSWORD: ${G4RD_PASSWORD}
+      AUTH0_GRANT_TYPE: ${G4RD_GRANT_TYPE}
+    ports:
+      - 8080:8080
+    <<: *common
