@@ -1,19 +1,20 @@
 import GnomadAnnotationModel from '../../../models/GnomadAnnotationModel';
 import getCoordinates from '../../../models/utils/getCoordinates';
 import { GnomadAnnotation, GnomadAnnotations, VariantQueryDataResult } from '../../../types';
+import { timeitAsync } from '../../../utils/timeit';
 
-const annotateGnomad = async (
-  queryResponse: VariantQueryDataResult[]
-): Promise<VariantQueryDataResult[]> => {
-  const annotationCoordinates = getCoordinates(queryResponse);
+const annotateGnomad = timeitAsync('annotateGnomad')(
+  async (queryResponse: VariantQueryDataResult[]): Promise<VariantQueryDataResult[]> => {
+    const annotationCoordinates = getCoordinates(queryResponse);
 
-  const annotations = await GnomadAnnotationModel.getAnnotations(
-    annotationCoordinates,
-    'gnomAD_GRCh37'
-  );
+    const annotations = await GnomadAnnotationModel.getAnnotations(
+      annotationCoordinates,
+      'gnomAD_GRCh37'
+    );
 
-  return annotate(queryResponse, annotations);
-};
+    return annotate(queryResponse, annotations);
+  }
+);
 
 const _mapToAnnotationsKeyMap = (annotations: GnomadAnnotation[]) =>
   Object.fromEntries(

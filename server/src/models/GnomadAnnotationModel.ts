@@ -1,4 +1,5 @@
 import mongoose, { Document, Model, model } from 'mongoose';
+import logger from '../logger';
 import { GnomadAnnotation, GnomadAnnotations } from '../types';
 
 export type GnomadAnnotationId = Pick<GnomadAnnotation, 'alt' | 'chrom' | 'ref' | 'pos'>;
@@ -74,8 +75,8 @@ gnomandAnnotationSchema.statics.getAnnotations = async function (
     annotations.exomeAnnotations = await getAnnotationsByType('exome');
     annotations.genomeAnnotations = await getAnnotationsByType('genome');
 
-    console.log(`${annotations.exomeAnnotations.length} exome gnomAD annotation(s) found`);
-    console.log(`${annotations.genomeAnnotations.length} genome gnomAD annotation(s) found`);
+    logger.debug(`${annotations.exomeAnnotations.length} exome gnomAD annotation(s) found`);
+    logger.debug(`${annotations.genomeAnnotations.length} genome gnomAD annotation(s) found`);
   }
 
   return annotations;
