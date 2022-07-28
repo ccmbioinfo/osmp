@@ -239,8 +239,8 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: 'af',
                         id: 'af',
-                        Header: 'gnomad_exome_AF',
-                        width: getColumnWidth('gnomad_exome_AF', true),
+                        Header: 'gnomAD_AF',
+                        width: getColumnWidth('gnomAD_AF', true),
                         filter: 'between',
                     },
                     /* { accessor: 'gnomadHet', id: 'gnomadHet', Header: 'gnomadHet', width: 105 }, */
