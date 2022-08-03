@@ -29,7 +29,7 @@ mongoose
 
 app.use(
   session({
-    secret: 'ssmp',
+    secret: process.env.SERVER_SESSION_SECRET!,
     resave: false,
     saveUninitialized: true,
     store: memoryStore,

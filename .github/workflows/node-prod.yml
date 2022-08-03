@@ -122,6 +122,7 @@ jobs:
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
           MONGO_CONNECTION_STRING: ${{ secrets.MONGO_CONNECTION_STRING }}
+          SERVER_SESSION_SECRET: ${{ secrets.SERVER_SESSION_SECRET }}
           # Keycloak
           KEYCLOAK_DB_ADDR: ${{ secrets.KEYCLOAK_DB_ADDR }}
           KEYCLOAK_DB: ${{ secrets.KEYCLOAK_DB }}

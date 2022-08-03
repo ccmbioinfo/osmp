@@ -166,6 +166,7 @@ jobs:
           KEYCLOAK_AUTH_URL: ${{ secrets.KEYCLOAK_AUTH_URL }}
           KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
           KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+          SERVER_SESSION_SECRET: ${{ secrets.SERVER_SESSION_SECRET }}
           # Test Node
           TEST_DATA_DB: ${{ secrets.TEST_DATA_DB }}
           TEST_DATA_DB_USER: ${{ secrets.TEST_DATA_DB_USER }}
