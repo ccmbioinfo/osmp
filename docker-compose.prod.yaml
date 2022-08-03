@@ -26,6 +26,7 @@ services:
       KEYCLOAK_CLIENT_ID:
       KEYCLOAK_REALM:
       MONGO_CONNECTION_STRING:
+      SERVER_SESSION_SECRET:
     ports:
       - 3000:3000
     <<: *common
