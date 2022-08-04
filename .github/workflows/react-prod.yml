@@ -67,7 +67,7 @@ jobs:
     needs: build-react
     environment: OSMP_PROD
     concurrency: OSMP_PROD
-    if: github.event_name == 'push'
+    if: github.ref == 'refs/heads/production'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2

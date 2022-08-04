@@ -56,7 +56,7 @@ jobs:
     needs: build-react
     environment: SSMP_BUILD
     concurrency: SSMP_BUILD
-    if: github.event_name == 'push'
+    if: github.ref == 'refs/heads/develop'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2

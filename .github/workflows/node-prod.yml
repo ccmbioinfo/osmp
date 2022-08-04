@@ -74,7 +74,7 @@ jobs:
     runs-on: [cheo-ri]
     needs:
       - build-server
-    if: github.event_name == 'push'
+    if: github.ref == 'refs/heads/production'
     environment: OSMP_PROD
     concurrency: OSMP_PROD
     steps:
