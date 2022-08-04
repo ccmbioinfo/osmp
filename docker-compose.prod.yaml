@@ -11,7 +11,7 @@ services:
     build: server
     image: ghcr.io/ccmbioinfo/osmp:stable
     cpus: 1.0
-    mem_limit: 5G # To be changed later. 
+    mem_limit: 5G # To be changed later.
     restart: always
     environment:
       G4RD_AUTH_METHOD:
@@ -43,7 +43,7 @@ services:
       DB_USER: "${KEYCLOAK_DB_USER}"
       DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
       PROXY_ADDRESS_FORWARDING: "true"
-      KEYCLOAK_FRONTEND_URL: "https://keycloak.osmp.genomics4rd.ca/auth"
+      KEYCLOAK_FRONTEND_URL: "https://keycloak.genomics4rd.ca/auth"
       AUTH0_BROKER_TOKEN_URL: ${G4RD_TOKEN_URL}
       AUTH0_BROKER_MANAGEMENT_API_URL: ${G4RD_AUTH0_BASE_URL}api/v2/
       AUTH0_BROKER_CLIENT_ID: ${G4RD_CLIENT_ID} # use same creds as osmp server backend
