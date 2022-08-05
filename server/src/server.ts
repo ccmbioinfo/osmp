@@ -16,7 +16,7 @@ import memorystore from 'memorystore';
 
 const app = express();
 
-const memoryStore = memorystore(session);
+const MemoryStore = memorystore(session);
 
 mongoose
   .connect(process.env.MONGO_CONNECTION_STRING!)
@@ -33,7 +33,7 @@ app.use(
     secret: process.env.SERVER_SESSION_SECRET!,
     resave: false,
     saveUninitialized: true,
-    store: new memoryStore({
+    store: new MemoryStore({
       checkPeriod: 86400000, // prune expired entries every 24h
     }),
   })
@@ -41,7 +41,7 @@ app.use(
 
 const keycloak = new Keycloak(
   {
-    store: memoryStore,
+    store: MemoryStore,
   },
   {
     realm: process.env.KEYCLOAK_REALM!,
