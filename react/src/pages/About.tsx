@@ -23,8 +23,8 @@ const AboutPage: React.FC<{}> = () => {
                         programming interfaces (APIs), the OSMP returns rare variants in the gene,
                         along with participant-level phenotypic (HPO terms) and genotypic (zygosity,
                         inheritance, variant quality) information. The portal’s user-friendly design
-                        allows the queriors to filter and sort variant/participant information to
-                        rule matches in or out, reducing the need for time-consuming email
+                        allows you to filter and sort variant/participant information to rule
+                        matches in or out, reducing the need for time-consuming email
                         correspondence. We anticipate that through robust data sharing practices,
                         the OSMP will provide a more accessible and efficient solution to genomic
                         matchmaking for RD researchers, and foster future connections with
@@ -65,8 +65,8 @@ const AboutPage: React.FC<{}> = () => {
                             <Typography variant="h4" lineHeight={1.4} customMargin>
                                 To search for a gene of interest, please specify the genome assembly
                                 (GRCh37 or GRCh38), gene name, maximum allele frequency and variants
-                                stores from one or multiple contributors. The result table will
-                                display variant details including variant annotations and patient
+                                stores from one or more contributors. The result table will display
+                                variant details including variant annotations and patient
                                 information.
                             </Typography>
                         </li>
@@ -95,14 +95,14 @@ const AboutPage: React.FC<{}> = () => {
                             </Typography>
                             <Typography variant="h4" lineHeight={1.4} customMargin>
                                 For variants that are not in the user-specified genome assembly, the
-                                OSMP "liftOver" these variants from their original genome assembly
+                                OSMP lifts over these variants from their original genome assembly
                                 to the desired one using the{' '}
                                 <a href="https://hgdownload.soe.ucsc.edu/downloads.html">
                                     {' '}
                                     UCSC liftOver tool{' '}
                                 </a>
-                                . The column "Original Assembly" displays the variant's genome
-                                assembly in the variant store. The column "Current Assembly"
+                                . The "Original Assembly" column displays the variant's genome
+                                assembly in the variant store. The "Current Assembly" column
                                 displays the genome assembly for the data shown in the result table.
                             </Typography>
                         </li>
