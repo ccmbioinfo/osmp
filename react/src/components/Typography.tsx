@@ -7,6 +7,8 @@ interface TypographyOverrides {
     condensed?: boolean;
     error?: boolean;
     success?: boolean;
+    lineHeight?: number;
+    customMargin?: boolean;
 }
 
 type TagType = keyof typeof Theme.typography;
@@ -17,8 +19,9 @@ interface TypographyProps extends TypographyOverrides {
 
 const Component = styled.p<TypographyProps>`
     user-select: text;
-    margin-inline-end: ${props => props.theme.space[2]};
-    margin: ${props => (props.condensed ? '0' : 'revert')};
+    ${props => !props.customMargin && `margin-inline-end: ${props.theme.space[2]};`}
+    margin: ${props =>
+        props.customMargin ? '20px 300px 20px 0px' : props.condensed ? '0' : 'revert'};
     color: ${props =>
         props.error
             ? props.theme.colors.error
@@ -48,6 +51,7 @@ const Component = styled.p<TypographyProps>`
                 return props.theme.fontFamily.heading;
         }
     }};
+    line-height: ${props => props.lineHeight};
 `;
 
 const Typography: React.FC<TypographyProps> = ({ variant, children, ...userStyles }) => {
