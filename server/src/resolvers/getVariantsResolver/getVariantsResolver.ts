@@ -89,23 +89,27 @@ const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
 
     // Cadd annotations for data in user requested assemblyId
     let data: VariantQueryDataResult[] = dataForAnnotation;
-    const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
-    const settledCadd = (await Promise.allSettled([caddAnnotationsPromise]))[0]; // wait for single promise to settle
 
-    if (
-      settledCadd.status === 'fulfilled' &&
-      !isVariantQuery(settledCadd.value) &&
-      !settledCadd.value.error
-    ) {
-      data = annotateCadd(dataForAnnotation, settledCadd.value.data);
-    } else if (settledCadd.status === 'fulfilled') {
-      errors.push({
-        source: settledCadd.value.source,
-        error: settledCadd.value.error as ErrorResponse,
-      });
+    // Only perform CADD and gnomAD annotations if there are variants to annotate
+    if (data.length) {
+      const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
+      const settledCadd = (await Promise.allSettled([caddAnnotationsPromise]))[0]; // wait for single promise to settle
+
+      if (
+        settledCadd.status === 'fulfilled' &&
+        !isVariantQuery(settledCadd.value) &&
+        !settledCadd.value.error
+      ) {
+        data = annotateCadd(dataForAnnotation, settledCadd.value.data);
+      } else if (settledCadd.status === 'fulfilled') {
+        errors.push({
+          source: settledCadd.value.source,
+          error: settledCadd.value.error as ErrorResponse,
+        });
+      }
+
+      data = await annotateGnomad(assemblyId, annotationPosition, data);
     }
-
-    data = await annotateGnomad(assemblyId, annotationPosition, data ?? dataForAnnotation);
 
     // return unmapped variants if there's any
     if (unliftedVariants.length) {
