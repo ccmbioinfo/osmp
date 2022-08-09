@@ -10,8 +10,8 @@ services:
   server:
     build: server
     image: ghcr.io/ccmbioinfo/osmp:stable
-    cpus: 1.0
-    mem_limit: 5G # To be changed later.
+    cpus: 2.0
+    mem_limit: 10G
     restart: always
     environment:
       G4RD_AUTH_METHOD:
