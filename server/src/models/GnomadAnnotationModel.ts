@@ -69,12 +69,6 @@ const GnomadGRCh37AnnotationSchema = new mongoose.Schema<
   an: {
     type: Number,
   },
-  cdna: {
-    type: String,
-  },
-  transcript: {
-    type: String,
-  },
 });
 
 const GnomadGRCh37GenomeAnnotationSchema = new mongoose.Schema<
@@ -90,7 +84,7 @@ const GnomadGRCh38AnnotationSchema = new mongoose.Schema<
 const getAnnotations = async (
   model: GnomadGenomeAnnotationModel | GnomadGRCh37ExomeAnnotationModel,
   ids: AnnotationInput,
-  omittedFields: string[]
+  omittedFields: string[] = []
 ) => {
   const { start, end, coordinates } = ids;
 
@@ -106,10 +100,17 @@ const getAnnotations = async (
 };
 
 GnomadGRCh37AnnotationSchema.statics.getAnnotations = async function (ids: AnnotationInput) {
-  const exomeAnnotations = await getAnnotations(this, ids, ['filter', 'gene']);
+  const exomeAnnotations = await getAnnotations(this, ids, [
+    'cdna',
+    'filter',
+    'gene',
+    'transcript',
+  ]);
   const genomeAnnotations = await getAnnotations(GnomadGRCh37GenomeAnnotationModel, ids, [
+    'cdna',
     'gene',
     'source',
+    'transcript',
   ]);
 
   logger.debug(

@@ -52,12 +52,10 @@ export const annotate = (
       const {
         af: primaryAF,
         alt,
-        cdna,
         chrom,
         nhomalt,
         pos,
         ref,
-        transcript,
         ...rest
       } = primaryAnnotationKeyMap[variantKey];
       /* eslint-enable @typescript-eslint/no-unused-vars */
@@ -70,18 +68,6 @@ export const annotate = (
         // The overall allele frequency is calculated as the greater value between the exome allele frequency and the genome allele frequency
         af: Math.max(primaryAF, secondaryAF),
         gnomadHom: nhomalt,
-        // Ideally, the cdna value should come from the CADD annotations (if available),
-        // but it can also be determined using the values from gnomAD as a fallback
-        cdna:
-          r.variant.info?.cdna && r.variant.info?.cdna !== 'NA'
-            ? r.variant.info?.cdna
-            : cdna
-            ? `c.${cdna}${ref}>${alt}`
-            : 'NA',
-        transcript:
-          r.variant.info?.transcript && r.variant.info?.transcript !== 'NA'
-            ? r.variant.info?.transcript
-            : transcript ?? '',
         ...rest,
       };
     }

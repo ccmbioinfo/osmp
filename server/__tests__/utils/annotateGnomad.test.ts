@@ -13,7 +13,6 @@ import {
 describe('Test whether variants get annotated', () => {
   const annotation: Omit<GnomadBaseAnnotation, 'af'> = {
     alt: 'T',
-    cdna: '1234',
     chrom: '1',
     nhomalt: 1,
     pos: 123456,
@@ -24,7 +23,6 @@ describe('Test whether variants get annotated', () => {
       ...annotation,
       af: 1,
       an: 1,
-      transcript: 'ENST00000123456',
     },
   ];
   const secondaryAnnotations: GnomadGenomeAnnotation[] = [
@@ -62,9 +60,7 @@ describe('Test whether variants get annotated', () => {
       expect(nodeData.variant.info).toEqual({
         af: Math.max(primaryAnnotations[0].af, secondaryAnnotations[0].af),
         an: primaryAnnotations[0].an,
-        cdna: `c.${primaryAnnotations[0].cdna}${primaryAnnotations[0].ref}>${primaryAnnotations[0].alt}`,
         gnomadHom: primaryAnnotations[0].nhomalt,
-        transcript: primaryAnnotations[0].transcript,
       })
     );
   });

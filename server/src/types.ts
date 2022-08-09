@@ -215,9 +215,7 @@ export interface CaddAnnotation extends VariantCoordinate {
 
 export interface GnomadBaseAnnotation extends VariantCoordinate {
   af: number;
-  cdna?: string;
   nhomalt: number;
-  transcript?: string;
 }
 
 export interface GnomadGRCh37ExomeAnnotation extends GnomadBaseAnnotation {
