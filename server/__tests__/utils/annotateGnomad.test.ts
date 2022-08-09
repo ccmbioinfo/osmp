@@ -1,4 +1,4 @@
-import { annotate } from '../../src/resolvers/getVariantsResolver/utils/annotateGnomad';
+import annotateGnomad from '../../src/resolvers/getVariantsResolver/utils/annotateGnomad';
 import {
   GnomadAnnotations,
   GnomadBaseAnnotation,
@@ -53,7 +53,7 @@ describe('Test whether variants get annotated', () => {
       },
     ];
 
-    const result = annotate(variants, annotations);
+    const result = annotateGnomad(variants, annotations);
 
     // Check if the corresponding variant has info fields populated
     result.forEach(nodeData =>
@@ -67,7 +67,7 @@ describe('Test whether variants get annotated', () => {
 
   it('test empty variants data array', async () => {
     const variants: VariantQueryDataResult[] = [];
-    const result = annotate(variants, annotations);
+    const result = annotateGnomad(variants, annotations);
 
     expect(result).toEqual(variants);
   });
@@ -91,7 +91,7 @@ describe('Test whether variants get annotated', () => {
       },
     ];
 
-    const result = annotate(variants, annotations);
+    const result = annotateGnomad(variants, annotations);
 
     expect(result).toEqual(variants);
   });

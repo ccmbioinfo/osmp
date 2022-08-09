@@ -231,7 +231,7 @@ export interface GnomadAnnotations {
   secondaryAnnotations: GnomadGenomeAnnotation[];
 }
 
-export interface ErrorResponse {
+interface ErrorResponse {
   id: string;
   code: number | string;
   message?: string | null;
@@ -245,6 +245,7 @@ export interface QueryResult<T> {
 
 export type VariantQueryResponse = QueryResult<VariantQueryDataResult[]>;
 export type CADDAnnotationQueryResponse = QueryResult<CaddAnnotation[]>;
+export type GnomadAnnotationQueryResponse = QueryResult<GnomadAnnotations>;
 
 export interface SourceError {
   source: string;

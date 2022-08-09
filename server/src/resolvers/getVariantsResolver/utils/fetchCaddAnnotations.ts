@@ -1,10 +1,10 @@
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
-import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
 import fetch from 'cross-fetch';
+import { QueryResponseError } from './queryResponseError';
 import { timeitAsync } from '../../../utils/timeit';
 
 const ANNOTATION_URL_38 =
@@ -135,33 +135,35 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
 };
 
 const fetchAnnotations = timeitAsync('fetchCaddAnnotations')(
-  (position: string, assemblyId: string): Promise<CADDAnnotationQueryResponse> => {
-    const resolvedAssemblyId = resolveAssembly(assemblyId);
+  async (position: string, assemblyId: string): Promise<CADDAnnotationQueryResponse> => {
     const source = 'CADD annotations';
+    const resolvedAssemblyId = resolveAssembly(assemblyId);
     const [start, end] = position.replace(/.+:/, '').split('-');
     const size = +end - +start;
+
     if (size > 200_000) {
-      return Promise.resolve({
-        error: {
-          id: uuidv4(),
-          code: 422,
-          message: `Gene of size ${size.toLocaleString()}bp is too large to annotate with VEP. Annotating with gnomAD only!`,
-        },
+      throw new QueryResponseError({
+        code: 422,
+        message: `Gene of size ${size.toLocaleString()}bp is too large to annotate with VEP. Annotating with gnomAD only!`,
         source,
-        data: [],
       });
-    } else {
-      return _getAnnotations(position, resolvedAssemblyId)
-        .then(result => ({ source, data: _formatAnnotations(result, resolvedAssemblyId) }))
-        .catch(error => ({
-          error: {
-            id: uuidv4(),
-            code: 500,
-            message: `Error fetching annotations: ${error}`,
-          },
-          source,
-          data: [],
-        }));
+    }
+
+    try {
+      const annotations = await _getAnnotations(position, resolvedAssemblyId);
+
+      return {
+        source: 'CADD annotations',
+        data: _formatAnnotations(annotations, resolvedAssemblyId),
+      };
+    } catch (err) {
+      if (err instanceof QueryResponseError) throw err;
+
+      throw new QueryResponseError({
+        code: 500,
+        message: `Error fetching CADD annotations: ${err}`,
+        source,
+      });
     }
   }
 );

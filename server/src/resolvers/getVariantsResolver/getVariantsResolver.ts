@@ -2,7 +2,7 @@ import logger from '../../logger';
 import {
   CADDAnnotationQueryResponse,
   CombinedVariantQueryResponse,
-  ErrorResponse,
+  GnomadAnnotationQueryResponse,
   QueryInput,
   SourceError,
   VariantQueryDataResult,
@@ -12,8 +12,10 @@ import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
+import fetchGnomadAnnotations from './utils/fetchGnomadAnnotations';
 import annotateGnomad from './utils/annotateGnomad';
 import liftover from './utils/liftOver';
+import { QueryResponseError } from './utils/queryResponseError';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 import { timeitAsync } from '../../utils/timeit';
 
@@ -21,8 +23,9 @@ const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVaria
   await resolveVariantQuery(args);
 
 const isVariantQuery = (
-  arg: VariantQueryResponse | CADDAnnotationQueryResponse
-): arg is VariantQueryResponse => arg.source !== 'CADD annotations';
+  arg: VariantQueryResponse | CADDAnnotationQueryResponse | GnomadAnnotationQueryResponse
+): arg is VariantQueryResponse =>
+  arg.source !== 'CADD annotations' && arg.source !== 'gnomAD annotations';
 
 const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
   async (args: QueryInput): Promise<CombinedVariantQueryResponse> => {
@@ -92,23 +95,36 @@ const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
 
     // Only perform CADD and gnomAD annotations if there are variants to annotate
     if (data.length) {
-      const caddAnnotationsPromise = fetchCaddAnnotations(annotationPosition, assemblyId);
-      const settledCadd = (await Promise.allSettled([caddAnnotationsPromise]))[0]; // wait for single promise to settle
+      try {
+        const { data: caddAnnotations } = await fetchCaddAnnotations(
+          annotationPosition,
+          assemblyId
+        );
 
-      if (
-        settledCadd.status === 'fulfilled' &&
-        !isVariantQuery(settledCadd.value) &&
-        !settledCadd.value.error
-      ) {
-        data = annotateCadd(dataForAnnotation, settledCadd.value.data);
-      } else if (settledCadd.status === 'fulfilled') {
-        errors.push({
-          source: settledCadd.value.source,
-          error: settledCadd.value.error as ErrorResponse,
-        });
+        data = annotateCadd(dataForAnnotation, caddAnnotations);
+      } catch (err) {
+        if (err instanceof QueryResponseError) {
+          const { source, ...error } = err as QueryResponseError;
+
+          errors.push({ source, error });
+        }
       }
 
-      data = await annotateGnomad(assemblyId, annotationPosition, data);
+      try {
+        const { data: gnomadAnnotations } = await fetchGnomadAnnotations(
+          assemblyId,
+          annotationPosition,
+          data
+        );
+
+        data = annotateGnomad(dataForAnnotation, gnomadAnnotations);
+      } catch (err) {
+        if (err instanceof QueryResponseError) {
+          const { source, ...error } = err;
+
+          errors.push({ source, error });
+        }
+      }
     }
 
     // return unmapped variants if there's any
