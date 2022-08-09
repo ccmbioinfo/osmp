@@ -55,6 +55,7 @@ const addAdditionalFieldsAndFormatNulls = (
     cdna: results.cdna || 'NA',
     aaChange: results.aaChange || 'NA',
     af: results.af || 0,
+    gnomadHom: results.gnomadHom || 0,
 });
 
 export const calculateColumnWidth = (
