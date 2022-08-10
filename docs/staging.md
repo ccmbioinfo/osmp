@@ -1,0 +1,11 @@
+# Staging
+
+OSMP staging instance is connected to [G4RD Phenotips staging instance](https://staging.phenotips.genomics4rd.ca).
+
+OSMP is deployed via Compose at [https://osmp.ccmdev.ca/](https://osmp.ccmdev.ca/). For G4RD data soource, OSMP staging instance is connected to the [staging instance of G4RD Phenotips](https://osmp.ccmdev.ca/). To deploy the frontend, compiled static bundles are uploaded to a designated MinIO bucket. The routing between the frontend and backend is handled by the HAProxy reverse proxy.
+
+## Continuous deployment through Github Actions
+
+On each commit to the branch "develop", if the changes affect the backend, a Github Actions workflow [Build, test, and deploy backend to staging](https://github.com/ccmbioinfo/osmp/blob/develop/.github/workflows/node.yml) is run. After the Docker image build and test stages pass, we move to the deployment stage. This stage runs on a self-hosted Actions runner that is networked with the staging host, and deploys the backend to the staging host.
+
+If the changes affect the frontend, a different workflow [Build react app and deploy to staging](https://github.com/ccmbioinfo/osmp/blob/develop/.github/workflows/react.yml) builds the frontend, incorporating environment-specific configurations as needed, and uploads the compiled static bundles to a designated S3 (MinIO) bucket.
