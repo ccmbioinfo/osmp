@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useApolloClient } from '@apollo/client';
+import React from 'react';
+import { NetworkStatus, useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
 import { useFetchVariantsQuery } from '../apollo/hooks';
@@ -29,7 +29,6 @@ import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
-import { NetworkStatus } from 'apollo-client';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
