@@ -1,46 +1,48 @@
-import GnomadAnnotationModel from '../../../models/GnomadAnnotationModel';
-import getCoordinates from '../../../models/utils/getCoordinates';
-import { GnomadAnnotation, VariantQueryDataResult } from '../../../types';
+import {
+  GnomadAnnotations,
+  GnomadGenomeAnnotation,
+  GnomadGRCh37ExomeAnnotation,
+  VariantQueryDataResult,
+} from '../../../types';
 
-const annotateGnomad = async (
-  queryResponse: VariantQueryDataResult[]
-): Promise<VariantQueryDataResult[]> => {
-  const annotationCoordinates = getCoordinates(queryResponse);
+const _mapToAnnotationsKeyMap = (
+  annotations: (GnomadGRCh37ExomeAnnotation | GnomadGenomeAnnotation)[]
+) => Object.fromEntries(annotations.map(a => [`${a.ref}-${a.pos}-${a.chrom}`, a]));
 
-  const annotations = await GnomadAnnotationModel.getAnnotations(
-    annotationCoordinates,
-    'gnomAD_GRCh37'
-  );
-
-  return annotate(queryResponse, annotations);
-};
-
-export const annotate = (
+export const annotateGnomad = (
   queryResponse: VariantQueryDataResult[],
-  annotations: GnomadAnnotation[]
+  annotations: GnomadAnnotations
 ) => {
-  const annotationKeyMap = Object.fromEntries(
-    annotations.map(a => [`${a.ref}-${a.pos}-${a.chrom}-${a.assembly.replace(/\D/g, '')}`, a])
-  );
+  const { primaryAnnotations, secondaryAnnotations } = annotations;
+  const primaryAnnotationKeyMap = _mapToAnnotationsKeyMap(primaryAnnotations);
+  const secondaryAnnotationKeyMap = _mapToAnnotationsKeyMap(secondaryAnnotations);
 
   queryResponse.forEach(r => {
-    const variantKey = `${r.variant.ref}-${r.variant.start}-${
-      r.variant.chromosome
-    }-${r.variant.assemblyId.replace(/\D/g, '')}`;
+    const variantKey = `${r.variant.ref}-${r.variant.start}-${`${
+      r.variant.assemblyIdCurrent === 'GRCh38' ? 'chr' : ''
+    }${r.variant.chromosome}`}`;
 
-    if (variantKey in annotationKeyMap) {
-      /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-      const { alt, assembly, cdna, chrom, ref, pos, type, nhomalt, ...rest } =
-        annotationKeyMap[variantKey];
+    if (variantKey in primaryAnnotationKeyMap) {
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const {
+        af: primaryAF,
+        alt,
+        chrom,
+        nhomalt,
+        pos,
+        ref,
+        ...rest
+      } = primaryAnnotationKeyMap[variantKey];
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+      // For the GRCh38 assembly, there aren't any secondary gnomAD annotations, so secondaryAF will always be 0
+      // and the overall allele frequency will simply be the genome allele frequency
+      const secondaryAF = secondaryAnnotationKeyMap?.[variantKey]?.af ?? 0;
+
       r.variant.info = {
         ...r.variant.info,
+        // The overall allele frequency is calculated as the greater value between the exome allele frequency and the genome allele frequency
+        af: Math.max(primaryAF, secondaryAF),
         gnomadHom: nhomalt,
-        cdna:
-          r.variant.info?.cdna && r.variant.info?.cdna !== 'NA'
-            ? r.variant.info?.cdna
-            : cdna
-            ? `c.${cdna}${ref}>${alt}`
-            : 'NA',
         ...rest,
       };
     }

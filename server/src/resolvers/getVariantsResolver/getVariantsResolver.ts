@@ -2,6 +2,7 @@ import logger from '../../logger';
 import {
   CADDAnnotationQueryResponse,
   CombinedVariantQueryResponse,
+  GnomadAnnotationQueryResponse,
   QueryInput,
   SourceError,
   VariantQueryDataResult,
@@ -11,9 +12,12 @@ import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
+import fetchGnomadAnnotations from './utils/fetchGnomadAnnotations';
 import annotateGnomad from './utils/annotateGnomad';
 import liftover from './utils/liftOver';
+import { QueryResponseError } from './utils/queryResponseError';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
+import { timeitAsync } from '../../utils/timeit';
 import { SlurmApi, Configuration } from '../../slurm';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
@@ -97,9 +101,9 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     );
     console.log(slurmJob.data.job_id);
   }
-  
 
-  
+
+
 
   // filter data that are not in user requested assemblyId
   const dataForLiftover = combinedResults.filter(v => v.variant.assemblyId !== assemblyId);
@@ -111,7 +115,7 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     } else return false;
   });
   let unliftedVariants: VariantQueryDataResult[] = [];
-  
+
   // perform liftOver if needed
   if (dataForLiftover.length) {
     const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
@@ -135,24 +139,27 @@ const resolveVariantQuery = async (args: QueryInput): Promise<CombinedVariantQue
     data = await annotateGnomad(data ?? dataForAnnotation);
   }
 
-  // return unmapped variants if there's any
-  if (unliftedVariants.length) {
-    data = data.concat(unliftedVariants);
+    // return unmapped variants if there's any
+    if (unliftedVariants.length) {
+      data = data.concat(unliftedVariants);
+    }
+    return { errors, data };
   }
-  return { errors, data };
-};
+);
 
-const buildSourceQuery = (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
-  switch (source) {
-    case 'local':
-      return getLocalQuery();
-    case 'remote-test':
-      return getRemoteTestNodeQuery(args);
-    case 'g4rd':
-      return getG4rdNodeQuery(args);
-    default:
-      throw new Error(`source ${source} not found!`);
+const buildSourceQuery = timeitAsync('buildSourceQuery')(
+  (source: string, args: QueryInput): Promise<VariantQueryResponse> => {
+    switch (source) {
+      case 'local':
+        return getLocalQuery();
+      case 'remote-test':
+        return getRemoteTestNodeQuery(args);
+      case 'g4rd':
+        return getG4rdNodeQuery(args);
+      default:
+        throw new Error(`source ${source} not found!`);
+    }
   }
-};
+);
 
 export default getVariants;

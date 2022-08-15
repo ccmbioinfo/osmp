@@ -1,10 +1,11 @@
 import resolveAssembly from './resolveAssembly';
 import resolveChromosome from './resolveChromosome';
-import { v4 as uuidv4 } from 'uuid';
 import { CADDAnnotationQueryResponse, CaddAnnotation } from '../../../types';
 import { TabixIndexedFile } from '@gmod/tabix';
 import { RemoteFile, Fetcher } from 'generic-filehandle';
 import fetch from 'cross-fetch';
+import { QueryResponseError } from './queryResponseError';
+import { timeitAsync } from '../../../utils/timeit';
 
 const ANNOTATION_URL_38 =
   'https://krishna.gs.washington.edu/download/CADD/v1.6/GRCh38/whole_genome_SNVs_inclAnno.tsv.gz';
@@ -57,9 +58,9 @@ const _getAnnotations = async (position: string, assemblyId: string) => {
 /**
  * Takes in tabix query response and adapts it to @typedef CaddAnnotation
  * @param annotations: a list of tab-delimited strings from CADD annotation TSV.
- * Indexes for headers in the GRCh38 annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf. 
- * For GRCh37 annotation, please visit https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.4.pdf. 
- * Note that in GRCh37 version 1.6, an addtional 9 fields for SpliceAI and MMSplice are added after the field "Grantham". 
+ * Indexes for headers in the GRCh38 annotation TSV can be found at https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.6.pdf.
+ * For GRCh37 annotation, please visit https://cadd.gs.washington.edu/static/ReleaseNotes_CADD_v1.4.pdf.
+ * Note that in GRCh37 version 1.6, an addtional 9 fields for SpliceAI and MMSplice are added after the field "Grantham".
  *  Chrom: 1
     Pos: 2
     Ref: 3
@@ -133,37 +134,38 @@ const _formatAnnotations = (annotations: string[], assemblyId: string) => {
   return result;
 };
 
-const fetchAnnotations = (
-  position: string,
-  assemblyId: string
-): Promise<CADDAnnotationQueryResponse> => {
-  const resolvedAssemblyId = resolveAssembly(assemblyId);
-  const source = 'CADD annotations';
-  const [start, end] = position.replace(/.+:/, '').split('-');
-  const size = +end - +start;
-  if (size > 600000) {
-    return Promise.resolve({
-      error: {
-        id: uuidv4(),
+const fetchAnnotations = timeitAsync('fetchCaddAnnotations')(
+  async (position: string, assemblyId: string): Promise<CADDAnnotationQueryResponse> => {
+    const source = 'CADD annotations';
+    const resolvedAssemblyId = resolveAssembly(assemblyId);
+    const [start, end] = position.replace(/.+:/, '').split('-');
+    const size = +end - +start;
+
+    if (size > 200_000) {
+      throw new QueryResponseError({
         code: 422,
         message: `Gene of size ${size.toLocaleString()}bp is too large to annotate with VEP. Annotating with gnomAD only!`,
-      },
-      source,
-      data: [],
-    });
-  } else {
-    return _getAnnotations(position, resolvedAssemblyId)
-      .then(result => ({ source, data: _formatAnnotations(result, resolvedAssemblyId) }))
-      .catch(error => ({
-        error: {
-          id: uuidv4(),
-          code: 500,
-          message: `Error fetching annotations: ${error}`,
-        },
         source,
-        data: [],
-      }));
+      });
+    }
+
+    try {
+      const annotations = await _getAnnotations(position, resolvedAssemblyId);
+
+      return {
+        source: 'CADD annotations',
+        data: _formatAnnotations(annotations, resolvedAssemblyId),
+      };
+    } catch (err) {
+      if (err instanceof QueryResponseError) throw err;
+
+      throw new QueryResponseError({
+        code: 500,
+        message: `Error fetching CADD annotations: ${err}`,
+        source,
+      });
+    }
   }
-};
+);
 
 export default fetchAnnotations;

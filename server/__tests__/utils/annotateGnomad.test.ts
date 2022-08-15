@@ -1,24 +1,38 @@
-import { annotate } from '../../src/resolvers/getVariantsResolver/utils/annotateGnomad';
-import { GnomadAnnotation, VariantQueryDataResult } from '../../src/types';
+import annotateGnomad from '../../src/resolvers/getVariantsResolver/utils/annotateGnomad';
+import {
+  GnomadAnnotations,
+  GnomadBaseAnnotation,
+  GnomadGenomeAnnotation,
+  GnomadGRCh37ExomeAnnotation,
+  VariantQueryDataResult,
+} from '../../src/types';
 
 /**
     Confirms that the variant query response is annotated before getting returned to the frontend
 */
 describe('Test whether variants get annotated', () => {
-  const annotations: GnomadAnnotation[] = [
+  const annotation: Omit<GnomadBaseAnnotation, 'af'> = {
+    alt: 'T',
+    chrom: '1',
+    nhomalt: 1,
+    pos: 123456,
+    ref: 'A',
+  };
+  const primaryAnnotations: GnomadGRCh37ExomeAnnotation[] = [
     {
+      ...annotation,
       af: 1,
-      alt: 'T',
       an: 1,
-      assembly: 'gnomAD_GRCh37',
-      cdna: '1234',
-      chrom: '1',
-      nhomalt: 1,
-      pos: 123456,
-      ref: 'A',
-      type: 'exome',
     },
   ];
+  const secondaryAnnotations: GnomadGenomeAnnotation[] = [
+    {
+      ...annotation,
+      ac: 1,
+      af: 2,
+    },
+  ];
+  const annotations: GnomadAnnotations = { primaryAnnotations, secondaryAnnotations };
 
   it('finds the correct coordinates and returns a unique annotation', () => {
     const variants: VariantQueryDataResult[] = [
@@ -39,22 +53,21 @@ describe('Test whether variants get annotated', () => {
       },
     ];
 
-    const result = annotate(variants, annotations);
+    const result = annotateGnomad(variants, annotations);
 
     // Check if the corresponding variant has info fields populated
     result.forEach(nodeData =>
       expect(nodeData.variant.info).toEqual({
-        af: annotations[0].af,
-        an: annotations[0].an,
-        cdna: `c.${annotations[0].cdna}${annotations[0].ref}>${annotations[0].alt}`,
-        gnomadHom: annotations[0].nhomalt,
+        af: Math.max(primaryAnnotations[0].af, secondaryAnnotations[0].af),
+        an: primaryAnnotations[0].an,
+        gnomadHom: primaryAnnotations[0].nhomalt,
       })
     );
   });
 
   it('test empty variants data array', async () => {
     const variants: VariantQueryDataResult[] = [];
-    const result = annotate(variants, annotations);
+    const result = annotateGnomad(variants, annotations);
 
     expect(result).toEqual(variants);
   });
@@ -78,7 +91,7 @@ describe('Test whether variants get annotated', () => {
       },
     ];
 
-    const result = annotate(variants, annotations);
+    const result = annotateGnomad(variants, annotations);
 
     expect(result).toEqual(variants);
   });

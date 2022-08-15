@@ -12,10 +12,14 @@ import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import validateToken from './patches/validateToken';
 import mongoose from 'mongoose';
+import memorystore from 'memorystore';
 
 const app = express();
 
-const memoryStore = new session.MemoryStore();
+const MemoryStore = memorystore(session);
+const memoryStore = new MemoryStore({
+  checkPeriod: 86400000, // prune expired entries every 24h
+});
 
 mongoose
   .connect(process.env.MONGO_CONNECTION_STRING!)
@@ -29,7 +33,7 @@ mongoose
 
 app.use(
   session({
-    secret: 'ssmp',
+    secret: process.env.SERVER_SESSION_SECRET!,
     resave: false,
     saveUninitialized: true,
     store: memoryStore,
