@@ -2,7 +2,6 @@ import logger from '../../logger';
 import {
   CADDAnnotationQueryResponse,
   CombinedVariantQueryResponse,
-  GnomadAnnotationQueryResponse,
   QueryInput,
   SourceError,
   VariantQueryDataResult,
@@ -12,10 +11,8 @@ import getLocalQuery from './adapters/localQueryAdapter';
 import getRemoteTestNodeQuery from './adapters/remoteTestNodeAdapter';
 import fetchCaddAnnotations from './utils/fetchCaddAnnotations';
 import annotateCadd from './utils/annotateCadd';
-import fetchGnomadAnnotations from './utils/fetchGnomadAnnotations';
 import annotateGnomad from './utils/annotateGnomad';
 import liftover from './utils/liftOver';
-import { QueryResponseError } from './utils/queryResponseError';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 import { timeitAsync } from '../../utils/timeit';
 import { SlurmApi, Configuration } from '../../slurm';
