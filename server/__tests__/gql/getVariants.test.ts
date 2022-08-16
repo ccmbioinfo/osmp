@@ -70,6 +70,7 @@ describe('Test minimal getVariants query', () => {
               levelSeverity
               onsetType
               phenotypeId
+              observed
             }
             sex
           }

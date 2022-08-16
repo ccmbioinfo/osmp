@@ -31,6 +31,7 @@ describe('Test local query adapter', () => {
               levelSeverity: 'high',
               onsetType: '3',
               phenotypeId: '4',
+              observed: true,
             })),
         },
         variant: {
