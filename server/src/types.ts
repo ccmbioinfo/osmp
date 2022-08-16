@@ -58,6 +58,7 @@ export interface PhenotypicFeaturesFields {
   onsetType?: Maybe<string>;
   phenotypeId?: Maybe<string>;
   phenotypeLabel?: Maybe<string>;
+  observed?: Maybe<boolean>;
 }
 
 export interface DiseaseFields {
@@ -198,6 +199,7 @@ export interface Feature {
   qualifiers?: FeatureQualifier[];
 }
 export interface NonStandardFeature {
+  id?: undefined; // does not occur; used for type guarding
   label?: string;
   categories?: { id?: string; label?: string }[];
   type?: string; // "should be 'phenotype'"

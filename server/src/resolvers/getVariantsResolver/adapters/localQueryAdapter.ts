@@ -63,6 +63,7 @@ export const transformLocalQueryResponse: ResultTransformer<LocalQueryResponse[]
             levelSeverity: 'high',
             onsetType: '3',
             phenotypeId: '4',
+            observed: true,
           })),
       },
       variant: {

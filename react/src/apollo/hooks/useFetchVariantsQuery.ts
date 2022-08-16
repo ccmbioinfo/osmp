@@ -78,6 +78,7 @@ const fetchVariantsQuery = gql`
                         onsetType
                         phenotypeId
                         phenotypeLabel
+                        observed
                     }
                     sex
                 }

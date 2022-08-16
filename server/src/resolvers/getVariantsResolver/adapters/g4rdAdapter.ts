@@ -15,9 +15,12 @@ import {
   G4RDVariantQueryResult,
   Disorder,
   IndividualInfoFields,
+  PhenotypicFeaturesFields,
+  NonStandardFeature,
+  Feature,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
-import { timeit } from '../../../utils/timeit';
+import { timeit, timeitAsync } from '../../../utils/timeit';
 import resolveAssembly from '../utils/resolveAssembly';
 
 /* eslint-disable camelcase */
@@ -31,7 +34,7 @@ type G4RDNodeQueryError = AxiosError<string>;
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
  */
-const getG4rdNodeQuery = async ({
+const _getG4rdNodeQuery = async ({
   input: { gene: geneInput, variant },
 }: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
@@ -65,7 +68,11 @@ const getG4rdNodeQuery = async ({
         variant,
       },
       {
-        headers: { Authorization, 'Content-Type': 'application/json', Accept: 'application/json' },
+        headers: {
+          Authorization,
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
       }
     );
 
@@ -134,6 +141,12 @@ const getG4rdNodeQuery = async ({
   };
 };
 
+/**
+ * @param args VariantQueryInput
+ * @returns  Promise<ResolvedVariantQueryResult>
+ */
+const getG4rdNodeQuery = timeitAsync('getG4rdNodeQuery')(_getG4rdNodeQuery);
+
 const getAuthHeader = async () => {
   const {
     G4RD_USERNAME: username,
@@ -188,6 +201,9 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
   }
 };
 
+const isObserved = (feature: Feature | NonStandardFeature) =>
+  feature.observed === 'yes' ? true : feature.observed === 'no' ? false : undefined;
+
 export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = timeit(
   'transformG4RDQueryResponse'
 )(
@@ -208,6 +224,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
       let info: IndividualInfoFields = {};
       let ethnicity: string = '';
       let disorders: Disorder[] = [];
+      let phenotypicFeatures: PhenotypicFeaturesFields[] = individual.phenotypicFeatures || [];
 
       if (patient) {
         const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
@@ -228,6 +245,34 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
           clinicalStatus,
           disorders,
         };
+        // variant response contains all phenotypic features listed,
+        // even if some of them are explicitly _not_ observed by clinician and recorded as such
+        if (individual.phenotypicFeatures !== null && individual.phenotypicFeatures !== undefined) {
+          const features = [...(patient.features ?? []), ...(patient.nonstandard_features ?? [])];
+          const detailedFeatures = individual.phenotypicFeatures;
+          // build list of features the safe way
+          const detailedFeatureMap = Object.fromEntries(
+            detailedFeatures.map(feat => [feat.phenotypeId, feat])
+          );
+          const finalFeatures: PhenotypicFeaturesFields[] = features.map(feat => {
+            if (feat.id === undefined) {
+              return {
+                ageOfOnset: null,
+                dateOfOnset: null,
+                levelSeverity: null,
+                onsetType: null,
+                phenotypeId: feat.id,
+                phenotypeLabel: feat.label,
+                observed: isObserved(feat),
+              };
+            }
+            return {
+              ...detailedFeatureMap[feat.id],
+              observed: isObserved(feat),
+            };
+          });
+          phenotypicFeatures = finalFeatures;
+        }
       }
 
       const variant: VariantResponseFields = {
@@ -248,6 +293,7 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
         ethnicity,
         info,
         familyId,
+        phenotypicFeatures,
       };
       return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
     });
