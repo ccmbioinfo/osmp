@@ -148,6 +148,7 @@ export interface G4RDVariantQueryResult {
 }
 
 /* G4RD GET patients endpoint schema */
+// https://docs.phenotips.com/reference/fetchpatients-1
 export interface Contact {
   institution?: string;
   name?: string;
@@ -176,6 +177,32 @@ export interface Notes {
 export interface Solved {
   status: 'solved' | 'unsolved' | '';
 }
+export interface FeatureQualifier {
+  id?: string;
+  label?: string;
+  type?: // these types are the "accepted options" according to the docs
+  | 'age_of_onset'
+    | 'laterality'
+    | 'pace_of_progression'
+    | 'severity'
+    | 'spatial_pattern'
+    | 'temporal_pattern'
+    | string;
+}
+export interface Feature {
+  id?: string;
+  label?: string;
+  type?: string; // "should be 'phenotype'"
+  observed?: string; // may be 'yes' or 'no' or empty
+  notes?: string;
+  qualifiers?: FeatureQualifier[];
+}
+export interface NonStandardFeature {
+  label?: string;
+  categories?: { id?: string; label?: string }[];
+  type?: string; // "should be 'phenotype'"
+  observed?: string; // may be 'yes' or 'no' or empty
+}
 export interface G4RDPatientQueryResult {
   notes: Notes;
   ethnicity: Ethnicity;
@@ -184,6 +211,8 @@ export interface G4RDPatientQueryResult {
   id: string;
   genes?: Gene[];
   solved?: Solved;
+  features?: Feature[];
+  nonstandard_features?: NonStandardFeature[];
 }
 
 /* End of G4RD GET patients endpoint schema */
