@@ -15,7 +15,10 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({
     return (
         <CellViewer<PhenotypicFeaturesFields>
             {...{ rowExpanded, toggleRowExpanded }}
-            formatItemText={phenotype => phenotype.phenotypeLabel || ''}
+            formatItemText={phenotype => {
+                const prefix = phenotype.observed === false ? 'NO ' : 'YES ';
+                return phenotype.phenotypeLabel ? prefix + phenotype.phenotypeLabel : '';
+            }}
             itemName={{ singular: 'Phenotype' }}
             items={phenotypes}
         />
