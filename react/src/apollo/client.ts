@@ -125,6 +125,7 @@ export const useLazyApolloQuery = <T, V>(
         context: { dispatch },
         fetchPolicy: 'cache-first',
         errorPolicy: 'all',
+        notifyOnNetworkStatusChange: true,
         ...options,
     });
 };
