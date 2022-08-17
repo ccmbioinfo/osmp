@@ -49,6 +49,7 @@ const addAdditionalFieldsAndFormatNulls = (
     uniqueId: number
 ): ResultTableColumns => ({
     ...results,
+    chromosome: results.chromosome.replace('chr', ''),
     emptyCaseDetails: '',
     emptyVariationDetails: '',
     uniqueId,
