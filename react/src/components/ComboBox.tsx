@@ -2,9 +2,8 @@ import React, { ChangeEvent, useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 import { FaCaretDown } from 'react-icons/fa';
 import styled from 'styled-components/macro';
-import { Background, Typography } from '../components';
 import { useClickAway } from '../hooks';
-import { GeneSelectionValue } from './GeneSearch';
+import Button from './Button';
 import Input, { InputProps } from './Input';
 import { Flex } from './Layout';
 import SelectableList, { SelectableListItem, SelectableListWrapper } from './SelectableList';
@@ -12,6 +11,13 @@ import Spinner from './Spinner';
 
 interface ComboBoxProps<T> {
     options: SelectableListItem<T | T[]>[];
+    fetchMoreOptions?: () => void;
+    allOptionsFetched?: boolean;
+    fetchMoreButtonText?: {
+        fetch?: string;
+        fetching?: string;
+        allFetched?: string;
+    };
     loading?: boolean;
     onSelect: (item: T) => void;
     onChange?: (searchTerm: string) => void;
@@ -20,6 +26,7 @@ interface ComboBoxProps<T> {
     isMulti?: boolean;
     selection?: T[];
     value: string;
+    subtext?: React.ReactNode;
 }
 
 export const Wrapper = styled(Flex)`
@@ -53,12 +60,24 @@ export const Header = styled(Flex)`
     flex-wrap: nowrap;
 `;
 
-/* Typeguard for type definition of option */
-const isGene = (arg: any): arg is GeneSelectionValue =>
-    typeof arg === 'object' && 'name' in arg && 'position' in arg;
+const FetchMoreButton = styled(Button)`
+    justify-content: center !important;
+    min-height: unset;
+    margin: 0;
+    padding: 5px 20px !important;
+    border-radius: 0 !important;
+    font-size: 0.85rem !important;
+
+    &:disabled {
+        opacity: 1;
+    }
+`;
 
 export default function ComboBox<T extends {}>({
     options,
+    fetchMoreOptions,
+    allOptionsFetched,
+    fetchMoreButtonText = {},
     loading,
     onChange,
     onSelect,
@@ -67,7 +86,13 @@ export default function ComboBox<T extends {}>({
     value,
     isMulti,
     selection,
+    subtext,
 }: ComboBoxProps<T>) {
+    const {
+        fetch = 'Fetch More',
+        fetching = 'Fetching...',
+        allFetched = 'Nothing More to Fetch',
+    } = fetchMoreButtonText;
     const [open, setOpen] = useState<Boolean>(false);
 
     if (searchable && !onChange) {
@@ -104,14 +129,6 @@ export default function ComboBox<T extends {}>({
                 )}
             </Header>
             <SelectableListWrapper fullWidth>
-                {options.length > 1 && isGene(options[0].value) && open && (
-                    <Background variant="success" style={{ padding: '0 0.75rem' }}>
-                        <Typography variant="subtitle" success bold>
-                            {options.length} gene aliases are found. Please select the appropriate
-                            gene.
-                        </Typography>
-                    </Background>
-                )}
                 {open && (
                     <SelectableList
                         ref={ref}
@@ -124,6 +141,26 @@ export default function ComboBox<T extends {}>({
                                 setOpen(false);
                             }
                         }}
+                        stickyHeader={
+                            (subtext || fetchMoreOptions) && (
+                                <>
+                                    {subtext}
+                                    {fetchMoreOptions && !!options.length && (
+                                        <FetchMoreButton
+                                            disabled={loading || !!allOptionsFetched}
+                                            onClick={() => fetchMoreOptions()}
+                                            variant="secondary"
+                                        >
+                                            {!!allOptionsFetched
+                                                ? allFetched
+                                                : loading
+                                                ? fetching
+                                                : fetch}
+                                        </FetchMoreButton>
+                                    )}
+                                </>
+                            )
+                        }
                     />
                 )}
             </SelectableListWrapper>

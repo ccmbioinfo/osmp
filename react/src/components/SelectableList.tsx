@@ -7,6 +7,10 @@ interface SelectableListWrapperProps {
     fullWidth?: boolean;
 }
 
+interface StyledListProps {
+    stickyHeader?: React.ReactNode;
+}
+
 export const SelectableListWrapper = styled.div<SelectableListWrapperProps>`
     position: absolute;
     top: 100%;
@@ -14,13 +18,13 @@ export const SelectableListWrapper = styled.div<SelectableListWrapperProps>`
     width: ${props => (props.fullWidth ? '100%' : 'fit-content')};
 `;
 
-const StyledList = styled.ul`
+const StyledList = styled.ul<StyledListProps>`
     box-shadow: ${props => props.theme.boxShadow};
     padding: 0;
     margin: 0;
     list-style-type: none;
     width: inherit;
-    max-height: 200px;
+    max-height: ${props => (props.stickyHeader ? '250' : '200')}px;
     overflow: auto;
 `;
 
@@ -72,12 +76,23 @@ interface ListProps<T> {
     onSelect: (val: T) => void;
     selection?: T[];
     options: SelectableListItem<T>[];
+    stickyHeader?: React.ReactNode;
 }
 
 function SelectableListInner<T>(props: ListProps<T>, ref: React.ForwardedRef<HTMLUListElement>) {
-    const { onSelect, options, isMulti, selection } = props;
+    const { onSelect, options, isMulti, selection, stickyHeader } = props;
     return (
-        <StyledList ref={ref}>
+        <StyledList {...{ ref, stickyHeader }}>
+            {stickyHeader && (
+                <StyledListItem
+                    style={{
+                        position: 'sticky',
+                        top: 0,
+                    }}
+                >
+                    {stickyHeader}
+                </StyledListItem>
+            )}
             {options.map((item, index) => {
                 if (!isMulti) {
                     return (

@@ -1,5 +1,6 @@
 import { ApolloClient, createHttpLink, from, InMemoryCache, useLazyQuery } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
+import { relayStylePagination } from '@apollo/client/utilities';
 import { ApolloLink, QueryHookOptions, ServerError, useQuery } from '@apollo/react-hooks';
 import { RestLink } from 'apollo-link-rest';
 import ApolloLinkTimeout from 'apollo-link-timeout';
@@ -86,7 +87,15 @@ export const buildLink = (token?: string) => {
 
 export const client = new ApolloClient<any>({
     link: buildLink(),
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+        typePolicies: {
+            Query: {
+                fields: {
+                    autocompleteResults: relayStylePagination(),
+                },
+            },
+        },
+    }),
     defaultOptions: {
         watchQuery: {
             nextFetchPolicy: 'cache-only',
