@@ -18,9 +18,10 @@ export const annotateGnomad = (
   const secondaryAnnotationKeyMap = _mapToAnnotationsKeyMap(secondaryAnnotations);
 
   queryResponse.forEach(r => {
-    const variantKey = `${r.variant.ref}-${r.variant.start}-${`${
-      r.variant.assemblyIdCurrent === 'GRCh38' ? 'chr' : ''
-    }${r.variant.chromosome}`}`;
+    const normalizedChromosome = r.variant.chromosome.replace('chr', '');
+    const variantKey = `${r.variant.ref}-${r.variant.start}-${
+      r.variant.assemblyIdCurrent === 'GRCh38' ? `chr${normalizedChromosome}` : normalizedChromosome
+    }`;
 
     if (variantKey in primaryAnnotationKeyMap) {
       /* eslint-disable @typescript-eslint/no-unused-vars */
