@@ -49,12 +49,14 @@ const addAdditionalFieldsAndFormatNulls = (
     uniqueId: number
 ): ResultTableColumns => ({
     ...results,
+    chromosome: results.chromosome.replace('chr', ''),
     emptyCaseDetails: '',
     emptyVariationDetails: '',
     uniqueId,
     cdna: results.cdna || 'NA',
     aaChange: results.aaChange || 'NA',
     af: results.af || 0,
+    gnomadHom: results.gnomadHom || 0,
 });
 
 export const calculateColumnWidth = (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useApolloClient } from '@apollo/client';
+import { NetworkStatus, useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
 import styled from 'styled-components/macro';
 import { useFetchVariantsQuery } from '../apollo/hooks';
@@ -126,7 +126,10 @@ const VariantQueryPage: React.FC<{}> = () => {
             },
         } as const);
 
-    const [fetchVariants, { data, loading }] = useFetchVariantsQuery();
+    const [fetchVariants, { data, networkStatus }] = useFetchVariantsQuery();
+
+    const loading =
+        networkStatus === NetworkStatus.loading || networkStatus === NetworkStatus.refetch;
 
     const { state: errorState, dispatch } = useErrorContext();
 
