@@ -457,6 +457,7 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                                 {...{ toggleRowExpanded }}
                                 phenotypes={phenotypicFeatures?.filter(p => !p.observed)}
                                 rowExpanded={isExpanded}
+                                color={'red'}
                             />
                         ),
                     },
