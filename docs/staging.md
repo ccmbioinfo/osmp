@@ -1,7 +1,5 @@
 # Staging
 
-OSMP staging instance is connected to [G4RD Phenotips staging instance](https://staging.phenotips.genomics4rd.ca).
-
 OSMP is deployed via Compose at [https://osmp.ccmdev.ca/](https://osmp.ccmdev.ca/). For G4RD data soource, OSMP staging instance is connected to the [staging instance of G4RD Phenotips](https://osmp.ccmdev.ca/). To deploy the frontend, compiled static bundles are uploaded to a designated MinIO bucket. The routing between the frontend and backend is handled by the HAProxy reverse proxy.
 
 ## Continuous deployment through Github Actions
