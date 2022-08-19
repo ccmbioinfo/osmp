@@ -186,6 +186,7 @@ describe('Test g4rd query response transformer', () => {
             individualId
             phenotypicFeatures {
               levelSeverity
+              observed
               phenotypeId
             }
             sex

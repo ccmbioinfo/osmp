@@ -409,10 +409,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                     {
                         accessor: state =>
                             state.phenotypicFeatures
-                                ? state.phenotypicFeatures.map(p => p.phenotypeLabel).join(', ')
+                                ? state.phenotypicFeatures
+                                      .filter(p => p.observed)
+                                      .map(p => p.phenotypeLabel)
+                                      .join(', ')
                                 : '',
-                        id: 'phenotypicFeatures',
-                        Header: 'Phenotypes',
+                        id: 'phenotypicFeaturesPresent',
+                        Header: 'Present Phenotypes',
                         width: 150,
                         Cell: ({
                             row: {
@@ -425,8 +428,36 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         }) => (
                             <PhenotypeViewer
                                 {...{ toggleRowExpanded }}
-                                phenotypes={phenotypicFeatures}
+                                phenotypes={phenotypicFeatures?.filter(p => p.observed)}
                                 rowExpanded={isExpanded}
+                            />
+                        ),
+                    },
+                    {
+                        accessor: state =>
+                            state.phenotypicFeatures
+                                ? state.phenotypicFeatures
+                                      .filter(p => !p.observed)
+                                      .map(p => p.phenotypeLabel)
+                                      .join(', ')
+                                : '',
+                        id: 'phenotypicFeaturesAbsent',
+                        Header: 'Absent Phenotypes',
+                        width: 150,
+                        Cell: ({
+                            row: {
+                                isExpanded,
+                                original: { phenotypicFeatures },
+                                toggleRowExpanded,
+                            },
+                        }: {
+                            row: Row<ResultTableColumns>;
+                        }) => (
+                            <PhenotypeViewer
+                                {...{ toggleRowExpanded }}
+                                phenotypes={phenotypicFeatures?.filter(p => !p.observed)}
+                                rowExpanded={isExpanded}
+                                color="red"
                             />
                         ),
                     },

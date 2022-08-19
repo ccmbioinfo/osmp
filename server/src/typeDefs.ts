@@ -61,6 +61,7 @@ export default gql`
     onsetType: String
     phenotypeId: String
     phenotypeLabel: String
+    observed: Boolean
   }
 
   type Disorder {

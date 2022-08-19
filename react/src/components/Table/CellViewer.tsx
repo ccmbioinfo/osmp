@@ -7,6 +7,7 @@ import { CellText } from './Table.styles';
 export interface ViewerProps {
     rowExpanded: boolean;
     toggleRowExpanded: (value?: boolean) => void;
+    color?: string;
 }
 
 interface ItemName {
@@ -32,7 +33,7 @@ const Text = styled(props => <CellText {...props} />)`
     white-space: break-spaces;
     cursor: pointer;
     text-decoration: underline dotted;
-    color: blue;
+    color: ${props => props.color || 'blue'};
 `;
 
 const CellViewer = <T extends {}>({
@@ -42,6 +43,7 @@ const CellViewer = <T extends {}>({
     rowExpanded,
     toggleRowExpanded,
     text,
+    color,
 }: CellViewerProps<T>) => {
     const [cellExpanded, setCellExpanded] = useState<boolean>(false);
 
@@ -57,7 +59,7 @@ const CellViewer = <T extends {}>({
             <>
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
-                        <Text onClick={onClick}>
+                        <Text onClick={onClick} color={color}>
                             {!!formatItemText ? formatItemText(item) : item}
                         </Text>
                         {!isLastElement(index, items) && <CellBorder />}
@@ -65,7 +67,7 @@ const CellViewer = <T extends {}>({
                 ))}
             </>
         ) : (
-            <Text onClick={onClick}>{`${items.length} ${
+            <Text onClick={onClick} color={color}>{`${items.length} ${
                 items.length === 1 ? singular : plural ?? `${singular}s`
             }`}</Text>
         );

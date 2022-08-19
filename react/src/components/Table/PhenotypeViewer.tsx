@@ -11,6 +11,7 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({
     phenotypes,
     rowExpanded,
     toggleRowExpanded,
+    color,
 }) => {
     return (
         <CellViewer<PhenotypicFeaturesFields>
@@ -18,6 +19,7 @@ const PhenotypeViewer: React.FC<PhenotypeViewerProps> = ({
             formatItemText={phenotype => phenotype.phenotypeLabel || ''}
             itemName={{ singular: 'Phenotype' }}
             items={phenotypes}
+            color={color}
         />
     );
 };

@@ -122,6 +122,10 @@ components:
                       todo
                     type: string
                     example: "Xxx"
+                  observed:
+                    description: |
+                      Whether the phenotypic feature was observed or not.
+                    type: boolean
         sex:
           description: |
             Sex of the individual.

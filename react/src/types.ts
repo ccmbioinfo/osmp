@@ -57,6 +57,7 @@ export interface PhenotypicFeaturesFields {
     onsetType?: Maybe<string>;
     phenotypeId?: Maybe<string>;
     phenotypeLabel?: Maybe<string>;
+    observed?: Maybe<boolean>;
 }
 
 export interface DiseaseFields {
