@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { NetworkStatus } from '@apollo/client';
 import { useAsyncDebounce } from 'react-table';
 import { useFetchAutocompleteQuery } from '../apollo/hooks';
+import { Background, Typography } from '../components';
 import { AssemblyId } from '../types';
 import ComboBox from './ComboBox';
 import { SelectableListItem } from './SelectableList';
@@ -41,8 +43,14 @@ const isCanonicalRegion = (chr: string) =>
 const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
     const [options, setOptions] = useState<SelectableListItem<GeneSelectionValue>[]>([]);
 
-    const [fetchAutocompleteResults, { data: autocompleteResults, loading: autocompleteLoading }] =
-        useFetchAutocompleteQuery();
+    const [
+        fetchAutocompleteResults,
+        { data: autocompleteResults, fetchMore: fetchMoreAutocompleteResults, networkStatus },
+    ] = useFetchAutocompleteQuery();
+    const autocompleteLoading =
+        networkStatus === NetworkStatus.loading ||
+        networkStatus === NetworkStatus.refetch ||
+        networkStatus === NetworkStatus.fetchMore;
 
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
 
@@ -84,32 +92,69 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
         []
     );
 
-    useEffect(() => {
-        if (options.length) {
-            if (!geneName) {
-                setOptions([]);
-            }
+    const fetchMoreAutocompleteOptions = useCallback(async () => {
+        if (autocompleteResults) {
+            await fetchMoreAutocompleteResults({
+                variables: {
+                    size: Math.min(1000, autocompleteResults.autocompleteResults.hits.length + 10),
+                },
+            });
         }
-        if (geneName.length > 0 && !options.map(o => o.value.name).includes(geneName)) {
-            debouncedAutocompleteFetch({ variables: { q: geneName.toLowerCase() } });
-        }
-    }, [debouncedAutocompleteFetch, geneName, options]);
+    }, [autocompleteResults, fetchMoreAutocompleteResults]);
 
     useEffect(() => {
-        if (autocompleteResults) {
+        if (geneName.length)
+            debouncedAutocompleteFetch({ variables: { q: geneName.toLowerCase(), size: 10 } });
+    }, [debouncedAutocompleteFetch, geneName]);
+
+    useEffect(() => {
+        if (options.length && !geneName) setOptions([]);
+    }, [geneName, options]);
+
+    useEffect(() => {
+        if (autocompleteResults)
             setOptions(formatAutocompleteOptions(autocompleteResults, assembly));
-        }
     }, [geneName, assembly, autocompleteResults, formatAutocompleteOptions]);
 
     return (
         <ComboBox
             options={options}
+            fetchMoreOptions={fetchMoreAutocompleteOptions}
+            allOptionsFetched={
+                autocompleteResults?.autocompleteResults.hits.length ===
+                autocompleteResults?.autocompleteResults.total
+            }
+            fetchMoreButtonText={{
+                fetch: `Fetch 10 More Gene Hits (${
+                    autocompleteResults?.autocompleteResults.hits.length ?? 0
+                }/${autocompleteResults?.autocompleteResults.total ?? 0})`,
+                allFetched: `All Gene Hits (${
+                    autocompleteResults?.autocompleteResults.total ?? 0
+                }) Fetched`,
+            }}
             loading={autocompleteLoading}
             onChange={term => onChange(term)}
             onSelect={(item: GeneSelectionValue) => onSelect(item)}
             placeholder="Gene Search"
             searchable
             value={geneName || ''}
+            subtext={
+                options.length > 1 && (
+                    <Background
+                        variant="success"
+                        style={{
+                            margin: 0,
+                            padding: '5px 20px',
+                        }}
+                    >
+                        <Typography variant="subtitle" success bold condensed>
+                            {options.length} gene aliases found from{' '}
+                            {autocompleteResults?.autocompleteResults?.hits.length ?? 0} gene hits.
+                            Please select the appropriate gene.
+                        </Typography>
+                    </Background>
+                )
+            }
         />
     );
 };

@@ -5,11 +5,11 @@ import { useLazyApolloQuery } from '../client';
     fetch autocomplete results with ensembl id and genomic position 
 */
 const autocompleteQuery = gql`
-    query FetchAutocomplete($q: String) {
-        autocompleteResults(q: $q)
+    query FetchAutocomplete($q: String, $size: Number) {
+        autocompleteResults(q: $q, size: $size)
             @rest(
                 type: "AutoCompleteSuggestion"
-                path: "query?species=human&fields=genomic_pos_hg19,symbol,genomic_pos,ensembl.gene&{args}"
+                path: "query?species=human&fields=genomic_pos_hg19,symbol,genomic_pos,ensembl.gene&size={args.size}&q={args.q}"
             ) {
             hits {
                 symbol
@@ -27,6 +27,7 @@ const autocompleteQuery = gql`
                     start
                 }
             }
+            total
         }
     }
 `;
@@ -49,9 +50,12 @@ const useFetchAutocompleteQuery = () =>
                         start: number;
                     };
                 }[];
+                total: number;
             };
         },
-        { q: string }
-    >(autocompleteQuery);
+        { q: string; size: number }
+    >(autocompleteQuery, {
+        notifyOnNetworkStatusChange: true,
+    });
 
 export default useFetchAutocompleteQuery;
