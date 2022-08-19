@@ -2,15 +2,15 @@
 
 ## Front End
 
-The front end is a React.js SPA bootstrapped with [create-react-app](https://github.com/facebook/create-react-app) and written in [Typescript](https://www.typescriptlang.org/). [Styled-components](https://styled-components.com/docs) is used for theming and styling. Additional component tooling provided by [storybook](https://storybook.js.org/).
+The front end is a React.js SPA bootstrapped with [create-react-app](https://github.com/facebook/create-react-app) and written in [Typescript](https://www.typescriptlang.org/). [Styled-components](https://styled-components.com/docs) is used for theming and styling. Additional component tooling is provided by [storybook](https://storybook.js.org/).
 
 ### Building and editing the front end code
 
-- from the root project directory copy the sample .env file and enter the appropriate values
+- from the root project directory, copy the sample `.env` file and enter the appropriate values:
   - ```bash
     cp .env.sample .env
     ```
-- if this is your first time bringing up the app, install dependencies:
+- if this is your first time bringing up the app, install the dependencies:
   - ```bash
     docker-compose run --rm react yarn install
     ```
@@ -21,7 +21,7 @@ The front end is a React.js SPA bootstrapped with [create-react-app](https://git
     ```
   - note that this will enable hot reloading.
 
-- (optional) start the storybook server
+- (optional) start the storybook server:
   - ```bash
         docker-compose exec -i react yarn storybook
     ```
@@ -33,7 +33,7 @@ The back end is a node.js server built with [express](https://expressjs.com/), [
 ### Building and editing the back end code
 
 - make sure the `.env` file exists (see above)
-- if this is your first time bringing up the app, install dependencies:
+- if this is your first time bringing up the app, install the dependencies:
   - ```bash
     docker-compose run --rm server yarn install
     ```
@@ -60,7 +60,7 @@ Phenotips API documentation can be found [here](https://help.phenotips.com/hc/en
 Apart from Phenotips, another data source for the staging instance is a Node/Express server that queries a MySQL database that has been populated wtih variants from the STAGER application database.
 
 - make sure the `.env` file exists (see above)
-- if this is your first time bringing up the app, install dependencies:
+- if this is your first time bringing up the app, install the dependencies:
   - ```bash
     docker-compose run --rm test-node yarn install
     ```
@@ -70,7 +70,7 @@ Apart from Phenotips, another data source for the staging instance is a Node/Exp
     docker-compose up test-node
     ```
 
-- to populate MySQL database with variants from STAGER, download this [script](https://sickkidsca.sharepoint.com/:u:/r/sites/thecenterforcomputationalmedicineworkspace/Shared%20Documents/SSMP/data/stager-local-20210716.sql?csf=1&web=1&e=fVzHIB) and run the script using one of these two options:
+- to populate the MySQL database with variants from STAGER, download this [script](https://sickkidsca.sharepoint.com/:u:/r/sites/thecenterforcomputationalmedicineworkspace/Shared%20Documents/SSMP/data/stager-local-20210716.sql?csf=1&web=1&e=fVzHIB) and run the script using one of these two options:
   - MySQLWorkbench
   - ```bash
     docker exec -i <stager-mysql-container-name> mysql -u <env.TEST_DATA_DB_USER> --password="<env.TEST_DATA_DB_PASSWORD>" <env.TEST_DATA_DB> < <filepath>.sql
@@ -91,7 +91,7 @@ The keycloak admin portal can be accessed in the browser by navigating to localh
 
 ## Mongo
 
-gnomAD annotations are performed on-the-fly using MongoDB. The staging VM and production VM are connected to the MongoDB instance in the CHEO-RI tenancy. Since dev VMs are not in the CHEO-RI tenancy, they cannot connect to the MongoDB instance in the CHEO-RI tenancy. Instead, in local development, we can connect to [mongodb.ccm.sickkids.ca](mongodb.ccm.sickkids.ca) which currently only support GRCh37 annotations.
+gnomAD annotations are performed on-the-fly using MongoDB. The staging VM and production VM are connected to the MongoDB instance in the CHEO-RI tenancy. Since dev VMs are not in the CHEO-RI tenancy, they cannot connect to the MongoDB instance in the CHEO-RI tenancy. Instead, in local development, we can connect to [mongodb.ccm.sickkids.ca](mongodb.ccm.sickkids.ca) which currently only supports GRCh37 annotations and a small subset of GRCh38 annotations.
 
 Annotations were imported into mongo using the following command. Note that that the headers should not be included in the csv and the order of the fields passed to the `fields` argument should match the order of the fields in the csv.
 
