@@ -24,8 +24,9 @@ const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVaria
   await resolveVariantQuery(args);
 
 const isVariantQuery = (
-  arg: VariantQueryResponse | CADDAnnotationQueryResponse
-): arg is VariantQueryResponse => arg.source !== 'CADD annotations';
+  arg: VariantQueryResponse | CADDAnnotationQueryResponse | GnomadAnnotationQueryResponse
+): arg is VariantQueryResponse =>
+  arg.source !== 'CADD annotations' && arg.source !== 'gnomAD annotations';
 
 const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
   async (args: QueryInput): Promise<CombinedVariantQueryResponse> => {
@@ -90,11 +91,14 @@ const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
 
       const slurmJob = await slurm.slurmctldSubmitJob(
         {
-          script: '#!/bin/bash\necho Hello World!',
+          script: '#!/bin/bash\n./slurm-script-1.sh',
           job: {
-            environment: { SBATCH_DEBUG: 1 },
+            environment: { SBATCH_DEBUG: 1, PATH: '/bin:/usr/bin/:/usr/local/bin/' },
             current_working_directory: '/home/jxu',
             standard_output: 'test.out',
+            standard_error: 'test_error.out',
+            memory_per_node: 4096,
+            time_limit: 3000,
           },
         },
         {
