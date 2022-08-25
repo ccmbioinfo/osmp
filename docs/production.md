@@ -1,6 +1,6 @@
 # Production
 
-OSMP is deployed via Compose at [https://osmp.genomics4rd.ca](https://osmp.genomics4rd.ca). The key differences between the staging and production are the removal of the test node and increased memory and CPU resource allocations for the `server` container. The OSMP production instance is connected to the [production instance of G4RD Phenotips](https://phenotips.genomics4rd.ca). Similar to the staging stack, to deploy the frontend, compiled static bundles are uploaded to a designated MinIO bucket. The routing between the frontend and backend is handled by the HAProxy reverse proxy.
+OSMP is deployed via Docker Compose at [https://osmp.genomics4rd.ca](https://osmp.genomics4rd.ca). The key differences between the staging and production are the removal of the test node and increased memory and CPU resource allocations for the `server` container. The OSMP production instance is connected to the [production instance of G4RD Phenotips](https://phenotips.genomics4rd.ca). Similar to the staging stack, to deploy the frontend, compiled static bundles are uploaded to a designated MinIO bucket. The routing between the frontend and backend is handled by the HAProxy reverse proxy. User accounts are managed in [Keycloak](https://keycloak.genomics4rd.ca).
 
 ## Continuous deployment through Github Actions
 
