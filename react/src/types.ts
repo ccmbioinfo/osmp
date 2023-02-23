@@ -7,7 +7,7 @@ export interface VariantResponseInfoFields {
     cdna?: Maybe<string>;
     consequence?: Maybe<string>;
     geneName?: Maybe<string>;
-    gnomadHet?: Maybe<string>;
+    gnomadHet?: Maybe<number>;
     gnomadHom?: Maybe<number>;
     phred?: Maybe<number>;
     spliceAIScore?: Maybe<number>;

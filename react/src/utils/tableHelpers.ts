@@ -173,12 +173,14 @@ export const prepareData = (
 
     sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
+        // if different variant from previous iteration
         if (
             currVariant.ref !== ref ||
             currVariant.alt !== alt ||
             currVariant.start !== start ||
             currVariant.end !== end
         ) {
+            // If this isn't the first variant
             if (uniqueVariantIndices.length) {
                 result
                     .slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId)
