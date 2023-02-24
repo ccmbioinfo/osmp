@@ -39,12 +39,12 @@ export const annotateGnomad = (
       // and the overall allele frequency will simply be the genome allele frequency
       const secondaryAF = secondaryAnnotationKeyMap?.[variantKey]?.af ?? 0;
 
-      // The overall allele frequency is calculated as the greater value between the exome allele frequency and the genome allele frequency
-      const af = Math.max(primaryAF, secondaryAF);
-      const ac = 'ac' in rest ? rest.ac : Math.round(rest.an * af);
+      const primaryIsGenome = 'ac' in rest;
+      const ac = primaryIsGenome ? rest.ac : Math.round(rest.an * primaryAF);
       r.variant.info = {
         ...r.variant.info,
-        af: af,
+        // The overall allele frequency is calculated as the greater value between the exome allele frequency and the genome allele frequency
+        af: Math.max(primaryAF, secondaryAF),
         gnomadHom: nhomalt,
         // https://www.biostars.org/p/440426/; each homozygote adds 2 to allele count, so remaining are heterozygotes
         // only works for autosomes and X chromosome
