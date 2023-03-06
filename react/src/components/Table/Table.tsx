@@ -64,6 +64,7 @@ export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'di
     CallsetInfoFields &
     VariantResponseInfoFields & { source: string; diseases: string };
 export interface ResultTableColumns extends FlattenedQueryResponse {
+    maleCount: number;
     emptyCaseDetails: string;
     emptyVariationDetails: string;
     homozygousCount?: number;
@@ -277,6 +278,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'SpliceAI type',
                         width: getColumnWidth('SpliceAI type'),
                         filter: 'multiSelect',
+                    },
+                    {
+                        accessor: 'maleCount',
+                        id: 'maleCount',
+                        Header: 'Male Count',
+                        width: getColumnWidth('Male Count'),
+                        filter: 'between',
                     },
                 ],
             },
