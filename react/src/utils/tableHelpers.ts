@@ -121,7 +121,7 @@ export const isHomozygous = (zygosity: string | null | undefined) => {
     return !!zygosity?.toLowerCase().includes('hom');
 };
 
-export const isMale = (sex: string | null | undefined) => sex === 'Male';
+export const isMale = (sex: string | null | undefined) => resolveSex('' + sex) === 'Male';
 
 export const isLastCellInSet = (cell: Cell<ResultTableColumns>, columnOrder: string[]) =>
     !!cell.column &&
