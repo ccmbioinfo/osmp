@@ -5,6 +5,7 @@ import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
   aaChange?: Maybe<string>;
   af?: Maybe<number>;
+  ac?: Maybe<number>;
   cdna?: Maybe<string>;
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
