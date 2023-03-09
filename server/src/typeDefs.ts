@@ -9,11 +9,11 @@ export default gql`
   type VariantResponseInfoFields {
     aaChange: String
     af: Float
+    ac: Int
     assembly: String
     cdna: String
     consequence: String
     geneName: String
-    gnomadHet: Int
     gnomadHom: Int
     phred: Float
     spliceAIScore: Float
