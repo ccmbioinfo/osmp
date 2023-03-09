@@ -61,9 +61,7 @@ describe('Test whether variants get annotated', () => {
         af: Math.max(primaryAnnotations[0].af, secondaryAnnotations[0].af),
         an: primaryAnnotations[0].an,
         gnomadHom: primaryAnnotations[0].nhomalt,
-        gnomadHet:
-          Math.round(primaryAnnotations[0].an * primaryAnnotations[0].af) -
-          primaryAnnotations[0].nhomalt * 2,
+        ac: primaryAnnotations[0].af * primaryAnnotations[0].an + secondaryAnnotations[0].ac,
       })
     );
   });
