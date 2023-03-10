@@ -56,8 +56,9 @@ const addAdditionalFieldsAndFormatNulls = (
     cdna: results.cdna || 'NA',
     aaChange: results.aaChange || 'NA',
     af: results.af || 0,
+    ac: results.ac || 0,
     gnomadHom: results.gnomadHom || 0,
-    gnomadHet: results.gnomadHet || 0,
+    // gnomadHet: results.gnomadHet || 0,
     maleCount: 0,
 });
 

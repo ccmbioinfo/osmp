@@ -223,6 +223,13 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         width: getColumnWidth('Het Count'),
                         filter: 'between',
                     },
+                    // {
+                    //     accessor: 'maleCount',
+                    //     id: 'maleCount',
+                    //     Header: 'Male Count',
+                    //     width: getColumnWidth('Male Count'),
+                    //     filter: 'between',
+                    // },
                     { accessor: 'cdna', id: 'cdna', Header: 'cdna', width: getColumnWidth('cdna') },
                     {
                         id: 'aaChange',
@@ -245,10 +252,10 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         filter: 'between',
                     },
                     {
-                        accessor: 'gnomadHet',
-                        id: 'gnomadHet',
-                        Header: 'gnomadHet',
-                        width: getColumnWidth('gnomadHet'),
+                        accessor: 'ac',
+                        id: 'ac',
+                        Header: 'gnomAD_AC',
+                        width: getColumnWidth('gnomAD_AC', true),
                         filter: 'between',
                     },
                     {
@@ -278,13 +285,6 @@ const Table: React.FC<TableProps> = ({ variantData }) => {
                         Header: 'SpliceAI type',
                         width: getColumnWidth('SpliceAI type'),
                         filter: 'multiSelect',
-                    },
-                    {
-                        accessor: 'maleCount',
-                        id: 'maleCount',
-                        Header: 'Male Count',
-                        width: getColumnWidth('Male Count'),
-                        filter: 'between',
                     },
                 ],
             },
