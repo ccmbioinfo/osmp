@@ -46,7 +46,7 @@ const _getG4rdNodeQuery = async ({
     Authorization = await getAuthHeader();
   } catch (e: any) {
     logger.error(e);
-    logger.error(e?.resoponse?.data);
+    logger.error(e?.response?.data);
     return {
       data: [],
       error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
