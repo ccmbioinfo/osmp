@@ -46,7 +46,7 @@ const _getG4rdNodeQuery = async ({
     Authorization = await getAuthHeader();
   } catch (e: any) {
     logger.error(e);
-    logger.error(e?.response?.data);
+    logger.error(JSON.stringify(e?.response?.data));
     return {
       data: [],
       error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
@@ -165,7 +165,7 @@ const getAuthHeader = async () => {
     }
 
     const params = new URLSearchParams({
-      client_id: client_id,
+      client_id,
       grant_type,
       password,
       realm,

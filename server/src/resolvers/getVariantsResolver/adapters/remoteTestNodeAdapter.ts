@@ -140,7 +140,7 @@ export const transformRemoteTestNodeErrorResponse: ErrorTransformer<
     return {
       id: uuidv4(),
       code: error.response?.status || 500,
-      message: error.response?.data,
+      message: JSON.stringify(error.response?.data),
     };
   }
 };

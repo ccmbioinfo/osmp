@@ -53,7 +53,7 @@ const _getCMHNodeQuery = async ({
     Authorization = await getAuthHeader();
   } catch (e: any) {
     logger.error(e);
-    logger.error(e?.response?.data);
+    logger.error(JSON.stringify(e?.response?.data));
     return {
       data: [],
       error: { code: 403, message: 'ERROR FETCHING OAUTH TOKEN', id: uuidv4() },
