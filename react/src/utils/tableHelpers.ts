@@ -248,6 +248,18 @@ export const prepareData = (
         row.maleCount = currMaleCount;
     });
 
+    // update individualId, familyId with source prefix
+    // (P0001 from G4RD is not the same as P0001 from CMH)
+    result.map(r => {
+        if (r.individualId) {
+            r.individualId = [r.source, r.individualId].join('_');
+        }
+        if (r.familyId) {
+            r.familyId = [r.source, r.familyId].join('_');
+        }
+        return r;
+    });
+
     // Remove duplicate variants for the same patient
     const uniquePatientVariants = result.filter(
         (arr, index, self) =>

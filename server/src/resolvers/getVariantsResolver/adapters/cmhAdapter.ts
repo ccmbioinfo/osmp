@@ -25,21 +25,28 @@ import resolveAssembly from '../utils/resolveAssembly';
 
 /* eslint-disable camelcase */
 
-const SOURCE_NAME = 'g4rd';
-const BEARER_CACHE_KEY = 'g4rdToken';
+/**
+ * CMH's PhenoTips instance should have the same format as G4RD.
+ * However, there's a different process in place for accessing it:
+ * - Request access token from Azure,
+ * - Provide token and Gene42 secret when querying CMH PT.
+ */
 
-type G4RDNodeQueryError = AxiosError<string>;
+const SOURCE_NAME = 'cmh';
+const AZURE_BEARER_CACHE_KEY = 'cmhToken';
+
+type CMHNodeQueryError = AxiosError<string>;
 
 /**
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
  */
-const _getG4rdNodeQuery = async ({
+const _getCMHNodeQuery = async ({
   input: { gene: geneInput, variant },
 }: QueryInput): Promise<VariantQueryResponse> => {
-  let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
-  let G4RDVariantQueryResponse: null | AxiosResponse<G4RDVariantQueryResult> = null;
-  let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
+  let CMHNodeQueryError: CMHNodeQueryError | null = null;
+  let CMHVariantQueryResponse: null | AxiosResponse<G4RDVariantQueryResult> = null;
+  let CMHPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
   const FamilyIds: null | Record<string, string> = {}; // <PatientId, FamilyId>
   let Authorization = '';
   try {
@@ -53,15 +60,12 @@ const _getG4rdNodeQuery = async ({
       source: SOURCE_NAME,
     };
   }
-  const url = `${process.env.G4RD_URL}/rest/variants/match`;
+  const url = `${process.env.CMH_URL}/rest/variants/match`;
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { position, ...gene } = geneInput;
   variant.assemblyId = 'GRCh37';
-  // For g4rd node, assemblyId is a required field as specified in this sample request:
-  // https://github.com/ccmbioinfo/report-scripts/blob/master/docs/phenotips-api.md#matching-endpoint
-  // assemblyId is set to be GRCh37 because g4rd node only contains data in assembly GRCh37.
   try {
-    G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
+    CMHVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
       url,
       {
         gene,
@@ -72,13 +76,14 @@ const _getG4rdNodeQuery = async ({
           Authorization,
           'Content-Type': 'application/json',
           Accept: 'application/json',
+          'X-Gene42-Secret': `${process.env.CMH_GENE42_SECRET}`, //
         },
       }
     );
 
     // Get patients info
-    if (G4RDVariantQueryResponse) {
-      let individualIds = G4RDVariantQueryResponse.data.results
+    if (CMHVariantQueryResponse) {
+      let individualIds = CMHVariantQueryResponse.data.results
         .map(v => v.individual.individualId!)
         .filter(Boolean); // Filter out undefined and null values.
 
@@ -86,17 +91,18 @@ const _getG4rdNodeQuery = async ({
       individualIds = [...new Set(individualIds)];
 
       if (individualIds.length > 0) {
-        const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
+        const patientUrl = `${process.env.CMH_URL}/rest/patients/fetch?${individualIds
           .map(id => `id=${id}`)
           .join('&')}`;
 
-        G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(
+        CMHPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(
           new URL(patientUrl).toString(),
           {
             headers: {
               Authorization,
               'Content-Type': 'application/json',
               Accept: 'application/json',
+              'X-Gene42-Secret': `${process.env.CMH_GENE42_SECRET}`,
             },
           }
         );
@@ -107,13 +113,14 @@ const _getG4rdNodeQuery = async ({
             Authorization,
             'Content-Type': 'application/json',
             Accept: 'application/json',
+            'X-Gene42-Secret': `${process.env.CMH_GENE42_SECRET}`,
           },
         });
 
         const familyResponses = await Promise.allSettled(
           individualIds.map(id =>
             patientFamily.get<G4RDFamilyQueryResult>(
-              new URL(`${process.env.G4RD_URL}/rest/patients/${id}/family`).toString()
+              new URL(`${process.env.CMH_URL}/rest/patients/${id}/family`).toString()
             )
           )
         );
@@ -127,16 +134,16 @@ const _getG4rdNodeQuery = async ({
     }
   } catch (e: any) {
     logger.error(e);
-    G4RDNodeQueryError = e;
+    CMHNodeQueryError = e;
   }
 
   return {
-    data: transformG4RDQueryResponse(
-      (G4RDVariantQueryResponse?.data as G4RDVariantQueryResult) || [],
-      (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
+    data: transformCMHQueryResponse(
+      (CMHVariantQueryResponse?.data as G4RDVariantQueryResult) || [],
+      (CMHPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
       FamilyIds
     ),
-    error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
+    error: transformCMHNodeErrorResponse(CMHNodeQueryError),
     source: SOURCE_NAME,
   };
 };
@@ -145,48 +152,41 @@ const _getG4rdNodeQuery = async ({
  * @param args VariantQueryInput
  * @returns  Promise<ResolvedVariantQueryResult>
  */
-const getG4rdNodeQuery = timeitAsync('getG4rdNodeQuery')(_getG4rdNodeQuery);
+const getCMHNodeQuery = timeitAsync('getCMHNodeQuery')(_getCMHNodeQuery);
 
 const getAuthHeader = async () => {
   const {
-    G4RD_USERNAME: username,
-    G4RD_PASSWORD: password,
-    G4RD_TOKEN_URL,
-    G4RD_REALM: realm,
-    G4RD_CLIENT_ID: client_id,
-    G4RD_GRANT_TYPE: grant_type,
+    CMH_AZURE_CLIENT_ID: client_id,
+    CMH_AZURE_CLIENT_SECRET: client_secret,
+    CMH_TOKEN_URL,
+    CMH_RESOURCE: resource,
+    CMH_SCOPE: scope,
+    CMH_GRANT_TYPE: grant_type,
   } = process.env;
-  if (process.env.G4RD_AUTH_METHOD === 'basic') {
-    return `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
-  } else if (process.env.G4RD_AUTH_METHOD === 'bearer') {
-    const cachedToken = getFromCache(BEARER_CACHE_KEY);
-    if (cachedToken) {
-      return `Bearer ${cachedToken}`;
-    }
-
-    const params = new URLSearchParams({
-      client_id,
-      grant_type,
-      password,
-      realm,
-      scope: 'openid profile email',
-      username,
-    } as Record<string, string>);
-
-    const tokenResponse = await axios.post<{ id_token: string }>(G4RD_TOKEN_URL!, params, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: '*/*' },
-    });
-    const token = tokenResponse.data.id_token; // docs say to use id_token, not bearer_token
-    const decoded = jwtDecode<{ iat: number; exp: number }>(token);
-    const ttl = decoded.exp - Date.now() / 1000;
-    putInCache(BEARER_CACHE_KEY, token, ttl);
-    return `Bearer ${token}`;
-  } else {
-    throw new Error(`NO AUTH METHOD CONFIGURED FOR ${SOURCE_NAME}!`);
+  const cachedToken = getFromCache(AZURE_BEARER_CACHE_KEY);
+  if (cachedToken) {
+    return `Bearer ${cachedToken}`;
   }
+
+  const params = new URLSearchParams({
+    client_id,
+    client_secret,
+    resource,
+    scope,
+    grant_type,
+  } as Record<string, string>);
+
+  const tokenResponse = await axios.post<{ access_token: string }>(CMH_TOKEN_URL!, params, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: '*/*' },
+  });
+  const token = tokenResponse.data.access_token;
+  const decoded = jwtDecode<{ iat: number; exp: number }>(token);
+  const ttl = decoded.exp - Date.now() / 1000;
+  putInCache(AZURE_BEARER_CACHE_KEY, token, ttl);
+  return `Bearer ${token}`;
 };
 
-export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError> = error => {
+export const transformCMHNodeErrorResponse: ErrorTransformer<CMHNodeQueryError> = error => {
   if (!error) {
     return undefined;
   } else {
@@ -204,8 +204,8 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
 const isObserved = (feature: Feature | NonStandardFeature) =>
   feature.observed === 'yes' ? true : feature.observed === 'no' ? false : undefined;
 
-export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = timeit(
-  'transformG4RDQueryResponse'
+export const transformCMHQueryResponse: ResultTransformer<G4RDVariantQueryResult> = timeit(
+  'transformCMHQueryResponse'
 )(
   (
     variantResponse: G4RDVariantQueryResult,
@@ -300,4 +300,4 @@ export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResul
   }
 );
 
-export default getG4rdNodeQuery;
+export default getCMHNodeQuery;
