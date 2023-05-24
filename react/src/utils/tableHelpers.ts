@@ -270,7 +270,8 @@ export const prepareData = (
                     t.end === arr.end &&
                     t.alt === arr.alt &&
                     t.ref === arr.ref &&
-                    t.individualId === arr.individualId
+                    t.individualId === arr.individualId &&
+                    t.source === arr.source
             )
     );
 
