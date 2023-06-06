@@ -63,7 +63,7 @@ const _getCMHNodeQuery = async ({
   const url = `${process.env.CMH_URL}/rest/variants/match`;
   /* eslint-disable @typescript-eslint/no-unused-vars */
   const { position, ...gene } = geneInput;
-  variant.assemblyId = 'GRCh37';
+  variant.assemblyId = 'GRCh38';
   try {
     CMHVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
       url,
