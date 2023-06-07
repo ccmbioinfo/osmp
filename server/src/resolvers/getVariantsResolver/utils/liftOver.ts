@@ -83,8 +83,10 @@ const liftover = timeitAsync('liftover')(
         geneEnd = result.variant.end;
       }
     });
-    const annotationPosition = `${dataForAnnotation[0].variant.chromosome}:${geneStart}-${geneEnd}`;
 
+    let annotationPosition = '';
+    if (dataForAnnotation.length > 0)
+      annotationPosition = `${dataForAnnotation[0].variant.chromosome}:${geneStart}-${geneEnd}`;
     promises.rm(lifted);
     promises.rm(unlifted);
     promises.rm(bedfile);
