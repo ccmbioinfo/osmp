@@ -87,8 +87,13 @@ const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
 
     // perform liftOver if needed
     if (dataForLiftover.length) {
-      const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
-      ({ unliftedVariants, dataForAnnotation, annotationPosition } = liftoverResults);
+      try {
+        const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
+        ({ unliftedVariants, dataForAnnotation, annotationPosition } = liftoverResults);
+        // annotationPosition == "" if there's no data for annotation, which is fine
+      } catch (err) {
+        logger.error(JSON.stringify(err));
+      }
     }
 
     // Cadd annotations for data in user requested assemblyId
