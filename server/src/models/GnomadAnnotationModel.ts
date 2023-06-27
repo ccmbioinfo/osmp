@@ -1,6 +1,7 @@
 import mongoose, { Model, model } from 'mongoose';
 import logger from '../logger';
 import {
+  CMHVariantIndelCoordinate,
   GnomadBaseAnnotation,
   GnomadGenomeAnnotation,
   GnomadGRCh37ExomeAnnotation,
@@ -90,9 +91,58 @@ const getAnnotations = async (
 
   if (!coordinates.length) return [];
 
+  // Check and modify coordinates to fit gnomAD model
+  // CMH uses "-" in ref/alt fields for insertions/deletions respectively, gnomAD doesn't
+  const cmhInsertions: CMHVariantIndelCoordinate<'$alt'>[] = [];
+  const cmhDeletions: CMHVariantIndelCoordinate<'$ref'>[] = [];
+  const normalCoords: VariantCoordinate[] = [];
+  coordinates.forEach(coord => {
+    if (coord.alt === '-') {
+      // CMH deletion
+      cmhDeletions.push({
+        $expr: {
+          $eq: [{ $substrCP: ['$ref', 1, { $strLenCP: '$ref' }] }, coord.ref],
+        },
+        pos: coord.pos - 1, // cmh 'start' is +1 compared to gnomad
+        chrom: coord.chrom,
+      });
+    } else if (coord.ref === '-') {
+      // CMH insertion
+      cmhInsertions.push({
+        $expr: {
+          $eq: [{ $substrCP: ['$alt', 1, { $strLenCP: '$alt' }] }, coord.alt],
+        },
+        pos: coord.pos,
+        chrom: coord.chrom,
+      });
+    } else {
+      normalCoords.push(coord);
+    }
+  });
+
   return await model.aggregate([
     { $match: { pos: { $gte: start, $lte: end } } },
-    { $match: { $or: coordinates } },
+    {
+      $match: {
+        $or: [
+          ...normalCoords, // normal coordinates
+          {
+            // CMH coordinates
+            $and: [
+              {
+                // This part might not be necessary?
+                $expr: {
+                  $eq: [{ $substrCP: ['$ref', 0, 1] }, { $substrCP: ['$alt', 0, 1] }],
+                },
+              },
+              {
+                $or: [...cmhInsertions, ...cmhDeletions],
+              },
+            ],
+          },
+        ],
+      },
+    },
     {
       $project: Object.fromEntries([...omittedFields, '_id', 'assembly', 'type'].map(f => [f, 0])),
     },
