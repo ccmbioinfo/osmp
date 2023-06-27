@@ -233,6 +233,7 @@ export interface VariantCoordinate {
 
 // Very specific type so that it can be put into a mongo.aggregate under "$or:"
 // CMH indels use "-" unlike G4RD, so we compare $ref[1:] or $alt[1:] to ref or alt in CMH respectively
+// '$ref' for deletions, '$alt' for insertions (ie. which one has more nucleotides)
 export interface CMHVariantIndelCoordinate<T extends '$ref' | '$alt'> {
   $expr: {
     $eq: [{ $substrCP: [T, 1, { $strLenCP: T }] }, string];
