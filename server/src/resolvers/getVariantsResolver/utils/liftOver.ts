@@ -3,7 +3,6 @@ import { tmpdir } from 'os';
 import * as path from 'path';
 import { AssemblyId, VariantQueryDataResult } from '../../../types';
 import { timeitAsync } from '../../../utils/timeit';
-import logger from '../../../logger';
 const exec = require('util').promisify(require('child_process').exec);
 
 const createTmpFile = async () => {
@@ -31,9 +30,6 @@ const liftover = timeitAsync('liftover')(
     dataForLiftover: VariantQueryDataResult[],
     assemblyIdInput: AssemblyId
   ) => {
-    console.debug(
-      `dataForAnnotation: ${dataForAnnotation.length}, dataForLiftover: ${dataForLiftover.length}, assemblyIdInput: ${assemblyIdInput}`
-    );
     // Convert variants from JSON format to BED format.
     // Note that position format is 1-based and BED format is half-open 0-based: https://genome.ucsc.edu/FAQ/FAQformat.html#format1
     const bedstring = dataForLiftover
@@ -47,7 +43,6 @@ const liftover = timeitAsync('liftover')(
           }\t${v.variant.start - 1}\t${v.variant.end}`
       )
       .join('\n');
-    logger.debug(`bedstring: ${bedstring}`);
     const lifted = await createTmpFile();
     const unlifted = await createTmpFile();
     const bedfile = await createTmpFile();
@@ -61,10 +56,7 @@ const liftover = timeitAsync('liftover')(
     }
     const liftOverCommand = `liftOver ${bedfile} ${chain} ${lifted} ${unlifted}`;
     try {
-      const { liftOverStdout, liftOverStderr } = await exec(liftOverCommand);
-      logger.debug(liftOverCommand);
-      logger.debug(`${liftOverStdout}`);
-      logger.debug(`${liftOverStderr}`);
+      await exec(liftOverCommand);
       const _liftedVars = await promises.readFile(lifted);
       const _unliftedVars = await promises.readFile(unlifted);
       const liftedVars = parseBedStart(_liftedVars.toString());
@@ -105,14 +97,9 @@ const liftover = timeitAsync('liftover')(
       let annotationPosition = '';
       if (dataForAnnotation.length > 0)
         annotationPosition = `${dataForAnnotation[0].variant.chromosome}:${geneStart}-${geneEnd}`;
-      // promises.rm(lifted);
-      // promises.rm(unlifted);
-      // promises.rm(bedfile);
-      logger.debug('After liftover');
-      logger.debug(`${dataForAnnotation.length}`);
-      logger.debug(`${unliftedVariants.length}`);
-      logger.debug(`Annotation position: '${annotationPosition}'`);
-      logger.debug(JSON.stringify(unliftedVariants[0]));
+      promises.rm(lifted);
+      promises.rm(unlifted);
+      promises.rm(bedfile);
 
       return { dataForAnnotation, unliftedVariants, annotationPosition };
     } catch (e) {
