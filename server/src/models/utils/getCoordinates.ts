@@ -17,6 +17,10 @@ const getCoordinates = (results: VariantQueryDataResult[]) => {
       end = variant.end;
     }
 
+    if (variant.chromosome.startsWith('chr')) {
+      variant.chromosome = variant.chromosome.substring(3);
+    }
+
     coordinates.push({
       alt: variant.alt,
       chrom: `${resolvedAssemblyId === 'GRCh38' ? 'chr' : ''}${variant.chromosome}`,

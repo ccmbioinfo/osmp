@@ -120,29 +120,36 @@ const getAnnotations = async (
     }
   });
 
+  // don't worry about the types
+  const coordinateStage: { $match: { $or: any[] } } = {
+    $match: {
+      $or: [
+        ...normalCoords, // normal coordinates
+      ],
+    },
+  };
+
+  // Don't need to add match for CMH coordinates if there aren't any
+  if (cmhInsertions.length > 0 || cmhDeletions.length > 0) {
+    coordinateStage.$match.$or.push({
+      // CMH coordinates
+      $and: [
+        {
+          // This part might not be necessary?
+          $expr: {
+            $eq: [{ $substrCP: ['$ref', 0, 1] }, { $substrCP: ['$alt', 0, 1] }],
+          },
+        },
+        {
+          $or: [...cmhInsertions, ...cmhDeletions],
+        },
+      ],
+    });
+  }
+
   return await model.aggregate([
     { $match: { pos: { $gte: start, $lte: end } } },
-    {
-      $match: {
-        $or: [
-          ...normalCoords, // normal coordinates
-          {
-            // CMH coordinates
-            $and: [
-              {
-                // This part might not be necessary?
-                $expr: {
-                  $eq: [{ $substrCP: ['$ref', 0, 1] }, { $substrCP: ['$alt', 0, 1] }],
-                },
-              },
-              {
-                $or: [...cmhInsertions, ...cmhDeletions],
-              },
-            ],
-          },
-        ],
-      },
-    },
+    coordinateStage,
     {
       $project: Object.fromEntries([...omittedFields, '_id', 'assembly', 'type'].map(f => [f, 0])),
     },
