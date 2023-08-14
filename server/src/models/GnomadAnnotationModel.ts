@@ -131,29 +131,21 @@ const getAnnotations = async (
 
   // Don't need to add match for CMH coordinates if there aren't any
   if (cmhInsertions.length > 0 || cmhDeletions.length > 0) {
-    coordinateStage.$match.$or.push({
-      // CMH coordinates
-      $and: [
-        {
-          // This part might not be necessary?
-          $expr: {
-            $eq: [{ $substrCP: ['$ref', 0, 1] }, { $substrCP: ['$alt', 0, 1] }],
-          },
-        },
-        {
-          $or: [...cmhInsertions, ...cmhDeletions],
-        },
-      ],
-    });
+    // we assume that ref[0] == alt[0] in gnomAD
+    coordinateStage.$match.$or = coordinateStage.$match.$or.concat([
+      ...cmhInsertions,
+      ...cmhDeletions,
+    ]);
   }
 
-  return await model.aggregate([
-    { $match: { pos: { $gte: start, $lte: end } } },
+  const results = await model.aggregate([
+    { $match: { pos: { $gte: Math.max(start - 1, 0), $lte: end } } },
     coordinateStage,
     {
       $project: Object.fromEntries([...omittedFields, '_id', 'assembly', 'type'].map(f => [f, 0])),
     },
   ]);
+  return results;
 };
 
 GnomadGRCh37AnnotationSchema.statics.getAnnotations = async function (ids: AnnotationInput) {
