@@ -1,11 +1,11 @@
 import resolveAssembly from '../../resolvers/getVariantsResolver/utils/resolveAssembly';
 import { VariantCoordinate, VariantQueryDataResult } from '../../types';
 
-const getCoordinates = (result: VariantQueryDataResult[]) => {
+const getCoordinates = (results: VariantQueryDataResult[]) => {
   let start = +Infinity;
   let end = -Infinity;
   const coordinates: VariantCoordinate[] = [];
-  const variants = result.flat().map(d => d.variant);
+  const variants = results.flat().map(d => d.variant);
   variants.forEach(variant => {
     const resolvedAssemblyId = resolveAssembly(variant.assemblyIdCurrent ?? 'GRCh37');
 
@@ -15,6 +15,10 @@ const getCoordinates = (result: VariantQueryDataResult[]) => {
 
     if (variant.end > end) {
       end = variant.end;
+    }
+
+    if (variant.chromosome.startsWith('chr')) {
+      variant.chromosome = variant.chromosome.substring(3);
     }
 
     coordinates.push({
