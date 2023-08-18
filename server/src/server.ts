@@ -85,6 +85,7 @@ const startServer = async () => {
     schema,
     context: ({ req, res }: any) => ({ req, res }),
     plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+    cache: 'bounded',
   });
   await apolloServer.start();
   apolloServer.applyMiddleware({ app });
