@@ -21,6 +21,7 @@ const memoryStore = new MemoryStore({
   checkPeriod: 86400000, // prune expired entries every 24h
 });
 
+mongoose.set('strictQuery', true); // default value for mongoose v6
 mongoose
   .connect(process.env.MONGO_CONNECTION_STRING!)
   .then(() => {
