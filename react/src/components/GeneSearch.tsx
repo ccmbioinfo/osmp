@@ -55,9 +55,14 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
     const debouncedAutocompleteFetch = useAsyncDebounce(fetchAutocompleteResults, 500);
 
     const formatAutocompleteOptions = useCallback(
-        (autocompleteResults: AutocompleteResults, assembly: AssemblyId) =>
-            (autocompleteResults.autocompleteResults.hits || [])
-                .filter(hit => !!hit.ensembl && !!hit.genomic_pos && !!hit.genomic_pos_hg19)
+        (autocompleteResults: AutocompleteResults, assembly: AssemblyId) => {
+            const is38 = /38/.test(assembly);
+            const something = (autocompleteResults.autocompleteResults.hits || [])
+                .filter(
+                    hit =>
+                        !!hit.ensembl &&
+                        ((is38 && !!hit.genomic_pos) || (!is38 && !!hit.genomic_pos_hg19))
+                )
                 .map((hit, i) => {
                     const { symbol, ...rest } = hit;
 
@@ -70,8 +75,6 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                         genomic_pos,
                         genomic_pos_hg19,
                     };
-
-                    const is38 = /38/.test(assembly);
 
                     return (is38 ? genomic_pos : genomic_pos_hg19)
                         .filter(g => isCanonicalRegion(g.chr))
@@ -88,7 +91,9 @@ const GeneSearch: React.FC<GeneSearchProps> = ({ assembly, geneName, onChange, o
                             };
                         });
                 })
-                .flat(),
+                .flat();
+            return something;
+        },
         []
     );
 
