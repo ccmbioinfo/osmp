@@ -148,6 +148,17 @@ export interface G4RDVariantQueryResult {
   }[];
 }
 
+export interface PTPaginatedVariantQueryResult {
+  page: number;
+  limit: number;
+  exists: boolean;
+  numTotalResults: number;
+  results: {
+    individualIds: string[];
+    variant: VariantResponseFields;
+  }[];
+}
+
 /* G4RD GET patients endpoint schema */
 // https://docs.phenotips.com/reference/fetchpatients-1
 export interface Contact {
