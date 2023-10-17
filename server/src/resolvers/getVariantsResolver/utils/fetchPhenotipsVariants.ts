@@ -50,6 +50,7 @@ const fetchPhenotipsVariants = async (
         // expect page = currentPage, limit = count
         maxResults = numTotalResults;
         collectedResults = collectedResults.concat(results);
+        currentPage += 1;
       } else {
         break;
       }
