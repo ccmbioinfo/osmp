@@ -8,6 +8,9 @@ const config: Config.InitialOptions = {
     '.(ts|tsx)': 'ts-jest',
   },
   verbose: true,
+  moduleNameMapper: {
+    axios: '<rootDir>/node_modules/axios/dist/node/axios.cjs',
+  }
 };
 
 export default config;
