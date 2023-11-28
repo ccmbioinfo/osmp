@@ -14,7 +14,7 @@ import ErrorProvider, {
 } from './Error/ErrorProvider';
 import ErrorFallback from './ErrorFallback';
 import ErrorIndicator from './ErrorIndicator';
-import GeneSearch from './GeneSearch';
+import GeneNameSearch from './GeneNameSearch';
 import IconButton from './IconButton';
 import Input from './Input';
 import { Background, Body, ButtonWrapper, Column, Container, Flex, InlineFlex } from './Layout';
@@ -50,7 +50,7 @@ export {
     ErrorFallback,
     ErrorIndicator,
     Flex,
-    GeneSearch,
+    GeneNameSearch,
     InlineFlex,
     IconButton,
     Input,

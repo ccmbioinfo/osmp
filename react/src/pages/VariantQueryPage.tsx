@@ -13,7 +13,7 @@ import {
     ComboBox,
     ErrorIndicator,
     Flex,
-    GeneSearch,
+    GeneNameSearch,
     Input,
     RequiredIndicator,
     RequiredTextBox,
@@ -205,9 +205,9 @@ const VariantQueryPage: React.FC<{}> = () => {
                             }}
                         >
                             <Typography variant="subtitle" bold>
-                                Gene Name <RequiredIndicator />
+                                Gene Name / Position <RequiredIndicator />
                             </Typography>
-                            <GeneSearch
+                            <GeneNameSearch
                                 assembly={resolveAssembly(queryOptionsForm.assemblyId.value)}
                                 geneName={queryOptionsForm.gene.value}
                                 onChange={geneName => updateQueryOptionsForm({ gene: geneName })}
