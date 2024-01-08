@@ -59,9 +59,8 @@ const _getG4rdNodeQuery = async ({
   // For g4rd node, assemblyId is a required field as specified in this sample request:
   // https://github.com/ccmbioinfo/report-scripts/blob/master/docs/phenotips-api.md#matching-endpoint
   // assemblyId is set to be GRCh37 because g4rd node only contains data in assembly GRCh37.
-  
-  // Labelled try-block, so we can break out of this block instead of adding indentation with if-blocks
-  fetch_block: try {
+
+  try {
     G4RDVariants = await fetchPhenotipsVariants(
       process.env.G4RD_URL as string,
       geneInput,
@@ -70,57 +69,52 @@ const _getG4rdNodeQuery = async ({
     );
 
     // Get patients info
-    if (!G4RDVariants) break fetch_block;
+    if (G4RDVariants) {
+      let individualIds = G4RDVariants.flatMap(v => v.individualIds).filter(Boolean); // Filter out undefined and null values.
 
-    let individualIds = G4RDVariants
-      .flatMap(v => v.individualIds)
-      .filter(Boolean); // Filter out undefined and null values.
+      // Get all unique individual Ids.
+      individualIds = [...new Set(individualIds)];
 
-    // Get all unique individual Ids.
-    individualIds = [...new Set(individualIds)];
+      if (individualIds.length > 0) {
+        const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
+          .map(id => `id=${id}`)
+          .join('&')}`;
 
-    if (individualIds.length <= 0) break fetch_block;
+        G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(
+          new URL(patientUrl).toString(),
+          {
+            headers: {
+              Authorization,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+            },
+          }
+        );
 
-    const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${
-      individualIds
-      .map(id => `id=${id}`)
-      .join('&')
-    }`;
+        // Get Family Id for each patient.
+        const patientFamily = axios.create({
+          headers: {
+            Authorization,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        });
 
-    G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(
-      new URL(patientUrl).toString(),
-      {
-        headers: {
-          Authorization,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+        const familyResponses = await Promise.allSettled(
+          individualIds.map(id =>
+            patientFamily.get<G4RDFamilyQueryResult>(
+              new URL(`${process.env.G4RD_URL}/rest/patients/${id}/family`).toString()
+            )
+          )
+        );
+
+        familyResponses.forEach((response, index) => {
+          if (response.status === 'fulfilled' && response.value.status === 200) {
+            FamilyIds[individualIds[index]] = response.value.data.id;
+          }
+        });
       }
-    );
-
-    // Get Family Id for each patient.
-    const patientFamily = axios.create({
-      headers: {
-        Authorization,
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-    });
-
-    const familyResponses = await Promise.allSettled(
-      individualIds.map(id =>
-        patientFamily.get<G4RDFamilyQueryResult>(
-          new URL(`${process.env.G4RD_URL}/rest/patients/${id}/family`).toString()
-        )
-      )
-    );
-
-    familyResponses.forEach((response, index) => {
-      if (response.status === 'fulfilled' && response.value.status === 200) {
-        FamilyIds[individualIds[index]] = response.value.data.id;
-      }
-    });
-
+    }
   } catch (e: any) {
     logger.error(e);
     G4RDNodeQueryError = e;
@@ -220,8 +214,10 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
       return individualIds.map(individualId => {
         const patient = individualIdsMap[individualId];
 
-        let contactInfo: string = patient.contact ? patient.contact.map(c => c.name).join(" ,") : "";
-    
+        const contactInfo: string = patient.contact
+          ? patient.contact.map(c => c.name).join(' ,')
+          : '';
+
         let info: IndividualInfoFields = {};
         let ethnicity: string = '';
         let disorders: Disorder[] = [];
@@ -265,7 +261,6 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
             };
           });
           phenotypicFeatures = finalFeatures;
-          
         }
 
         const variant: VariantResponseFields = {
@@ -278,7 +273,7 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
           chromosome: r.variant.chromosome,
         };
 
-        let familyId: string = familyIds[individualId];
+        const familyId: string = familyIds[individualId];
 
         const individualResponseFields: IndividualResponseFields = {
           ...patient,

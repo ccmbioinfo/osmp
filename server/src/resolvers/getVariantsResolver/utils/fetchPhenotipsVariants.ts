@@ -28,13 +28,13 @@ const fetchPhenotipsVariants = async (
   let currentPage = 1;
   let collectedResults: PTPaginatedVariantQueryResult['results'] = [];
   let maxResults = Infinity;
-  let count = COUNT;
-  let position = resolveChromosome(gene.position);
+  const count = COUNT;
+  const position = resolveChromosome(gene.position);
 
   logger.debug(`Begin fetching paginated variants from ${baseUrl}. gene: ${JSON.stringify(gene)}, variant: ${JSON.stringify(variant)}`);
   do {
     try {
-      let variantQueryResponse = await axios.post<PTPaginatedVariantQueryResult>(
+      const variantQueryResponse = await axios.post<PTPaginatedVariantQueryResult>(
         `${baseUrl}/rest/variants/match`,
         {
           page: currentPage,
@@ -57,14 +57,14 @@ const fetchPhenotipsVariants = async (
         }
       );
       if (variantQueryResponse && variantQueryResponse.data.exists) {
-        let { results, numTotalResults } = variantQueryResponse.data;
+        const { results, numTotalResults } = variantQueryResponse.data;
         logger.debug(`Successful query of page ${currentPage}, limit ${count}, total: ${numTotalResults}`);
         // expect page = currentPage, limit = count
         maxResults = numTotalResults;
         collectedResults = collectedResults.concat(results);
         currentPage += 1;
       } else {
-        if (collectedResults.length == 0) {
+        if (collectedResults.length === 0) {
           logger.warn(`Variant data does not exist at position ${JSON.stringify(position)}`);
           return [];
         } else {
