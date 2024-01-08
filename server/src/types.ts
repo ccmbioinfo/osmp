@@ -148,15 +148,17 @@ export interface G4RDVariantQueryResult {
   }[];
 }
 
+export type PTVariantArray = {
+  individualIds: string[];
+  variant: VariantResponseFields;
+}[];
+
 export interface PTPaginatedVariantQueryResult {
   page: number;
   limit: number;
   exists: boolean;
   numTotalResults: number;
-  results: {
-    individualIds: string[];
-    variant: VariantResponseFields;
-  }[];
+  results: PTVariantArray;
 }
 
 /* G4RD GET patients endpoint schema */
@@ -226,6 +228,11 @@ export interface G4RDPatientQueryResult {
   solved?: Solved;
   features?: Feature[];
   nonstandard_features?: NonStandardFeature[];
+  contact?: {
+    name: string,
+    id: string,
+  }[];
+  sex?: Maybe<string>;
 }
 
 /* End of G4RD GET patients endpoint schema */
