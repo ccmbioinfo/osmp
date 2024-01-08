@@ -229,8 +229,8 @@ export interface G4RDPatientQueryResult {
   features?: Feature[];
   nonstandard_features?: NonStandardFeature[];
   contact?: {
-    name: string,
-    id: string,
+    name: string;
+    id: string;
   }[];
   sex?: Maybe<string>;
 }

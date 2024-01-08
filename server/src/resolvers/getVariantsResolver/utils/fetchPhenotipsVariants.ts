@@ -31,7 +31,11 @@ const fetchPhenotipsVariants = async (
   const count = COUNT;
   const position = resolveChromosome(gene.position);
 
-  logger.debug(`Begin fetching paginated variants from ${baseUrl}. gene: ${JSON.stringify(gene)}, variant: ${JSON.stringify(variant)}`);
+  logger.debug(
+    `Begin fetching paginated variants from ${baseUrl}. gene: ${JSON.stringify(
+      gene
+    )}, variant: ${JSON.stringify(variant)}`
+  );
   do {
     try {
       const variantQueryResponse = await axios.post<PTPaginatedVariantQueryResult>(
@@ -45,12 +49,12 @@ const fetchPhenotipsVariants = async (
               chrom: Number(position.chromosome),
               start: Number(position.start),
               end: Number(position.end),
-            }
+            },
           },
         },
         {
           headers: {
-            Authorization: authorization,  // TODO: In future, use function instead to get auth?
+            Authorization: authorization, // TODO: In future, use function instead to get auth?
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
@@ -58,7 +62,9 @@ const fetchPhenotipsVariants = async (
       );
       if (variantQueryResponse && variantQueryResponse.data.exists) {
         const { results, numTotalResults } = variantQueryResponse.data;
-        logger.debug(`Successful query of page ${currentPage}, limit ${count}, total: ${numTotalResults}`);
+        logger.debug(
+          `Successful query of page ${currentPage}, limit ${count}, total: ${numTotalResults}`
+        );
         // expect page = currentPage, limit = count
         maxResults = numTotalResults;
         collectedResults = collectedResults.concat(results);
@@ -69,11 +75,15 @@ const fetchPhenotipsVariants = async (
           return [];
         } else {
           // it would be really weird if this happened. the error existed on one page but not the next?
-          logger.error(`Position '${JSON.stringify(position)}' has missing data on page ${currentPage} somehow??`);
+          logger.error(
+            `Position '${JSON.stringify(
+              position
+            )}' has missing data on page ${currentPage} somehow??`
+          );
           throw new QueryResponseError({
             code: 500,
-            message: "Internal Server Error",
-            source: "OSMP"
+            message: 'Internal Server Error',
+            source: 'OSMP',
           });
         }
       }
@@ -82,7 +92,9 @@ const fetchPhenotipsVariants = async (
       throw error; // Adapters will need to handle this error
     }
   } while (collectedResults.length < maxResults);
-  logger.debug(`Fetched ${collectedResults.length} variants across ${currentPage-1} pages from ${baseUrl}`);
+  logger.debug(
+    `Fetched ${collectedResults.length} variants across ${currentPage - 1} pages from ${baseUrl}`
+  );
 
   return collectedResults;
 };
