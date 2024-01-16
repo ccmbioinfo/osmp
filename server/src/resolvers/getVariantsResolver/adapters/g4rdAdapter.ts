@@ -251,10 +251,10 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
           const features = [...(patient.features ?? []), ...(patient.nonstandard_features ?? [])];
           const finalFeatures: PhenotypicFeaturesFields[] = features.map(feat => {
             return {
-              ageOfOnset: null,
-              dateOfOnset: null,
+              // ageOfOnset: null,
+              // dateOfOnset: null,
               levelSeverity: null,
-              onsetType: null,
+              // onsetType: null,
               phenotypeId: feat.id,
               phenotypeLabel: feat.label,
               observed: isObserved(feat),
@@ -276,7 +276,7 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
         const familyId: string = familyIds[individualId];
 
         const individualResponseFields: IndividualResponseFields = {
-          ...patient,
+          sex: patient.sex,
           ethnicity,
           info,
           familyId,
