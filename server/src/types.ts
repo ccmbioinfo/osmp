@@ -148,6 +148,19 @@ export interface G4RDVariantQueryResult {
   }[];
 }
 
+export type PTVariantArray = {
+  individualIds: string[];
+  variant: VariantResponseFields;
+}[];
+
+export interface PTPaginatedVariantQueryResult {
+  page: number;
+  limit: number;
+  exists: boolean;
+  numTotalResults: number;
+  results: PTVariantArray;
+}
+
 /* G4RD GET patients endpoint schema */
 // https://docs.phenotips.com/reference/fetchpatients-1
 export interface Contact {
@@ -215,6 +228,11 @@ export interface G4RDPatientQueryResult {
   solved?: Solved;
   features?: Feature[];
   nonstandard_features?: NonStandardFeature[];
+  contact?: {
+    name: string;
+    id: string;
+  }[];
+  sex?: Maybe<string>;
 }
 
 /* End of G4RD GET patients endpoint schema */

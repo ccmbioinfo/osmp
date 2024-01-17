@@ -12,16 +12,17 @@ import {
   VariantResponseFields,
   G4RDFamilyQueryResult,
   G4RDPatientQueryResult,
-  G4RDVariantQueryResult,
   Disorder,
   IndividualInfoFields,
   PhenotypicFeaturesFields,
   NonStandardFeature,
   Feature,
+  PTVariantArray,
 } from '../../../types';
 import { getFromCache, putInCache } from '../../../utils/cache';
 import { timeit, timeitAsync } from '../../../utils/timeit';
 import resolveAssembly from '../utils/resolveAssembly';
+import fetchPhenotipsVariants from '../utils/fetchPhenotipsVariants';
 
 /* eslint-disable camelcase */
 
@@ -38,7 +39,7 @@ const _getG4rdNodeQuery = async ({
   input: { gene: geneInput, variant },
 }: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
-  let G4RDVariantQueryResponse: null | AxiosResponse<G4RDVariantQueryResult> = null;
+  let G4RDVariants: null | PTVariantArray = null;
   let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
   const FamilyIds: null | Record<string, string> = {}; // <PatientId, FamilyId>
   let Authorization = '';
@@ -53,34 +54,23 @@ const _getG4rdNodeQuery = async ({
       source: SOURCE_NAME,
     };
   }
-  const url = `${process.env.G4RD_URL}/rest/variants/match`;
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  const { position, ...gene } = geneInput;
   variant.assemblyId = 'GRCh37';
   // For g4rd node, assemblyId is a required field as specified in this sample request:
   // https://github.com/ccmbioinfo/report-scripts/blob/master/docs/phenotips-api.md#matching-endpoint
   // assemblyId is set to be GRCh37 because g4rd node only contains data in assembly GRCh37.
+
   try {
-    G4RDVariantQueryResponse = await axios.post<G4RDVariantQueryResult>(
-      url,
-      {
-        gene,
-        variant,
-      },
-      {
-        headers: {
-          Authorization,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }
+    G4RDVariants = await fetchPhenotipsVariants(
+      process.env.G4RD_URL as string,
+      geneInput,
+      variant,
+      Authorization
     );
 
     // Get patients info
-    if (G4RDVariantQueryResponse) {
-      let individualIds = G4RDVariantQueryResponse.data.results
-        .map(v => v.individual.individualId!)
-        .filter(Boolean); // Filter out undefined and null values.
+    if (G4RDVariants) {
+      let individualIds = G4RDVariants.flatMap(v => v.individualIds).filter(Boolean); // Filter out undefined and null values.
 
       // Get all unique individual Ids.
       individualIds = [...new Set(individualIds)];
@@ -132,7 +122,7 @@ const _getG4rdNodeQuery = async ({
 
   return {
     data: transformG4RDQueryResponse(
-      (G4RDVariantQueryResponse?.data as G4RDVariantQueryResult) || [],
+      (G4RDVariants as PTVariantArray) || [],
       (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
       FamilyIds
     ),
@@ -204,98 +194,97 @@ export const transformG4RDNodeErrorResponse: ErrorTransformer<G4RDNodeQueryError
 const isObserved = (feature: Feature | NonStandardFeature) =>
   feature.observed === 'yes' ? true : feature.observed === 'no' ? false : undefined;
 
-export const transformG4RDQueryResponse: ResultTransformer<G4RDVariantQueryResult> = timeit(
+export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = timeit(
   'transformG4RDQueryResponse'
 )(
   (
-    variantResponse: G4RDVariantQueryResult,
+    variants: PTVariantArray,
     patientResponse: G4RDPatientQueryResult[],
     familyIds: Record<string, string>
   ) => {
     const individualIdsMap = Object.fromEntries(patientResponse.map(p => [p.id, p]));
+    // Format we want: list where every entry is a variant-patient pair
+    // Received format: list of variants, and list of patients. Each variant has list of patient IDs associated to it.
 
-    return (variantResponse.results || []).map(r => {
+    return (variants || []).flatMap(r => {
       /* eslint-disable @typescript-eslint/no-unused-vars */
       r.variant.assemblyId = resolveAssembly(r.variant.assemblyId);
-      const { individual, contactInfo } = r;
+      const { individualIds } = r;
 
-      const patient = individual.individualId ? individualIdsMap[individual.individualId] : null;
+      return individualIds.map(individualId => {
+        const patient = individualIdsMap[individualId];
 
-      let info: IndividualInfoFields = {};
-      let ethnicity: string = '';
-      let disorders: Disorder[] = [];
-      let phenotypicFeatures: PhenotypicFeaturesFields[] = individual.phenotypicFeatures || [];
+        const contactInfo: string = patient.contact
+          ? patient.contact.map(c => c.name).join(' ,')
+          : '';
 
-      if (patient) {
-        const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
-        const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
-        const diagnosis = patient.clinicalStatus;
-        const solved = patient.solved ? patient.solved.status : '';
-        const clinicalStatus = patient.clinicalStatus;
-        disorders = patient.disorders.filter(({ label }) => label !== 'affected') as Disorder[];
-        ethnicity = Object.values(patient.ethnicity)
-          .flat()
-          .map(p => p.trim())
-          .join(', ');
-        info = {
-          solved,
-          candidateGene,
-          diagnosis,
-          classifications,
-          clinicalStatus,
-          disorders,
-        };
-        // variant response contains all phenotypic features listed,
-        // even if some of them are explicitly _not_ observed by clinician and recorded as such
-        if (individual.phenotypicFeatures !== null && individual.phenotypicFeatures !== undefined) {
+        let info: IndividualInfoFields = {};
+        let ethnicity: string = '';
+        let disorders: Disorder[] = [];
+        let phenotypicFeatures: PhenotypicFeaturesFields[] = [];
+
+        if (patient) {
+          const candidateGene = (patient.genes ?? []).map(g => g.gene).join('\n');
+          const classifications = (patient.genes ?? []).map(g => g.status).join('\n');
+          const diagnosis = patient.clinicalStatus;
+          const solved = patient.solved ? patient.solved.status : '';
+          const clinicalStatus = patient.clinicalStatus;
+          disorders = patient.disorders.filter(({ label }) => label !== 'affected') as Disorder[];
+          ethnicity = Object.values(patient.ethnicity)
+            .flat()
+            .map(p => p.trim())
+            .join(', ');
+          info = {
+            solved,
+            candidateGene,
+            diagnosis,
+            classifications,
+            clinicalStatus,
+            disorders,
+          };
+          // variant response contains all phenotypic features listed,
+          // even if some of them are explicitly _not_ observed by clinician and recorded as such
+
+          // UPDATE Dec 2022: variant response no longer contains phenotypic features as of pagination change
+          // We only have patient query for features
+          // Some fields are lost (see 'null' fields below), but G4RD approves since they aren't visible on the front-end anyways
           const features = [...(patient.features ?? []), ...(patient.nonstandard_features ?? [])];
-          const detailedFeatures = individual.phenotypicFeatures;
-          // build list of features the safe way
-          const detailedFeatureMap = Object.fromEntries(
-            detailedFeatures.map(feat => [feat.phenotypeId, feat])
-          );
           const finalFeatures: PhenotypicFeaturesFields[] = features.map(feat => {
-            if (feat.id === undefined) {
-              return {
-                ageOfOnset: null,
-                dateOfOnset: null,
-                levelSeverity: null,
-                onsetType: null,
-                phenotypeId: feat.id,
-                phenotypeLabel: feat.label,
-                observed: isObserved(feat),
-              };
-            }
             return {
-              ...detailedFeatureMap[feat.id],
+              // ageOfOnset: null,
+              // dateOfOnset: null,
+              levelSeverity: null,
+              // onsetType: null,
+              phenotypeId: feat.id,
+              phenotypeLabel: feat.label,
               observed: isObserved(feat),
             };
           });
           phenotypicFeatures = finalFeatures;
         }
-      }
 
-      const variant: VariantResponseFields = {
-        alt: r.variant.alt,
-        assemblyId: r.variant.assemblyId,
-        callsets: r.variant.callsets,
-        end: r.variant.end,
-        ref: r.variant.ref,
-        start: r.variant.start,
-        chromosome: r.variant.chromosome,
-      };
+        const variant: VariantResponseFields = {
+          alt: r.variant.alt,
+          assemblyId: r.variant.assemblyId,
+          callsets: r.variant.callsets,
+          end: r.variant.end,
+          ref: r.variant.ref,
+          start: r.variant.start,
+          chromosome: r.variant.chromosome,
+        };
 
-      let familyId: string = '';
-      if (individual.individualId) familyId = familyIds[individual.individualId];
+        const familyId: string = familyIds[individualId];
 
-      const individualResponseFields: IndividualResponseFields = {
-        ...individual,
-        ethnicity,
-        info,
-        familyId,
-        phenotypicFeatures,
-      };
-      return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
+        const individualResponseFields: IndividualResponseFields = {
+          sex: patient.sex,
+          ethnicity,
+          info,
+          familyId,
+          phenotypicFeatures,
+          individualId,
+        };
+        return { individual: individualResponseFields, variant, contactInfo, source: SOURCE_NAME };
+      });
     });
   }
 );

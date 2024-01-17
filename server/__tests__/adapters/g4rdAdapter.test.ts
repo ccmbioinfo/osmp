@@ -1,14 +1,16 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { transformG4RDQueryResponse } from '../../src/resolvers/getVariantsResolver/adapters/g4rdAdapter';
 import typeDefs from '../../src/typeDefs';
-import { CombinedVariantQueryResponse, G4RDVariantQueryResult } from '../../src/types';
+import { CombinedVariantQueryResponse, PTPaginatedVariantQueryResult } from '../../src/types';
 import { addMocksToSchema } from '@graphql-tools/mock';
 import { testGraphQLQuery } from '../testGraphQLQuery';
 
 /* an around the world test here would validate the transformer and pass it to the schema */
 
-const testResponse: G4RDVariantQueryResult = {
+const testResponse: PTPaginatedVariantQueryResult = {
   exists: true,
+  page: 1,
+  limit: 5,
   numTotalResults: 1,
   results: [
     {
@@ -27,20 +29,12 @@ const testResponse: G4RDVariantQueryResult = {
           },
         ],
       },
-      individual: {
-        individualId: '12345',
-        diseases: [],
-        phenotypicFeatures: [
-          { phenotypeId: 'HP:0002140', levelSeverity: null },
-          { phenotypeId: 'HP:0002326', levelSeverity: null },
-          { phenotypeId: 'HP:0012158', levelSeverity: null },
-        ],
-        sex: 'NCIT:C46112',
-      },
-      contactInfo: 'Test User',
+      individualIds: ['12345'],
     },
   ],
 };
+
+const testVariantArray = testResponse.results;
 
 const patientTestResponse = [
   {
@@ -140,7 +134,7 @@ const patientTestResponse = [
 const familyTestResponse = { '12345': '6789' };
 
 const transformed = transformG4RDQueryResponse(
-  testResponse,
+  testVariantArray,
   patientTestResponse,
   familyTestResponse
 );
@@ -172,22 +166,12 @@ describe('Test g4rd query response transformer', () => {
             start
           }
           individual {
-            diseases {
-              ageOfOnset {
-                age
-                ageGroup
-              }
-              description
-              diseaseId
-              levelSeverity
-              outcome
-              stage
-            }
             individualId
             phenotypicFeatures {
               levelSeverity
               observed
               phenotypeId
+              phenotypeLabel
             }
             sex
             ethnicity
