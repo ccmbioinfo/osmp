@@ -71,6 +71,7 @@ const _getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariants) {
+      logger.debug(`G4RDVariants length: ${G4RDVariants.length}`);
       let individualIds = G4RDVariants.flatMap(v => v.individualIds).filter(Boolean); // Filter out undefined and null values.
 
       // Get all unique individual Ids.
@@ -92,11 +93,18 @@ const _getG4rdNodeQuery = async ({
           },
         });
 
+        logger.debug("Begin fetching family IDs");
+
         const familyResponses = await Promise.allSettled(
-          individualIds.map(id =>
-            patientFamily.get<G4RDFamilyQueryResult>(
+          individualIds.map((id, i) => {
+            if (i % 50 === 0 || i === individualIds.length - 1) {
+              logger.debug(`Fetching family ${i+1} of ${individualIds.length}`);
+            }
+            return patientFamily.get<G4RDFamilyQueryResult>(
               new URL(`${process.env.G4RD_URL}/rest/patients/${id}/family`).toString()
-            )
+            );
+          }
+            
           )
         );
 
