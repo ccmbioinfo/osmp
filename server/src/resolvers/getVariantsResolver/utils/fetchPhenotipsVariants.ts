@@ -29,7 +29,13 @@ const fetchPhenotipsVariants = async (
   let collectedResults: PTPaginatedVariantQueryResult['results'] = [];
   let maxResults = Infinity;
   const count = COUNT;
-  const position = resolveChromosome(gene.position);
+  const _position = resolveChromosome(gene.position);
+  const chromosome = ["X", "Y"].indexOf(_position.chromosome) !== -1 ? _position.chromosome : Number(_position.chromosome);
+  const position = {
+    chrom: chromosome,
+    start: Number(_position.start),
+    end: Number(_position.end),
+  };
 
   logger.debug(
     `Begin fetching paginated variants from ${baseUrl}. gene: ${JSON.stringify(
@@ -45,11 +51,7 @@ const fetchPhenotipsVariants = async (
           limit: count,
           variant: {
             ...variant,
-            position: {
-              chrom: Number(position.chromosome),
-              start: Number(position.start),
-              end: Number(position.end),
-            },
+            position,
           },
         },
         {
