@@ -31,7 +31,10 @@ const fetchPhenotipsVariants = async (
   let maxResults = Infinity;
   const count = COUNT;
   const _position = resolveChromosome(gene.position);
-  const chromosome = ["X", "Y"].indexOf(_position.chromosome) !== -1 ? _position.chromosome : Number(_position.chromosome);
+  const chromosome =
+    ['X', 'Y'].indexOf(_position.chromosome) !== -1
+      ? _position.chromosome
+      : Number(_position.chromosome);
   const position = {
     chrom: chromosome,
     start: Number(_position.start),

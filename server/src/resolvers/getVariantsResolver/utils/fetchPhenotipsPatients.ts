@@ -34,19 +34,25 @@ const fetchPhenotipsPatients = async (
     while (currStart < individualIds.length) {
       const currEndCapped = Math.min(currEnd, individualIds.length);
       const queryIds = individualIds.slice(currStart, currEndCapped);
-      const patientUrl = `${baseUrl}/rest/patients/fetch?${queryIds.map(id => `id=${id}`).join('&')}`;
+      const patientUrl = `${baseUrl}/rest/patients/fetch?${queryIds
+        .map(id => `id=${id}`)
+        .join('&')}`;
       const patientQueryResponse = await axios.get<G4RDPatientQueryResult[]>(
         new URL(patientUrl).toString(),
         {
           headers: {
             Authorization: authorization,
             'Content-Type': 'application/json',
-            Accept: 'application/json'
+            Accept: 'application/json',
           },
         }
       );
-      finalPatientQueryResponse = finalPatientQueryResponse.concat(patientQueryResponse?.data || []);
-      logger.debug(`Successful query for patients, received ${finalPatientQueryResponse.length} of ${individualIds.length}.`);
+      finalPatientQueryResponse = finalPatientQueryResponse.concat(
+        patientQueryResponse?.data || []
+      );
+      logger.debug(
+        `Successful query for patients, received ${finalPatientQueryResponse.length} of ${individualIds.length}.`
+      );
       currStart += COUNT;
       currEnd += COUNT;
     }

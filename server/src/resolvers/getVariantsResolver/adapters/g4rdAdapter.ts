@@ -77,7 +77,11 @@ const _getG4rdNodeQuery = async ({
       individualIds = [...new Set(individualIds)];
 
       if (individualIds.length > 0) {
-        G4RDPatientQueryResponse = await fetchPhenotipsPatients(process.env.G4RD_URL!, individualIds, Authorization);
+        G4RDPatientQueryResponse = await fetchPhenotipsPatients(
+          process.env.G4RD_URL!,
+          individualIds,
+          Authorization
+        );
 
         // Get Family Id for each patient.
         const patientFamily = axios.create({
@@ -202,7 +206,9 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
       return individualIds.map(individualId => {
         const patient = individualIdsMap[individualId];
 
-        const contactInfo: string = patient.contact ? patient.contact.map(c => c.name).join(' ,') : '';
+        const contactInfo: string = patient.contact
+          ? patient.contact.map(c => c.name).join(' ,')
+          : '';
 
         let info: IndividualInfoFields = {};
         let ethnicity: string = '';
