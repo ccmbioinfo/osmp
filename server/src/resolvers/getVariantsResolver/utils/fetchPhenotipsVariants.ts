@@ -24,7 +24,7 @@ const fetchPhenotipsVariants = async (
   baseUrl: string,
   gene: GeneQueryInput,
   variant: VariantQueryInput,
-  authorization: string
+  getAuthorization: () => Promise<string>
 ): Promise<PTPaginatedVariantQueryResult['results']> => {
   let currentPage = 1;
   let collectedResults: PTPaginatedVariantQueryResult['results'] = [];
@@ -60,7 +60,7 @@ const fetchPhenotipsVariants = async (
         },
         {
           headers: {
-            Authorization: authorization, // TODO: In future, use function instead to get auth?
+            Authorization: await getAuthorization(),
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },

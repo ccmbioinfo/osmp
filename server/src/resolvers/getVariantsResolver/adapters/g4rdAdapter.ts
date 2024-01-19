@@ -66,7 +66,7 @@ const _getG4rdNodeQuery = async ({
       process.env.G4RD_URL as string,
       geneInput,
       variant,
-      Authorization
+      getAuthHeader
     );
 
     // Get patients info
@@ -80,7 +80,7 @@ const _getG4rdNodeQuery = async ({
         G4RDPatientQueryResponse = await fetchPhenotipsPatients(
           process.env.G4RD_URL!,
           individualIds,
-          Authorization
+          getAuthHeader
         );
 
         // Get Family Id for each patient.
