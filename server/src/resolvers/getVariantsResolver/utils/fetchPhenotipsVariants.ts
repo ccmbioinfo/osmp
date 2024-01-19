@@ -7,6 +7,7 @@ import logger from '../../../logger';
 import resolveChromosome from './resolveChromosome';
 import { QueryResponseError } from './queryResponseError';
 
+// How many variants to query for at a time?
 const COUNT = 25;
 
 /**
@@ -38,7 +39,7 @@ const fetchPhenotipsVariants = async (
   };
 
   logger.debug(
-    `Begin fetching paginated variants from ${baseUrl}. gene: ${JSON.stringify(
+    `Begin fetching paginated variants from ${baseUrl}/rest/variants/match. gene: ${JSON.stringify(
       gene
     )}, variant: ${JSON.stringify(variant)}`
   );
