@@ -7,6 +7,7 @@ import logger from '../../../logger';
 import resolveChromosome from './resolveChromosome';
 import { QueryResponseError } from './queryResponseError';
 
+// How many variants to query for at a time?
 const COUNT = 25;
 
 /**
@@ -23,16 +24,25 @@ const fetchPhenotipsVariants = async (
   baseUrl: string,
   gene: GeneQueryInput,
   variant: VariantQueryInput,
-  authorization: string
+  getAuthorization: () => Promise<string>
 ): Promise<PTPaginatedVariantQueryResult['results']> => {
   let currentPage = 1;
   let collectedResults: PTPaginatedVariantQueryResult['results'] = [];
   let maxResults = Infinity;
   const count = COUNT;
-  const position = resolveChromosome(gene.position);
+  const _position = resolveChromosome(gene.position);
+  const chromosome =
+    ['X', 'Y'].indexOf(_position.chromosome) !== -1
+      ? _position.chromosome
+      : Number(_position.chromosome);
+  const position = {
+    chrom: chromosome,
+    start: Number(_position.start),
+    end: Number(_position.end),
+  };
 
   logger.debug(
-    `Begin fetching paginated variants from ${baseUrl}. gene: ${JSON.stringify(
+    `Begin fetching paginated variants from ${baseUrl}/rest/variants/match. gene: ${JSON.stringify(
       gene
     )}, variant: ${JSON.stringify(variant)}`
   );
@@ -45,16 +55,12 @@ const fetchPhenotipsVariants = async (
           limit: count,
           variant: {
             ...variant,
-            position: {
-              chrom: Number(position.chromosome),
-              start: Number(position.start),
-              end: Number(position.end),
-            },
+            position,
           },
         },
         {
           headers: {
-            Authorization: authorization, // TODO: In future, use function instead to get auth?
+            Authorization: await getAuthorization(),
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },

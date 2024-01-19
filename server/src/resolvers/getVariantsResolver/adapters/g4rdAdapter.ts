@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, { AxiosError } from 'axios';
 import jwtDecode from 'jwt-decode';
 import { URLSearchParams } from 'url';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +23,7 @@ import { getFromCache, putInCache } from '../../../utils/cache';
 import { timeit, timeitAsync } from '../../../utils/timeit';
 import resolveAssembly from '../utils/resolveAssembly';
 import fetchPhenotipsVariants from '../utils/fetchPhenotipsVariants';
+import fetchPhenotipsPatients from '../utils/fetchPhenotipsPatients';
 
 /* eslint-disable camelcase */
 
@@ -40,7 +41,7 @@ const _getG4rdNodeQuery = async ({
 }: QueryInput): Promise<VariantQueryResponse> => {
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
   let G4RDVariants: null | PTVariantArray = null;
-  let G4RDPatientQueryResponse: null | AxiosResponse<G4RDPatientQueryResult> = null;
+  let G4RDPatientQueryResponse: null | G4RDPatientQueryResult[] = null;
   const FamilyIds: null | Record<string, string> = {}; // <PatientId, FamilyId>
   let Authorization = '';
   try {
@@ -65,30 +66,22 @@ const _getG4rdNodeQuery = async ({
       process.env.G4RD_URL as string,
       geneInput,
       variant,
-      Authorization
+      getAuthHeader
     );
 
     // Get patients info
     if (G4RDVariants) {
+      logger.debug(`G4RDVariants length: ${G4RDVariants.length}`);
       let individualIds = G4RDVariants.flatMap(v => v.individualIds).filter(Boolean); // Filter out undefined and null values.
 
       // Get all unique individual Ids.
       individualIds = [...new Set(individualIds)];
 
       if (individualIds.length > 0) {
-        const patientUrl = `${process.env.G4RD_URL}/rest/patients/fetch?${individualIds
-          .map(id => `id=${id}`)
-          .join('&')}`;
-
-        G4RDPatientQueryResponse = await axios.get<G4RDPatientQueryResult>(
-          new URL(patientUrl).toString(),
-          {
-            headers: {
-              Authorization,
-              'Content-Type': 'application/json',
-              Accept: 'application/json',
-            },
-          }
+        G4RDPatientQueryResponse = await fetchPhenotipsPatients(
+          process.env.G4RD_URL!,
+          individualIds,
+          getAuthHeader
         );
 
         // Get Family Id for each patient.
@@ -100,12 +93,17 @@ const _getG4rdNodeQuery = async ({
           },
         });
 
+        logger.debug('Begin fetching family IDs');
+
         const familyResponses = await Promise.allSettled(
-          individualIds.map(id =>
-            patientFamily.get<G4RDFamilyQueryResult>(
+          individualIds.map((id, i) => {
+            if (i % 50 === 0 || i === individualIds.length - 1) {
+              logger.debug(`Fetching family ${i + 1} of ${individualIds.length}`);
+            }
+            return patientFamily.get<G4RDFamilyQueryResult>(
               new URL(`${process.env.G4RD_URL}/rest/patients/${id}/family`).toString()
-            )
-          )
+            );
+          })
         );
 
         familyResponses.forEach((response, index) => {
@@ -123,7 +121,7 @@ const _getG4rdNodeQuery = async ({
   return {
     data: transformG4RDQueryResponse(
       (G4RDVariants as PTVariantArray) || [],
-      (G4RDPatientQueryResponse?.data as G4RDPatientQueryResult) || [],
+      G4RDPatientQueryResponse,
       FamilyIds
     ),
     error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
