@@ -105,7 +105,9 @@ const fetchPhenotipsVariants = async (
         logger.error(JSON.stringify(error));
         throw error;
       } else {
-        logger.warn(`Failed fetch (${numFailedQueries}/${RETRY_COUNT}) to ${baseUrl}/rest/variants/match, page: ${currentPage}`);
+        logger.warn(
+          `Failed fetch (${numFailedQueries}/${RETRY_COUNT}) to ${baseUrl}/rest/variants/match, page: ${currentPage}`
+        );
         logger.warn(JSON.stringify(error));
       }
     }

@@ -88,7 +88,6 @@ const _getG4rdNodeQuery = async ({
           logger.error(JSON.stringify(e));
           G4RDPatientQueryResponse = [];
         }
-        
 
         // Get Family Id for each patient.
         const patientFamily = axios.create({
