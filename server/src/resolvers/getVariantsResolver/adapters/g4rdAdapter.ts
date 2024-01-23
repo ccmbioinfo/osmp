@@ -78,11 +78,17 @@ const _getG4rdNodeQuery = async ({
       individualIds = [...new Set(individualIds)];
 
       if (individualIds.length > 0) {
-        G4RDPatientQueryResponse = await fetchPhenotipsPatients(
-          process.env.G4RD_URL!,
-          individualIds,
-          getAuthHeader
-        );
+        try {
+          G4RDPatientQueryResponse = await fetchPhenotipsPatients(
+            process.env.G4RD_URL!,
+            individualIds,
+            getAuthHeader
+          );
+        } catch (e) {
+          logger.error(JSON.stringify(e));
+          G4RDPatientQueryResponse = [];
+        }
+        
 
         // Get Family Id for each patient.
         const patientFamily = axios.create({

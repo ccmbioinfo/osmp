@@ -10,6 +10,9 @@ import { QueryResponseError } from './queryResponseError';
 // How many variants to query for at a time?
 const COUNT = 25;
 
+// How many times to retry a given query before throwing the error back?
+const RETRY_COUNT = 3;
+
 /**
  * Return a complete list of results from Phenotips with a given query to /rest/variants/match.
  * Collects paginated results as a single array of results.
@@ -40,6 +43,8 @@ const fetchPhenotipsVariants = async (
     start: Number(_position.start),
     end: Number(_position.end),
   };
+
+  let numFailedQueries = 0;
 
   logger.debug(
     `Begin fetching paginated variants from ${baseUrl}/rest/variants/match. gene: ${JSON.stringify(
@@ -78,6 +83,7 @@ const fetchPhenotipsVariants = async (
       } else {
         if (collectedResults.length === 0) {
           logger.warn(`Variant data does not exist at position ${JSON.stringify(position)}`);
+          logger.debug(JSON.stringify(variantQueryResponse));
           return [];
         } else {
           // it would be really weird if this happened. the error existed on one page but not the next?
@@ -94,8 +100,14 @@ const fetchPhenotipsVariants = async (
         }
       }
     } catch (error: any) {
-      logger.error(JSON.stringify(error));
-      throw error; // Adapters will need to handle this error
+      numFailedQueries += 1;
+      if (numFailedQueries > RETRY_COUNT) {
+        logger.error(JSON.stringify(error));
+        throw error;
+      } else {
+        logger.warn(`Failed fetch (${numFailedQueries}/${RETRY_COUNT}) to ${baseUrl}/rest/variants/match, page: ${currentPage}`);
+        logger.warn(JSON.stringify(error));
+      }
     }
   } while (collectedResults.length < maxResults);
   logger.debug(
