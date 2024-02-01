@@ -42,7 +42,7 @@ const _getG4rdNodeQuery = async ({
   let G4RDNodeQueryError: G4RDNodeQueryError | null = null;
   let G4RDVariants: null | PTVariantArray = null;
   let G4RDPatientQueryResponse: null | G4RDPatientQueryResult[] = null;
-  const FamilyIds: null | Record<string, string> = {}; // <PatientId, FamilyId>
+  const FamilyIds: Record<string, string> = {}; // <PatientId, FamilyId>
   let Authorization = '';
   try {
     Authorization = await getAuthHeader();
@@ -126,7 +126,7 @@ const _getG4rdNodeQuery = async ({
   return {
     data: transformG4RDQueryResponse(
       (G4RDVariants as PTVariantArray) || [],
-      G4RDPatientQueryResponse,
+      (G4RDPatientQueryResponse as G4RDPatientQueryResult[]) || [],
       FamilyIds
     ),
     error: transformG4RDNodeErrorResponse(G4RDNodeQueryError),
