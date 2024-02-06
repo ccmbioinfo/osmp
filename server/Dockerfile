@@ -30,5 +30,5 @@ FROM base
 COPY --from=builder /usr/src/app/dist .
 ENV NODE_ENV=production
 USER node
-EXPOSE 3000
-CMD ["node", "--trace-gc", "."]
+EXPOSE 3000 9229
+CMD ["node", "--trace-gc", "--inspect=0.0.0.0:9229", "."]

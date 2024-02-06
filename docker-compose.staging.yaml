@@ -37,6 +37,7 @@ services:
       TEST_NODE_URL: http://test-node:3000/data
     ports:
       - 3000:3000
+      - 9229:9229
     <<: *common
 
   test-node:
