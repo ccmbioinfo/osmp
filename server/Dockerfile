@@ -31,4 +31,4 @@ COPY --from=builder /usr/src/app/dist .
 ENV NODE_ENV=production
 USER node
 EXPOSE 3000 9229
-CMD ["node", "--trace-gc", "--inspect=0.0.0.0:9229", "--max-old-space-size=1000", "--heapsnapshot-near-heap-limit=10", "."]
+CMD ["node", "--trace-gc", "--inspect=0.0.0.0:9229", "--max-old-space-size=100", "--heapsnapshot-near-heap-limit=10", "."]
