@@ -56,7 +56,10 @@ const addAdditionalFieldsAndFormatNulls = (
     cdna: results.cdna || 'NA',
     aaChange: results.aaChange || 'NA',
     af: results.af || 0,
+    ac: results.ac || 0,
     gnomadHom: results.gnomadHom || 0,
+    // gnomadHet: results.gnomadHet || 0,
+    maleCount: 0,
 });
 
 export const calculateColumnWidth = (
@@ -119,6 +122,8 @@ export const isHomozygous = (zygosity: string | null | undefined) => {
     return !!zygosity?.toLowerCase().includes('hom');
 };
 
+export const isMale = (sex: string | null | undefined) => resolveSex('' + sex) === 'Male';
+
 export const isLastCellInSet = (cell: Cell<ResultTableColumns>, columnOrder: string[]) =>
     !!cell.column &&
     // Check if the cell's column is the last in its set (excluding hidden columns)
@@ -154,7 +159,7 @@ export const isLastHeaderInSet = (
 };
 
 // 1, Sort queryResult in ascending order according to variant's ref, alt, start, end.
-// 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId, homozygousCount, heterozygousCount to each row.
+// 2, Flatten data and compute values as needed (note that column display formatting function should not alter values for ease of export). Assign uniqueId, homozygousCount, heterozygousCount, maleCount to each row.
 export const prepareData = (
     queryResult: VariantQueryDataResult[]
 ): [ResultTableColumns[], number[]] => {
@@ -170,21 +175,26 @@ export const prepareData = (
     var currRowId = 0;
     var currHomozygousCount = 0;
     var currHeterozygousCount = 0;
+    var currMaleCount = 0;
 
+    // sorted by variant
     sortedQueryResult.forEach(d => {
         const { ref, alt, start, end } = d.variant;
+        // if different variant from previous iteration
         if (
             currVariant.ref !== ref ||
             currVariant.alt !== alt ||
             currVariant.start !== start ||
             currVariant.end !== end
         ) {
+            // Update previous batch of rows that were all the same variant
             if (uniqueVariantIndices.length) {
                 result
                     .slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId)
                     .forEach(row => {
                         row.homozygousCount = currHomozygousCount;
                         row.heterozygousCount = currHeterozygousCount;
+                        row.maleCount = currMaleCount;
                     });
             }
 
@@ -192,9 +202,11 @@ export const prepareData = (
             currHeterozygousCount = 0;
             currVariant = { ref, alt, start, end };
             currUniqueId += 1;
+            currMaleCount = 0;
             uniqueVariantIndices.push(currRowId);
         }
 
+        // update counts
         if (d.variant.callsets.length) {
             result.push.apply(
                 result,
@@ -206,6 +218,10 @@ export const prepareData = (
                             } else if (isHomozygous(cs.info.zygosity)) {
                                 currHomozygousCount += 1;
                             }
+                            if (isMale(d.individual.sex)) {
+                                currMaleCount += 1;
+                            }
+
                             return true;
                         } else {
                             return false;
@@ -229,6 +245,19 @@ export const prepareData = (
     result.slice(uniqueVariantIndices[uniqueVariantIndices.length - 1], currRowId).forEach(row => {
         row.homozygousCount = currHomozygousCount;
         row.heterozygousCount = currHeterozygousCount;
+        row.maleCount = currMaleCount;
+    });
+
+    // update individualId, familyId with source prefix
+    // (P0001 from G4RD is not the same as P0001 from CMH)
+    result.map(r => {
+        if (r.individualId) {
+            r.individualId = [r.source, r.individualId].join('_');
+        }
+        if (r.familyId) {
+            r.familyId = [r.source, r.familyId].join('_');
+        }
+        return r;
     });
 
     // Remove duplicate variants for the same patient
@@ -241,7 +270,8 @@ export const prepareData = (
                     t.end === arr.end &&
                     t.alt === arr.alt &&
                     t.ref === arr.ref &&
-                    t.individualId === arr.individualId
+                    t.individualId === arr.individualId &&
+                    t.source === arr.source
             )
     );
 

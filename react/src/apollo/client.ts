@@ -12,7 +12,7 @@ import { VariantQueryResponseError } from '../types';
 const GRAPHQL_URL = process.env.REACT_APP_GRAPHQL_URL;
 
 export const buildLink = (token?: string) => {
-    const timeoutLink = new ApolloLinkTimeout(90_000); // 90 second timeout
+    const timeoutLink = new ApolloLinkTimeout(900_000); // 900 second timeout
     const mygeneRestLink = new RestLink({
         uri: 'https://mygene.info/v3/',
     });

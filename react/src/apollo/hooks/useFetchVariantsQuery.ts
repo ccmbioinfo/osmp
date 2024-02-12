@@ -25,10 +25,10 @@ const fetchVariantsQuery = gql`
                     info {
                         aaChange
                         af
+                        ac
                         cdna
                         consequence
                         geneName
-                        gnomadHet
                         gnomadHom
                         phred
                         spliceAIScore

@@ -1,6 +1,7 @@
 import mongoose, { Model, model } from 'mongoose';
 import logger from '../logger';
 import {
+  CMHVariantIndelCoordinate,
   GnomadBaseAnnotation,
   GnomadGenomeAnnotation,
   GnomadGRCh37ExomeAnnotation,
@@ -90,13 +91,61 @@ const getAnnotations = async (
 
   if (!coordinates.length) return [];
 
-  return await model.aggregate([
-    { $match: { pos: { $gte: start, $lte: end } } },
-    { $match: { $or: coordinates } },
+  // Check and modify coordinates to fit gnomAD model
+  // CMH uses "-" in ref/alt fields for insertions/deletions respectively, gnomAD doesn't
+  const cmhInsertions: CMHVariantIndelCoordinate<'$alt'>[] = [];
+  const cmhDeletions: CMHVariantIndelCoordinate<'$ref'>[] = [];
+  const normalCoords: VariantCoordinate[] = [];
+  coordinates.forEach(coord => {
+    if (coord.alt === '-') {
+      // CMH deletion
+      cmhDeletions.push({
+        $expr: {
+          $eq: [{ $substrCP: ['$ref', 1, { $strLenCP: '$ref' }] }, coord.ref],
+        },
+        pos: coord.pos - 1, // cmh 'start' is +1 compared to gnomad
+        chrom: coord.chrom,
+      });
+    } else if (coord.ref === '-') {
+      // CMH insertion
+      cmhInsertions.push({
+        $expr: {
+          $eq: [{ $substrCP: ['$alt', 1, { $strLenCP: '$alt' }] }, coord.alt],
+        },
+        pos: coord.pos,
+        chrom: coord.chrom,
+      });
+    } else {
+      normalCoords.push(coord);
+    }
+  });
+
+  // don't worry about the types
+  const coordinateStage: { $match: { $or: any[] } } = {
+    $match: {
+      $or: [
+        ...normalCoords, // normal coordinates
+      ],
+    },
+  };
+
+  // Don't need to add match for CMH coordinates if there aren't any
+  if (cmhInsertions.length > 0 || cmhDeletions.length > 0) {
+    // we assume that ref[0] == alt[0] in gnomAD
+    coordinateStage.$match.$or = coordinateStage.$match.$or.concat([
+      ...cmhInsertions,
+      ...cmhDeletions,
+    ]);
+  }
+
+  const results = await model.aggregate([
+    { $match: { pos: { $gte: Math.max(start - 1, 0), $lte: end } } },
+    coordinateStage,
     {
       $project: Object.fromEntries([...omittedFields, '_id', 'assembly', 'type'].map(f => [f, 0])),
     },
   ]);
+  return results;
 };
 
 GnomadGRCh37AnnotationSchema.statics.getAnnotations = async function (ids: AnnotationInput) {

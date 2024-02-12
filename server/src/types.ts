@@ -5,10 +5,10 @@ import { Maybe } from 'graphql/jsutils/Maybe';
 export interface VariantResponseInfoFields {
   aaChange?: Maybe<string>;
   af?: Maybe<number>;
+  ac?: Maybe<number>;
   cdna?: Maybe<string>;
   consequence?: Maybe<string>;
   geneName?: Maybe<string>;
-  gnomadHet?: Maybe<string>;
   gnomadHom?: Maybe<number>;
   phred?: Maybe<number>;
   spliceAIScore?: Maybe<number>;
@@ -148,6 +148,19 @@ export interface G4RDVariantQueryResult {
   }[];
 }
 
+export type PTVariantArray = {
+  individualIds: string[];
+  variant: VariantResponseFields;
+}[];
+
+export interface PTPaginatedVariantQueryResult {
+  page: number;
+  limit: number;
+  exists: boolean;
+  numTotalResults: number;
+  results: PTVariantArray;
+}
+
 /* G4RD GET patients endpoint schema */
 // https://docs.phenotips.com/reference/fetchpatients-1
 export interface Contact {
@@ -215,6 +228,11 @@ export interface G4RDPatientQueryResult {
   solved?: Solved;
   features?: Feature[];
   nonstandard_features?: NonStandardFeature[];
+  contact?: {
+    name: string;
+    id: string;
+  }[];
+  sex?: Maybe<string>;
 }
 
 /* End of G4RD GET patients endpoint schema */
@@ -229,6 +247,17 @@ export interface VariantCoordinate {
   chrom: string;
   ref: string;
   pos: number;
+}
+
+// Very specific type so that it can be put into a mongo.aggregate under "$or:"
+// CMH indels use "-" unlike G4RD, so we compare $ref[1:] or $alt[1:] to ref or alt in CMH respectively
+// '$ref' for deletions, '$alt' for insertions (ie. which one has more nucleotides)
+export interface CMHVariantIndelCoordinate<T extends '$ref' | '$alt'> {
+  $expr: {
+    $eq: [{ $substrCP: [T, 1, { $strLenCP: T }] }, string];
+  };
+  pos: number;
+  chrom: string;
 }
 
 export interface CaddAnnotation extends VariantCoordinate {

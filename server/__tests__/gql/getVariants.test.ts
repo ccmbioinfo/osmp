@@ -29,10 +29,10 @@ describe('Test minimal getVariants query', () => {
             info {
               aaChange
               af
+              ac
               cdna
               consequence
               geneName
-              gnomadHet
               gnomadHom
               transcript
             }

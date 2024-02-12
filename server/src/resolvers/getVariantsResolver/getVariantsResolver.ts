@@ -18,6 +18,7 @@ import liftover from './utils/liftOver';
 import { QueryResponseError } from './utils/queryResponseError';
 import getG4rdNodeQuery from './adapters/g4rdAdapter';
 import { timeitAsync } from '../../utils/timeit';
+import getCMHNodeQuery from './adapters/cmhAdapter';
 
 const getVariants = async (parent: any, args: QueryInput): Promise<CombinedVariantQueryResponse> =>
   await resolveVariantQuery(args);
@@ -86,8 +87,13 @@ const resolveVariantQuery = timeitAsync('resolveVariantQuery')(
 
     // perform liftOver if needed
     if (dataForLiftover.length) {
-      const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
-      ({ unliftedVariants, dataForAnnotation, annotationPosition } = liftoverResults);
+      try {
+        const liftoverResults = await liftover(dataForAnnotation, dataForLiftover, assemblyId);
+        ({ unliftedVariants, dataForAnnotation, annotationPosition } = liftoverResults);
+        // annotationPosition == "" if there's no data for annotation, which is fine
+      } catch (err) {
+        logger.error(JSON.stringify(err));
+      }
     }
 
     // Cadd annotations for data in user requested assemblyId
@@ -144,6 +150,8 @@ const buildSourceQuery = timeitAsync('buildSourceQuery')(
         return getRemoteTestNodeQuery(args);
       case 'g4rd':
         return getG4rdNodeQuery(args);
+      case 'cmh':
+        return getCMHNodeQuery(args);
       default:
         throw new Error(`source ${source} not found!`);
     }
