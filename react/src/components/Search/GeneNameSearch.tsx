@@ -6,6 +6,7 @@ import { Background, Typography } from '..';
 import { AssemblyId } from '../../types';
 import ComboBox from '../ComboBox';
 import { SelectableListItem } from '../SelectableList';
+import isCanonicalRegion from '../../utils/isCanonicalRegion';
 interface HitPosition {
     chr: string;
     start: number;
@@ -36,9 +37,6 @@ interface GeneNameSearchProps {
     onSelect: (gene: GeneSelectionValue) => void;
     onChange: (geneName: string) => void;
 }
-
-const isCanonicalRegion = (chr: string) =>
-    ['X', 'Y', ...Array.from({ length: 22 }, (_, i) => (i + 1).toString())].includes(chr);
 
 const GeneNameSearch: React.FC<GeneNameSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
     const [options, setOptions] = useState<SelectableListItem<GeneSelectionValue>[]>([]);

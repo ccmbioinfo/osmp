@@ -1,7 +1,6 @@
 import React from 'react';
 import { NetworkStatus, useApolloClient } from '@apollo/client';
 import { RiInformationFill } from 'react-icons/ri';
-import styled from 'styled-components/macro';
 import { useFetchVariantsQuery } from '../apollo/hooks';
 import {
     Background,
@@ -29,6 +28,7 @@ import { useErrorContext, useFormReducer } from '../hooks';
 import { formIsValid, FormState, Validator } from '../hooks/useFormReducer';
 import { AssemblyId } from '../types';
 import { formatErrorMessage, resolveAssembly } from '../utils';
+import ErrorText from '../components/ErrorText';
 
 const queryOptionsFormValidator: Validator<QueryOptionsFormState> = {
     assemblyId: {
@@ -83,20 +83,6 @@ interface QueryOptionsFormState {
     position: string;
     sources: string[];
 }
-
-const ErrorWrapper = styled.div`
-    margin: 0 0 ${props => props.theme.space[2]};
-    padding: ${props => props.theme.space[4]} 0.75rem 0;
-`;
-
-const ErrorText: React.FC<{ error?: string }> = ({ error }) =>
-    error ? (
-        <ErrorWrapper>
-            <Typography error variant="subtitle" bold condensed>
-                {error}
-            </Typography>
-        </ErrorWrapper>
-    ) : null;
 
 const VariantQueryPage: React.FC<{}> = () => {
     const [queryOptionsForm, updateQueryOptionsForm, resetQueryOptionsForm] =
