@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { NetworkStatus } from '@apollo/client';
 import { useAsyncDebounce } from 'react-table';
-import { useFetchAutocompleteQuery } from '../apollo/hooks';
-import { Background, Typography } from '.';
-import { AssemblyId } from '../types';
-import ComboBox from './ComboBox';
-import { SelectableListItem } from './SelectableList';
+import { useFetchAutocompleteQuery } from '../../apollo/hooks';
+import { Background, Typography } from '..';
+import { AssemblyId } from '../../types';
+import ComboBox from '../ComboBox';
+import { SelectableListItem } from '../SelectableList';
 interface HitPosition {
     chr: string;
     start: number;
