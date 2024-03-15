@@ -1,61 +1,67 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Input } from '..';
+import { Flex, Input } from '..';
 import ErrorText from '../ErrorText';
 import isCanonicalRegion from '../../utils/isCanonicalRegion';
+import styled from 'styled-components/macro';
 
+export const Wrapper = styled(Flex)`
+    position: relative
+    min-height: 38px;
+    flex-wrap: wrap;
+    flex-grow: 0;
+    position: relative;
+    width: 100%;
+`;
 interface GenePositionSearchProps {
     position: string;
     onChange: (position: string) => void;
     onError?: (errorText: string | undefined) => void;
-    validatePosition?: (position: string) => boolean;
 }
 
 const GenePositionSearch: React.FC<GenePositionSearchProps> = (props) => {
 
-    const [errorText, setErrorText] = useState<string | undefined>(undefined);
-
     // Update error text based on position format
     const validatePosition = (position: string) => {
+        position = position.replaceAll(",", "")
+        if (position === "") {
+            return (undefined);
+        }
         const chromStartEnd = position.split(":");
         if (chromStartEnd.length !== 2) {
-            setErrorText("Invalid format: expected 1 ':' separator between chromosome and start-end");
-            return;
+            return ("Invalid format: expected 1 ':' separator between chromosome and start-end");
         }
 
-        const [chrom, region] = position;
+        const [chrom, region] = chromStartEnd;
         const startEnd = region.split("-");
         if (startEnd.length !== 2) {
-            setErrorText("Invalid format: expected 1 '-' separator between start and end positions");
-            return;
+            return ("Invalid format: expected 1 '-' separator between start and end positions");
         }
         if (!isCanonicalRegion(chrom)) {
-            setErrorText("Invalid chromosome: expected '1'-'22', 'X' or 'Y'");
-            return;
+            return ("Invalid chromosome: expected '1'-'22', 'X' or 'Y'");
         }
 
-        const [start, end] = startEnd;
+        let [start, end] = startEnd.map(s => Number(s.replaceAll(",", "")));
         if (start > end) {
-            setErrorText("Invalid region: start position should be less than or equal to end position");
-            return;
+            return "Invalid region: start position should be less than or equal to end position";
         }
-
-        setErrorText("");
+        return undefined;
     }
 
     const handlePositionChange = (position: string) => {
-        validatePosition(position);
+        if (props.onError) props.onError(validatePosition(position));
         props.onChange(position);
     };
 
     return (
         <>
-            <Input 
-                variant="outlined"
-                onChange={e => handlePositionChange(e.currentTarget.value)}
-                value={props.position}
-                placeholder="eg. 1:10,000,000-20,000,000"
-            />
-            <ErrorText error={errorText} />
+            <Wrapper>
+                <Input
+                    variant="outlined"
+                    onChange={e => handlePositionChange(e.currentTarget.value)}
+                    value={props.position}
+                    placeholder="eg. 1:10,000,000-20,000,000"
+                />
+            </Wrapper>
         </>
     );
 };
