@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Flex, Input } from '..';
-import ErrorText from '../ErrorText';
 import isCanonicalRegion from '../../utils/isCanonicalRegion';
 import styled from 'styled-components/macro';
 
 export const Wrapper = styled(Flex)`
     position: relative
     min-height: 38px;
-    flex-wrap: wrap;
-    flex-grow: 0;
+    flex-wrap: nowrap;
+    flex-shrink: 1;
     position: relative;
     width: 100%;
 `;

@@ -4,23 +4,16 @@ import { AssemblyId } from '../../types';
 import { Flex } from '../Layout';
 import GeneNameSearch, { GeneSelectionValue } from './GeneNameSearch';
 import GenePositionSearch from './GenePositionSearch';
+import ComboBox from '../ComboBox';
 
 const Wrapper = styled(Flex)`
     position: relative
-    min-height: 38px;
+    min-height: 40px;
     flex-wrap: nowrap;
-    flex-grow: 0;
+    flex-grow: 1;
     position: relative;
     width: 100%;
 `;
-
-const Select = styled.select`
-
-`; // TODO: style this
-
-const Option = styled.option`
-
-`; // TODO: style this
 
 interface GeneCombinedSearchProps {
     assembly: AssemblyId;
@@ -39,15 +32,20 @@ interface GeneCombinedSearchProps {
  */
 const GeneCombinedSearch: React.FC<GeneCombinedSearchProps> = (props) => {
 
-    const [searchMode, setSearchMode] = useState("name");  // "name" or "pos"
-
+    const [searchMode, setSearchMode] = useState("Gene Name");
     return (
         <Wrapper>
-            <Select value={searchMode} onChange={e => setSearchMode(e.currentTarget.value)}>
-                <Option value="name">Gene Name</Option>
-                <Option value="pos">Region</Option>
-            </Select>
-            {searchMode === "name" && 
+            <ComboBox 
+            options={["Gene Name", "Region"].map((a, id) => ({
+                id,
+                label: a,
+                value: a,
+            }))}
+            onSelect={setSearchMode}
+            value={searchMode}
+            placeholder="Select"
+            />
+            {searchMode === "Gene Name" && 
                 <GeneNameSearch 
                 assembly={props.assembly}
                 geneName={props.geneName}
@@ -55,7 +53,7 @@ const GeneCombinedSearch: React.FC<GeneCombinedSearchProps> = (props) => {
                 onSelect={props.onNameSelect}
                 />
             }
-            {searchMode === "pos" &&
+            {searchMode === "Region" &&
                 <GenePositionSearch 
                 position={props.genePosition}
                 onChange={props.onPositionChange}
