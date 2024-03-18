@@ -83,7 +83,7 @@ const fetchPhenotipsVariants = async (
       } else {
         if (collectedResults.length === 0) {
           logger.warn(`Variant data does not exist at position ${JSON.stringify(position)}`);
-          logger.debug(JSON.stringify(variantQueryResponse));
+          logger.debug(JSON.stringify(variantQueryResponse.data));
           return [];
         } else {
           // it would be really weird if this happened. the error existed on one page but not the next?
