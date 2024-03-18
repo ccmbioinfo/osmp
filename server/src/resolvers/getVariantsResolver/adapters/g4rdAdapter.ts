@@ -71,7 +71,6 @@ const _getG4rdNodeQuery = async ({
 
     // Get patients info
     if (G4RDVariants && G4RDVariants.length > 0) {
-
       logger.debug(`G4RDVariants length: ${G4RDVariants.length}`);
       let individualIds = G4RDVariants.flatMap(v => v.individualIds).filter(Boolean); // Filter out undefined and null values.
 
@@ -127,9 +126,9 @@ const _getG4rdNodeQuery = async ({
         error: {
           code: 404,
           id: uuidv4(),
-          message: "No variants found matching your query.",
-        }
-      }
+          message: 'No variants found matching your query.',
+        },
+      };
     }
   } catch (e: any) {
     logger.error(e);
