@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/macro';
 import { AssemblyId } from '../../types';
+import ComboBox from '../ComboBox';
 import { Flex } from '../Layout';
 import GeneNameSearch, { GeneSelectionValue } from './GeneNameSearch';
 import GenePositionSearch from './GenePositionSearch';
-import ComboBox from '../ComboBox';
 
 const Wrapper = styled(Flex)`
     position: relative
@@ -14,6 +14,19 @@ const Wrapper = styled(Flex)`
     position: relative;
     width: 100%;
 `;
+
+interface DropdownProps {
+    options: {
+        id: number,
+        value: string;
+        label: string;
+    }[];
+
+}
+
+const Dropdown: React.FC<DropdownProps> = (props) => {
+    return <></>;
+};
 
 interface GeneCombinedSearchProps {
     assembly: AssemblyId;
