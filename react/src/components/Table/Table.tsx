@@ -62,7 +62,7 @@ export type FlattenedQueryResponse = Omit<IndividualResponseFields, 'info' | 'di
         'callsets' | 'info'
     > &
     CallsetInfoFields &
-    VariantResponseInfoFields & { source: string; diseases: string; geneName: string; };
+    VariantResponseInfoFields & { source: string; diseases: string; geneName: string };
 export interface ResultTableColumns extends FlattenedQueryResponse {
     maleCount: number;
     emptyCaseDetails: string;
