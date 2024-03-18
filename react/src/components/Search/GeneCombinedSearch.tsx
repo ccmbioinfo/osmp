@@ -66,8 +66,6 @@ const Dropdown: React.FC<DropdownProps> = props => {
 
     useClickAway(ref, () => setOpen(false), ignoreRef);
 
-    console.log(JSON.stringify(props));
-
     return (
         <DropdownWrapper ref={ignoreRef}>
             <DropdownHeader tabIndex={0} role="button" onClick={() => setOpen(true)}>
