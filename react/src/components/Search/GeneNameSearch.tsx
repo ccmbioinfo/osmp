@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { NetworkStatus } from '@apollo/client';
 import { useAsyncDebounce } from 'react-table';
-import { useFetchAutocompleteQuery } from '../../apollo/hooks';
 import { Background, Typography } from '..';
+import { useFetchAutocompleteQuery } from '../../apollo/hooks';
 import { AssemblyId } from '../../types';
+import isCanonicalRegion from '../../utils/isCanonicalRegion';
 import ComboBox from '../ComboBox';
 import { SelectableListItem } from '../SelectableList';
-import isCanonicalRegion from '../../utils/isCanonicalRegion';
 interface HitPosition {
     chr: string;
     start: number;
@@ -38,7 +38,12 @@ interface GeneNameSearchProps {
     onChange: (geneName: string) => void;
 }
 
-const GeneNameSearch: React.FC<GeneNameSearchProps> = ({ assembly, geneName, onChange, onSelect }) => {
+const GeneNameSearch: React.FC<GeneNameSearchProps> = ({
+    assembly,
+    geneName,
+    onChange,
+    onSelect,
+}) => {
     const [options, setOptions] = useState<SelectableListItem<GeneSelectionValue>[]>([]);
 
     const [

@@ -56,7 +56,7 @@ interface DropdownProps {
 /**
  * Dropdown component for selecting search type.
  */
-const Dropdown: React.FC<DropdownProps> = (props) => {
+const Dropdown: React.FC<DropdownProps> = props => {
     // ComboBox styling is too deep, so we need our own dropdown
 
     const [open, setOpen] = useState<Boolean>(false);
@@ -68,26 +68,30 @@ const Dropdown: React.FC<DropdownProps> = (props) => {
 
     console.log(JSON.stringify(props));
 
-    return <DropdownWrapper ref={ignoreRef}>
-        <DropdownHeader tabIndex={0} role="button" onClick={() => setOpen(true)}>
-            <DropdownHeaderText>{props.value}</DropdownHeaderText>
-            <FaCaretDown style={{
-                marginLeft: "8px"
-            }}/>
-        </DropdownHeader>
-        <SelectableListWrapper>
-            {open && (
-                <SelectableList 
-                ref={ref}
-                options={props.options}
-                onSelect={item => {
-                    props.onSelect(item as string);
-                    setOpen(false);
-                }}
+    return (
+        <DropdownWrapper ref={ignoreRef}>
+            <DropdownHeader tabIndex={0} role="button" onClick={() => setOpen(true)}>
+                <DropdownHeaderText>{props.value}</DropdownHeaderText>
+                <FaCaretDown
+                    style={{
+                        marginLeft: '8px',
+                    }}
                 />
-            )}
-        </SelectableListWrapper>
-    </DropdownWrapper>;
+            </DropdownHeader>
+            <SelectableListWrapper>
+                {open && (
+                    <SelectableList
+                        ref={ref}
+                        options={props.options}
+                        onSelect={item => {
+                            props.onSelect(item as string);
+                            setOpen(false);
+                        }}
+                    />
+                )}
+            </SelectableListWrapper>
+        </DropdownWrapper>
+    );
 };
 
 interface GeneCombinedSearchProps {
@@ -100,43 +104,42 @@ interface GeneCombinedSearchProps {
     onError?: (errorText: string | undefined) => void;
 }
 
-const OPTIONS = ["Gene Name", "Position"];
+const OPTIONS = ['Gene Name', 'Position'];
 
 /**
  * Combined search component for searching by gene name or by position.
  * Contains a dropdown integrated into the search bar where the user can
  * switch between search modes.
  */
-const GeneCombinedSearch: React.FC<GeneCombinedSearchProps> = (props) => {
-
+const GeneCombinedSearch: React.FC<GeneCombinedSearchProps> = props => {
     const [searchMode, setSearchMode] = useState<string>(OPTIONS[0]);
 
     return (
         <SearchWrapper>
-            <Dropdown 
-            options={OPTIONS.map((a, id) => ({
-                id,
-                value: a,
-                label: a,
-            }))}
-            onSelect={(option) => setSearchMode(option)}
-            value={searchMode}
+            <Dropdown
+                options={OPTIONS.map((a, id) => ({
+                    id,
+                    value: a,
+                    label: a,
+                }))}
+                onSelect={option => setSearchMode(option)}
+                value={searchMode}
             />
-            {searchMode === "Gene Name" && 
-                <GeneNameSearch 
-                assembly={props.assembly}
-                geneName={props.geneName}
-                onChange={props.onNameChange}
-                onSelect={props.onNameSelect}
+            {searchMode === 'Gene Name' && (
+                <GeneNameSearch
+                    assembly={props.assembly}
+                    geneName={props.geneName}
+                    onChange={props.onNameChange}
+                    onSelect={props.onNameSelect}
                 />
-            }
-            {searchMode === "Position" &&
-                <GenePositionSearch 
-                position={props.genePosition}
-                onChange={props.onPositionChange}
-                onError={props.onError}
+            )}
+            {searchMode === 'Position' && (
+                <GenePositionSearch
+                    position={props.genePosition}
+                    onChange={props.onPositionChange}
+                    onError={props.onError}
                 />
-            }
+            )}
         </SearchWrapper>
     );
 };
