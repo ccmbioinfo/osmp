@@ -286,6 +286,7 @@ export const transformG4RDQueryResponse: ResultTransformer<PTVariantArray> = tim
           ref: r.variant.ref,
           start: r.variant.start,
           chromosome: r.variant.chromosome,
+          info: r.variant.info,
         };
 
         const familyId: string = familyIds[individualId];
