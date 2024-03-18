@@ -190,7 +190,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                     <Flex alignItems="flex-start" style={{ flexGrow: 1 }}>
                         <Column
                             style={{
-                                width: '25%',
+                                width: '20%',
                                 minWidth: 150,
                             }}
                         >
@@ -216,7 +216,7 @@ const VariantQueryPage: React.FC<{}> = () => {
                             alignItems="flex-start"
                             style={{
                                 flexGrow: 1,
-                                minWidth: 200,
+                                minWidth: 240,
                             }}
                         >
                             <Typography variant="subtitle" bold>
