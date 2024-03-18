@@ -283,6 +283,7 @@ export const transformCMHQueryResponse: ResultTransformer<G4RDVariantQueryResult
         ref: r.variant.ref,
         start: r.variant.start,
         chromosome: r.variant.chromosome,
+        info: r.variant.info,
       };
 
       let familyId: string = '';
